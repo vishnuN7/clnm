@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employees — CLN Admin</title>
+  <meta name="theme-color" content="#a855f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">CLN</div>
+        <div><h2>CLN System</h2><span>Admin Panel</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/admin/dashboard.html?fresh=20260516d" class="nav-item"><span class="nav-icon">DB</span> Dashboard</a>
+        <a href="/admin/employees.html" class="nav-item active"><span class="nav-icon">EM</span> Employees</a>
+        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon">CU</span> Customers</a>
+        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon">LN</span> Loan Applications</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="user-details"><p id="sidebar-user-name">Admin</p><span id="sidebar-user-role">admin</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+  <main class="main-content">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
+      <div class="topbar-title"><h2>Employees</h2><p>Manage system users</p></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add Employee</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div id="page-alert" class="alert"></div>
+
+      <!-- Search -->
+      <div class="filters-bar">
+        <div class="search-box" style="flex:1;">
+          <span class="search-icon">Search</span>
+          <input type="text" id="search-input" class="form-control" placeholder="Search by name or email..." oninput="renderTable()" style="width:100%;" />
+        </div>
+        <select id="status-filter" onchange="renderTable()">
+          <option value="">All Status</option>
+          <option value="1">Active</option>
+          <option value="0">Inactive</option>
+        </select>
+      </div>
+
+      <div class="card full-table">
+        <div class="card-header">
+          <h3>Employee List</h3>
+          <span id="count-badge" class="badge badge-employee">0 employees</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Password</th><th>Phone</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="employees-tbody"><tr><td colspan="8" class="text-center text-muted">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Add Employee Modal -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add New Employee</h3>
+      <button class="modal-close" onclick="closeAddModal()">Close</button>
+    </div>
+    <div id="modal-alert" class="alert"></div>
+    <div class="form-group"><label>Full Name</label><input type="text" id="emp-name" class="form-control" placeholder="John Doe" /></div>
+    <div class="form-group"><label>Email Address</label><input type="email" id="emp-email" class="form-control" placeholder="john@example.com" /></div>
+    <div class="form-group"><label>Phone Number</label><input type="tel" id="emp-phone" class="form-control" placeholder="9876543210" /></div>
+    <div class="form-group"><label>Password</label><input type="password" id="emp-password" class="form-control" placeholder="Min. 8 characters" /></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addEmployee()" id="add-btn">Add Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal-overlay" id="password-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Reset Employee Password</h3>
+      <button class="modal-close" onclick="closePasswordModal()">Close</button>
+    </div>
+    <div id="password-modal-alert" class="alert"></div>
+    <div class="form-group">
+      <label>Employee</label>
+      <input type="text" id="password-employee-name" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+      <label>New Password</label>
+      <input type="password" id="new-password" class="form-control" placeholder="Enter new password" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closePasswordModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEmployeePassword()" id="password-btn">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/api.js?v=20260516c"></script>
+<script>
+  let allEmployees = [];
+  let passwordEmployeeId = null;
+  const user = requireRole('admin');
+  if (user) { renderSidebarUser(); loadEmployees(); }
+
+  async function loadEmployees() {
+    const res = await api.get('/admin/employees');
+    if (!res?.ok) return;
+    allEmployees = res.data.data;
+    renderTable();
+  }
+
+  function renderTable() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    const statusFilter = document.getElementById('status-filter').value;
+    let list = allEmployees.filter(e => {
+      const matchQ = !q || e.name.toLowerCase().includes(q) || e.email.toLowerCase().includes(q);
+      const matchS = statusFilter === '' || String(e.is_active) === statusFilter;
+      return matchQ && matchS;
+    });
+    document.getElementById('count-badge').textContent = `${list.length} employees`;
+    const tbody = document.getElementById('employees-tbody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No employees found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map((e, i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td>${e.name}</td>
+        <td>${e.email}</td>
+        <td>${e.password ? '********' : '—'}</td>
+        <td>${e.phone || '—'}</td>
+        <td><span class="badge ${e.is_active ? 'badge-active' : 'badge-inactive'}">${e.is_active ? 'Active' : 'Inactive'}</span></td>
+        <td>${formatDate(e.created_at)}</td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="openPasswordModal(${e.id}, '${escapeHtml(e.name)}')">Reset Password</button>
+          ${e.is_active
+            ? `<button class="btn btn-danger btn-sm" onclick="toggleEmployee(${e.id}, 0)">Deactivate</button>`
+            : `<button class="btn btn-success btn-sm" onclick="toggleEmployee(${e.id}, 1)">Activate</button>`}
+        </td>
+      </tr>`).join('');
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  async function toggleEmployee(id, activate) {
+    const endpoint = activate ? `/admin/employees/${id}/activate` : `/admin/employees/${id}/deactivate`;
+    const res = await api.patch(endpoint);
+    if (res?.ok) { showAlert('page-alert', res.data.message, 'success'); loadEmployees(); }
+    else showAlert('page-alert', res?.data?.message || 'Error', 'error');
+  }
+
+  function openAddModal() { document.getElementById('add-modal').classList.add('show'); }
+  function closeAddModal() { document.getElementById('add-modal').classList.remove('show'); }
+
+  function openPasswordModal(id, name) {
+    passwordEmployeeId = id;
+    document.getElementById('password-employee-name').value = name;
+    document.getElementById('new-password').value = '';
+    showAlert('password-modal-alert', '', 'success');
+    document.getElementById('password-modal').classList.add('show');
+  }
+
+  function closePasswordModal() {
+    passwordEmployeeId = null;
+    document.getElementById('password-modal').classList.remove('show');
+    showAlert('password-modal-alert', '', 'success');
+  }
+
+  async function saveEmployeePassword() {
+    const password = document.getElementById('new-password').value;
+    if (!password || password.trim().length < 8) {
+      return showAlert('password-modal-alert', 'Password must be at least 8 characters long.', 'error');
+    }
+
+    const btn = document.getElementById('password-btn');
+    btn.disabled = true;
+    btn.textContent = 'Updating...';
+
+    const res = await api.post(`/admin/employees/${passwordEmployeeId}/password`, { password });
+
+    btn.disabled = false;
+    btn.textContent = 'Update Password';
+
+    if (res?.ok) {
+      closePasswordModal();
+      showAlert('page-alert', res.data.message, 'success');
+    } else {
+      showAlert('password-modal-alert', res?.data?.message || 'Failed to update password.', 'error');
+    }
+  }
+
+  async function addEmployee() {
+    const name = document.getElementById('emp-name').value.trim();
+    const email = document.getElementById('emp-email').value.trim();
+    const phone = document.getElementById('emp-phone').value.trim();
+    const password = document.getElementById('emp-password').value;
+    if (!name || !email || !password) return showAlert('modal-alert', 'Name, email and password are required.', 'error');
+    const btn = document.getElementById('add-btn');
+    btn.disabled = true; btn.textContent = 'Adding...';
+    const res = await api.post('/admin/employees', { name, email, phone, password });
+    btn.disabled = false; btn.textContent = 'Add Employee';
+    if (res?.ok) {
+      closeAddModal();
+      showAlert('page-alert', 'Employee added successfully!', 'success');
+      ['emp-name','emp-email','emp-phone','emp-password'].forEach(id => document.getElementById(id).value = '');
+      loadEmployees();
+    } else showAlert('modal-alert', res?.data?.message || 'Failed to add employee.', 'error');
+  }
+</script>
+</body>
+</html>

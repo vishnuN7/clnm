@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — CLN</title>
+  <meta name="theme-color" content="#a855f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <script>
+    (function ensureFreshDashboard() {
+      const version = '20260516d';
+      const url = new URL(window.location.href);
+      const current = url.searchParams.get('fresh');
+      if (current === version) return;
+      url.searchParams.set('fresh', version);
+      window.location.replace(url.toString());
+    })();
+  </script>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">CLN</div>
+        <div><h2>CLN System</h2><span>Admin Panel</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/admin/dashboard.html" class="nav-item active"><span class="nav-icon">DB</span> Dashboard</a>
+        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon">EM</span> Employees</a>
+        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon">CU</span> Customers</a>
+        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon">LN</span> Loan Applications</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="user-details"><p id="sidebar-user-name">Admin</p><span id="sidebar-user-role">admin</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
+      <div class="topbar-title"><h2>Dashboard</h2><p>Overview of all loan activities</p></div>
+      <div class="topbar-actions">
+        <span id="current-date" style="font-size:13px;color:var(--text-secondary);"></span>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Stats -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card" role="button" tabindex="0" onclick="toggleEmployeesInsights()" onkeydown="if(event.key==='Enter' || event.key===' ') toggleEmployeesInsights()" style="cursor:pointer;">
+          <div class="stat-icon">E</div>
+          <div class="stat-value" id="stat-employees">—</div>
+          <div class="stat-label">Employees</div>
+        </div>
+      </div>
+
+      <div id="employees-insights" class="card" style="display:none;margin-bottom:28px;">
+        <div class="card-header">
+          <h3>Employees Overview</h3>
+          <button class="btn btn-secondary btn-sm" onclick="toggleEmployeesInsights()">Close</button>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start;">
+            <div class="card" style="margin:0;">
+              <div class="card-header"><h3 style="font-size:14px;">Employee Names</h3></div>
+              <div id="employee-list" style="max-height:420px;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:8px;"></div>
+            </div>
+            <div class="card" style="margin:0;">
+              <div class="card-header">
+                <h3 id="employee-detail-title" style="font-size:14px;">Select an employee</h3>
+                <button class="btn btn-secondary btn-sm" onclick="refreshEmployeeDetails()">Refresh</button>
+              </div>
+              <div class="card-body" id="employee-detail-body">
+                <p style="color:var(--text-secondary);font-size:13px;">Click an employee name to see their work details, recent loan activity, and customers added.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts + Recent -->
+      <div class="content-grid">
+        <div class="card">
+          <div class="card-header"><h3>Monthly Loan Trend</h3></div>
+          <div class="card-body"><div class="chart-container"><canvas id="chart-trend"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Loan Status Breakdown</h3></div>
+          <div class="card-body"><div class="chart-container"><canvas id="chart-status"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- Recent Loans -->
+      <div class="card full-table">
+        <div class="card-header">
+          <h3>Recent Loan Applications</h3>
+          <a href="/admin/loans.html" class="btn btn-secondary btn-sm">View All →</a>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Applied By</th><th>Date</th></tr></thead>
+            <tbody id="recent-loans-tbody"><tr><td colspan="6" class="text-center text-muted">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Customer Detail Modal (reused on dashboard) -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <h3 id="detail-title">Customer Details</h3>
+      <button class="modal-close" onclick="closeDetail()">Close</button>
+    </div>
+    <div id="detail-body" style="font-size:14px;"></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeDetail()">Close</button></div>
+  </div>
+</div>
+
+<script src="/js/api.js?v=20260516c"></script>
+<script>
+  const user = requireRole('admin');
+  if (user) {
+    renderSidebarUser();
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+    loadDashboard();
+  }
+
+  async function viewCustomerDetail(id) {
+    if (!id) return;
+    const res = await api.get(`/admin/customers/${id}`);
+    if (!res?.ok) return;
+    const { customer, documents, loans } = res.data.data;
+    document.getElementById('detail-title').textContent = `Customer: ${customer.name}`;
+    function resolveFileUrl(path) {
+      if (!path) return '#';
+      if (path.startsWith('http://') || path.startsWith('https://')) return path;
+      const uploadsBase = (typeof api !== 'undefined' && api.uploadsBase) ? api.uploadsBase : (window.api && window.api.uploadsBase) ? window.api.uploadsBase : null;
+      return uploadsBase ? uploadsBase + path : path;
+    }
+
+    document.getElementById('detail-body').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+        <div><span style="color:var(--text-muted);font-size:12px;">Phone</span><p style="font-weight:600;">${customer.phone}</p></div>
+        <div><span style="color:var(--text-muted);font-size:12px;">Area</span><p style="font-weight:600;">${customer.area}</p></div>
+        <div style="grid-column:span 2"><span style="color:var(--text-muted);font-size:12px;">Address</span><p>${customer.address}</p></div>
+      </div>
+      <h4 style="margin-bottom:12px;font-size:14px;">Documents (${documents.length})</h4>
+      <div style="margin-bottom:20px;">
+        ${documents.length ? documents.map(d => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;">
+            <span>${d.doc_type} — ${d.file_name}</span>
+            <a href="${resolveFileUrl(d.file_path)}" target="_blank" class="btn btn-secondary btn-sm">View</a>
+          </div>`).join('') : '<p style="color:var(--text-muted);">No documents uploaded.</p>'}
+      </div>
+      <h4 style="margin-bottom:12px;font-size:14px;">Loans (${loans.length})</h4>
+      ${loans.length ? loans.map(l => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;">
+          <span>${formatCurrency(l.amount)} — ${l.purpose || 'General'}</span>
+          ${statusBadge(l.status)}
+        </div>`).join('') : '<p style="color:var(--text-muted);">No loans.</p>'}
+    `;
+    document.getElementById('detail-modal').classList.add('show');
+  }
+
+  function closeDetail() { document.getElementById('detail-modal').classList.remove('show'); }
+
+  function toggleEmployeesInsights() {
+    const panel = document.getElementById('employees-insights');
+    const shouldShow = panel.style.display === 'none' || !panel.style.display;
+    panel.style.display = shouldShow ? 'block' : 'none';
+    if (shouldShow) {
+      loadEmployeesOverviewData();
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  let dashboardLoans = [];
+  let dashboardCustomers = [];
+  let dashboardEmployees = [];
+  let selectedEmployeeId = null;
+  let selectedEmployeeView = null;
+
+  function refreshEmployeeDetails() {
+    if (!selectedEmployeeId) {
+      loadEmployeesOverviewData(true);
+      return;
+    }
+    renderEmployeeDetails(selectedEmployeeId, true);
+  }
+
+  function normalizeEmployeeName(name) {
+    return String(name || '').trim().toLowerCase();
+  }
+
+  function buildEmployeeMetrics(employee) {
+    const employeeName = normalizeEmployeeName(employee.name);
+    const employeeLoans = dashboardLoans.filter(l => normalizeEmployeeName(l.applied_by_name) === employeeName);
+    const employeeCustomers = dashboardCustomers.filter(c => normalizeEmployeeName(c.added_by_name) === employeeName);
+
+    const statusCounts = employeeLoans.reduce((acc, loan) => {
+      acc[loan.status] = (acc[loan.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    const totalLoanAmount = employeeLoans.reduce((sum, loan) => sum + Number(loan.amount || 0), 0);
+
+    return {
+      employeeLoans,
+      employeeCustomers,
+      totalLoanAmount,
+      totalLoans: employeeLoans.length,
+      pending: statusCounts.Pending || 0,
+      approved: statusCounts.Approved || 0,
+      rejected: statusCounts.Rejected || 0
+    };
+  }
+
+  function renderEmployeeList() {
+    const listEl = document.getElementById('employee-list');
+    if (!dashboardEmployees.length) {
+      listEl.innerHTML = '<p style="padding:12px;color:var(--text-secondary);font-size:13px;">No employees found.</p>';
+      return;
+    }
+
+    listEl.innerHTML = dashboardEmployees.map(emp => {
+      const metrics = buildEmployeeMetrics(emp);
+      return `
+        <button type="button" class="btn btn-secondary" onclick="selectEmployee(${emp.id})" style="justify-content:space-between;width:100%;text-align:left;padding:12px 14px;display:flex;align-items:center;gap:12px;${selectedEmployeeId === emp.id ? 'border-color: var(--accent); background: rgba(59,130,246,0.12);' : ''}">
+          <span>
+            <strong style="display:block;font-size:14px;">${emp.name}</strong>
+            <small style="color:var(--text-muted);">${emp.email}</small>
+          </span>
+          <span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${metrics.totalLoans} loans</span>
+        </button>`;
+    }).join('');
+  }
+
+  function selectEmployee(id) {
+    selectedEmployeeId = id;
+    selectedEmployeeView = null;
+    renderEmployeeList();
+    renderEmployeeDetails(id);
+  }
+
+  async function loadEmployeesOverviewData(forceReload = false) {
+    if (forceReload) {
+      dashboardEmployees = [];
+      dashboardCustomers = [];
+      dashboardLoans = [];
+      selectedEmployeeId = null;
+      selectedEmployeeView = null;
+    }
+
+    if (!dashboardEmployees.length) {
+      const [empRes, custRes, loanRes] = await Promise.all([
+        api.get('/admin/employees'),
+        api.get('/admin/customers'),
+        api.get('/admin/loans')
+      ]);
+      if (!empRes?.ok || !custRes?.ok || !loanRes?.ok) return;
+      dashboardEmployees = empRes.data.data;
+      dashboardCustomers = custRes.data.data;
+      dashboardLoans = loanRes.data.data;
+    }
+
+    renderEmployeeList();
+
+    const detailTitle = document.getElementById('employee-detail-title');
+    const detailBody = document.getElementById('employee-detail-body');
+    if (detailTitle) detailTitle.textContent = 'Select an employee';
+    if (detailBody) {
+      detailBody.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">Click an employee name to see their work details.</p>';
+    }
+  }
+
+  async function renderEmployeeDetails(id, forceReload = false) {
+    if (forceReload) {
+      dashboardCustomers = [];
+      dashboardLoans = [];
+    }
+
+    if (!dashboardEmployees.length || (!dashboardCustomers.length && !dashboardLoans.length)) {
+      const [empRes, custRes, loanRes] = await Promise.all([
+        api.get('/admin/employees'),
+        api.get('/admin/customers'),
+        api.get('/admin/loans')
+      ]);
+      if (!empRes?.ok || !custRes?.ok || !loanRes?.ok) return;
+      dashboardEmployees = empRes.data.data;
+      dashboardCustomers = custRes.data.data;
+      dashboardLoans = loanRes.data.data;
+    }
+
+    const employee = dashboardEmployees.find(emp => emp.id === id);
+    if (!employee) return;
+
+    selectedEmployeeId = id;
+    const metrics = buildEmployeeMetrics(employee);
+    const detailTitle = document.getElementById('employee-detail-title');
+    const detailBody = document.getElementById('employee-detail-body');
+
+    detailTitle.textContent = employee.name;
+    detailBody.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px;">
+        <div><span style="color:var(--text-muted);font-size:12px;">Email</span><p style="font-weight:600;">${employee.email}</p></div>
+        <div><span style="color:var(--text-muted);font-size:12px;">Phone</span><p style="font-weight:600;">${employee.phone || '—'}</p></div>
+        <div><span style="color:var(--text-muted);font-size:12px;">Status</span><p style="font-weight:600;">${employee.is_active ? 'Active' : 'Inactive'}</p></div>
+        <div><span style="color:var(--text-muted);font-size:12px;">Joined</span><p style="font-weight:600;">${formatDate(employee.created_at)}</p></div>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px;">
+        <div class="stat-card" role="button" tabindex="0" onclick="showEmployeeView('loans')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('loans')" style="cursor:pointer;"><div class="stat-icon">L</div><div class="stat-value">${metrics.totalLoans}</div><div class="stat-label">Loans Applied</div></div>
+        <div class="stat-card" role="button" tabindex="0" onclick="showEmployeeView('pending')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('pending')" style="cursor:pointer;"><div class="stat-icon">⏳</div><div class="stat-value">${metrics.pending}</div><div class="stat-label">Pending</div></div>
+        <div class="stat-card" role="button" tabindex="0" onclick="showEmployeeView('approved')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('approved')" style="cursor:pointer;"><div class="stat-icon">A</div><div class="stat-value">${metrics.approved}</div><div class="stat-label">Approved</div></div>
+        <div class="stat-card" role="button" tabindex="0" onclick="showEmployeeView('customers')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('customers')" style="cursor:pointer;"><div class="stat-icon">C</div><div class="stat-value">${metrics.employeeCustomers.length}</div><div class="stat-label">Customers Added</div></div>
+      </div>
+      <div id="employee-view-message" style="padding:14px 16px;border:1px dashed var(--border);border-radius:12px;color:var(--text-secondary);font-size:13px;">
+        Click one of the buttons above to see this employee's loan or customer details.
+      </div>
+      <div id="employee-view-output" style="display:none;margin-top:18px;"></div>
+    `;
+
+    selectedEmployeeView = null;
+  }
+
+  function showEmployeeView(view) {
+    if (!selectedEmployeeId) return;
+    selectedEmployeeView = view;
+    const employee = dashboardEmployees.find(emp => emp.id === selectedEmployeeId);
+    if (!employee) return;
+
+    const metrics = buildEmployeeMetrics(employee);
+    const messageEl = document.getElementById('employee-view-message');
+    const outputEl = document.getElementById('employee-view-output');
+
+    messageEl.style.display = 'none';
+    outputEl.style.display = 'block';
+
+    if (view === 'customers') {
+      outputEl.innerHTML = `
+        <div style="margin-bottom:18px;">
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">Customers Added by ${employee.name}</p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Area</th><th>Date</th></tr></thead>
+              <tbody>
+                ${metrics.employeeCustomers.length ? metrics.employeeCustomers.map((customer, index) => `
+                  <tr>
+                    <td>${index + 1}</td>
+                    <td>${customer.name}</td>
+                    <td>${customer.phone}</td>
+                    <td>${customer.area}</td>
+                    <td>${formatDate(customer.created_at)}</td>
+                  </tr>`).join('') : '<tr><td colspan="5" class="text-center text-muted">No customers added yet.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+      return;
+    }
+
+    const statusFilter = view === 'loans' ? null : view === 'pending' ? 'Pending' : view === 'approved' ? 'Approved' : view === 'rejected' ? 'Rejected' : null;
+    const filteredLoans = statusFilter ? metrics.employeeLoans.filter(loan => loan.status === statusFilter) : metrics.employeeLoans;
+    const titleMap = {
+      loans: 'All Loans Applied',
+      pending: 'Pending Loans',
+      approved: 'Approved Loans',
+      rejected: 'Rejected Loans'
+    };
+
+    const totalLoanAmount = filteredLoans.reduce((sum, loan) => sum + Number(loan.amount || 0), 0);
+
+    outputEl.innerHTML = `
+      <div style="margin-bottom:18px;">
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;">${titleMap[view] || 'Loans'}</p>
+        <p style="font-size:22px;font-weight:800;">${filteredLoans.length}</p>
+        <p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Total loan amount handled: ${formatCurrency(totalLoanAmount)}</p>
+      </div>
+      <div style="margin-bottom:18px;">
+        <h4 style="font-size:14px;margin-bottom:10px;">Recent Loans</h4>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>#</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody>
+              ${filteredLoans.length ? filteredLoans.slice(0, 5).map((loan, index) => `
+                <tr onclick="viewCustomerDetail(${loan.customer_id})" style="cursor:pointer">
+                  <td>${index + 1}</td>
+                  <td>${loan.customer_name}</td>
+                  <td>${formatCurrency(loan.amount)}</td>
+                  <td>${statusBadge(loan.status)}</td>
+                  <td>${formatDate(loan.created_at)}</td>
+                </tr>`).join('') : '<tr><td colspan="5" class="text-center text-muted">No loan activity yet.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  }
+
+  async function loadDashboard() {
+    const res = await api.get('/admin/dashboard');
+    if (!res?.ok) return;
+    const { totalCustomers, totalEmployees, loans } = res.data.data;
+
+    const statusMap = {};
+    loans.statusBreakdown.forEach(s => statusMap[s.status] = parseInt(s.count));
+
+    document.getElementById('stat-employees').textContent = totalEmployees;
+
+    await loadEmployeesOverviewData();
+
+    // Recent loans table
+    const tbody = document.getElementById('recent-loans-tbody');
+    if (!loans.recentLoans.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No loans yet.</td></tr>';
+    } else {
+      tbody.innerHTML = loans.recentLoans.map(l => `
+        <tr onclick="viewCustomerDetail(${l.customer_id})" style="cursor:pointer">
+          <td>#${l.id}</td>
+          <td>${l.customer_name}</td>
+          <td>${formatCurrency(l.amount)}</td>
+          <td>${statusBadge(l.status)}</td>
+          <td>${l.applied_by_name}</td>
+          <td>${formatDate(l.created_at)}</td>
+        </tr>`).join('');
+    }
+
+    // Charts
+    const months = loans.monthlyTrend.map(m => m.month);
+    const counts = loans.monthlyTrend.map(m => m.count);
+
+    const chartDefaults = { color: '#94a3b8', borderColor: 'rgba(255,255,255,0.05)' };
+    Chart.defaults.color = chartDefaults.color;
+    Chart.defaults.borderColor = chartDefaults.borderColor;
+
+    new Chart(document.getElementById('chart-trend'), {
+      type: 'bar',
+      data: {
+        labels: months,
+        datasets: [{
+          label: 'Loans',
+          data: counts,
+          backgroundColor: 'rgba(59,130,246,0.6)',
+          borderColor: '#3b82f6',
+          borderWidth: 1, borderRadius: 6
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+
+    new Chart(document.getElementById('chart-status'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Pending', 'Approved', 'Rejected'],
+        datasets: [{
+          data: [statusMap['Pending']||0, statusMap['Approved']||0, statusMap['Rejected']||0],
+          backgroundColor: ['rgba(245,158,11,0.8)', 'rgba(16,185,129,0.8)', 'rgba(239,68,68,0.8)'],
+          borderWidth: 0
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '65%' }
+    });
+  }
+</script>
+</body>
+</html>

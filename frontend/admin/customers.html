@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customers — CLN Admin</title>
+  <meta name="theme-color" content="#a855f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">CLN</div>
+        <div><h2>CLN System</h2><span>Admin Panel</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/admin/dashboard.html?fresh=20260516d" class="nav-item"><span class="nav-icon">DB</span> Dashboard</a>
+        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon">EM</span> Employees</a>
+        <a href="/admin/customers.html" class="nav-item active"><span class="nav-icon">CU</span> Customers</a>
+        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon">LN</span> Loan Applications</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="user-details"><p id="sidebar-user-name">Admin</p><span id="sidebar-user-role">admin</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+  <main class="main-content">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
+      <div class="topbar-title"><h2>Customers</h2><p>All registered customers</p></div>
+    </div>
+
+    <div class="page-content">
+      <div class="filters-bar">
+        <div class="search-box" style="flex:1;">
+          <span class="search-icon">Search</span>
+          <input type="text" id="search-input" class="form-control" placeholder="Search by name or phone..." oninput="loadCustomers()" style="width:100%;" />
+        </div>
+        <div class="area-filter-container" style="position: relative; max-width: 150px;">
+          <input type="text" id="area-search-input" class="form-control" placeholder="Search areas..." oninput="filterAreaOptions()" />
+          <div id="area-dropdown" class="area-dropdown" style="position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: var(--bg-secondary); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 0 0 8px 8px; max-height: 250px; overflow-y: auto; display: none; z-index: 1000; box-shadow: 0 8px 16px rgba(0,0,0,0.2); min-width: 140px;">
+            <div class="area-option" data-value="" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(168, 85, 247, 0.15); font-weight: 500; font-size: 13px; color: var(--text-primary); transition: background 0.2s;">All Areas</div>
+          </div>
+          <input type="hidden" id="area-filter" value="" />
+        </div>
+      </div>
+
+      <div class="card full-table">
+        <div class="card-header">
+          <h3>Customer List</h3>
+          <span id="count-badge" class="badge badge-employee">— customers</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Area</th><th>Address</th><th>Added By</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="customers-tbody"><tr><td colspan="8" class="text-center text-muted">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Customer Detail Modal -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <h3 id="detail-title">Customer Details</h3>
+      <button class="modal-close" onclick="closeDetail()">Close</button>
+    </div>
+    <div id="detail-body" style="font-size:14px;"></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeDetail()">Close</button></div>
+  </div>
+</div>
+
+<script src="/js/api.js?v=20260516c"></script>
+<script>
+  const user = requireRole('admin');
+  if (user) { 
+    renderSidebarUser(); 
+    loadAreas(); 
+    loadCustomers();
+    
+    // Setup area search dropdown behavior
+    const areaSearchInput = document.getElementById('area-search-input');
+    const areaDropdown = document.getElementById('area-dropdown');
+    
+    areaSearchInput.addEventListener('focus', () => {
+      areaDropdown.style.display = 'block';
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.area-filter-container')) {
+        areaDropdown.style.display = 'none';
+      }
+    });
+  }
+
+  async function loadAreas() {
+    try {
+      const res = await api.get('/admin/areas');
+      const dropdown = document.getElementById('area-dropdown');
+      let html = '<div class="area-option" data-value="" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(168, 85, 247, 0.1); font-weight: 500; font-size: 13px; color: var(--text-primary); transition: background 0.2s; display: block;">All Areas</div>';
+      if (!res?.ok) {
+        console.warn('Failed to load areas', res?.data?.message || res);
+        dropdown.innerHTML = html;
+        attachAreaOptionListeners();
+        return;
+      }
+      if (res.data.data && Array.isArray(res.data.data)) {
+        res.data.data.forEach(a => {
+          html += `<div class="area-option" data-value="${a}" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(168, 85, 247, 0.1); font-size: 13px; color: var(--text-primary); transition: background 0.2s; display: block;">${a}</div>`;
+        });
+      }
+      dropdown.innerHTML = html;
+      attachAreaOptionListeners();
+    } catch (err) {
+      console.error('Error loading areas', err);
+    }
+  }
+
+  function attachAreaOptionListeners() {
+    document.querySelectorAll('.area-option').forEach(option => {
+      option.addEventListener('mouseover', () => {
+        option.style.background = 'rgba(168, 85, 247, 0.1)';
+      });
+      option.addEventListener('mouseout', () => {
+        option.style.background = 'transparent';
+      });
+      option.addEventListener('click', function() {
+        const value = this.getAttribute('data-value');
+        document.getElementById('area-filter').value = value;
+        document.getElementById('area-search-input').value = value || '';
+        document.getElementById('area-dropdown').style.display = 'none';
+        loadCustomers();
+      });
+    });
+  }
+
+  function filterAreaOptions() {
+    const searchValue = document.getElementById('area-search-input').value.toLowerCase();
+    const options = document.querySelectorAll('.area-option');
+    options.forEach(option => {
+      const optionText = option.getAttribute('data-value').toLowerCase();
+      if (searchValue === '') {
+        option.style.display = option.getAttribute('data-value') === '' ? 'block' : 'block';
+      } else {
+        if (option.getAttribute('data-value') === '') {
+          option.style.display = 'none';
+        } else {
+          option.style.display = optionText.includes(searchValue) ? 'block' : 'none';
+        }
+      }
+    });
+  }
+
+  async function loadCustomers() {
+    const search = document.getElementById('search-input').value;
+    const area = document.getElementById('area-filter').value;
+    const qs = buildQueryString({ search, area });
+    const tbody = document.getElementById('customers-tbody');
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>';
+    try {
+      const res = await api.get(`/admin/customers${qs}`);
+      if (!res) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Network error. Is the server running?</td></tr>';
+        document.getElementById('count-badge').textContent = `— customers`;
+        return;
+      }
+      if (!res.ok) {
+        const msg = res.data?.message || 'Failed to load customers.';
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">${msg}</td></tr>`;
+        document.getElementById('count-badge').textContent = `— customers`;
+        return;
+      }
+      const list = res.data.data;
+      document.getElementById('count-badge').textContent = `${list.length} customers`;
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No customers found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map((c, i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td>${c.name}</td>
+        <td>${c.phone}</td>
+        <td><span class="badge badge-employee">${c.area}</span></td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.address}">${c.address}</td>
+        <td>${c.added_by_name}</td>
+        <td>${formatDate(c.created_at)}</td>
+        <td><button class="btn btn-secondary btn-sm" onclick="viewDetail(${c.id})">View</button></td>
+      </tr>`).join('');
+    } catch (err) {
+      console.error('Error loading customers', err);
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Error loading customers.</td></tr>';
+      document.getElementById('count-badge').textContent = `— customers`;
+    }
+  }
+
+  async function viewDetail(id) {
+    const res = await api.get(`/admin/customers/${id}`);
+    if (!res?.ok) return;
+    const { customer, documents, loans } = res.data.data;
+    document.getElementById('detail-title').textContent = `Customer: ${customer.name}`;
+    function resolveFileUrl(path) {
+      if (!path) return '#';
+      if (path.startsWith('http://') || path.startsWith('https://')) return path;
+      const uploadsBase = (typeof api !== 'undefined' && api.uploadsBase) ? api.uploadsBase : (window.api && window.api.uploadsBase) ? window.api.uploadsBase : null;
+      return uploadsBase ? uploadsBase + path : path;
+    }
+
+    document.getElementById('detail-body').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+        <div><span style="color:var(--text-muted);font-size:12px;">Phone</span><p style="font-weight:600;">${customer.phone}</p></div>
+        <div><span style="color:var(--text-muted);font-size:12px;">Area</span><p style="font-weight:600;">${customer.area}</p></div>
+        <div style="grid-column:span 2"><span style="color:var(--text-muted);font-size:12px;">Address</span><p>${customer.address}</p></div>
+      </div>
+      <h4 style="margin-bottom:12px;font-size:14px;">Documents (${documents.length})</h4>
+      <div style="margin-bottom:20px;">
+        ${documents.length ? documents.map(d => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;">
+            <span>${d.doc_type} — ${d.file_name}</span>
+            <a href="${resolveFileUrl(d.file_path)}" target="_blank" class="btn btn-secondary btn-sm">View</a>
+          </div>`).join('') : '<p style="color:var(--text-muted);">No documents uploaded.</p>'}
+      </div>
+      <h4 style="margin-bottom:12px;font-size:14px;">Loans (${loans.length})</h4>
+      ${loans.length ? loans.map(l => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;">
+          <span>${formatCurrency(l.amount)} — ${l.purpose || 'General'}</span>
+          ${statusBadge(l.status)}
+        </div>`).join('') : '<p style="color:var(--text-muted);">No loans.</p>'}
+    `;
+    document.getElementById('detail-modal').classList.add('show');
+  }
+
+  function closeDetail() { document.getElementById('detail-modal').classList.remove('show'); }
+</script>
+</body>
+</html>

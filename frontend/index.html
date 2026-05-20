@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLN Management System — Login</title>
+  <meta name="description" content="Secure login portal for the Customer Loan Network Management System." />
+  <meta name="theme-color" content="#a855f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="login-page">
+  <div class="login-wrapper">
+
+    <div class="login-container">
+      <div class="login-card">
+        <div class="user-avatar-large">D</div>
+
+        <div class="login-role-toggle" role="group" aria-label="Select login role">
+          <button type="button" id="btn-admin" class="active" onclick="selectRole('admin')">Admin</button>
+          <button type="button" id="btn-employee" onclick="selectRole('employee')">Employee</button>
+        </div>
+
+        <div id="network-notice" class="alert alert-warning" style="display:none; margin-top: 8px;">
+          Employee login is allowed only from office network.
+        </div>
+        
+        <div id="login-alert" class="alert alert-error"></div>
+
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <input type="email" id="email" class="form-control" placeholder="Email or username" required autocomplete="username" />
+          </div>
+          
+          <div class="form-group password-group">
+            <div class="password-input-wrapper">
+              <input type="password" id="password" class="form-control" placeholder="Password" required autocomplete="current-password" />
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                <span class="eye-icon">Show</span>
+              </button>
+            </div>
+            <a href="#" class="forgot-password">Forgot?</a>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="keep-signed" class="form-checkbox" />
+            <label for="keep-signed" class="checkbox-label">Keep me signed in</label>
+          </div>
+
+          <button type="submit" id="login-btn" class="btn btn-primary">
+            <span id="btn-text">Sign in</span>
+            <span id="btn-spinner" class="spinner" style="display:none;"></span>
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+    <footer class="login-page-footer">
+      <p>Powered by DixitLending © 2026</p>
+      <span class="footer-link"><a href="#">www.dixitlending.com</a></span>
+    </footer>
+  </div>
+
+  <script src="/js/api.js?v=20260516b"></script>
+  <script>
+    let selectedRole = 'admin';
+
+    // Redirect if already logged in
+    const existingUser = getUser();
+    if (existingUser && getToken()) {
+      window.location.href = existingUser.role === 'admin' ? '/admin/dashboard.html?fresh=20260516d' : '/employee/dashboard.html';
+    }
+
+    function selectRole(role) {
+      selectedRole = role;
+      document.getElementById('btn-admin').classList.toggle('active', role === 'admin');
+      document.getElementById('btn-employee').classList.toggle('active', role === 'employee');
+      const notice = document.getElementById('network-notice');
+      notice.style.display = role === 'employee' ? 'block' : 'none';
+    }
+
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const toggleBtn = document.querySelector('.toggle-password');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleBtn.classList.add('visible');
+      } else {
+        passwordInput.type = 'password';
+        toggleBtn.classList.remove('visible');
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const alertEl  = document.getElementById('login-alert');
+      alertEl.classList.remove('show');
+
+      document.getElementById('btn-text').style.display = 'none';
+      document.getElementById('btn-spinner').style.display = 'inline-block';
+      document.getElementById('login-btn').disabled = true;
+
+      const res = await api.post('/auth/login', { email, password, role: selectedRole });
+
+      document.getElementById('btn-text').style.display = 'inline';
+      document.getElementById('btn-spinner').style.display = 'none';
+      document.getElementById('login-btn').disabled = false;
+
+      if (!res || !res.ok) {
+        const msg = res?.data?.message || 'Login failed.';
+        alertEl.className = 'alert alert-error show';
+        alertEl.textContent = msg;
+        return;
+      }
+
+      setSession(res.data.token, res.data.user);
+      window.location.href = res.data.user.role === 'admin' ? '/admin/dashboard.html?fresh=20260516d' : '/employee/dashboard.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Customer — CLN Employee</title>
+  <meta name="theme-color" content="#a855f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">CLN</div>
+        <div><h2>CLN System</h2><span>Employee Portal</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon">DB</span> Dashboard</a>
+        <a href="/employee/add-customer.html" class="nav-item active"><span class="nav-icon">Add</span> Add Customer</a>
+        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon">LN</span> My Loans</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">E</div>
+        <div class="user-details"><p id="sidebar-user-name">Employee</p><span id="sidebar-user-role">employee</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+  <main class="main-content">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
+      <div class="topbar-title"><h2>Add Customer</h2><p>Register a new customer and upload documents</p></div>
+    </div>
+    <div class="page-content">
+      <div id="page-alert" class="alert"></div>
+      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:start;" class="add-customer-grid">
+
+        <!-- Customer Form -->
+        <div class="card">
+          <div class="card-header"><h3>Customer Details</h3></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Quick Paste Details (Optional)</label>
+              <textarea id="cust-quick-paste" class="form-control" rows="10" placeholder="Paste the full customer block here. Example:&#10;Name - Rahul Sharma&#10;Loan Amount - 200000&#10;Mob no - 9876543210&#10;Marital Status - Married&#10;Current address - 10, MG Road, Bengaluru"></textarea>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillFromQuickPaste()">Fill Fields from Paste</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="insertPasteSample()">Insert Sample Template</button>
+              </div>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.4;">Tip: As soon as you paste, Name, Mobile, Area and Address are auto-filled. You can still use <strong>Fill Fields from Paste</strong> if needed.</p>
+            </div>
+            <div class="form-group"><label>Full Name *</label><input type="text" id="cust-name" class="form-control" placeholder="e.g. Rahul Sharma" /></div>
+            <div class="form-group"><label>Phone Number *</label><input type="tel" id="cust-phone" class="form-control" placeholder="10-digit mobile" maxlength="10" /></div>
+            <div class="form-group"><label>Area *</label><input type="text" id="cust-area" class="form-control" placeholder="e.g. Koramangala" list="area-list" /><datalist id="area-list"></datalist></div>
+            <div class="form-group"><label>Full Address *</label><textarea id="cust-address" class="form-control" rows="3" placeholder="Door no., Street, City, PIN"></textarea></div>
+            <button class="btn btn-primary" onclick="addCustomer()" id="add-cust-btn">Add Customer</button>
+          </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div id="upload-section" style="display:none;">
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header"><h3>Customer Added</h3></div>
+            <div class="card-body">
+              <p id="new-customer-info" style="font-size:14px;color:var(--text-secondary);"></p>
+              <a href="/employee/loans.html" class="btn btn-primary" style="margin-top:12px;display:inline-flex;" id="create-loan-link">Create Loan Application</a>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Upload Documents</h3></div>
+            <div class="card-body">
+              <div class="form-group">
+                <label>Document Type</label>
+                <select id="doc-type" class="form-control">
+                  <option value="Aadhar">Aadhar Card</option>
+                  <option value="PAN">PAN Card</option>
+                  <option value="3M Bank Statement">3M Bank Statement</option>
+                  <option value="3M Salary Slip">3M Salary Slip</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Select File (PDF, JPG, PNG — max 5MB)</label>
+                <input type="file" id="doc-file" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp" />
+              </div>
+              <button class="btn btn-secondary" onclick="uploadDocument()" id="upload-btn">⬆️ Upload Document</button>
+              <div id="uploaded-docs" style="margin-top:16px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="upload-placeholder" class="card" style="text-align:center;padding:60px 20px;">
+          <div style="font-size:48px;margin-bottom:16px;">List</div>
+          <h3 style="font-size:15px;color:var(--text-secondary);">Add a customer first</h3>
+          <p style="font-size:13px;color:var(--text-muted);margin-top:8px;">Document upload will appear here after adding the customer.</p>
+        </div>
+      </div>
+
+      <div class="card full-table" style="margin-top:28px;">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+          <h3>My Customers</h3>
+          <button class="btn btn-danger btn-sm" id="delete-mode-btn" onclick="toggleDeleteMode()" style="display:none;">Delete</button>
+          <button class="btn btn-secondary btn-sm" id="cancel-delete-btn" onclick="cancelDeleteMode()" style="display:none;">Cancel</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th id="checkbox-header" style="display:none;width:40px;"><input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()" /></th><th>#</th><th>Name</th><th>Phone</th><th>Area</th><th>Date</th><th>Time</th></tr></thead>
+            <tbody id="my-customers-tbody"><tr><td colspan="7" class="text-center text-muted">Loading...</td></tr></tbody>
+          </table>
+        </div>
+        <div id="delete-action-bar" style="display:none;padding:12px 16px;background:rgba(239,68,68,0.1);border-top:1px solid var(--border);flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">
+          <p id="selected-count" style="font-size:13px;color:var(--text-secondary);">0 selected</p>
+          <button class="btn btn-danger" onclick="confirmDeleteSelected()">Delete Selected</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+    <!-- Customer Detail Modal (for My Customers page) -->
+    <div class="modal-overlay" id="customer-detail-modal" onclick="if (event.target.id==='customer-detail-modal') closeCustomerModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Customer Details</h3>
+          <button class="modal-close" onclick="closeCustomerModal()" title="Close" style="font-size:24px;font-weight:bold;">Close</button>
+        </div>
+        <div id="customer-detail-content">
+          <div style="text-align:center;padding:20px;color:var(--text-secondary);">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+<script src="/js/api.js?v=20260516c"></script>
+<script>
+  let newCustomerId = null;
+  const user = requireRole('employee');
+  if (user) { 
+    renderSidebarUser(); 
+    loadMyCustomers(); 
+    loadAreas(); 
+    document.getElementById('delete-mode-btn').style.display = 'inline-block';
+  }
+
+  async function loadAreas() {
+    const res = await api.get('/employee/areas');
+    if (!res?.ok) return;
+    const dl = document.getElementById('area-list');
+    res.data.data.forEach(a => {
+      dl.innerHTML += `<option value="${a}">`;
+    });
+  }
+
+  let deleteMode = false;
+  const selectedCustomers = new Set();
+
+  async function loadMyCustomers() {
+    const res = await api.get('/employee/customers');
+    if (!res?.ok) return;
+    const list = res.data.data;
+    const tbody = document.getElementById('my-customers-tbody');
+    tbody.innerHTML = list.length
+      ? list.map((c,i) => `
+        <tr>
+          <td class="checkbox-cell" style="display:none;width:40px;"><input type="checkbox" class="customer-checkbox" value="${c.id}" onchange="updateSelectedCount()" /></td>
+          <td>${i+1}</td>
+          <td><span style="cursor:pointer;color:var(--color-primary);text-decoration:underline;" onclick="openCustomerDetail(${c.id})">${c.name}</span></td>
+          <td>${c.phone}</td>
+          <td>${c.area}</td>
+          <td>${formatDate(c.created_at)}</td>
+          <td>${formatTime(c.created_at)}</td>
+        </tr>
+      `).join('')
+      : '<tr><td colspan="7" class="text-center text-muted">No customers yet.</td></tr>';
+  }
+
+  // Modal handling and detail fetch
+  let customerModalListenerAttached = false;
+
+  function openCustomerModal() {
+    document.getElementById('customer-detail-modal').classList.add('show');
+    attachCustomerModalListener();
+  }
+
+  function closeCustomerModal() {
+    document.getElementById('customer-detail-modal').classList.remove('show');
+    attachCustomerModalListener();
+  }
+
+  function attachCustomerModalListener() {
+    const open = document.getElementById('customer-detail-modal').classList.contains('show');
+    if (open && !customerModalListenerAttached) {
+      document.addEventListener('keydown', customerModalEsc);
+      customerModalListenerAttached = true;
+    } else if (!open && customerModalListenerAttached) {
+      document.removeEventListener('keydown', customerModalEsc);
+      customerModalListenerAttached = false;
+    }
+  }
+
+  function customerModalEsc(e) {
+    if (e.key === 'Escape') closeCustomerModal();
+  }
+
+  async function openCustomerDetail(customerId) {
+    openCustomerModal();
+    const res = await api.get(`/employee/customers/${customerId}`);
+    if (!res?.ok) {
+      document.getElementById('customer-detail-content').innerHTML = `<div style="color:red;padding:20px;text-align:center;">${res?.data?.message || 'Failed to load customer details'}</div>`;
+      return;
+    }
+    const c = res.data.data.customer;
+    const content = `
+      <div style="padding:16px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Name</label>
+            <p style="font-size:14px;margin-top:4px;">${c.name || '—'}</p>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Phone</label>
+            <p style="font-size:14px;margin-top:4px;">${c.phone || '—'}</p>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Email</label>
+            <p style="font-size:14px;margin-top:4px;">${c.email || '—'}</p>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Area</label>
+            <p style="font-size:14px;margin-top:4px;">${c.area || '—'}</p>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Address</label>
+            <p style="font-size:14px;margin-top:4px;">${c.address || '—'}</p>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Joined</label>
+            <p style="font-size:14px;margin-top:4px;">${formatDate(c.created_at) || '—'}</p>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border-color);padding-top:16px;display:flex;gap:8px;">
+          <a href="/employee/loans.html?customer_id=${c.id}" class="btn btn-primary" style="flex:1;text-align:center;">View Loans</a>
+          <button class="btn btn-secondary" style="flex:1;" onclick="closeCustomerModal()">Close</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('customer-detail-content').innerHTML = content;
+  }
+
+  function toggleDeleteMode() {
+    deleteMode = !deleteMode;
+    const checkboxHeader = document.getElementById('checkbox-header');
+    const deleteBtn = document.getElementById('delete-mode-btn');
+    const cancelBtn = document.getElementById('cancel-delete-btn');
+    const deleteBar = document.getElementById('delete-action-bar');
+    const checkboxCells = document.querySelectorAll('.checkbox-cell');
+    
+    if (deleteMode) {
+      checkboxHeader.style.display = 'table-cell';
+      deleteBar.style.display = 'flex';
+      deleteBtn.style.display = 'none';
+      cancelBtn.style.display = 'inline-block';
+      checkboxCells.forEach(cell => cell.style.display = 'table-cell');
+      selectedCustomers.clear();
+      document.getElementById('select-all-checkbox').checked = false;
+    } else {
+      cancelDeleteMode();
+    }
+  }
+
+  function cancelDeleteMode() {
+    deleteMode = false;
+    selectedCustomers.clear();
+    const checkboxHeader = document.getElementById('checkbox-header');
+    const deleteBtn = document.getElementById('delete-mode-btn');
+    const cancelBtn = document.getElementById('cancel-delete-btn');
+    const deleteBar = document.getElementById('delete-action-bar');
+    const checkboxCells = document.querySelectorAll('.checkbox-cell');
+    const allCheckboxes = document.querySelectorAll('.customer-checkbox');
+    
+    checkboxHeader.style.display = 'none';
+    deleteBar.style.display = 'none';
+    deleteBtn.style.display = 'inline-block';
+    cancelBtn.style.display = 'none';
+    checkboxCells.forEach(cell => cell.style.display = 'none');
+    allCheckboxes.forEach(cb => cb.checked = false);
+    document.getElementById('select-all-checkbox').checked = false;
+  }
+
+  function toggleSelectAll() {
+    const isChecked = document.getElementById('select-all-checkbox').checked;
+    const checkboxes = document.querySelectorAll('.customer-checkbox');
+    checkboxes.forEach(cb => {
+      cb.checked = isChecked;
+      if (isChecked) {
+        selectedCustomers.add(parseInt(cb.value));
+      } else {
+        selectedCustomers.delete(parseInt(cb.value));
+      }
+    });
+    updateSelectedCount();
+  }
+
+  function updateSelectedCount() {
+    selectedCustomers.clear();
+    const checkboxes = document.querySelectorAll('.customer-checkbox:checked');
+    checkboxes.forEach(cb => selectedCustomers.add(parseInt(cb.value)));
+    document.getElementById('selected-count').textContent = `${selectedCustomers.size} selected`;
+  }
+
+  async function confirmDeleteSelected() {
+    if (selectedCustomers.size === 0) return showAlert('page-alert', 'Select customers to delete.', 'warning');
+    if (!confirm(`Delete ${selectedCustomers.size} customer(s)? This cannot be undone.`)) return;
+
+    const ids = Array.from(selectedCustomers);
+    const res = await api.post('/employee/customers/delete', { ids });
+    if (!res?.ok) {
+      return showAlert('page-alert', res?.data?.message || 'Bulk delete failed.', 'error');
+    }
+
+    const results = res.data.results || [];
+    const failed = results.filter(r => !r.success);
+    const succeeded = results.filter(r => r.success);
+
+    if (failed.length > 0) {
+      const parts = [`Failed to delete ${failed.length} customer(s).`];
+      failed.slice(0,5).forEach(d => {
+        parts.push(`ID ${d.id}: ${d.reason}${d.loansCount ? ` (${d.loansCount} loan(s))` : ''}`);
+      });
+      if (failed.length > 5) parts.push(`and ${failed.length - 5} more...`);
+      showAlert('page-alert', parts.join(' '), 'error');
+    }
+
+    if (succeeded.length > 0) {
+      showAlert('page-alert', `${succeeded.length} customer(s) deleted.`, 'success');
+    }
+
+    cancelDeleteMode();
+    loadMyCustomers();
+  }
+
+  function extractValueByLabel(text, labels) {
+    const lines = text.split(/\r?\n/);
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      if (!line) continue;
+      for (const label of labels) {
+        const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`^${escaped}\\s*[:\\-]\\s*(.+)$`, 'i');
+        const match = line.match(regex);
+        if (match && match[1]) return match[1].trim();
+      }
+    }
+    return '';
+  }
+
+  function sanitizePhone(value) {
+    const digits = (value || '').replace(/\D/g, '');
+    return digits.length >= 10 ? digits.slice(-10) : digits;
+  }
+
+  function insertPasteSample() {
+    const sample = `Name -
+Loan Amount-
+Mob no-
+Marital Status-
+Mother name-
+Spouse name-
+Aadhar card-
+Pan card-
+Current address-
+Address years-
+Personal gmail-
+House - Owned/Rented
+Education-
+
+Employment
+Company Name-
+Company Address-
+Office email id-
+Experience-
+Total experience-
+Net monthly income-`;
+    document.getElementById('cust-quick-paste').value = sample;
+  }
+
+  function fillFromQuickPaste() {
+    const raw = document.getElementById('cust-quick-paste').value.trim();
+    if (!raw) return showAlert('page-alert', 'Paste customer details first.', 'warning');
+
+    const parsedName = extractValueByLabel(raw, ['Full Name', 'Name']);
+    const parsedPhone = sanitizePhone(extractValueByLabel(raw, ['Phone Number', 'Mob no', 'Mobile', 'Mobile Number']));
+    const parsedArea = extractValueByLabel(raw, ['Area', 'Locality']);
+    const parsedAddress = extractValueByLabel(raw, ['Full Address', 'Current address', 'Address']);
+
+    if (parsedName) document.getElementById('cust-name').value = parsedName;
+    if (parsedPhone) document.getElementById('cust-phone').value = parsedPhone;
+    if (parsedArea) document.getElementById('cust-area').value = parsedArea;
+    if (parsedAddress) document.getElementById('cust-address').value = parsedAddress;
+
+    showAlert('page-alert', 'Fields filled from pasted details. Please verify before submitting.', 'success');
+  }
+
+  function autoFillFromQuickPaste() {
+    const raw = document.getElementById('cust-quick-paste').value.trim();
+    if (!raw) return;
+
+    const parsedName = extractValueByLabel(raw, ['Full Name', 'Name']);
+    const parsedPhone = sanitizePhone(extractValueByLabel(raw, ['Phone Number', 'Mob no', 'Mobile', 'Mobile Number']));
+    const parsedArea = extractValueByLabel(raw, ['Area', 'Locality']);
+    const parsedAddress = extractValueByLabel(raw, ['Full Address', 'Current address', 'Address']);
+
+    if (parsedName) document.getElementById('cust-name').value = parsedName;
+    if (parsedPhone) document.getElementById('cust-phone').value = parsedPhone;
+    if (parsedArea) document.getElementById('cust-area').value = parsedArea;
+    if (parsedAddress) document.getElementById('cust-address').value = parsedAddress;
+  }
+
+  const quickPasteEl = document.getElementById('cust-quick-paste');
+  if (quickPasteEl) {
+    quickPasteEl.addEventListener('paste', () => setTimeout(autoFillFromQuickPaste, 0));
+    quickPasteEl.addEventListener('input', autoFillFromQuickPaste);
+  }
+
+  async function addCustomer() {
+    const name = document.getElementById('cust-name').value.trim();
+    const phone = document.getElementById('cust-phone').value.trim();
+    const area = document.getElementById('cust-area').value.trim();
+    const address = document.getElementById('cust-address').value.trim();
+    const quickPaste = document.getElementById('cust-quick-paste').value.trim();
+    if (!name || !phone || !area || !address) return showAlert('page-alert', 'All fields are required.', 'error');
+    if (!/^\d{10}$/.test(phone)) return showAlert('page-alert', 'Enter a valid 10-digit phone number.', 'error');
+
+    const finalAddress = quickPaste
+      ? `${address}\n\n--- Additional Customer Details ---\n${quickPaste}`
+      : address;
+
+    const btn = document.getElementById('add-cust-btn');
+    btn.disabled = true; btn.textContent = 'Adding...';
+    const res = await api.post('/employee/customers', { name, phone, area, address: finalAddress });
+    btn.disabled = false; btn.textContent = 'Add Customer';
+    if (!res?.ok) return showAlert('page-alert', res?.data?.message || 'Error.', 'error');
+    newCustomerId = res.data.id;
+    
+    // Store quick paste data for loan form auto-fill
+    if (quickPaste) {
+      const loanAmount = extractValueByLabel(quickPaste, ['Loan Amount']);
+      sessionStorage.setItem('cln_auto_loan_data', JSON.stringify({
+        customer_id: newCustomerId,
+        loan_amount: loanAmount ? loanAmount.replace(/\D/g, '') : '',
+        full_details: quickPaste
+      }));
+    }
+    
+    showAlert('page-alert', `Customer "${name}" added!`, 'success');
+    const createdAt = res.data.customer?.created_at;
+    const createdStamp = createdAt ? ` | ${formatDate(createdAt)} ${formatTime(createdAt)}` : '';
+    document.getElementById('new-customer-info').textContent = `${name} | ${phone} | ${area}${createdStamp}`;
+    document.getElementById('create-loan-link').href = `/employee/loans.html?customer_id=${newCustomerId}`;
+    document.getElementById('upload-section').style.display = 'block';
+    document.getElementById('upload-placeholder').style.display = 'none';
+    ['cust-name','cust-phone','cust-area','cust-address','cust-quick-paste'].forEach(id => document.getElementById(id).value = '');
+    loadMyCustomers();
+  }
+
+  async function uploadDocument() {
+    if (!newCustomerId) return showAlert('page-alert', 'Add a customer first.', 'error');
+    const file = document.getElementById('doc-file').files[0];
+    const docType = document.getElementById('doc-type').value;
+    if (!file) return showAlert('page-alert', 'Select a file.', 'error');
+    const form = new FormData();
+    form.append('document', file);
+    form.append('doc_type', docType);
+    const btn = document.getElementById('upload-btn');
+    btn.disabled = true; btn.textContent = 'Uploading...';
+    const res = await api.upload(`/employee/documents/${newCustomerId}`, form);
+    btn.disabled = false; btn.textContent = '⬆️ Upload Document';
+    if (!res?.ok) return showAlert('page-alert', res?.data?.message || 'Upload failed.', 'error');
+    showAlert('page-alert', `${docType} uploaded!`, 'success');
+    document.getElementById('doc-file').value = '';
+    const uploadedAt = res.data.document?.uploaded_at;
+    const uploadedStamp = uploadedAt ? ` <span style="color:var(--text-muted);font-size:12px;">(${formatDate(uploadedAt)} ${formatTime(uploadedAt)})</span>` : '';
+    function resolveFileUrl(path) {
+      if (!path) return '#';
+      if (path.startsWith('http://') || path.startsWith('https://')) return path;
+      const uploadsBase = (typeof api !== 'undefined' && api.uploadsBase) ? api.uploadsBase : (window.api && window.api.uploadsBase) ? window.api.uploadsBase : null;
+      return uploadsBase ? uploadsBase + path : path;
+    }
+
+    document.getElementById('uploaded-docs').innerHTML += `
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;font-size:13px;">
+        <span>Uploaded</span><span>${docType} — ${file.name}</span>
+        <span style="margin-left:8px;">${uploadedStamp}</span>
+        <a href="${resolveFileUrl(res.data.file_path)}" target="_blank" class="btn btn-secondary btn-sm" style="margin-left:auto;">View</a>
+      </div>`;
+  }
+</script>
+</body>
+</html>

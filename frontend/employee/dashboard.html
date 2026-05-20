@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Dashboard — CLN</title>
+  <meta name="theme-color" content="#a855f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">CLN</div>
+        <div><h2>CLN System</h2><span>Employee Portal</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/employee/dashboard.html" class="nav-item active"><span class="nav-icon">DB</span> Dashboard</a>
+        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon">Add</span> Add Customer</a>
+        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon">LN</span> My Loans</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">E</div>
+        <div class="user-details"><p id="sidebar-user-name">Employee</p><span id="sidebar-user-role">employee</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+  <main class="main-content">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
+      <div class="topbar-title"><h2>My Dashboard</h2><p id="greeting">Welcome back!</p></div>
+      <div class="topbar-actions">
+        <a href="/employee/add-customer.html" class="btn btn-primary btn-sm">+ Add Customer</a>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="stats-grid">
+        <a href="/employee/add-customer.html" style="text-decoration:none;color:inherit">
+          <div class="stat-card" role="button">
+            <div class="stat-icon">C</div>
+            <div class="stat-value" id="stat-customers">—</div>
+            <div class="stat-label">My Customers</div>
+          </div>
+        </a>
+
+        <a href="/employee/loans.html" style="text-decoration:none;color:inherit">
+          <div class="stat-card" role="button">
+            <div class="stat-icon">L</div>
+            <div class="stat-value" id="stat-loans">—</div>
+            <div class="stat-label">Total Loans</div>
+          </div>
+        </a>
+
+        <a href="/employee/loans.html?status=pending" style="text-decoration:none;color:inherit">
+          <div class="stat-card" role="button">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-value" id="stat-pending">—</div>
+            <div class="stat-label">Pending</div>
+          </div>
+        </a>
+
+        <a href="/employee/loans.html?status=approved" style="text-decoration:none;color:inherit">
+          <div class="stat-card" role="button">
+            <div class="stat-icon">A</div>
+            <div class="stat-value" id="stat-approved">—</div>
+            <div class="stat-label">Approved</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Quick actions -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;">
+        <a href="/employee/add-customer.html" style="text-decoration:none;">
+          <div class="card" style="padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background=''">
+            <div style="font-size:36px;margin-bottom:12px;">+</div>
+            <h3 style="font-size:15px;">Add New Customer</h3>
+            <p style="color:var(--text-secondary);font-size:13px;margin-top:4px;">Register customer with documents</p>
+          </div>
+        </a>
+        <a href="/employee/loans.html" style="text-decoration:none;">
+          <div class="card" style="padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background=''">
+            <div style="font-size:36px;margin-bottom:12px;">List</div>
+            <h3 style="font-size:15px;">Manage Loans</h3>
+            <p style="color:var(--text-secondary);font-size:13px;margin-top:4px;">Create and update loan applications</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="content-grid">
+        <!-- Recent Loans -->
+        <div class="card">
+          <div class="card-header"><h3>Recent Loans</h3><a href="/employee/loans.html" class="btn btn-secondary btn-sm">View All</a></div>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="recent-loans"><tr><td colspan="4" class="text-center text-muted">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Recent Customers -->
+        <div class="card">
+          <div class="card-header"><h3>Recent Customers</h3><a href="/employee/add-customer.html" class="btn btn-secondary btn-sm">Add New</a></div>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Name</th><th>Phone</th><th>Area</th></tr></thead>
+              <tbody id="recent-customers"><tr><td colspan="3" class="text-center text-muted">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Customer Detail Modal -->
+<div class="modal-overlay" id="customer-detail-modal" onclick="closeCustomerDetailOnOverlay(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Customer Details</h3>
+      <button class="modal-close" onclick="closeCustomerModal()" title="Close" style="font-size:24px;font-weight:bold;">Close</button>
+    </div>
+    <div id="customer-detail-content">
+      <div style="text-align:center;padding:20px;color:var(--text-secondary);">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- My Customers Modal -->
+<div class="modal-overlay" id="my-customers-modal" onclick="closeMyCustomersOnOverlay(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>My Customers</h3>
+      <button class="modal-close" onclick="closeMyCustomersModal()" title="Close" style="font-size:24px;font-weight:bold;">Close</button>
+    </div>
+    <div id="my-customers-modal-content">
+      <div style="text-align:center;padding:20px;color:var(--text-secondary);">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/api.js?v=20260516c"></script>
+<script>
+  let customerModalListenerAttached = false;
+  const user = requireRole('employee');
+  if (user) {
+    renderSidebarUser();
+    document.getElementById('greeting').textContent = `Welcome back, ${user.name}!`;
+    loadDashboard();
+  }
+
+  async function loadDashboard() {
+    const res = await api.get('/employee/dashboard');
+    if (!res?.ok) return;
+    const d = res.data.data;
+
+    document.getElementById('stat-customers').textContent = d.totalCustomers;
+    document.getElementById('stat-loans').textContent = d.totalLoans;
+    document.getElementById('stat-pending').textContent = d.pending;
+    document.getElementById('stat-approved').textContent = d.approved;
+
+    const loansTbody = document.getElementById('recent-loans');
+    loansTbody.innerHTML = d.recentLoans.length
+      ? d.recentLoans.map(l => `<tr><td>${l.customer_name}</td><td>${formatCurrency(l.amount)}</td><td>${statusBadge(l.status)}</td><td>${formatDate(l.created_at)}</td></tr>`).join('')
+      : '<tr><td colspan="4" class="text-center text-muted">No loans yet.</td></tr>';
+
+    const custTbody = document.getElementById('recent-customers');
+    custTbody.innerHTML = d.recentCustomers.length
+      ? d.recentCustomers.map(c => `<tr><td><span style="cursor:pointer;color:var(--color-primary);text-decoration:underline;" onclick="openCustomerDetail(${c.id})">${c.name}</span></td><td>${c.phone}</td><td>${c.area}</td></tr>`).join('')
+      : '<tr><td colspan="3" class="text-center text-muted">No customers yet.</td></tr>';
+  }
+
+  function openCustomerModal() {
+    document.getElementById('customer-detail-modal').classList.add('show');
+    syncCustomerModalListener();
+  }
+
+  function closeCustomerModal() {
+    document.getElementById('customer-detail-modal').classList.remove('show');
+    syncCustomerModalListener();
+  }
+
+  function closeCustomerDetailOnOverlay(event) {
+    if (event.target.id === 'customer-detail-modal') {
+      closeCustomerModal();
+    }
+  }
+
+  function openMyCustomersModal() {
+    document.getElementById('my-customers-modal').classList.add('show');
+    syncCustomerModalListener();
+    loadMyCustomersModal();
+  }
+
+  function closeMyCustomersModal() {
+    document.getElementById('my-customers-modal').classList.remove('show');
+    syncCustomerModalListener();
+  }
+
+  function closeMyCustomersOnOverlay(event) {
+    if (event.target.id === 'my-customers-modal') {
+      closeMyCustomersModal();
+    }
+  }
+
+  function syncCustomerModalListener() {
+    const detailOpen = document.getElementById('customer-detail-modal').classList.contains('show');
+    const listOpen = document.getElementById('my-customers-modal').classList.contains('show');
+    const shouldAttach = detailOpen || listOpen;
+
+    if (shouldAttach && !customerModalListenerAttached) {
+      document.addEventListener('keydown', handleEscapeKey);
+      customerModalListenerAttached = true;
+    } else if (!shouldAttach && customerModalListenerAttached) {
+      document.removeEventListener('keydown', handleEscapeKey);
+      customerModalListenerAttached = false;
+    }
+  }
+
+  async function loadMyCustomersModal() {
+    const res = await api.get('/employee/customers');
+    if (!res?.ok) {
+      document.getElementById('my-customers-modal-content').innerHTML = `<div style="color:red;padding:20px;text-align:center;">${res?.data?.message || 'Failed to load customers'}</div>`;
+      return;
+    }
+
+    const list = res.data.data || [];
+    const rows = list.length
+      ? list.map((c, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td><span style="cursor:pointer;color:var(--color-primary);text-decoration:underline;" onclick="openCustomerDetail(${c.id})">${c.name}</span></td>
+            <td>${c.phone || '—'}</td>
+            <td>${c.area || '—'}</td>
+            <td>${formatDate(c.created_at)}</td>
+          </tr>
+        `).join('')
+      : '<tr><td colspan="5" class="text-center text-muted">No customers yet.</td></tr>';
+
+    document.getElementById('my-customers-modal-content').innerHTML = `
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Area</th><th>Date</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function handleEscapeKey(event) {
+    if (event.key === 'Escape') {
+      const detailOpen = document.getElementById('customer-detail-modal').classList.contains('show');
+      const listOpen = document.getElementById('my-customers-modal').classList.contains('show');
+      if (detailOpen) {
+        closeCustomerModal();
+      } else if (listOpen) {
+        closeMyCustomersModal();
+      }
+    }
+  }
+
+  async function openCustomerDetail(customerId) {
+    openCustomerModal();
+    const res = await api.get(`/employee/customers/${customerId}`);
+    if (!res?.ok) {
+      document.getElementById('customer-detail-content').innerHTML = `<div style="color:red;padding:20px;text-align:center;">${res?.data?.message || 'Failed to load customer details'}</div>`;
+      return;
+    }
+    const c = res.data.data.customer;
+    const content = `
+      <div style="padding:16px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Name</label>
+            <p style="font-size:14px;margin-top:4px;">${c.name || '—'}</p>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Phone</label>
+            <p style="font-size:14px;margin-top:4px;">${c.phone || '—'}</p>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Email</label>
+            <p style="font-size:14px;margin-top:4px;">${c.email || '—'}</p>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Area</label>
+            <p style="font-size:14px;margin-top:4px;">${c.area || '—'}</p>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Address</label>
+            <p style="font-size:14px;margin-top:4px;">${c.address || '—'}</p>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Joined</label>
+            <p style="font-size:14px;margin-top:4px;">${formatDate(c.created_at) || '—'}</p>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border-color);padding-top:16px;">
+          <a href="/employee/loans.html?customer_id=${c.id}" class="btn btn-primary" style="width:100%;text-align:center;">View Loans</a>
+        </div>
+      </div>
+    `;
+    document.getElementById('customer-detail-content').innerHTML = content;
+  }
+</script>
+</body>
+</html>

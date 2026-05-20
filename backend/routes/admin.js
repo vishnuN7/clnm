@@ -1,0 +1,33 @@
+const express = require('express');
+const router = express.Router();
+const { requireAdmin } = require('../middleware/auth');
+const adminController = require('../controllers/adminController');
+
+// All routes require admin JWT
+router.use(requireAdmin);
+
+// Dashboard
+router.get('/dashboard', adminController.getDashboard);
+
+// Employees
+router.get('/employees', adminController.getEmployees);
+router.post('/employees', adminController.addEmployee);
+router.patch('/employees/:id/deactivate', adminController.deactivateEmployee);
+router.patch('/employees/:id/activate', adminController.activateEmployee);
+router.patch('/employees/:id/password', adminController.updateEmployeePassword);
+router.post('/employees/:id/password', adminController.updateEmployeePassword);
+
+// Customers
+router.get('/customers', adminController.getCustomers);
+router.get('/customers/:id', adminController.getCustomerDetail);
+
+// Loans
+router.get('/loans', adminController.getLoans);
+
+// Utilities
+router.get('/areas', adminController.getAreas);
+
+// Export
+router.get('/reports/export', adminController.exportLoans);
+
+module.exports = router;

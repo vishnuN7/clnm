@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Loans — CLN Employee</title>
+  <meta name="theme-color" content="#a855f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🏦</div>
+        <div><h2>CLN System</h2><span>Employee Portal</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon">➕</span> Add Customer</a>
+        <a href="/employee/loans.html" class="nav-item active"><span class="nav-icon">💰</span> My Loans</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">E</div>
+        <div class="user-details"><p id="sidebar-user-name">Employee</p><span id="sidebar-user-role">employee</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+  <main class="main-content">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">☰</button>
+      <div class="topbar-title"><h2>My Loans</h2><p>Create and manage loan applications</p></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="openCreateModal()">+ New Loan</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div id="page-alert" class="alert"></div>
+
+      <div class="filters-bar">
+        <select id="status-filter" onchange="loadLoans()">
+          <option value="">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+          <option value="ABND">ABND</option>
+        </select>
+        <select id="period-filter" onchange="loadLoans()">
+          <option value="">All Time</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="year">This Year</option>
+        </select>
+      </div>
+
+      <div class="card full-table">
+        <div class="card-header">
+          <h3>Loan Applications</h3>
+          <span id="count-badge" class="badge badge-employee">— loans</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Area</th><th>Amount</th><th>Purpose</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="loans-tbody"><tr><td colspan="9" class="text-center text-muted">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Create Loan Modal -->
+<div class="modal-overlay" id="create-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>New Loan Application</h3>
+      <button class="modal-close" onclick="closeCreateModal()">✕</button>
+    </div>
+    <div id="modal-alert" class="alert"></div>
+    <div class="form-group">
+      <label>Customer *</label>
+      <input type="hidden" id="loan-customer" />
+      <p id="loan-customer-display" style="font-size:14px;color:var(--text-primary);margin:8px 0;">—</p>
+    </div>
+    <div class="form-group"><label>Loan Amount (₹) *</label><input type="number" id="loan-amount" class="form-control" placeholder="e.g. 50000" min="1000" /></div>
+    <div class="form-group"><label>Purpose</label>
+      <select id="loan-purpose" class="form-control" onchange="togglePurposeOther()">
+        <option value="">Select purpose (optional)</option>
+        <option value="Home Renovation">Home Renovation</option>
+        <option value="Business">Business</option>
+        <option value="Education">Education</option>
+        <option value="Medical">Medical</option>
+        <option value="Debt Consolidation">Debt Consolidation</option>
+        <option value="Other">Other (specify below)</option>
+      </select>
+      <textarea id="loan-purpose-other" class="form-control" rows="2" placeholder="If 'Other', type purpose here" style="margin-top:8px;display:none;"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="createLoan()" id="create-btn">Submit Application</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal-overlay" id="status-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Update Loan Status</h3>
+      <button class="modal-close" onclick="closeStatusModal()">✕</button>
+    </div>
+    <div id="status-modal-alert" class="alert"></div>
+    <p id="status-loan-info" style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;"></p>
+    <div class="form-group">
+      <label>New Status *</label>
+      <select id="new-status" class="form-control">
+        <option value="Pending"> Pending</option>
+        <option value="Approved"> Approved</option>
+        <option value="Rejected"> Rejected</option>
+        <option value="ABND"> ABND</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Notes</label><textarea id="status-notes" class="form-control" rows="2" placeholder="Optional remarks..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeStatusModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitStatusUpdate()" id="status-btn">Update Status</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/api.js?v=20260516c"></script>
+<script>
+  let currentLoanId = null;
+  let filterCustomerId = null;
+  const user = requireRole('employee');
+  if (user) {
+    renderSidebarUser();
+    // Check for customer_id in query params
+    const params = new URLSearchParams(location.search);
+    filterCustomerId = params.get('customer_id');
+    
+    // If customer_id present, open create modal with auto-fill
+    if (filterCustomerId) {
+      setTimeout(() => openCreateModal(parseInt(filterCustomerId)), 100);
+    }
+    
+    loadLoans();
+  }
+
+  function togglePurposeOther() {
+    const sel = document.getElementById('loan-purpose');
+    const other = document.getElementById('loan-purpose-other');
+    if (!sel || !other) return;
+    other.style.display = sel.value === 'Other' ? 'block' : 'none';
+  }
+
+  // Utility to extract labeled value from pasted details (basic)
+  function extractValueByLabel(text, labels) {
+    if (!text) return '';
+    const lines = text.split(/\r?\n/);
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
+      for (const label of labels) {
+        const re = new RegExp('^' + label.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&') + '\\s*[:\\-]?\\s*(.+)$', 'i');
+        const m = line.match(re);
+        if (m && m[1]) return m[1].trim();
+      }
+    }
+    return '';
+  }
+
+  async function loadLoans() {
+    const status = document.getElementById('status-filter').value;
+    const period = document.getElementById('period-filter').value;
+    const qs = buildQueryString({ status, period });
+    const res = await api.get(`/employee/loans${qs}`);
+    if (!res?.ok) return;
+    let list = res.data.data;
+    
+    // Filter by customer_id if provided in URL
+    if (filterCustomerId) {
+      list = list.filter(l => l.customer_id === parseInt(filterCustomerId));
+    }
+    
+    document.getElementById('count-badge').textContent = `${list.length} loans`;
+    const tbody = document.getElementById('loans-tbody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No loans found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map((l, i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td>${l.customer_name}</td>
+        <td>${l.customer_phone}</td>
+        <td><span class="badge badge-employee">${l.area}</span></td>
+        <td style="font-weight:600;">${formatCurrency(l.amount)}</td>
+        <td>${l.purpose || '—'}</td>
+        <td>${statusBadge(l.status)}</td>
+        <td>${formatDate(l.created_at)}</td>
+        <td><button class="btn btn-secondary btn-sm" onclick="openStatusModal(${l.id}, '${l.customer_name}', '${l.amount}', '${l.status}')">Update</button></td>
+      </tr>`).join('');
+  }
+
+  function openCreateModal(customerIdParam = null) { 
+    document.getElementById('create-modal').classList.add('show');
+    document.getElementById('loan-customer-display').textContent = '—';
+    document.getElementById('loan-amount').value = '';
+    document.getElementById('loan-purpose').value = '';
+    document.getElementById('loan-purpose-other').value = '';
+    document.getElementById('loan-purpose-other').style.display = 'none';
+    document.getElementById('loan-customer').value = '';
+    
+    // If customer_id provided as param (from add-customer page)
+    if (customerIdParam) {
+      api.get('/employee/customers').then(res => {
+        if (res?.ok) {
+          const customer = res.data.data.find(c => c.id === customerIdParam);
+          if (customer) {
+            document.getElementById('loan-customer').value = customerIdParam;
+            document.getElementById('loan-customer-display').textContent = `${customer.name} (${customer.phone})`;
+          }
+        }
+      });
+    }
+    
+    // Auto-fill loan form from quick paste data (sessionStorage)
+    const autoData = sessionStorage.getItem('cln_auto_loan_data');
+    if (autoData) {
+      try {
+        const data = JSON.parse(autoData);
+        
+        // Only use sessionStorage data if not already set from URL param
+        if (!customerIdParam) {
+          api.get('/employee/customers').then(res => {
+            if (res?.ok) {
+              const customer = res.data.data.find(c => c.id === parseInt(data.customer_id));
+              if (customer) {
+                document.getElementById('loan-customer').value = data.customer_id;
+                document.getElementById('loan-customer-display').textContent = `${customer.name} (${customer.phone})`;
+              }
+            }
+          });
+        }
+        
+        if (data.loan_amount) {
+          document.getElementById('loan-amount').value = data.loan_amount;
+        }
+        if (data.full_details) {
+          // Try to extract purpose from pasted block
+          const p = extractValueByLabel(data.full_details, ['Purpose', 'Loan Purpose', 'Purpose of Loan']);
+          if (p) {
+            // If matches one of options, select it; otherwise put into 'other'
+            const sel = document.getElementById('loan-purpose');
+            const opt = Array.from(sel.options).find(o => o.value.toLowerCase() === p.toLowerCase());
+            if (opt) {
+              sel.value = opt.value;
+            } else {
+              sel.value = 'Other';
+              const other = document.getElementById('loan-purpose-other');
+              other.style.display = 'block';
+              other.value = p;
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse auto loan data:', e);
+      }
+    } else {
+      if (!customerIdParam) {
+        document.getElementById('loan-customer-display').textContent = 'Please add a customer first';
+      }
+    }
+  }
+  function closeCreateModal() { 
+    document.getElementById('create-modal').classList.remove('show');
+    document.getElementById('loan-amount').value = '';
+  }
+
+  async function createLoan() {
+    const customer_id = document.getElementById('loan-customer').value;
+    const amount = document.getElementById('loan-amount').value;
+    let purpose = document.getElementById('loan-purpose').value || '';
+    const other = document.getElementById('loan-purpose-other').value.trim();
+    if (purpose === 'Other') purpose = other || '';
+    if (!customer_id || !amount) return showAlert('modal-alert', 'Customer and amount are required.', 'error');
+    const btn = document.getElementById('create-btn');
+    btn.disabled = true; btn.textContent = 'Submitting...';
+    const res = await api.post('/employee/loans', { customer_id, amount, purpose });
+    btn.disabled = false; btn.textContent = 'Submit Application';
+    if (!res?.ok) return showAlert('modal-alert', res?.data?.message || 'Error.', 'error');
+    closeCreateModal();
+    showAlert('page-alert', 'Loan application created!', 'success');
+    sessionStorage.removeItem('cln_auto_loan_data');
+    loadLoans();
+  }
+
+  function openStatusModal(id, name, amount, status) {
+    currentLoanId = id;
+    document.getElementById('status-loan-info').textContent = `${name} — ${formatCurrency(amount)}`;
+    document.getElementById('new-status').value = status;
+    document.getElementById('status-notes').value = '';
+    document.getElementById('status-modal').classList.add('show');
+  }
+  function closeStatusModal() { document.getElementById('status-modal').classList.remove('show'); }
+
+  async function submitStatusUpdate() {
+    const status = document.getElementById('new-status').value;
+    const notes = document.getElementById('status-notes').value.trim();
+    const btn = document.getElementById('status-btn');
+    btn.disabled = true; btn.textContent = 'Updating...';
+    const res = await api.patch(`/employee/loans/${currentLoanId}/status`, { status, notes });
+    btn.disabled = false; btn.textContent = 'Update Status';
+    if (!res?.ok) return showAlert('status-modal-alert', res?.data?.message || 'Error.', 'error');
+    closeStatusModal();
+    showAlert('page-alert', `Loan status updated to ${status}.`, 'success');
+    loadLoans();
+  }
+</script>
+</body>
+</html>

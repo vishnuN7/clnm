@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loan Applications — CLN Admin</title>
+  <meta name="theme-color" content="#a855f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">CLN</div>
+        <div><h2>CLN System</h2><span>Admin Panel</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/admin/dashboard.html?fresh=20260516d" class="nav-item"><span class="nav-icon">DB</span> Dashboard</a>
+        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon">EM</span> Employees</a>
+        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon">CU</span> Customers</a>
+        <a href="/admin/loans.html" class="nav-item active"><span class="nav-icon">LN</span> Loan Applications</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="user-details"><p id="sidebar-user-name">Admin</p><span id="sidebar-user-role">admin</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+  <main class="main-content">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
+      <div class="topbar-title"><h2>Loan Applications</h2><p>Filter, search and export all loans</p></div>
+      <div class="topbar-actions">
+        <button class="btn btn-success btn-sm" onclick="exportCSV()">⬇️ Export CSV</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Summary row -->
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+        <div class="stat-card"><div class="stat-value" id="s-total">—</div><div class="stat-label">Total</div></div>
+        <div class="stat-card"><div class="stat-value" id="s-pending" style="color:var(--warning)">—</div><div class="stat-label">Pending</div></div>
+        <div class="stat-card"><div class="stat-value" id="s-approved" style="color:var(--success)">—</div><div class="stat-label">Approved</div></div>
+        <div class="stat-card"><div class="stat-value" id="s-rejected" style="color:var(--danger)">—</div><div class="stat-label">Rejected</div></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="search-box" style="flex:1;">
+          <span class="search-icon">Search</span>
+          <input type="text" id="search-input" class="form-control" placeholder="Search customer name/phone..." oninput="loadLoans()" style="width:100%;" />
+        </div>
+        <span class="filter-label">Area:</span>
+        <select id="area-filter" onchange="loadLoans()"><option value="">All Areas</option></select>
+        <span class="filter-label">Status:</span>
+        <select id="status-filter" onchange="loadLoans()">
+          <option value="">All</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+        <span class="filter-label">Period:</span>
+        <select id="period-filter" onchange="loadLoans()">
+          <option value="">All Time</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="year">This Year</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" onclick="resetFilters()">↺ Reset</button>
+      </div>
+
+      <div class="card full-table">
+        <div class="card-header">
+          <h3>Loan Records</h3>
+          <span id="count-badge" class="badge badge-employee">— loans</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Area</th><th>Amount</th><th>Purpose</th><th>Status</th><th>Applied By</th><th>Date</th></tr></thead>
+            <tbody id="loans-tbody"><tr><td colspan="9" class="text-center text-muted">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/api.js?v=20260516c"></script>
+<script>
+  const user = requireRole('admin');
+  if (user) { renderSidebarUser(); loadAreas(); loadLoans(); }
+
+  async function loadAreas() {
+    const res = await api.get('/admin/areas');
+    if (!res?.ok) return;
+    const sel = document.getElementById('area-filter');
+    res.data.data.forEach(a => sel.innerHTML += `<option value="${a}">${a}</option>`);
+  }
+
+  async function loadLoans() {
+    const search = document.getElementById('search-input').value;
+    const area   = document.getElementById('area-filter').value;
+    const status = document.getElementById('status-filter').value;
+    const period = document.getElementById('period-filter').value;
+    const qs = buildQueryString({ search, area, status, period });
+    const res = await api.get(`/admin/loans${qs}`);
+    if (!res?.ok) return;
+
+    const list = res.data.data;
+    document.getElementById('count-badge').textContent = `${list.length} loans`;
+    document.getElementById('s-total').textContent = list.length;
+    document.getElementById('s-pending').textContent = list.filter(l=>l.status==='Pending').length;
+    document.getElementById('s-approved').textContent = list.filter(l=>l.status==='Approved').length;
+    document.getElementById('s-rejected').textContent = list.filter(l=>l.status==='Rejected').length;
+
+    const tbody = document.getElementById('loans-tbody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No loans match the filters.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map((l,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td>${l.customer_name}</td>
+        <td>${l.customer_phone}</td>
+        <td><span class="badge badge-employee">${l.area}</span></td>
+        <td style="font-weight:600;">${formatCurrency(l.amount)}</td>
+        <td>${l.purpose || '—'}</td>
+        <td>${statusBadge(l.status)}</td>
+        <td>${l.applied_by_name}</td>
+        <td>${formatDate(l.created_at)}</td>
+      </tr>`).join('');
+  }
+
+  function resetFilters() {
+    ['search-input','area-filter','status-filter','period-filter'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = '';
+    });
+    loadLoans();
+  }
+
+  function exportCSV() {
+    const area   = document.getElementById('area-filter').value;
+    const status = document.getElementById('status-filter').value;
+    const period = document.getElementById('period-filter').value;
+    const qs = buildQueryString({ area, status, period });
+    window.open(`http://localhost:5000/api/admin/reports/export${qs}`, '_blank');
+  }
+</script>
+</body>
+</html>
