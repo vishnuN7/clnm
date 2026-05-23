@@ -2,10 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const db = require('./config/db');
 
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const employeeRoutes = require('./routes/employee');
+const { verifyTransporter } = require('./utils/mailer');
 
 const { loginLimiter, apiLimiter } = require('./middleware/rateLimit');
 
@@ -86,8 +88,59 @@ app.use((err, req, res, next) => {
 
 // ── Start Server ────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\nCLN Server running at http://localhost:${PORT}`);
-  console.log(`Admin login: admin@cln.com / Admin@123`);
-  console.log(`Employee login: employee@cln.com / Employee@123\n`);
+
+async function ensureDefaultAdminAccount() {
+  const adminEmail = 'dixitlendingsolution@gmail.com';
+  const legacyAdminEmail = 'admin@cln.com';
+
+  try {
+    const [existingTarget] = await db.query('SELECT id FROM users WHERE email = ? LIMIT 1', [adminEmail]);
+    if (existingTarget.length > 0) return;
+
+    const [legacyAdmin] = await db.query('SELECT id FROM users WHERE email = ? AND role = ? LIMIT 1', [legacyAdminEmail, 'admin']);
+    if (legacyAdmin.length === 0) return;
+
+    await db.query('UPDATE users SET email = ? WHERE id = ?', [adminEmail, legacyAdmin[0].id]);
+    console.log(`Updated admin login email from ${legacyAdminEmail} to ${adminEmail}`);
+  } catch (err) {
+    console.error('Failed to ensure default admin account:', err.message);
+  }
+}
+
+async function ensurePasswordResetTable() {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      token_hash CHAR(64) NOT NULL UNIQUE,
+      expires_at DATETIME NOT NULL,
+      used_at DATETIME NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_password_reset_user_id (user_id),
+      INDEX idx_password_reset_expires_at (expires_at),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `;
+
+  try {
+    await db.query(sql);
+  } catch (err) {
+    console.error('Failed to ensure password reset table:', err.message);
+  }
+}
+
+Promise.all([ensureDefaultAdminAccount(), ensurePasswordResetTable()]).finally(async () => {
+  try {
+    await verifyTransporter();
+    console.log('SMTP verification successful.');
+  } catch (err) {
+    console.warn('SMTP verification failed:', err && err.message ? err.message : err);
+    console.warn('Password reset emails may not be sent until SMTP is fixed.');
+  }
+
+  app.listen(PORT, () => {
+    console.log(`\nCLN Server running at http://localhost:${PORT}`);
+    console.log(`Admin login: dixitlendingsolution@gmail.com / Admin@123`);
+    console.log(`Employee login: employee@cln.com / Employee@123\n`);
+  });
 });

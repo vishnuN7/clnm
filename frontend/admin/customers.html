@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Customers — CLN Admin</title>
-  <meta name="theme-color" content="#a855f7" />
+  <meta name="theme-color" content="#5a7a52" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
@@ -15,18 +15,18 @@
 <div class="app-layout">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
+        <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
-        <div><h2>CLN System</h2><span>Admin Panel</span></div>
+        <div><h2><span class="emoji-sm">📊</span>CLN System</h2><span>Admin Panel</span></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-        <a href="/admin/dashboard.html?fresh=20260516d" class="nav-item"><span class="nav-icon">DB</span> Dashboard</a>
-        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon">EM</span> Employees</a>
-        <a href="/admin/customers.html" class="nav-item active"><span class="nav-icon">CU</span> Customers</a>
-        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon">LN</span> Loan Applications</a>
+        <a href="/admin/dashboard.html?fresh=20260516d" class="nav-item"><span class="nav-icon emoji-sm">📊</span> Dashboard</a>
+        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon emoji-sm">👥</span> Employees</a>
+        <a href="/admin/customers.html" class="nav-item active"><span class="nav-icon emoji-sm">📋</span> Customers</a>
+        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon emoji-sm">💼</span> Loan Applications</a>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -44,7 +44,7 @@
   <main class="main-content">
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2>Customers</h2><p>All registered customers</p></div>
+      <div class="topbar-title"><h2><span class="emoji">📋</span>Customers</h2><p>All registered customers</p></div>
     </div>
 
     <div class="page-content">
@@ -55,8 +55,8 @@
         </div>
         <div class="area-filter-container" style="position: relative; max-width: 150px;">
           <input type="text" id="area-search-input" class="form-control" placeholder="Search areas..." oninput="filterAreaOptions()" />
-          <div id="area-dropdown" class="area-dropdown" style="position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: var(--bg-secondary); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 0 0 8px 8px; max-height: 250px; overflow-y: auto; display: none; z-index: 1000; box-shadow: 0 8px 16px rgba(0,0,0,0.2); min-width: 140px;">
-            <div class="area-option" data-value="" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(168, 85, 247, 0.15); font-weight: 500; font-size: 13px; color: var(--text-primary); transition: background 0.2s;">All Areas</div>
+          <div id="area-dropdown" class="area-dropdown" style="position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0 0 8px 8px; max-height: 250px; overflow-y: auto; display: none; z-index: 1000; box-shadow: 0 8px 16px rgba(31, 43, 39, 0.12); min-width: 140px;">
+            <div class="area-option" data-value="" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 500; font-size: 13px; color: var(--text-primary); transition: background 0.2s;">All Areas</div>
           </div>
           <input type="hidden" id="area-filter" value="" />
         </div>
@@ -64,7 +64,7 @@
 
       <div class="card full-table">
         <div class="card-header">
-          <h3>Customer List</h3>
+          <h3><span class="emoji-sm">📋</span>Customer List</h3>
           <span id="count-badge" class="badge badge-employee">— customers</span>
         </div>
         <div class="table-wrapper">
@@ -118,7 +118,7 @@
     try {
       const res = await api.get('/admin/areas');
       const dropdown = document.getElementById('area-dropdown');
-      let html = '<div class="area-option" data-value="" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(168, 85, 247, 0.1); font-weight: 500; font-size: 13px; color: var(--text-primary); transition: background 0.2s; display: block;">All Areas</div>';
+      let html = '<div class="area-option" data-value="" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 500; font-size: 13px; color: var(--text-primary); transition: background 0.2s; display: block;">All Areas</div>';
       if (!res?.ok) {
         console.warn('Failed to load areas', res?.data?.message || res);
         dropdown.innerHTML = html;
@@ -127,7 +127,7 @@
       }
       if (res.data.data && Array.isArray(res.data.data)) {
         res.data.data.forEach(a => {
-          html += `<div class="area-option" data-value="${a}" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(168, 85, 247, 0.1); font-size: 13px; color: var(--text-primary); transition: background 0.2s; display: block;">${a}</div>`;
+          html += `<div class="area-option" data-value="${a}" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-primary); transition: background 0.2s; display: block;">${a}</div>`;
         });
       }
       dropdown.innerHTML = html;
@@ -140,7 +140,7 @@
   function attachAreaOptionListeners() {
     document.querySelectorAll('.area-option').forEach(option => {
       option.addEventListener('mouseover', () => {
-        option.style.background = 'rgba(168, 85, 247, 0.1)';
+        option.style.background = 'var(--bg-card-hover)';
       });
       option.addEventListener('mouseout', () => {
         option.style.background = 'transparent';
@@ -206,7 +206,7 @@
         <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.address}">${c.address}</td>
         <td>${c.added_by_name}</td>
         <td>${formatDate(c.created_at)}</td>
-        <td><button class="btn btn-secondary btn-sm" onclick="viewDetail(${c.id})">View</button></td>
+        <td><button class="btn btn-secondary btn-sm" onclick="viewDetail(${c.id})"><span class="emoji-sm">🔎</span>View</button></td>
       </tr>`).join('');
     } catch (err) {
       console.error('Error loading customers', err);

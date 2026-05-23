@@ -1,6 +1,19 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const UserModel = require('../models/userModel');
+const PasswordResetModel = require('../models/passwordResetModel');
+const { sendPasswordResetEmail } = require('../utils/mailer');
+
+const RESET_TOKEN_TTL_MS = 30 * 60 * 1000;
+
+function normalizeEmail(email) {
+  return String(email || '').trim().toLowerCase();
+}
+
+function hashResetToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
 
 const authController = {
   /**
@@ -15,7 +28,7 @@ const authController = {
         return res.status(400).json({ success: false, message: 'Email, password, and role are required.' });
       }
 
-      const user = await UserModel.findByEmail(email.toLowerCase().trim());
+      const user = await UserModel.findByEmail(normalizeEmail(email));
 
       if (!user) {
         // Don't reveal if email exists or not (prevents user enumeration)
@@ -71,6 +84,86 @@ const authController = {
       return res.json({ success: true, user });
     } catch (err) {
       return res.status(500).json({ success: false, message: 'Server error.' });
+    }
+  },
+
+  /**
+   * POST /api/auth/forgot-password
+   * Sends an email with a reset link for the admin account.
+   */
+  async forgotPassword(req, res) {
+    try {
+      const email = normalizeEmail(req.body.email);
+
+      if (!email) {
+        return res.status(400).json({ success: false, message: 'Email is required.' });
+      }
+
+      const user = await UserModel.findByEmail(email);
+
+      // Keep the response generic to avoid user enumeration.
+      if (!user || user.role !== 'admin') {
+        return res.json({
+          success: true,
+          message: 'If the email is registered as an admin account, a reset link will be sent.'
+        });
+      }
+
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const tokenHash = hashResetToken(rawToken);
+      const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+      const resetUrl = `${req.protocol}://${req.get('host')}/reset-password.html?token=${rawToken}`;
+
+      await PasswordResetModel.deleteForUser(user.id);
+      await PasswordResetModel.create({ userId: user.id, tokenHash, expiresAt });
+      await sendPasswordResetEmail({ to: user.email, name: user.name, resetUrl });
+
+      return res.json({
+        success: true,
+        message: 'If the email is registered as an admin account, a reset link will be sent.'
+      });
+    } catch (err) {
+      console.error('[Auth] Forgot password error:', err);
+      return res.status(500).json({ success: false, message: 'Unable to send reset email right now.' });
+    }
+  },
+
+  /**
+   * POST /api/auth/reset-password
+   * Updates the password using a valid reset token.
+   */
+  async resetPassword(req, res) {
+    try {
+      const { token, password, confirmPassword } = req.body;
+
+      if (!token || !password || !confirmPassword) {
+        return res.status(400).json({ success: false, message: 'Token, password, and confirm password are required.' });
+      }
+
+      if (password !== confirmPassword) {
+        return res.status(400).json({ success: false, message: 'Passwords do not match.' });
+      }
+
+      if (password.trim().length < 8) {
+        return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long.' });
+      }
+
+      const tokenHash = hashResetToken(token);
+      const resetEntry = await PasswordResetModel.findValidByTokenHash(tokenHash);
+
+      if (!resetEntry) {
+        return res.status(400).json({ success: false, message: 'Reset link is invalid or has expired.' });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await UserModel.updatePassword(resetEntry.user_id, hashedPassword);
+      await PasswordResetModel.markUsed(resetEntry.id);
+      await PasswordResetModel.deleteForUser(resetEntry.user_id);
+
+      return res.json({ success: true, message: 'Password has been reset successfully.' });
+    } catch (err) {
+      console.error('[Auth] Reset password error:', err);
+      return res.status(500).json({ success: false, message: 'Unable to reset password right now.' });
     }
   }
 };

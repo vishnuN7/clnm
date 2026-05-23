@@ -71,12 +71,27 @@ CREATE TABLE IF NOT EXISTS loans (
 );
 
 -- =====================================================
+-- PASSWORD RESET TOKENS TABLE
+-- =====================================================
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token_hash CHAR(64) NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_password_reset_user_id (user_id),
+    INDEX idx_password_reset_expires_at (expires_at),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- =====================================================
 -- SEED DATA - Default Admin Account
 -- Password: Admin@123 (bcrypt hashed)
 -- =====================================================
 INSERT IGNORE INTO users (name, email, password, role) VALUES (
     'System Admin',
-    'admin@cln.com',
+    'dixitlendingsolution@gmail.com',
     '$2a$10$UZxVtDc9rOveLTgWXcWnkeSPBrOIJxypnMc2bQI.nR7taYXg6HVyK',
     'admin'
 );

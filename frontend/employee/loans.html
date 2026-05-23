@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Loans — CLN Employee</title>
-  <meta name="theme-color" content="#a855f7" />
+  <meta name="theme-color" content="#5a7a52" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
@@ -15,17 +15,17 @@
 <div class="app-layout">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
+        <div class="sidebar-logo">
         <div class="logo-icon">🏦</div>
-        <div><h2>CLN System</h2><span>Employee Portal</span></div>
+        <div><h2><span class="emoji-sm">💼</span>CLN System</h2><span>Employee Portal</span></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
-        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon">➕</span> Add Customer</a>
-        <a href="/employee/loans.html" class="nav-item active"><span class="nav-icon">💰</span> My Loans</a>
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon emoji-sm">📊</span> Dashboard</a>
+        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon emoji-sm">➕</span> Add Customer</a>
+        <a href="/employee/loans.html" class="nav-item active"><span class="nav-icon emoji-sm">💼</span> My Loans</a>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -43,9 +43,9 @@
   <main class="main-content">
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">☰</button>
-      <div class="topbar-title"><h2>My Loans</h2><p>Create and manage loan applications</p></div>
+      <div class="topbar-title"><h2><span class="emoji">💼</span>My Loans</h2><p>Create and manage loan applications</p></div>
       <div class="topbar-actions">
-        <button class="btn btn-primary btn-sm" onclick="openCreateModal()">+ New Loan</button>
+        <button class="btn btn-primary btn-sm" onclick="openCreateModal()"><span class="emoji-sm">➕</span>New Loan</button>
       </div>
     </div>
 
@@ -70,7 +70,7 @@
 
       <div class="card full-table">
         <div class="card-header">
-          <h3>Loan Applications</h3>
+          <h3><span class="emoji-sm">💼</span>Loan Applications</h3>
           <span id="count-badge" class="badge badge-employee">— loans</span>
         </div>
         <div class="table-wrapper">

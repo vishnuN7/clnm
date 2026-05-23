@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Employees — CLN Admin</title>
-  <meta name="theme-color" content="#a855f7" />
+  <meta name="theme-color" content="#5a7a52" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
@@ -15,18 +15,18 @@
 <div class="app-layout">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
+        <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
-        <div><h2>CLN System</h2><span>Admin Panel</span></div>
+        <div><h2><span class="emoji-sm">📊</span>CLN System</h2><span>Admin Panel</span></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-        <a href="/admin/dashboard.html?fresh=20260516d" class="nav-item"><span class="nav-icon">DB</span> Dashboard</a>
-        <a href="/admin/employees.html" class="nav-item active"><span class="nav-icon">EM</span> Employees</a>
-        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon">CU</span> Customers</a>
-        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon">LN</span> Loan Applications</a>
+        <a href="/admin/dashboard.html?fresh=20260516d" class="nav-item"><span class="nav-icon emoji-sm">📊</span> Dashboard</a>
+        <a href="/admin/employees.html" class="nav-item active"><span class="nav-icon emoji-sm">👥</span> Employees</a>
+        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon emoji-sm">📋</span> Customers</a>
+        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon emoji-sm">💼</span> Loan Applications</a>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -44,9 +44,9 @@
   <main class="main-content">
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2>Employees</h2><p>Manage system users</p></div>
+      <div class="topbar-title"><h2><span class="emoji">👥</span>Employees</h2><p>Manage system users</p></div>
       <div class="topbar-actions">
-        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add Employee</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()"><span class="emoji-sm">➕</span>Add Employee</button>
       </div>
     </div>
 
@@ -68,7 +68,7 @@
 
       <div class="card full-table">
         <div class="card-header">
-          <h3>Employee List</h3>
+          <h3><span class="emoji-sm">👥</span>Employee List</h3>
           <span id="count-badge" class="badge badge-employee">0 employees</span>
         </div>
         <div class="table-wrapper">

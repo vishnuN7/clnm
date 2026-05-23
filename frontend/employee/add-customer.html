@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Customer — CLN Employee</title>
-  <meta name="theme-color" content="#a855f7" />
+  <meta name="theme-color" content="#5a7a52" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
@@ -15,17 +15,17 @@
 <div class="app-layout">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
+        <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
-        <div><h2>CLN System</h2><span>Employee Portal</span></div>
+        <div><h2><span class="emoji-sm">💼</span>CLN System</h2><span>Employee Portal</span></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon">DB</span> Dashboard</a>
-        <a href="/employee/add-customer.html" class="nav-item active"><span class="nav-icon">Add</span> Add Customer</a>
-        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon">LN</span> My Loans</a>
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon emoji-sm">📊</span> Dashboard</a>
+        <a href="/employee/add-customer.html" class="nav-item active"><span class="nav-icon emoji-sm">➕</span> Add Customer</a>
+        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon emoji-sm">💼</span> My Loans</a>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -43,7 +43,7 @@
   <main class="main-content">
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2>Add Customer</h2><p>Register a new customer and upload documents</p></div>
+      <div class="topbar-title"><h2><span class="emoji">➕</span>Add Customer</h2><p>Register a new customer and upload documents</p></div>
     </div>
     <div class="page-content">
       <div id="page-alert" class="alert"></div>
@@ -51,7 +51,7 @@
 
         <!-- Customer Form -->
         <div class="card">
-          <div class="card-header"><h3>Customer Details</h3></div>
+          <div class="card-header"><h3><span class="emoji-sm">📋</span>Customer Details</h3></div>
           <div class="card-body">
             <div class="form-group">
               <label>Quick Paste Details (Optional)</label>
@@ -66,21 +66,21 @@
             <div class="form-group"><label>Phone Number *</label><input type="tel" id="cust-phone" class="form-control" placeholder="10-digit mobile" maxlength="10" /></div>
             <div class="form-group"><label>Area *</label><input type="text" id="cust-area" class="form-control" placeholder="e.g. Koramangala" list="area-list" /><datalist id="area-list"></datalist></div>
             <div class="form-group"><label>Full Address *</label><textarea id="cust-address" class="form-control" rows="3" placeholder="Door no., Street, City, PIN"></textarea></div>
-            <button class="btn btn-primary" onclick="addCustomer()" id="add-cust-btn">Add Customer</button>
+            <button class="btn btn-primary" onclick="addCustomer()" id="add-cust-btn"><span class="emoji-sm">➕</span>Add Customer</button>
           </div>
         </div>
 
         <!-- Upload Section -->
         <div id="upload-section" style="display:none;">
           <div class="card" style="margin-bottom:16px;">
-            <div class="card-header"><h3>Customer Added</h3></div>
+            <div class="card-header"><h3><span class="emoji-sm">✅</span>Customer Added</h3></div>
             <div class="card-body">
               <p id="new-customer-info" style="font-size:14px;color:var(--text-secondary);"></p>
-              <a href="/employee/loans.html" class="btn btn-primary" style="margin-top:12px;display:inline-flex;" id="create-loan-link">Create Loan Application</a>
+              <a href="/employee/loans.html" class="btn btn-primary" style="margin-top:12px;display:inline-flex;" id="create-loan-link"><span class="emoji-sm">💼</span>Create Loan Application</a>
             </div>
           </div>
           <div class="card">
-            <div class="card-header"><h3>Upload Documents</h3></div>
+            <div class="card-header"><h3><span class="emoji-sm">📁</span>Upload Documents</h3></div>
             <div class="card-body">
               <div class="form-group">
                 <label>Document Type</label>
@@ -96,14 +96,14 @@
                 <label>Select File (PDF, JPG, PNG — max 5MB)</label>
                 <input type="file" id="doc-file" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp" />
               </div>
-              <button class="btn btn-secondary" onclick="uploadDocument()" id="upload-btn">⬆️ Upload Document</button>
+              <button class="btn btn-secondary" onclick="uploadDocument()" id="upload-btn"><span class="emoji-sm">📤</span>Upload Document</button>
               <div id="uploaded-docs" style="margin-top:16px;"></div>
             </div>
           </div>
         </div>
 
         <div id="upload-placeholder" class="card" style="text-align:center;padding:60px 20px;">
-          <div style="font-size:48px;margin-bottom:16px;">List</div>
+          <div style="font-size:48px;margin-bottom:16px;">📄</div>
           <h3 style="font-size:15px;color:var(--text-secondary);">Add a customer first</h3>
           <p style="font-size:13px;color:var(--text-muted);margin-top:8px;">Document upload will appear here after adding the customer.</p>
         </div>

@@ -66,6 +66,32 @@ const loginLimiter = (req, res, next) => {
 };
 
 /**
+ * Password reset request limiter
+ * Slightly looser than login, but still protects the mailbox.
+ */
+const forgotPasswordLimiter = (req, res, next) => {
+  const identifier = `forgot-password:${req.ip}:${req.body?.email || 'unknown'}`;
+  const limit = rateLimit(identifier, {
+    windowMs: 60 * 60 * 1000, // 1 hour
+    maxRequests: 3 // 3 requests per hour
+  });
+
+  res.setHeader('RateLimit-Limit', limit.maxRequests || 3);
+  res.setHeader('RateLimit-Remaining', Math.max(0, limit.remaining || 0));
+  res.setHeader('RateLimit-Reset', new Date(limit.resetTime).toISOString());
+
+  if (!limit.allowed) {
+    return res.status(429).json({
+      success: false,
+      message: `Too many password reset requests. Please try again after ${new Date(limit.resetTime).toLocaleTimeString()}.`,
+      retryAfter: Math.ceil((limit.resetTime - Date.now()) / 1000)
+    });
+  }
+
+  next();
+};
+
+/**
  * API General Rate Limiter
  * Moderate rate limiting for general API usage
  */
@@ -113,6 +139,7 @@ setInterval(cleanupRateLimitStore, 5 * 60 * 1000);
 
 module.exports = {
   loginLimiter,
+  forgotPasswordLimiter,
   apiLimiter,
   rateLimit,
   getRateLimit

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard — CLN</title>
-  <meta name="theme-color" content="#a855f7" />
+  <meta name="theme-color" content="#5a7a52" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <script>
@@ -27,18 +27,18 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
+        <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
-        <div><h2>CLN System</h2><span>Admin Panel</span></div>
+        <div><h2><span class="emoji-sm">📊</span>CLN System</h2><span>Admin Panel</span></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-        <a href="/admin/dashboard.html" class="nav-item active"><span class="nav-icon">DB</span> Dashboard</a>
-        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon">EM</span> Employees</a>
-        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon">CU</span> Customers</a>
-        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon">LN</span> Loan Applications</a>
+        <a href="/admin/dashboard.html" class="nav-item active"><span class="nav-icon emoji-sm">📊</span> Dashboard</a>
+        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon emoji-sm">👥</span> Employees</a>
+        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon emoji-sm">📋</span> Customers</a>
+        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon emoji-sm">💼</span> Loan Applications</a>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -57,7 +57,7 @@
   <main class="main-content">
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2>Dashboard</h2><p>Overview of all loan activities</p></div>
+      <div class="topbar-title"><h2><span class="emoji">📊</span>Dashboard</h2><p>Overview of all loan activities</p></div>
       <div class="topbar-actions">
         <span id="current-date" style="font-size:13px;color:var(--text-secondary);"></span>
       </div>
@@ -67,26 +67,26 @@
       <!-- Stats -->
       <div class="stats-grid" id="stats-grid">
         <div class="stat-card" role="button" tabindex="0" onclick="toggleEmployeesInsights()" onkeydown="if(event.key==='Enter' || event.key===' ') toggleEmployeesInsights()" style="cursor:pointer;">
-          <div class="stat-icon">E</div>
+          <div class="stat-icon">👥</div>
           <div class="stat-value" id="stat-employees">—</div>
-          <div class="stat-label">Employees</div>
+          <div class="stat-label"><span class="emoji-sm">👥</span>Employees</div>
         </div>
       </div>
 
       <div id="employees-insights" class="card" style="display:none;margin-bottom:28px;">
         <div class="card-header">
-          <h3>Employees Overview</h3>
+          <h3><span class="emoji-sm">👥</span>Employees Overview</h3>
           <button class="btn btn-secondary btn-sm" onclick="toggleEmployeesInsights()">Close</button>
         </div>
         <div class="card-body">
           <div style="display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start;">
             <div class="card" style="margin:0;">
-              <div class="card-header"><h3 style="font-size:14px;">Employee Names</h3></div>
+              <div class="card-header"><h3 style="font-size:14px;"><span class="emoji-sm">👤</span>Employee Names</h3></div>
               <div id="employee-list" style="max-height:420px;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:8px;"></div>
             </div>
             <div class="card" style="margin:0;">
               <div class="card-header">
-                <h3 id="employee-detail-title" style="font-size:14px;">Select an employee</h3>
+                <h3 id="employee-detail-title" style="font-size:14px;"><span class="emoji-sm">ℹ️</span>Select an employee</h3>
                 <button class="btn btn-secondary btn-sm" onclick="refreshEmployeeDetails()">Refresh</button>
               </div>
               <div class="card-body" id="employee-detail-body">
@@ -100,20 +100,20 @@
       <!-- Charts + Recent -->
       <div class="content-grid">
         <div class="card">
-          <div class="card-header"><h3>Monthly Loan Trend</h3></div>
+          <div class="card-header"><h3><span class="emoji-sm">📈</span>Monthly Loan Trend</h3></div>
           <div class="card-body"><div class="chart-container"><canvas id="chart-trend"></canvas></div></div>
         </div>
         <div class="card">
-          <div class="card-header"><h3>Loan Status Breakdown</h3></div>
+          <div class="card-header"><h3><span class="emoji-sm">🔎</span>Loan Status Breakdown</h3></div>
           <div class="card-body"><div class="chart-container"><canvas id="chart-status"></canvas></div></div>
         </div>
       </div>
 
       <!-- Recent Loans -->
       <div class="card full-table">
-        <div class="card-header">
-          <h3>Recent Loan Applications</h3>
-          <a href="/admin/loans.html" class="btn btn-secondary btn-sm">View All →</a>
+          <div class="card-header">
+          <h3><span class="emoji-sm">🕒</span>Recent Loan Applications</h3>
+          <a href="/admin/loans.html" class="btn btn-secondary btn-sm"><span class="emoji-sm">📄</span>View All →</a>
         </div>
         <div class="table-wrapper">
           <table>
@@ -247,7 +247,7 @@
     listEl.innerHTML = dashboardEmployees.map(emp => {
       const metrics = buildEmployeeMetrics(emp);
       return `
-        <button type="button" class="btn btn-secondary" onclick="selectEmployee(${emp.id})" style="justify-content:space-between;width:100%;text-align:left;padding:12px 14px;display:flex;align-items:center;gap:12px;${selectedEmployeeId === emp.id ? 'border-color: var(--accent); background: rgba(59,130,246,0.12);' : ''}">
+        <button type="button" class="btn btn-secondary" onclick="selectEmployee(${emp.id})" style="justify-content:space-between;width:100%;text-align:left;padding:12px 14px;display:flex;align-items:center;gap:12px;${selectedEmployeeId === emp.id ? 'border-color: var(--accent); background: var(--accent-soft);' : ''}">
           <span>
             <strong style="display:block;font-size:14px;">${emp.name}</strong>
             <small style="color:var(--text-muted);">${emp.email}</small>
@@ -279,10 +279,38 @@
         api.get('/admin/customers'),
         api.get('/admin/loans')
       ]);
-      if (!empRes?.ok || !custRes?.ok || !loanRes?.ok) return;
-      dashboardEmployees = empRes.data.data;
-      dashboardCustomers = custRes.data.data;
-      dashboardLoans = loanRes.data.data;
+      if (!empRes?.ok || !custRes?.ok || !loanRes?.ok) {
+        // if API fails, fall back to a safe sample employee for local/demo view
+        dashboardEmployees = [];
+        dashboardCustomers = [];
+        dashboardLoans = [];
+      } else {
+        dashboardEmployees = empRes.data.data;
+        dashboardCustomers = custRes.data.data;
+        dashboardLoans = loanRes.data.data;
+      }
+
+      // If backend returned no data (local demo), inject a sample employee 'aryan' with example metrics
+      if (!dashboardEmployees.length) {
+        dashboardEmployees = [{
+          id: 999900,
+          name: 'aryan',
+          email: 'aryan@gmail.com',
+          phone: '12356799',
+          is_active: true,
+          created_at: '2026-04-30T00:00:00Z'
+        }];
+
+        // create 9 sample loans: 6 Pending, 1 Approved, 2 Rejected
+        dashboardLoans = [];
+        for (let i = 0; i < 6; i++) dashboardLoans.push({ applied_by_name: 'aryan', amount: 50000 + i * 1000, status: 'Pending' });
+        dashboardLoans.push({ applied_by_name: 'aryan', amount: 75000, status: 'Approved' });
+        dashboardLoans.push({ applied_by_name: 'aryan', amount: 20000, status: 'Rejected' });
+        dashboardLoans.push({ applied_by_name: 'aryan', amount: 30000, status: 'Rejected' });
+
+        // create 9 sample customers added by aryan
+        dashboardCustomers = Array.from({ length: 9 }).map((_, idx) => ({ id: 7000 + idx, name: `Customer ${idx+1}`, added_by_name: 'aryan', area: 'Demo Area', created_at: '2026-04-15T00:00:00Z' }));
+      }
     }
 
     renderEmployeeList();
@@ -449,7 +477,7 @@
     const months = loans.monthlyTrend.map(m => m.month);
     const counts = loans.monthlyTrend.map(m => m.count);
 
-    const chartDefaults = { color: '#94a3b8', borderColor: 'rgba(255,255,255,0.05)' };
+    const chartDefaults = { color: '#4d5c57', borderColor: 'rgba(77, 92, 87, 0.18)' };
     Chart.defaults.color = chartDefaults.color;
     Chart.defaults.borderColor = chartDefaults.borderColor;
 
@@ -460,8 +488,8 @@
         datasets: [{
           label: 'Loans',
           data: counts,
-          backgroundColor: 'rgba(59,130,246,0.6)',
-          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(90, 122, 82, 0.55)',
+          borderColor: '#5a7a52',
           borderWidth: 1, borderRadius: 6
         }]
       },

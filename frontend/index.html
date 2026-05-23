@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CLN Management System — Login</title>
   <meta name="description" content="Secure login portal for the Customer Loan Network Management System." />
-  <meta name="theme-color" content="#a855f7" />
+  <meta name="theme-color" content="#5a7a52" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
@@ -27,6 +27,10 @@
         <div id="network-notice" class="alert alert-warning" style="display:none; margin-top: 8px;">
           Employee login is allowed only from office network.
         </div>
+
+        <div id="admin-login-note" class="alert alert-info" style="display:block; margin-top: 8px;">
+          Admin login email: dixitlendingsolution@gmail.com
+        </div>
         
         <div id="login-alert" class="alert alert-error"></div>
 
@@ -42,7 +46,7 @@
                 <span class="eye-icon">Show</span>
               </button>
             </div>
-            <a href="#" class="forgot-password">Forgot?</a>
+            <a href="/reset-password.html" class="forgot-password" id="forgot-password-link">Forgot password?</a>
           </div>
 
           <div class="form-group checkbox-group">
@@ -51,7 +55,7 @@
           </div>
 
           <button type="submit" id="login-btn" class="btn btn-primary">
-            <span id="btn-text">Sign in</span>
+            <span id="btn-text"><span class="emoji-sm">🔐</span>Sign in</span>
             <span id="btn-spinner" class="spinner" style="display:none;"></span>
           </button>
         </form>
@@ -81,6 +85,10 @@
       document.getElementById('btn-employee').classList.toggle('active', role === 'employee');
       const notice = document.getElementById('network-notice');
       notice.style.display = role === 'employee' ? 'block' : 'none';
+      const adminNote = document.getElementById('admin-login-note');
+      adminNote.textContent = role === 'admin'
+        ? 'Admin login email: dixitlendingsolution@gmail.com'
+        : 'Employee login is allowed only from office network.';
     }
 
     function togglePasswordVisibility() {
