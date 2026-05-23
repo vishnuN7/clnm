@@ -11,6 +11,12 @@ function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
 }
 
+function getFrontendBaseUrl(req) {
+  const configuredBase = process.env.FRONTEND_BASE_URL || process.env.ALLOWED_ORIGIN || '';
+  const fallbackBase = `${req.protocol}://${req.get('host')}`;
+  return String(configuredBase || fallbackBase).replace(/\/$/, '');
+}
+
 function hashResetToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
@@ -112,7 +118,7 @@ const authController = {
       const rawToken = crypto.randomBytes(32).toString('hex');
       const tokenHash = hashResetToken(rawToken);
       const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS);
-      const resetUrl = `${req.protocol}://${req.get('host')}/reset-password.html?token=${rawToken}`;
+      const resetUrl = `${getFrontendBaseUrl(req)}/reset-password.html?token=${rawToken}`;
 
       await PasswordResetModel.deleteForUser(user.id);
       await PasswordResetModel.create({ userId: user.id, tokenHash, expiresAt });

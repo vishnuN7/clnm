@@ -2,6 +2,11 @@
 // Dynamically detect API URL to support different environments
 const API_BASE = (() => {
   const { protocol, hostname, host } = window.location;
+  const configuredBase = window.__CLN_API_BASE__;
+
+  if (configuredBase) {
+    return configuredBase.replace(/\/$/, '') + '/api';
+  }
 
   // If frontend is opened as a local file, target local backend.
   if (protocol === 'file:') {

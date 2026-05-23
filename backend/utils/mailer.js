@@ -14,6 +14,7 @@ function createTransport() {
     host,
     port,
     secure: process.env.SMTP_SECURE === 'true' || port === 465,
+    family: 4,
     auth: { user, pass }
   });
 }

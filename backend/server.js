@@ -16,23 +16,49 @@ const app = express();
 // Trust the reverse proxy on VPS/Nginx so req.ip and secure cookies behave correctly
 app.set('trust proxy', 1);
 
+function normalizeOrigin(origin) {
+  return String(origin || '').trim().replace(/\/$/, '');
+}
+
+function getAllowedOrigins() {
+  const localOrigins = [
+    'http://localhost:5000',
+    'http://localhost:3000',
+    'http://localhost:8080',
+    'http://127.0.0.1:5000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:8080'
+  ];
+
+  const configuredOrigins = [process.env.ALLOWED_ORIGIN, process.env.FRONTEND_BASE_URL]
+    .filter(Boolean)
+    .flatMap((value) => value.split(','))
+    .map(normalizeOrigin)
+    .filter(Boolean);
+
+  return [...new Set([...localOrigins, ...configuredOrigins])];
+}
+
+function isAllowedOrigin(origin, allowedOrigins) {
+  if (allowedOrigins.includes(origin)) return true;
+
+  try {
+    const hostname = new URL(origin).hostname;
+    return hostname.endsWith('.netlify.app');
+  } catch {
+    return false;
+  }
+}
+
 // ── Middleware ──────────────────────────────────────────────────
-const allowedOrigins = [
-  'http://localhost:5000',
-  'http://localhost:3000',
-  'http://localhost:8080',
-  'http://127.0.0.1:5000',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:8080',
-  process.env.ALLOWED_ORIGIN || 'http://localhost:5000'
-];
+const allowedOrigins = getAllowedOrigins();
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, Postman)
     if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
+
+    if (isAllowedOrigin(origin, allowedOrigins)) {
       callback(null, true);
     } else {
       callback(new Error('CORS not allowed'));
