@@ -84,3 +84,34 @@ Schedule daily database dumps and upload backups to offsite storage such as S3 o
 - Keep `ALLOWED_ORIGIN` set to the production domain only.
 - Keep rate limiting enabled.
 - Do not store secrets in the repository.
+
+## Render backend setup
+
+Render does not provide a managed MySQL database inside a Web Service, so the backend must point to an external MySQL host.
+
+Use these values in the Render service environment settings:
+
+- `PORT`: leave unset in Render, or let Render provide it automatically.
+- `NODE_ENV`: `production`
+- `DB_HOST`: the hostname from your MySQL provider, for example `mysql.example.com`
+- `DB_PORT`: usually `3306`
+- `DB_USER`: the database username you created with your provider
+- `DB_PASSWORD`: the password for that MySQL user
+- `DB_NAME`: the database name you created, usually `cln_db`
+- `JWT_SECRET`: a long random secret generated locally
+- `ALLOWED_ORIGIN`: your Netlify frontend URL, for example `https://your-site.netlify.app`
+- `FRONTEND_BASE_URL`: the same Netlify URL, used for password reset links
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`: values from your email provider
+
+Where each value comes from:
+
+- MySQL host, user, password, and database name come from the database provider dashboard.
+- `JWT_SECRET` should be generated locally, for example with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+- `ALLOWED_ORIGIN` and `FRONTEND_BASE_URL` should be your deployed Netlify URL, not `localhost`.
+- SMTP values come from your mail provider, such as Gmail app passwords or another SMTP service.
+
+Render start command:
+
+- Use `npm start` instead of `npm run dev`.
+
+After setting the variables, import `backend/setup.sql` into the MySQL database once, then redeploy the Render service.
