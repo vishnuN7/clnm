@@ -10,12 +10,12 @@ const API_BASE = (() => {
 
   // If frontend is opened as a local file, target local backend.
   if (protocol === 'file:') {
-    return 'http://srv-d88q4feq1p3s73f74150:5000/api';
+    return 'https://clnm.onrender.com/api';
   }
 
   // In local dev, frontend may run on :8080/:3000 while backend runs on :5000.
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return `${protocol}//srv-d88q4feq1p3s73f74150:5000/api`;
+    return 'https://clnm.onrender.com/api';
   }
 
   // In production, use same-origin API.
