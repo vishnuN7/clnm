@@ -44,7 +44,7 @@ function isAllowedOrigin(origin, allowedOrigins) {
 
   try {
     const hostname = new URL(origin).hostname;
-    return hostname.endsWith('.netlify.app');
+    return hostname.endsWith('.netlify.app') || hostname.endsWith('.onrender.com');
   } catch {
     return false;
   }
