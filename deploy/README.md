@@ -93,7 +93,7 @@ Use these values in the Render service environment settings:
 
 - `PORT`: leave unset in Render, or let Render provide it automatically.
 - `NODE_ENV`: `production`
-- `DB_HOST`: the hostname from your MySQL provider, for example `mysql.example.com`
+- `DB_HOST`: the Cloud SQL public IP or managed MySQL hostname
 - `DB_PORT`: usually `3306`
 - `DB_USER`: the database username you created with your provider
 - `DB_PASSWORD`: the password for that MySQL user
