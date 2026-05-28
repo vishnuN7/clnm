@@ -130,7 +130,8 @@ const authController = {
       });
     } catch (err) {
       console.error('[Auth] Forgot password error:', err);
-      return res.status(500).json({ success: false, message: 'Unable to send reset email right now.' });
+      const message = err && err.message ? err.message : 'Unable to send reset email right now.';
+      return res.status(500).json({ success: false, message });
     }
   },
 
