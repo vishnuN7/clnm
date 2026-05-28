@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 function normalizeSmtpConfig() {
   const rawHost = String(process.env.SMTP_HOST || '').trim();
   const rawUser = String(process.env.SMTP_USER || '').trim();
-  const rawPass = String(process.env.SMTP_PASS || '').trim();
+  const rawPass = String(process.env.SMTP_PASS || '').replace(/\s+/g, '');
 
   // Some deployments accidentally put the sender email into SMTP_HOST.
   // If that happens, assume Gmail SMTP and treat the value as the username.
