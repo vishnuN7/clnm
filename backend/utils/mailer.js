@@ -1,10 +1,27 @@
 const nodemailer = require('nodemailer');
 
+function normalizeSmtpConfig() {
+  const rawHost = String(process.env.SMTP_HOST || '').trim();
+  const rawUser = String(process.env.SMTP_USER || '').trim();
+  const rawPass = String(process.env.SMTP_PASS || '').trim();
+
+  // Some deployments accidentally put the sender email into SMTP_HOST.
+  // If that happens, assume Gmail SMTP and treat the value as the username.
+  const looksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawHost);
+  const host = !rawHost || looksLikeEmail ? 'smtp.gmail.com' : rawHost;
+  const user = rawUser || (looksLikeEmail ? rawHost : '');
+
+  return {
+    host,
+    port: Number(process.env.SMTP_PORT || 587),
+    user,
+    pass: rawPass,
+    secure: process.env.SMTP_SECURE === 'true' || Number(process.env.SMTP_PORT || 587) === 465
+  };
+}
+
 function createTransport() {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const { host, port, user, pass, secure } = normalizeSmtpConfig();
 
   if (!host || !user || !pass) {
     throw new Error('SMTP is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS.');
@@ -13,8 +30,11 @@ function createTransport() {
   return nodemailer.createTransport({
     host,
     port,
-    secure: process.env.SMTP_SECURE === 'true' || port === 465,
+    secure,
     family: 4,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
     auth: { user, pass }
   });
 }
