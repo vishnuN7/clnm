@@ -1,4 +1,9 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
+
+if (typeof dns.setDefaultResultOrder === 'function') {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 function normalizeSmtpConfig() {
   const rawHost = String(process.env.SMTP_HOST || '').trim();
@@ -32,6 +37,7 @@ function createTransport() {
     port,
     secure,
     family: 4,
+    lookup: (hostname, options, callback) => dns.lookup(hostname, { ...options, family: 4 }, callback),
     connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 10000,
