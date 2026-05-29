@@ -7,7 +7,6 @@ const db = require('./config/db');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const employeeRoutes = require('./routes/employee');
-const { verifyTransporter } = require('./utils/mailer');
 
 const { loginLimiter, apiLimiter } = require('./middleware/rateLimit');
 
@@ -155,15 +154,7 @@ async function ensurePasswordResetTable() {
   }
 }
 
-Promise.all([ensureDefaultAdminAccount(), ensurePasswordResetTable()]).finally(async () => {
-  try {
-    await verifyTransporter();
-    console.log('SMTP verification successful.');
-  } catch (err) {
-    console.warn('SMTP verification failed:', err && err.message ? err.message : err);
-    console.warn('Password reset emails may not be sent until SMTP is fixed.');
-  }
-
+Promise.all([ensureDefaultAdminAccount(), ensurePasswordResetTable()]).finally(() => {
   app.listen(PORT, () => {
     console.log(`\nCLN Server running at http://localhost:${PORT}`);
     console.log(`Admin login: dixitlendingsolution@gmail.com / Admin@123`);

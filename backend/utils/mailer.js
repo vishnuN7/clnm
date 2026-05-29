@@ -38,17 +38,48 @@ function createTransport() {
     secure,
     family: 4,
     lookup: (hostname, options, callback) => dns.lookup(hostname, { ...options, family: 4 }, callback),
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-    auth: { user, pass }
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+    auth: { user, pass },
+    tls: { servername: host }
   });
 }
 
+async function sendWithGmailPortFallback(transporterFactory) {
+  const config = normalizeSmtpConfig();
+  const ports = [...new Set([config.port, 587, 465])];
+  let lastError = null;
+
+  for (const candidatePort of ports) {
+    try {
+      const secure = process.env.SMTP_SECURE === 'true' || candidatePort === 465;
+      const transporter = nodemailer.createTransport({
+        host: config.host,
+        port: candidatePort,
+        secure,
+        family: 4,
+        lookup: (hostname, options, callback) => dns.lookup(hostname, { ...options, family: 4 }, callback),
+        connectionTimeout: 30000,
+        greetingTimeout: 30000,
+        socketTimeout: 30000,
+        auth: { user: config.user, pass: config.pass },
+        tls: { servername: config.host }
+      });
+
+      return await transporterFactory(transporter);
+    } catch (err) {
+      lastError = err;
+      console.warn('[Mailer] SMTP attempt failed:', err && err.message ? err.message : err);
+    }
+  }
+
+  throw lastError || new Error('SMTP connection failed.');
+}
+
 async function verifyTransporter() {
-  const transporter = createTransport();
   try {
-    await transporter.verify();
+    await sendWithGmailPortFallback((transporter) => transporter.verify());
     return true;
   } catch (err) {
     // rethrow with contextual message
@@ -59,7 +90,6 @@ async function verifyTransporter() {
 }
 
 async function sendPasswordResetEmail({ to, name, resetUrl }) {
-  const transporter = createTransport();
   const from = process.env.SMTP_FROM || process.env.SMTP_USER;
 
   const subject = 'Reset your CLN password';
@@ -88,13 +118,13 @@ async function sendPasswordResetEmail({ to, name, resetUrl }) {
   ].join('\n');
 
   try {
-    await transporter.sendMail({
+    await sendWithGmailPortFallback((transporter) => transporter.sendMail({
       from,
       to,
       subject,
       text,
       html
-    });
+    }));
   } catch (err) {
     console.error('[Mailer] sendPasswordResetEmail error:', err && err.message ? err.message : err);
     throw err;
