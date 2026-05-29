@@ -1,17 +1,19 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
-const { verifyTransporter, sendPasswordResetEmail } = require('../utils/mailer');
+const { sendPasswordResetEmail } = require('../utils/mailer');
 
 (async () => {
   try {
-    console.log('Starting SMTP verification...');
-    await verifyTransporter();
-    console.log('SMTP verified OK.');
+    const to = process.env.RESEND_TEST_TO || process.env.RESEND_FROM;
+    const resetUrl = 'https://example.com/reset?token=testing';
 
-    const to = process.env.SMTP_USER;
+    if (!to) {
+      throw new Error('Set RESEND_TEST_TO before running this script.');
+    }
+
     console.log('Sending test reset email to', to);
-    await sendPasswordResetEmail({ to, name: 'CLN Test', resetUrl: 'https://example.com/reset?token=testing' });
+    await sendPasswordResetEmail({ to, name: 'CLN Test', resetUrl });
     console.log('Test email sent successfully.');
     process.exit(0);
   } catch (err) {

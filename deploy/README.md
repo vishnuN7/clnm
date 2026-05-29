@@ -101,14 +101,14 @@ Use these values in the Render service environment settings:
 - `JWT_SECRET`: a long random secret generated locally
 - `ALLOWED_ORIGIN`: your Netlify frontend URL, for example `https://your-site.netlify.app`
 - `FRONTEND_BASE_URL`: the same Netlify URL, used for password reset links
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`: values from your email provider
+- `RESEND_API_KEY`, `RESEND_FROM`: values from your Resend account
 
 Where each value comes from:
 
 - MySQL host, user, password, and database name come from the database provider dashboard.
 - `JWT_SECRET` should be generated locally, for example with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
 - `ALLOWED_ORIGIN` and `FRONTEND_BASE_URL` should be your deployed Netlify URL, not `localhost`.
-- SMTP values come from your mail provider, such as Gmail app passwords or another SMTP service.
+- Resend values come from your Resend dashboard after verifying a sender domain or address.
 
 Render start command:
 
