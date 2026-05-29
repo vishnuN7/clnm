@@ -1,12 +1,35 @@
 function normalizeResendConfig() {
   const apiKey = String(process.env.RESEND_API_KEY || '').trim();
-  const from = String(process.env.RESEND_FROM || '').trim();
+  const from = normalizeResendFrom(process.env.RESEND_FROM || '');
 
   if (!apiKey || !from) {
     throw new Error('Resend is not configured. Set RESEND_API_KEY and RESEND_FROM.');
   }
 
   return { apiKey, from };
+}
+
+function normalizeResendFrom(value) {
+  const rawValue = String(value || '').trim();
+
+  if (!rawValue) return '';
+
+  const mailtoMatch = rawValue.match(/mailto:([^\]\)\s>]+)/i);
+  if (mailtoMatch && mailtoMatch[1]) {
+    return mailtoMatch[1].trim();
+  }
+
+  const angleMatch = rawValue.match(/<([^>]+)>/);
+  if (angleMatch && angleMatch[1]) {
+    return angleMatch[1].trim();
+  }
+
+  const markdownMailtoMatch = rawValue.match(/\[([^\]]+)\]\(mailto:([^\)]+)\)/i);
+  if (markdownMailtoMatch && markdownMailtoMatch[2]) {
+    return markdownMailtoMatch[2].trim();
+  }
+
+  return rawValue;
 }
 
 function buildResetEmail({ name, resetUrl }) {
@@ -60,20 +83,35 @@ async function sendViaResend({ to, subject, html, text }) {
       signal: abortController.signal
     });
 
+    const rawBody = await response.text();
+    const parsedBody = rawBody ? tryParseJson(rawBody) : null;
+
     if (!response.ok) {
-      const responseText = await response.text();
-      throw new Error(`Resend request failed: ${response.status} ${responseText}`);
+      const responseMessage = parsedBody?.message || parsedBody?.error || rawBody || response.statusText || 'Unknown error';
+      throw new Error(`Resend request failed: ${response.status} ${responseMessage}`);
     }
 
-    return await response.json();
+    if (!parsedBody || typeof parsedBody !== 'object' || !parsedBody.id) {
+      throw new Error('Resend request failed: invalid API response.');
+    }
+
+    return parsedBody;
   } catch (err) {
     if (err && err.name === 'AbortError') {
-      throw new Error('Resend request timed out.');
+      throw new Error('Resend request timed out while sending the email.');
     }
 
     throw err;
   } finally {
     clearTimeout(timeoutId);
+  }
+}
+
+function tryParseJson(value) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
   }
 }
 
