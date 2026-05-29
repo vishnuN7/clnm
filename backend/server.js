@@ -7,6 +7,7 @@ const db = require('./config/db');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const employeeRoutes = require('./routes/employee');
+const { debugResendEnvironment } = require('./utils/mailer');
 
 const { loginLimiter, apiLimiter } = require('./middleware/rateLimit');
 
@@ -159,5 +160,6 @@ Promise.all([ensureDefaultAdminAccount(), ensurePasswordResetTable()]).finally((
     console.log(`\nCLN Server running at http://localhost:${PORT}`);
     console.log(`Admin login: dixitlendingsolution@gmail.com / Admin@123`);
     console.log(`Employee login: employee@cln.com / Employee@123\n`);
+    debugResendEnvironment();
   });
 });

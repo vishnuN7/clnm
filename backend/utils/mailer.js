@@ -58,6 +58,24 @@ function logResendEnvPresence(apiKey, from) {
   });
 }
 
+function debugResendEnvironment() {
+  const debugEnabled = String(process.env.RESEND_DEBUG || '').trim().toLowerCase() === 'true';
+
+  if (!debugEnabled) {
+    return;
+  }
+
+  const apiKey = cleanEnvValue(process.env.RESEND_API_KEY || '');
+  const from = normalizeResendFrom(process.env.RESEND_FROM || '');
+
+  console.info('[Mailer] Resend env presence (startup):', {
+    apiKeyPresent: Boolean(apiKey),
+    apiKeyLength: apiKey ? apiKey.length : 0,
+    fromPresent: Boolean(from),
+    fromLength: from ? from.length : 0
+  });
+}
+
 function buildResetEmail({ name, resetUrl }) {
   const subject = 'Reset your CLN password';
   const html = `
@@ -157,5 +175,6 @@ async function sendPasswordResetEmail({ to, name, resetUrl }) {
 }
 
 module.exports = {
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  debugResendEnvironment
 };
