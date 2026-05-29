@@ -1,6 +1,8 @@
 function normalizeResendConfig() {
-  const apiKey = String(process.env.RESEND_API_KEY || '').trim();
+  const apiKey = cleanEnvValue(process.env.RESEND_API_KEY || '');
   const from = normalizeResendFrom(process.env.RESEND_FROM || '');
+
+  logResendEnvPresence(apiKey, from);
 
   if (!apiKey || !from) {
     throw new Error('Resend is not configured. Set RESEND_API_KEY and RESEND_FROM.');
@@ -10,7 +12,7 @@ function normalizeResendConfig() {
 }
 
 function normalizeResendFrom(value) {
-  const rawValue = String(value || '').trim();
+  const rawValue = cleanEnvValue(value || '');
 
   if (!rawValue) return '';
 
@@ -30,6 +32,30 @@ function normalizeResendFrom(value) {
   }
 
   return rawValue;
+}
+
+function cleanEnvValue(value) {
+  const rawValue = String(value || '').trim();
+
+  if (!rawValue) return '';
+
+  const hasWrappingQuotes = (rawValue.startsWith('"') && rawValue.endsWith('"')) || (rawValue.startsWith("'") && rawValue.endsWith("'"));
+  return hasWrappingQuotes ? rawValue.slice(1, -1).trim() : rawValue;
+}
+
+function logResendEnvPresence(apiKey, from) {
+  const debugEnabled = String(process.env.RESEND_DEBUG || '').trim().toLowerCase() === 'true';
+
+  if (!debugEnabled) {
+    return;
+  }
+
+  console.info('[Mailer] Resend env presence:', {
+    apiKeyPresent: Boolean(apiKey),
+    apiKeyLength: apiKey ? apiKey.length : 0,
+    fromPresent: Boolean(from),
+    fromLength: from ? from.length : 0
+  });
 }
 
 function buildResetEmail({ name, resetUrl }) {
