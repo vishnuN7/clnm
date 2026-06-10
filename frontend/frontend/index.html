@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Management System — Login</title>
-  <meta name="description" content="Secure login portal for the Customer Loan Network Management System." />
-  <meta name="theme-color" content="#5a7a52" />
+  <title>CLN Lending Suite — Login</title>
+  <meta name="description" content="Secure login portal for the CLN Lending Suite." />
+  <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
@@ -42,8 +42,8 @@
           <div class="form-group password-group">
             <div class="password-input-wrapper">
               <input type="password" id="password" class="form-control" placeholder="Password" required autocomplete="current-password" />
-              <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
-                <span class="eye-icon">Show</span>
+              <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" aria-label="Show password">
+                <span class="eye-icon" aria-hidden="true"></span>
               </button>
             </div>
             <a href="/reset-password.html" class="forgot-password" id="forgot-password-link">Forgot password?</a>
@@ -64,8 +64,8 @@
     </div>
 
     <footer class="login-page-footer">
-      <p>Powered by DixitLending © 2026</p>
-      <span class="footer-link"><a href="#">www.dixitlending.com</a></span>
+      <p>CLN Lending Suite © 2026</p>
+      <span class="footer-link"><a href="#">cln.lending</a></span>
     </footer>
   </div>
 
@@ -102,6 +102,12 @@
       } else {
         passwordInput.type = 'password';
         toggleBtn.classList.remove('visible');
+      }
+
+      if (typeof window.clnIcon === 'function') {
+        const visible = toggleBtn.classList.contains('visible');
+        toggleBtn.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
+        toggleBtn.innerHTML = window.clnIcon(visible ? 'eyeOff' : 'eye');
       }
     }
 

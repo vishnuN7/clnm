@@ -1,12 +1,12 @@
 {
   "name": "CLN Management System",
   "short_name": "CLN",
-  "description": "Customer Loan Network Management System for desktop and mobile use",
+  "description": "CLN Lending Suite for desktop and mobile use",
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0f1e",
-  "theme_color": "#2563eb",
+  "background_color": "#07111e",
+  "theme_color": "#0f2747",
   "orientation": "portrait-primary",
   "icons": [
     {
