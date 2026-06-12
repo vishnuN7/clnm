@@ -115,3 +115,11 @@ Render start command:
 - Use `npm start` instead of `npm run dev`.
 
 After setting the variables, import `backend/setup.sql` into the MySQL database once, then redeploy the Render service.
+
+## Netlify frontend setup
+
+If you deploy the frontend on Netlify, set this site environment variable:
+
+- `CLN_API_BASE`: the Render backend URL, for example `https://clnm.onrender.com`
+
+The included `deploy/netlify.toml` build step injects that value into `frontend/js/runtime-config.js` during the Netlify build.
