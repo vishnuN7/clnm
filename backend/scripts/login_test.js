@@ -4,7 +4,7 @@
     const res = await fetch(`http://localhost:${port}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({ email: 'dixitlendingsolution@gmail.com', password: 'Admin@123', role: 'admin' })
+       body: JSON.stringify({ email: 'dixitlendingsolution@gmail.com', password: 'Utkarsh.3112', role: 'admin' })
     });
     const data = await res.json().catch(() => null);
     console.log('Login status:', res.status);

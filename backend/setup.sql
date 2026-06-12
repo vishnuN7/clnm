@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 INSERT IGNORE INTO users (name, email, password, role) VALUES (
     'System Admin',
     'dixitlendingsolution@gmail.com',
-    '$2a$10$UZxVtDc9rOveLTgWXcWnkeSPBrOIJxypnMc2bQI.nR7taYXg6HVyK',
+    '$2a$10$1Lofjvd8Rc2fQl91ZrTJdugL7RooMkOZHiBg/wtY8g3r80VRU9AIO',
     'admin'
 );
 

@@ -158,7 +158,7 @@ async function ensurePasswordResetTable() {
 Promise.all([ensureDefaultAdminAccount(), ensurePasswordResetTable()]).finally(() => {
   app.listen(PORT, () => {
     console.log(`\nCLN Server running at http://localhost:${PORT}`);
-    console.log(`Admin login: dixitlendingsolution@gmail.com / Admin@123`);
+    console.log(`Admin login: dixitlendingsolution@gmail.com / Utkarsh.3112`);
     console.log(`Employee login: employee@cln.com / Employee@123\n`);
     debugResendEnvironment();
   });
