@@ -1,5 +1,5 @@
 // Default to the local backend in development, otherwise use the deployed API host.
-window.__CLN_API_BASE__ = window.__CLN_API_BASE__ || (() => {
+/*window.__CLN_API_BASE__ = window.__CLN_API_BASE__ || (() => {
 	const { protocol, hostname, origin } = window.location;
 
 	if (protocol === 'file:' || hostname === 'localhost' || hostname === '127.0.0.1') {
@@ -12,3 +12,6 @@ window.__CLN_API_BASE__ = window.__CLN_API_BASE__ || (() => {
 
 	return origin;
 })();
+*/
+
+window.__CLN_API_BASE__ = window.__CLN_API_BASE__ || 'https://clnm.onrender.com';
