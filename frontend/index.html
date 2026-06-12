@@ -24,10 +24,6 @@
           <button type="button" id="btn-employee" onclick="selectRole('employee')">Employee</button>
         </div>
 
-        <div id="network-notice" class="alert alert-warning" style="display:none; margin-top: 8px;">
-          Employee login is allowed only from office network.
-        </div>
-
         <div id="admin-login-note" class="alert alert-info" style="display:block; margin-top: 8px;">
           Admin login email: dixitlendingsolution@gmail.com
         </div>
@@ -84,12 +80,8 @@
       selectedRole = role;
       document.getElementById('btn-admin').classList.toggle('active', role === 'admin');
       document.getElementById('btn-employee').classList.toggle('active', role === 'employee');
-      const notice = document.getElementById('network-notice');
-      notice.style.display = role === 'employee' ? 'block' : 'none';
       const adminNote = document.getElementById('admin-login-note');
-      adminNote.textContent = role === 'admin'
-        ? 'Admin login email: dixitlendingsolution@gmail.com'
-        : 'Employee login is allowed only from office network.';
+      adminNote.textContent = 'Admin login email: dixitlendingsolution@gmail.com';
     }
 
     function togglePasswordVisibility() {
