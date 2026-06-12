@@ -1,8 +1,9 @@
-const CACHE_NAME = 'cln-app-v3';
+const CACHE_NAME = 'cln-app-v4';
 const APP_SHELL = [
   '/index.html',
   '/css/styles.css',
-  '/js/api.js?v=20260601',
+  '/js/runtime-config.js?v=20260612a',
+  '/js/api.js?v=20260612a',
   '/manifest.json',
   '/icons/icon-192.svg',
   '/icons/icon-512.svg'
