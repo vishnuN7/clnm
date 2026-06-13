@@ -97,9 +97,11 @@ app.use('/api/employee', employeeRoutes);
 
 // ── SPA Fallback (serve login page for unknown routes) ──────────
 app.get('*', (req, res) => {
-  // Only for non-API routes
-  if (!req.path.startsWith('/api')) {
+  // Only for non-API and non-uploads routes
+  if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
     res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
+  } else {
+    res.status(404).send('Not Found');
   }
 });
 
