@@ -42,7 +42,8 @@ CREATE TABLE IF NOT EXISTS customers (
 CREATE TABLE IF NOT EXISTS documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL,
-    doc_type ENUM('Aadhar', 'PAN', 'Passport', 'Driving License', 'Other') NOT NULL,
+    doc_type ENUM('Aadhar', 'PAN', 'Passport', 'Driving License', '3M Bank Statement', '3M Salary Slip', 'Other') NOT NULL,
+    document_password VARCHAR(255) NULL,
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(500) NOT NULL,
     uploaded_by INT NOT NULL,
@@ -59,7 +60,7 @@ CREATE TABLE IF NOT EXISTS loans (
     customer_id INT NOT NULL,
     amount DECIMAL(12, 2) NOT NULL,
     purpose VARCHAR(255),
-    status ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending',
+    status ENUM('Pending', 'Approved', 'Rejected', 'ABND', 'Other') NOT NULL DEFAULT 'Pending',
     notes TEXT,
     applied_by INT NOT NULL,
     approved_by INT,

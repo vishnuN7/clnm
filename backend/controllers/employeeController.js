@@ -142,9 +142,10 @@ const employeeController = {
   async uploadDocuments(req, res) {
     try {
       const { customerId } = req.params;
-      const { doc_type } = req.body;
+      const { doc_type, document_password } = req.body;
 
-      if (!req.file) {
+      const files = Array.isArray(req.files) ? req.files : [];
+      if (files.length === 0) {
         return res.status(400).json({ success: false, message: 'No file uploaded.' });
       }
 
@@ -153,22 +154,28 @@ const employeeController = {
         return res.status(404).json({ success: false, message: 'Customer not found.' });
       }
 
-      const filePath = `/uploads/customer_${customerId}/${req.file.filename}`;
-      const id = await DocumentModel.create({
-        customer_id: customerId,
-        doc_type: doc_type || 'Other',
-        file_name: req.file.originalname,
-        file_path: filePath,
-        uploaded_by: req.user.id
-      });
-      const document = await DocumentModel.findById(id);
+      const uploadedDocuments = [];
+
+      for (const file of files) {
+        const filePath = `/uploads/customer_${customerId}/${file.filename}`;
+        const id = await DocumentModel.create({
+          customer_id: customerId,
+          doc_type: doc_type || 'Other',
+          document_password: document_password || null,
+          file_name: file.originalname,
+          file_path: filePath,
+          uploaded_by: req.user.id
+        });
+        const document = await DocumentModel.findById(id);
+        uploadedDocuments.push({ id, file_path: filePath, document });
+      }
 
       return res.status(201).json({
         success: true,
-        message: 'Document uploaded successfully.',
-        id,
-        file_path: filePath,
-        document
+        message: 'Documents uploaded successfully.',
+        ids: uploadedDocuments.map((item) => item.id),
+        file_paths: uploadedDocuments.map((item) => item.file_path),
+        documents: uploadedDocuments.map((item) => item.document)
       });
     } catch (err) {
       console.error('[Employee] Upload error:', err);
@@ -212,7 +219,7 @@ const employeeController = {
       const { id } = req.params;
       const { status, notes } = req.body;
 
-      if (!['Pending', 'Approved', 'Rejected'].includes(status)) {
+      if (!['Pending', 'Approved', 'Rejected', 'ABND', 'Other'].includes(status)) {
         return res.status(400).json({ success: false, message: 'Invalid status.' });
       }
 

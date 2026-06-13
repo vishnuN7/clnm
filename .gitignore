@@ -1,4 +1,8 @@
 # Environment Variables - NEVER COMMIT THESE
+# Dependencies
+node_modules/
+
+# Environment variables
 .env
 .env.local
 .env.*.local
@@ -11,6 +15,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Uploads directory
+# Uploaded documents
 backend/uploads/
 uploads/
 
@@ -20,6 +25,7 @@ uploads/
 *.swp
 *.swo
 *~
+# OS metadata
 .DS_Store
 
 # Database
@@ -50,3 +56,4 @@ temp/
 
 # Deployment secrets and certificates
 deploy/ssl/
+Thumbs.db

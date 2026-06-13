@@ -1001,6 +1001,7 @@ input[type="file"].form-control::file-selector-button:hover {
   background: rgba(255, 255, 255, 0.04);
   margin-bottom: 8px;
   border: 1px solid var(--border);
+  min-width: 0;
 }
 
 .user-avatar {
@@ -1022,12 +1023,22 @@ input[type="file"].form-control::file-selector-button:hover {
 .user-details p {
   font-size: 13px;
   font-weight: 600;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-details span {
   font-size: 11px;
   color: var(--text-secondary);
   text-transform: capitalize;
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .logout-btn {
@@ -1392,6 +1403,19 @@ tbody td:first-child {
 .badge-rejected:hover,
 .badge-inactive:hover {
   box-shadow: 0 4px 12px rgba(138, 53, 53, 0.2);
+}
+
+.badge-abnd,
+.badge-other {
+  background: linear-gradient(135deg, #eef1f7 0%, #e0e5ee 100%);
+  color: #4a5568;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(74, 85, 104, 0.12);
+}
+
+.badge-abnd:hover,
+.badge-other:hover {
+  box-shadow: 0 4px 12px rgba(74, 85, 104, 0.18);
 }
 
 .badge-admin {

@@ -14,6 +14,8 @@ router.get('/employees', adminController.getEmployees);
 router.post('/employees', adminController.addEmployee);
 router.patch('/employees/:id/deactivate', adminController.deactivateEmployee);
 router.patch('/employees/:id/activate', adminController.activateEmployee);
+router.post('/employees/:id/deactivate', adminController.deactivateEmployee);
+router.post('/employees/:id/activate', adminController.activateEmployee);
 router.patch('/employees/:id/password', adminController.updateEmployeePassword);
 router.post('/employees/:id/password', adminController.updateEmployeePassword);
 

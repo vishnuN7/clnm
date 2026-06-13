@@ -18,7 +18,7 @@ router.get('/customers/:id', employeeController.getCustomerDetail);
 router.delete('/customers/:id', employeeController.deleteCustomer);
 
 // Documents
-router.post('/documents/:customerId', upload.single('document'), employeeController.uploadDocuments);
+router.post('/documents/:customerId', upload.array('documents'), employeeController.uploadDocuments);
 
 // Loans
 router.get('/loans', employeeController.getLoans);

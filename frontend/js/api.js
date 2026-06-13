@@ -866,7 +866,13 @@ function formatTime(date) {
 }
 
 function statusBadge(status) {
-  const cls = { Pending: 'badge-pending', Approved: 'badge-approved', Rejected: 'badge-rejected' };
+  const cls = {
+    Pending: 'badge-pending',
+    Approved: 'badge-approved',
+    Rejected: 'badge-rejected',
+    ABND: 'badge-abnd',
+    Other: 'badge-other'
+  };
   return `<span class="badge ${cls[status] || ''}">${status}</span>`;
 }
 

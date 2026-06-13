@@ -221,6 +221,12 @@
     if (!res?.ok) return;
     const { customer, documents, loans } = res.data.data;
     document.getElementById('detail-title').textContent = `Customer: ${customer.name}`;
+    const escapeHtml = (value) => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
     function resolveFileUrl(path) {
       if (!path) return '#';
       if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -238,7 +244,7 @@
       <div style="margin-bottom:20px;">
         ${documents.length ? documents.map(d => `
           <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;">
-            <span>${d.doc_type} — ${d.file_name}</span>
+            <span>${escapeHtml(d.doc_type)} — ${escapeHtml(d.file_name)}${d.document_password ? ` <span style="color:var(--text-muted);">| Password: ${escapeHtml(d.document_password)}</span>` : ''}</span>
             <a href="${resolveFileUrl(d.file_path)}" target="_blank" class="btn btn-secondary btn-sm">View</a>
           </div>`).join('') : '<p style="color:var(--text-muted);">No documents uploaded.</p>'}
       </div>

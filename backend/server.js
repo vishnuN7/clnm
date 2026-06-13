@@ -155,7 +155,43 @@ async function ensurePasswordResetTable() {
   }
 }
 
-Promise.all([ensureDefaultAdminAccount(), ensurePasswordResetTable()]).finally(() => {
+async function ensureDocumentsTable() {
+  const allowedDocTypes = [
+    'Aadhar',
+    'PAN',
+    'Passport',
+    'Driving License',
+    '3M Bank Statement',
+    '3M Salary Slip',
+    'Other'
+  ];
+
+  const enumValues = allowedDocTypes.map((value) => `'${value.replace(/'/g, "''")}'`).join(', ');
+
+  try {
+    await db.query(`ALTER TABLE documents MODIFY doc_type ENUM(${enumValues}) NOT NULL`);
+
+    const [passwordColumn] = await db.query("SHOW COLUMNS FROM documents LIKE 'document_password'");
+    if (passwordColumn.length === 0) {
+      await db.query('ALTER TABLE documents ADD COLUMN document_password VARCHAR(255) NULL AFTER doc_type');
+    }
+  } catch (err) {
+    console.error('Failed to ensure documents table schema:', err.message);
+  }
+}
+
+async function ensureLoansTable() {
+  const allowedStatuses = ['Pending', 'Approved', 'Rejected', 'ABND', 'Other'];
+  const enumValues = allowedStatuses.map((value) => `'${value.replace(/'/g, "''")}'`).join(', ');
+
+  try {
+    await db.query(`ALTER TABLE loans MODIFY status ENUM(${enumValues}) NOT NULL DEFAULT 'Pending'`);
+  } catch (err) {
+    console.error('Failed to ensure loans table schema:', err.message);
+  }
+}
+
+Promise.all([ensureDefaultAdminAccount(), ensurePasswordResetTable(), ensureDocumentsTable(), ensureLoansTable()]).finally(() => {
   app.listen(PORT, () => {
     console.log(`\nCLN Server running at http://localhost:${PORT}`);
     console.log(`Admin login: dixitlendingsolution@gmail.com / Utkarsh.3112`);

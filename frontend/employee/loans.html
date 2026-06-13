@@ -59,6 +59,7 @@
           <option value="Approved">Approved</option>
           <option value="Rejected">Rejected</option>
           <option value="ABND">ABND</option>
+          <option value="Other">Other</option>
         </select>
         <select id="period-filter" onchange="loadLoans()">
           <option value="">All Time</option>
@@ -133,6 +134,7 @@
         <option value="Approved"> Approved</option>
         <option value="Rejected"> Rejected</option>
         <option value="ABND"> ABND</option>
+        <option value="Other"> Other</option>
       </select>
     </div>
     <div class="form-group"><label>Notes</label><textarea id="status-notes" class="form-control" rows="2" placeholder="Optional remarks..."></textarea></div>
@@ -315,7 +317,8 @@
   function openStatusModal(id, name, amount, status) {
     currentLoanId = id;
     document.getElementById('status-loan-info').textContent = `${name} — ${formatCurrency(amount)}`;
-    document.getElementById('new-status').value = status;
+    const allowedStatus = ['Pending', 'Approved', 'Rejected', 'ABND', 'Other'];
+    document.getElementById('new-status').value = allowedStatus.includes(status) ? status : 'Pending';
     document.getElementById('status-notes').value = '';
     document.getElementById('status-modal').classList.add('show');
   }

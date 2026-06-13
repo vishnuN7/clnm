@@ -163,10 +163,10 @@
         <td><span class="badge ${e.is_active ? 'badge-active' : 'badge-inactive'}">${e.is_active ? 'Active' : 'Inactive'}</span></td>
         <td>${formatDate(e.created_at)}</td>
         <td>
-          <button class="btn btn-secondary btn-sm" onclick="openPasswordModal(${e.id}, '${escapeHtml(e.name)}')">Reset Password</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick='openPasswordModal(${e.id}, ${JSON.stringify(e.name)})'>Reset Password</button>
           ${e.is_active
-            ? `<button class="btn btn-danger btn-sm" onclick="toggleEmployee(${e.id}, 0)">Deactivate</button>`
-            : `<button class="btn btn-success btn-sm" onclick="toggleEmployee(${e.id}, 1)">Activate</button>`}
+            ? `<button type="button" class="btn btn-danger btn-sm" onclick="toggleEmployee(${e.id}, 0)">Deactivate</button>`
+            : `<button type="button" class="btn btn-success btn-sm" onclick="toggleEmployee(${e.id}, 1)">Activate</button>`}
         </td>
       </tr>`).join('');
   }
@@ -182,7 +182,7 @@
 
   async function toggleEmployee(id, activate) {
     const endpoint = activate ? `/admin/employees/${id}/activate` : `/admin/employees/${id}/deactivate`;
-    const res = await api.patch(endpoint);
+    const res = await api.post(endpoint);
     if (res?.ok) { showAlert('page-alert', res.data.message, 'success'); loadEmployees(); }
     else showAlert('page-alert', res?.data?.message || 'Error', 'error');
   }
