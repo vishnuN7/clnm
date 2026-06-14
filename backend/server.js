@@ -84,6 +84,36 @@ app.use((req, res, next) => {
 // Serve uploaded documents
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Fallback to database-stored uploads if file is missing on local disk
+app.get('/uploads/*', async (req, res, next) => {
+  try {
+    const dbFilePath = decodeURIComponent(req.path);
+    const [rows] = await db.query(
+      'SELECT file_name, file_data FROM documents WHERE file_path = ? LIMIT 1',
+      [dbFilePath]
+    );
+
+    if (rows.length > 0 && rows[0].file_data) {
+      const { file_name, file_data } = rows[0];
+      const ext = path.extname(file_name).toLowerCase();
+      let contentType = 'application/octet-stream';
+      if (ext === '.pdf') contentType = 'application/pdf';
+      else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+      else if (ext === '.png') contentType = 'image/png';
+      else if (ext === '.webp') contentType = 'image/webp';
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `inline; filename="${file_name}"`);
+      return res.send(file_data);
+    }
+
+    return res.status(404).send('Not Found');
+  } catch (err) {
+    console.error('Error serving fallback upload from database:', err.message);
+    next(err);
+  }
+});
+
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
@@ -176,6 +206,12 @@ async function ensureDocumentsTable() {
     const [passwordColumn] = await db.query("SHOW COLUMNS FROM documents LIKE 'document_password'");
     if (passwordColumn.length === 0) {
       await db.query('ALTER TABLE documents ADD COLUMN document_password VARCHAR(255) NULL AFTER doc_type');
+    }
+
+    const [fileDataColumn] = await db.query("SHOW COLUMNS FROM documents LIKE 'file_data'");
+    if (fileDataColumn.length === 0) {
+      await db.query('ALTER TABLE documents ADD COLUMN file_data LONGBLOB NULL');
+      console.log("Added 'file_data' column to 'documents' table successfully.");
     }
   } catch (err) {
     console.error('Failed to ensure documents table schema:', err.message);

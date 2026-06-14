@@ -2,6 +2,7 @@ const CustomerModel = require('../models/customerModel');
 const LoanModel = require('../models/loanModel');
 const DocumentModel = require('../models/documentModel');
 const path = require('path');
+const fs = require('fs');
 
 const employeeController = {
   // ── Dashboard ───────────────────────────────────────────────
@@ -158,13 +159,23 @@ const employeeController = {
 
       for (const file of files) {
         const filePath = `/uploads/customer_${customerId}/${file.filename}`;
+        let fileData = null;
+        try {
+          if (file.path && fs.existsSync(file.path)) {
+            fileData = fs.readFileSync(file.path);
+          }
+        } catch (readErr) {
+          console.error('[Employee] Error reading file into buffer:', readErr.message);
+        }
+
         const id = await DocumentModel.create({
           customer_id: customerId,
           doc_type: doc_type || 'Other',
           document_password: document_password || null,
           file_name: file.originalname,
           file_path: filePath,
-          uploaded_by: req.user.id
+          uploaded_by: req.user.id,
+          file_data: fileData
         });
         const document = await DocumentModel.findById(id);
         uploadedDocuments.push({ id, file_path: filePath, document });

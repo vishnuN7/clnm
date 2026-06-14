@@ -1,10 +1,10 @@
 const db = require('../config/db');
 
 const DocumentModel = {
-  async create({ customer_id, doc_type, document_password, file_name, file_path, uploaded_by }) {
+  async create({ customer_id, doc_type, document_password, file_name, file_path, uploaded_by, file_data }) {
     const [result] = await db.query(
-      'INSERT INTO documents (customer_id, doc_type, document_password, file_name, file_path, uploaded_by) VALUES (?, ?, ?, ?, ?, ?)',
-      [customer_id, doc_type, document_password || null, file_name, file_path, uploaded_by]
+      'INSERT INTO documents (customer_id, doc_type, document_password, file_name, file_path, uploaded_by, file_data) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [customer_id, doc_type, document_password || null, file_name, file_path, uploaded_by, file_data || null]
     );
     return result.insertId;
   },
