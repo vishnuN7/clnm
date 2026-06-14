@@ -1,3 +1,28 @@
+const nodemailer = require('nodemailer');
+
+async function sendViaSMTP({ to, subject, html, text }) {
+  const secure = process.env.SMTP_SECURE === 'true';
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: secure,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }
+  });
+
+  const mailOptions = {
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to: to,
+    subject: subject,
+    html: html,
+    text: text
+  };
+
+  return transporter.sendMail(mailOptions);
+}
+
 function normalizeResendConfig() {
   const apiKey = cleanEnvValue(process.env.RESEND_API_KEY || '');
   const from = normalizeResendFrom(process.env.RESEND_FROM || '');
@@ -58,22 +83,17 @@ function logResendEnvPresence(apiKey, from) {
   });
 }
 
-function debugResendEnvironment() {
-  const debugEnabled = String(process.env.RESEND_DEBUG || '').trim().toLowerCase() === 'true';
+function debugMailerEnvironment() {
+  const smtpHost = process.env.SMTP_HOST;
+  const resendKey = process.env.RESEND_API_KEY;
 
-  if (!debugEnabled) {
-    return;
+  if (smtpHost) {
+    console.info(`[Mailer] Configured to use SMTP: ${smtpHost}:${process.env.SMTP_PORT || 587}, User: ${process.env.SMTP_USER}`);
+  } else if (resendKey) {
+    console.info(`[Mailer] Configured to use Resend API, From: ${process.env.RESEND_FROM}`);
+  } else {
+    console.warn('[Mailer] WARNING: No mailer transport (SMTP or Resend) is configured!');
   }
-
-  const apiKey = cleanEnvValue(process.env.RESEND_API_KEY || '');
-  const from = normalizeResendFrom(process.env.RESEND_FROM || '');
-
-  console.info('[Mailer] Resend env presence (startup):', {
-    apiKeyPresent: Boolean(apiKey),
-    apiKeyLength: apiKey ? apiKey.length : 0,
-    fromPresent: Boolean(from),
-    fromLength: from ? from.length : 0
-  });
 }
 
 function buildResetEmail({ name, resetUrl }) {
@@ -167,7 +187,11 @@ async function sendPasswordResetEmail({ to, name, resetUrl }) {
   const { subject, html, text } = buildResetEmail({ name, resetUrl });
 
   try {
-    await sendViaResend({ to, subject, html, text });
+    if (process.env.SMTP_HOST) {
+      await sendViaSMTP({ to, subject, html, text });
+    } else {
+      await sendViaResend({ to, subject, html, text });
+    }
   } catch (err) {
     console.error('[Mailer] sendPasswordResetEmail error:', err && err.message ? err.message : err);
     throw err;
@@ -176,5 +200,5 @@ async function sendPasswordResetEmail({ to, name, resetUrl }) {
 
 module.exports = {
   sendPasswordResetEmail,
-  debugResendEnvironment
+  debugResendEnvironment: debugMailerEnvironment
 };
