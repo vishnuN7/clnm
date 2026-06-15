@@ -692,25 +692,17 @@ function initTheme() {
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
-  const localDevHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  if (localDevHost) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      registrations.forEach((registration) => registration.unregister());
-    }).catch(() => {});
-
-    if (window.caches && typeof window.caches.keys === 'function') {
-      window.caches.keys().then((keys) => {
-        keys.forEach((key) => window.caches.delete(key));
-      }).catch(() => {});
-    }
-    return;
-  }
-
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js').catch((err) => {
-      console.warn('Service worker registration failed:', err);
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => {
+      registration.unregister();
     });
-  });
+  }).catch(() => {});
+
+  if (window.caches && typeof window.caches.keys === 'function') {
+    window.caches.keys().then((keys) => {
+      keys.forEach((key) => window.caches.delete(key));
+    }).catch(() => {});
+  }
 }
 
 if (document.readyState === 'loading') {

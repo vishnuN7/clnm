@@ -17,7 +17,18 @@
 
     <div class="login-container">
       <div class="login-card">
-        <div class="user-avatar-large">D</div>
+        <div class="login-brand">
+          <div class="brand-logo-container">
+            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--accent-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="var(--accent-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="var(--accent-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 22V12" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+            </svg>
+          </div>
+          <h2 class="brand-title">Dixit Lending Solution</h2>
+          <p class="brand-subtitle">CLN Lending Suite</p>
+        </div>
 
         <div class="login-role-toggle" role="group" aria-label="Select login role">
           <button type="button" id="btn-admin" class="active" onclick="selectRole('admin')">Admin</button>
@@ -63,8 +74,8 @@
     </footer>
   </div>
 
-  <script src="/js/runtime-config.js?v=20260612a"></script>
-  <script src="/js/api.js?v=20260612a"></script>
+  <script src="/js/runtime-config.js?v=20260615b"></script>
+  <script src="/js/api.js?v=20260615b"></script>
   <script>
     let selectedRole = 'admin';
 
