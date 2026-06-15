@@ -25,6 +25,8 @@ router.get('/customers/:id', adminController.getCustomerDetail);
 
 // Loans
 router.get('/loans', adminController.getLoans);
+router.delete('/loans/:id', adminController.deleteLoan);
+router.post('/loans/delete', adminController.deleteLoansBulk);
 
 // Utilities
 router.get('/areas', adminController.getAreas);

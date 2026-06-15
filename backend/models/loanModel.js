@@ -99,6 +99,11 @@ const LoanModel = {
       monthlyTrend,
       recentLoans
     };
+  },
+
+  async delete(id) {
+    const [result] = await db.query('DELETE FROM loans WHERE id = ?', [id]);
+    return result.affectedRows;
   }
 };
 
