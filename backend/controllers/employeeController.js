@@ -241,6 +241,36 @@ const employeeController = {
     }
   },
 
+  async deleteDocument(req, res) {
+    try {
+      const { id } = req.params;
+      const document = await DocumentModel.findById(id);
+      if (!document) {
+        return res.status(404).json({ success: false, message: 'Document not found.' });
+      }
+
+      // Try to delete physical file from disk
+      if (document.file_path) {
+        const fullDiskPath = path.join(__dirname, '..', document.file_path);
+        try {
+          if (fs.existsSync(fullDiskPath)) {
+            fs.unlinkSync(fullDiskPath);
+          }
+        } catch (fileErr) {
+          console.warn('[Employee] Warning: Failed to delete physical document file:', fileErr.message);
+        }
+      }
+
+      // Delete from database
+      await DocumentModel.delete(id);
+
+      return res.json({ success: true, message: 'Document deleted successfully.' });
+    } catch (err) {
+      console.error('[Employee] Delete document error:', err);
+      return res.status(500).json({ success: false, message: 'Failed to delete document.' });
+    }
+  },
+
   async getAreas(req, res) {
     try {
       const areas = await CustomerModel.getAreas();
