@@ -3,6 +3,7 @@ const UserModel = require('../models/userModel');
 const CustomerModel = require('../models/customerModel');
 const LoanModel = require('../models/loanModel');
 const DocumentModel = require('../models/documentModel');
+const db = require('../config/db');
 
 const adminController = {
   // ── Dashboard ───────────────────────────────────────────────
@@ -104,11 +105,125 @@ const adminController = {
   // ── Customers ───────────────────────────────────────────────
   async getCustomers(req, res) {
     try {
-      const { area, search } = req.query;
-      const customers = await CustomerModel.getAll({ area, search });
+      const { area, search, period } = req.query;
+      const customers = await CustomerModel.getAll({ area, search, period });
       return res.json({ success: true, data: customers });
     } catch (err) {
       return res.status(500).json({ success: false, message: 'Failed to fetch customers.' });
+    }
+  },
+
+  async exportCustomers(req, res) {
+    try {
+      const { area, search, period } = req.query;
+      const customers = await CustomerModel.getAll({ area, search, period });
+
+      // Fetch all loans to map them to customers
+      const [allLoans] = await db.query('SELECT customer_id, amount, status FROM loans');
+      const loanMap = {};
+      allLoans.forEach(l => {
+        if (!loanMap[l.customer_id]) loanMap[l.customer_id] = [];
+        loanMap[l.customer_id].push(l);
+      });
+
+      // Helper function to extract fields from quick paste
+      function extractField(text, labels) {
+        if (!text) return '';
+        const lines = text.split(/\r?\n/);
+        for (const raw of lines) {
+          const line = raw.trim();
+          if (!line) continue;
+          for (const label of labels) {
+            const re = new RegExp('^' + label.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&') + '\\s*[:\\-—]?\\s*(.+)$', 'i');
+            const m = line.match(re);
+            if (m && m[1]) return m[1].trim();
+          }
+        }
+        for (const label of labels) {
+          const escapedLabel = label.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&');
+          const re = new RegExp(escapedLabel + '\\s*[:\\-—]\\s*([^\\n\\-\\-]+?)(?=\\s*(?:[A-Z][a-zA-Z\\s’\']+[:\\-—]|---|$))', 'i');
+          const m = text.match(re);
+          if (m && m[1]) return m[1].trim();
+        }
+        return '';
+      }
+
+      const headers = [
+        'Customer ID', 'Customer Name', 'Mobile Number', 'Alternate Mobile Number', 'Address',
+        'Aadhaar Number', 'PAN Number', 'Loan Amount', 'Loan Status', 'Employee Name',
+        'Personal Gmail ID', 'Marital Status', 'Mother\'s Name', 'Spouse\'s Name', 'House Type',
+        'Education', 'Company Name', 'Company Address', 'Official Email ID',
+        'Current Work Experience', 'Total Work Experience', 'Net Monthly Income',
+        'Created Date', 'Updated Date'
+      ];
+
+      const rows = customers.map(c => {
+        const cLoans = loanMap[c.id] || [];
+        const dbLoanAmount = cLoans.map(l => l.amount).join('; ');
+        const dbLoanStatus = cLoans.map(l => l.status).join('; ');
+
+        const rawDetails = c.address || '';
+        const altPhone = extractField(rawDetails, ['Mobile Number', 'Phone Number', 'Mob no', 'Mobile']);
+        const aadhaar = extractField(rawDetails, ['Aadhaar Number', 'Aadhar Number', 'Aadhar card', 'Aadhar Card', 'Aadhar']);
+        const pan = extractField(rawDetails, ['PAN Number', 'PAN card', 'Pan card']);
+        
+        // Fallback for loan amount if not in DB
+        const quickPasteLoanAmt = extractField(rawDetails, ['Required Loan Amount', 'Loan Amount', 'Amount']);
+        const loanAmount = dbLoanAmount || quickPasteLoanAmt || '—';
+        const loanStatus = dbLoanStatus || (quickPasteLoanAmt ? 'Pending' : 'Not Applied');
+
+        const personalGmail = extractField(rawDetails, ['Personal Gmail ID', 'Personal gmail']);
+        const marital = extractField(rawDetails, ['Marital Status']);
+        const mother = extractField(rawDetails, ['Mother’s Name', "Mother's Name", 'Mother name']);
+        const spouse = extractField(rawDetails, ['Spouse’s Name (if applicable)', "Spouse's Name", 'Spouse name']);
+        const house = extractField(rawDetails, ['House Type', 'House - Owned/Rented', 'House']);
+        const education = extractField(rawDetails, ['Highest Education Qualification', 'Education']);
+        const company = extractField(rawDetails, ['Company Name']);
+        const compAddress = extractField(rawDetails, ['Company Address']);
+        const officeEmail = extractField(rawDetails, ['Official Email ID', 'Office email id', 'Office email']);
+        const curExp = extractField(rawDetails, ['Current Work Experience', 'Experience']);
+        const totExp = extractField(rawDetails, ['Total Work Experience', 'Total experience']);
+        const income = extractField(rawDetails, ['Net Monthly Income (₹)', 'Net monthly income']);
+
+        // Clean raw address (before the "--- Additional Customer Details ---" separator)
+        const cleanAddress = rawDetails.split('--- Additional Customer Details ---')[0].trim();
+
+        return [
+          c.id,
+          `"${c.name.replace(/"/g, '""')}"`,
+          c.phone,
+          altPhone ? `"${altPhone.replace(/"/g, '""')}"` : '—',
+          `"${cleanAddress.replace(/"/g, '""')}"`,
+          aadhaar ? `"${aadhaar.replace(/"/g, '""')}"` : '—',
+          pan ? `"${pan.replace(/"/g, '""')}"` : '—',
+          `"${loanAmount.replace(/"/g, '""')}"`,
+          `"${loanStatus.replace(/"/g, '""')}"`,
+          `"${c.added_by_name.replace(/"/g, '""')}"`,
+          personalGmail ? `"${personalGmail.replace(/"/g, '""')}"` : '—',
+          marital ? `"${marital.replace(/"/g, '""')}"` : '—',
+          mother ? `"${mother.replace(/"/g, '""')}"` : '—',
+          spouse ? `"${spouse.replace(/"/g, '""')}"` : '—',
+          house ? `"${house.replace(/"/g, '""')}"` : '—',
+          education ? `"${education.replace(/"/g, '""')}"` : '—',
+          company ? `"${company.replace(/"/g, '""')}"` : '—',
+          compAddress ? `"${compAddress.replace(/"/g, '""')}"` : '—',
+          officeEmail ? `"${officeEmail.replace(/"/g, '""')}"` : '—',
+          curExp ? `"${curExp.replace(/"/g, '""')}"` : '—',
+          totExp ? `"${totExp.replace(/"/g, '""')}"` : '—',
+          income ? `"${income.replace(/"/g, '""')}"` : '—',
+          new Date(c.created_at).toLocaleDateString('en-IN'),
+          new Date(c.updated_at).toLocaleDateString('en-IN')
+        ];
+      });
+
+      const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="customers_export_${Date.now()}.csv"`);
+      return res.send(csv);
+    } catch (err) {
+      console.error('[Admin] Export customers error:', err);
+      return res.status(500).json({ success: false, message: 'Export failed.' });
     }
   },
 

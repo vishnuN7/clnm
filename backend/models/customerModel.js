@@ -20,7 +20,7 @@ const CustomerModel = {
     return rows[0] || null;
   },
 
-  async getAll({ area, search, added_by } = {}) {
+  async getAll({ area, search, added_by, period } = {}) {
     let sql = `
       SELECT c.*, u.name AS added_by_name
       FROM customers c
@@ -32,6 +32,14 @@ const CustomerModel = {
     if (area) { sql += ' AND c.area = ?'; params.push(area); }
     if (search) { sql += ' AND (c.name LIKE ? OR c.phone LIKE ?)'; params.push(`%${search}%`, `%${search}%`); }
     if (added_by) { sql += ' AND c.added_by = ?'; params.push(added_by); }
+
+    if (period === 'week') {
+      sql += ' AND c.created_at >= DATE_SUB(NOW(), INTERVAL 1 WEEK)';
+    } else if (period === 'month') {
+      sql += ' AND c.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+    } else if (period === 'year') {
+      sql += ' AND c.created_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)';
+    }
 
     sql += ' ORDER BY c.created_at DESC';
     const [rows] = await db.query(sql, params);

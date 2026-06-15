@@ -21,6 +21,7 @@ router.post('/employees/:id/password', adminController.updateEmployeePassword);
 
 // Customers
 router.get('/customers', adminController.getCustomers);
+router.get('/customers/export', adminController.exportCustomers);
 router.get('/customers/:id', adminController.getCustomerDetail);
 
 // Loans

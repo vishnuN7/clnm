@@ -10,6 +10,11 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
   <link rel="stylesheet" href="/css/styles.css" />
+  <style>
+    .filter-option:hover {
+      background: var(--bg-card-hover) !important;
+    }
+  </style>
 </head>
 <body>
 <div class="app-layout">
@@ -63,9 +68,29 @@
       </div>
 
       <div class="card full-table">
-        <div class="card-header">
-          <h3><span class="emoji-sm">📋</span>Customer List</h3>
-          <span id="count-badge" class="badge badge-employee">— customers</span>
+        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <h3><span class="emoji-sm">📋</span>Customer List</h3>
+            <span id="count-badge" class="badge badge-employee">— customers</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;position:relative;">
+            <!-- Filter Dropdown Container -->
+            <div style="position:relative;">
+              <button class="btn btn-secondary btn-sm" id="filter-btn" onclick="toggleFilterMenu()" style="display:inline-flex;align-items:center;gap:6px;">
+                <span class="emoji-sm">📅</span>Filter <span id="current-filter-label" style="font-weight:normal;opacity:0.8;">(All Time)</span> ▼
+              </button>
+              <div id="filter-menu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 16px rgba(0,0,0,0.15);z-index:1000;min-width:130px;padding:6px 0;">
+                <div class="filter-option" onclick="applyDateFilter('', 'All Time')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-primary);transition:background 0.2s;">All Time</div>
+                <div class="filter-option" onclick="applyDateFilter('week', 'This Week')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-primary);transition:background 0.2s;">This Week</div>
+                <div class="filter-option" onclick="applyDateFilter('month', 'This Month')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-primary);transition:background 0.2s;">This Month</div>
+                <div class="filter-option" onclick="applyDateFilter('year', 'This Year')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-primary);transition:background 0.2s;">This Year</div>
+              </div>
+            </div>
+            <!-- Download CSV Button -->
+            <button class="btn btn-primary btn-sm" id="download-csv-btn" onclick="downloadCSV()" style="display:none;align-items:center;gap:6px;">
+              <span class="emoji-sm">📥</span>Download CSV
+            </button>
+          </div>
         </div>
         <div class="table-wrapper">
           <table>
@@ -176,7 +201,8 @@
   async function loadCustomers() {
     const search = document.getElementById('search-input').value;
     const area = document.getElementById('area-filter').value;
-    const qs = buildQueryString({ search, area });
+    const period = selectedPeriod;
+    const qs = buildQueryString({ search, area, period });
     const tbody = document.getElementById('customers-tbody');
     tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>';
     try {
@@ -259,6 +285,54 @@
   }
 
   function closeDetail() { document.getElementById('detail-modal').classList.remove('show'); }
+
+  let selectedPeriod = '';
+
+  function toggleFilterMenu() {
+    const menu = document.getElementById('filter-menu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    const btn = document.getElementById('filter-btn');
+    const menu = document.getElementById('filter-menu');
+    if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+
+  function applyDateFilter(period, label) {
+    selectedPeriod = period;
+    document.getElementById('current-filter-label').textContent = `(${label})`;
+    document.getElementById('filter-menu').style.display = 'none';
+    
+    // Show/hide Download CSV button based on filter presence
+    const csvBtn = document.getElementById('download-csv-btn');
+    if (period) {
+      csvBtn.style.display = 'inline-flex';
+    } else {
+      csvBtn.style.display = 'none';
+    }
+    
+    loadCustomers();
+  }
+
+  function downloadCSV() {
+    const search = document.getElementById('search-input').value;
+    const area   = document.getElementById('area-filter').value;
+    const period = selectedPeriod;
+    const token  = typeof getToken === 'function' ? getToken() : '';
+    const qs = buildQueryString({ search, area, period, token });
+    
+    const apiBase = (typeof api !== 'undefined' && api.base)
+      ? api.base
+      : (window.api && window.api.base)
+        ? window.api.base
+        : '';
+        
+    window.open(`${apiBase}/admin/customers/export${qs}`, '_blank');
+  }
 </script>
 </body>
 </html>

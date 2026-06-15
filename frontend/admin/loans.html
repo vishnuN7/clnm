@@ -187,7 +187,8 @@
     const area   = document.getElementById('area-filter').value;
     const status = document.getElementById('status-filter').value;
     const period = document.getElementById('period-filter').value;
-    const qs = buildQueryString({ area, status, period });
+    const token  = typeof getToken === 'function' ? getToken() : '';
+    const qs = buildQueryString({ area, status, period, token });
     const apiBase = (typeof api !== 'undefined' && api.base)
       ? api.base
       : (window.api && window.api.base)
