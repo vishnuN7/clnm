@@ -283,6 +283,22 @@
       return;
     }
     const c = res.data.data.customer;
+    const docs = res.data.data.documents || [];
+
+    const escapeHtml = (value) => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+    function resolveFileUrl(path) {
+      if (!path) return '#';
+      if (path.startsWith('http://') || path.startsWith('https://')) return path;
+      const uploadsBase = (typeof api !== 'undefined' && api.uploadsBase) ? api.uploadsBase : (window.api && window.api.uploadsBase) ? window.api.uploadsBase : null;
+      return uploadsBase ? uploadsBase + path : path;
+    }
+
     const content = `
       <div style="padding:16px;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
@@ -302,21 +318,52 @@
             <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Area</label>
             <p style="font-size:14px;margin-top:4px;">${c.area || '—'}</p>
           </div>
-          <div>
+          <div style="grid-column: span 2;">
             <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Address</label>
-            <p style="font-size:14px;margin-top:4px;">${c.address || '—'}</p>
+            <p style="font-size:14px;margin-top:4px;white-space:pre-line;">${c.address || '—'}</p>
           </div>
           <div>
             <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Joined</label>
             <p style="font-size:14px;margin-top:4px;">${formatDate(c.created_at) || '—'}</p>
           </div>
         </div>
-        <div style="border-top:1px solid var(--border-color);padding-top:16px;">
-          <a href="/employee/loans.html?customer_id=${c.id}" class="btn btn-primary" style="width:100%;text-align:center;">View Loans</a>
+
+        <h4 style="margin: 16px 0 8px;font-size:12px;text-transform:uppercase;color:var(--text-secondary);font-weight:600;">Uploaded Documents (${docs.length})</h4>
+        <div style="margin-bottom:20px;max-height:180px;overflow-y:auto;border: 1px solid var(--border-color);border-radius:8px;padding:8px;">
+          ${docs.length ? docs.map(d => `
+            <div class="doc-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;font-size:13px;">
+              <span>${escapeHtml(d.doc_type)} — ${escapeHtml(d.file_name)}${d.document_password ? ` <span style="color:var(--text-muted);">| Password: ${escapeHtml(d.document_password)}</span>` : ''}</span>
+              <div style="display:flex;gap:6px;">
+                <a href="${resolveFileUrl(d.file_path)}" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 8px; font-size:11px;">View</a>
+                <button class="btn btn-danger btn-sm" onclick="deleteUploadedDoc(${d.id}, this)" style="padding: 4px 8px; font-size:11px;">Delete</button>
+              </div>
+            </div>`).join('') : '<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:12px 0;">No documents uploaded.</p>'}
+        </div>
+
+        <div style="border-top:1px solid var(--border-color);padding-top:16px;display:flex;gap:8px;">
+          <a href="/employee/loans.html?customer_id=${c.id}" class="btn btn-primary" style="flex:1;text-align:center;">View Loans</a>
+          <button class="btn btn-secondary" style="flex:1;" onclick="closeCustomerModal()">Close</button>
         </div>
       </div>
     `;
     document.getElementById('customer-detail-content').innerHTML = content;
+  }
+
+  async function deleteUploadedDoc(id, btn) {
+    if (!confirm('Are you sure you want to delete this document?')) return;
+    btn.disabled = true;
+    btn.textContent = 'Deleting...';
+    const res = await api.delete(`/employee/documents/${id}`);
+    if (!res?.ok) {
+      btn.disabled = false;
+      btn.textContent = 'Delete';
+      return alert(res?.data?.message || 'Failed to delete document.');
+    }
+    alert('Document deleted successfully.');
+    const docRow = btn.closest('.doc-row');
+    if (docRow) {
+      docRow.remove();
+    }
   }
 </script>
 </body>
