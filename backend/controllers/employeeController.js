@@ -241,6 +241,65 @@ const employeeController = {
     }
   },
 
+  async deleteLoan(req, res) {
+    try {
+      const { id } = req.params;
+      const loan = await LoanModel.findById(id);
+      if (!loan) {
+        return res.status(404).json({ success: false, message: 'Loan record not found.' });
+      }
+
+      // Check authorization
+      if (loan.applied_by !== req.user.id) {
+        return res.status(403).json({ success: false, message: 'Access denied. You can only delete your own loan applications.' });
+      }
+
+      await LoanModel.delete(id);
+      return res.json({ success: true, message: 'Loan record deleted successfully.' });
+    } catch (err) {
+      console.error('[Employee] Delete loan error:', err);
+      return res.status(500).json({ success: false, message: 'Failed to delete loan record.' });
+    }
+  },
+
+  async deleteLoansBulk(req, res) {
+    try {
+      const { ids } = req.body;
+      if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ success: false, message: 'No loan IDs provided.' });
+      }
+
+      const results = [];
+      for (const id of ids) {
+        try {
+          const loan = await LoanModel.findById(id);
+          if (loan) {
+            // Check authorization
+            if (loan.applied_by !== req.user.id) {
+              results.push({ id, success: false, reason: 'Access denied: Not applied by you' });
+              continue;
+            }
+            await LoanModel.delete(id);
+            results.push({ id, success: true });
+          } else {
+            results.push({ id, success: false, reason: 'Not found' });
+          }
+        } catch (itemErr) {
+          results.push({ id, success: false, reason: itemErr.message });
+        }
+      }
+
+      return res.json({
+        success: true,
+        message: `Processed ${ids.length} loan deletions.`,
+        results
+      });
+    } catch (err) {
+      console.error('[Employee] Bulk delete loans error:', err);
+      return res.status(500).json({ success: false, message: 'Bulk delete loans failed.' });
+    }
+  },
+
   async deleteDocument(req, res) {
     try {
       const { id } = req.params;

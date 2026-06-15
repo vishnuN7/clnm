@@ -25,6 +25,8 @@ router.delete('/documents/:id', employeeController.deleteDocument);
 router.get('/loans', employeeController.getLoans);
 router.post('/loans', employeeController.createLoan);
 router.patch('/loans/:id/status', employeeController.updateLoanStatus);
+router.delete('/loans/:id', employeeController.deleteLoan);
+router.post('/loans/delete', employeeController.deleteLoansBulk);
 
 // Utilities
 router.get('/areas', employeeController.getAreas);
