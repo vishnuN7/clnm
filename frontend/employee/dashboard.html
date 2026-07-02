@@ -10,6 +10,382 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
   <link rel="stylesheet" href="/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ── Loan Status Distribution Premium Card ── */
+    .status-dist-card {
+      margin-bottom: 28px;
+      overflow: visible;
+    }
+    .status-dist-card .card-body {
+      padding: 22px;
+    }
+    .status-dist-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .status-dist-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      min-width: 0;
+    }
+    .status-dist-header h3 svg {
+      width: 18px;
+      height: 18px;
+      color: var(--accent-secondary);
+    }
+    .status-dist-total-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(47,111,237,0.08) 100%);
+      color: var(--accent);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .status-dist-total-badge svg {
+      width: 16px;
+      height: 16px;
+    }
+    :root[data-theme='dark'] .status-dist-total-badge {
+      background: rgba(139,180,255,0.15);
+      border-color: rgba(139,180,255,0.2);
+    }
+
+    .status-dist-grid {
+      display: grid;
+      grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .status-dist-chart {
+      position: relative;
+      min-height: 250px;
+      height: 100%;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, rgba(47,111,237,0.05) 0%, rgba(255,255,255,0.72) 100%);
+      overflow: hidden;
+    }
+    :root[data-theme='dark'] .status-dist-chart {
+      background: linear-gradient(135deg, rgba(139,180,255,0.08) 0%, rgba(10,19,32,0.68) 100%);
+      border-color: rgba(151,176,210,0.12);
+    }
+    .status-dist-chart canvas {
+      max-width: 100%;
+      max-height: 100%;
+      position: relative;
+      z-index: 1;
+    }
+    .status-dist-chart-center {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      text-align: center;
+    }
+    .status-dist-chart-center strong {
+      font-size: 30px;
+      line-height: 1;
+      color: var(--text-primary);
+    }
+    .status-dist-chart-center span {
+      margin-top: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .status-dist-chart-empty {
+      display: none;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      padding: 40px 20px;
+    }
+    .status-dist-chart-empty svg {
+      width: 48px;
+      height: 48px;
+      display: block;
+      margin: 0 auto 12px;
+      opacity: 0.4;
+    }
+
+    .status-dist-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+      gap: 10px;
+      height: 100%;
+      overflow: visible;
+    }
+    .status-dist-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .status-dist-list::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    .status-item {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      min-height: 104px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .status-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 3px;
+      background: var(--status-color, var(--accent-secondary));
+    }
+    .status-item:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+    }
+    :root[data-theme='dark'] .status-item {
+      background: rgba(11,20,34,0.5);
+      border-color: rgba(151,176,210,0.1);
+    }
+    :root[data-theme='dark'] .status-item:hover {
+      background: rgba(14,24,41,0.7);
+      border-color: rgba(151,176,210,0.2);
+    }
+
+    .status-item-zero {
+      opacity: 0.56;
+    }
+    .status-item-zero:hover {
+      opacity: 0.82;
+    }
+
+    .status-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .status-icon svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .status-info {
+      min-width: 0;
+    }
+    .status-name {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.25;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      white-space: normal;
+      overflow: hidden;
+    }
+    .status-bar-wrap {
+      margin-top: 4px;
+      height: 4px;
+      background: var(--bg-secondary);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    :root[data-theme='dark'] .status-bar-wrap {
+      background: rgba(151,176,210,0.08);
+    }
+    .status-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .status-stats {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+      padding-top: 2px;
+    }
+    .status-count {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .status-pct {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    /* Status icon/badge colors */
+    .icon-pending { background: rgba(245,158,11,0.15); color: #d97706; }
+    :root[data-theme='dark'] .icon-pending { background: rgba(245,158,11,0.18); color: #fbbf24; }
+    .bar-pending { background: #f59e0b; }
+
+    .icon-under-review { background: rgba(99,102,241,0.15); color: #4f46e5; }
+    :root[data-theme='dark'] .icon-under-review { background: rgba(99,102,241,0.18); color: #818cf8; }
+    .bar-under-review { background: #6366f1; }
+
+    .icon-documents-pending { background: rgba(6,182,212,0.15); color: #0891b2; }
+    :root[data-theme='dark'] .icon-documents-pending { background: rgba(6,182,212,0.18); color: #22d3ee; }
+    .bar-documents-pending { background: #06b6d4; }
+
+    .icon-approved { background: rgba(16,185,129,0.15); color: #059669; }
+    :root[data-theme='dark'] .icon-approved { background: rgba(16,185,129,0.18); color: #34d399; }
+    .bar-approved { background: #10b981; }
+
+    .icon-rejected { background: rgba(239,68,68,0.15); color: #dc2626; }
+    :root[data-theme='dark'] .icon-rejected { background: rgba(239,68,68,0.18); color: #f87171; }
+    .bar-rejected { background: #ef4444; }
+
+    .icon-loan-disbursed { background: rgba(56,189,248,0.15); color: #0284c7; }
+    :root[data-theme='dark'] .icon-loan-disbursed { background: rgba(56,189,248,0.18); color: #38bdf8; }
+    .bar-loan-disbursed { background: #16a34a; }
+
+    .icon-cancelled { background: rgba(148,163,184,0.15); color: #64748b; }
+    :root[data-theme='dark'] .icon-cancelled { background: rgba(148,163,184,0.18); color: #94a3b8; }
+    .bar-cancelled { background: #94a3b8; }
+
+    .icon-hold { background: rgba(234,88,12,0.15); color: #c2410c; }
+    :root[data-theme='dark'] .icon-hold { background: rgba(234,88,12,0.18); color: #fb923c; }
+    .bar-hold { background: #ea580c; }
+
+    .icon-abnd { background: rgba(107,114,128,0.15); color: #6b7280; }
+    :root[data-theme='dark'] .icon-abnd { background: rgba(107,114,128,0.18); color: #9ca3af; }
+    .bar-abnd { background: #6b7280; }
+
+    .icon-other { background: rgba(14,165,233,0.15); color: #0284c7; }
+    :root[data-theme='dark'] .icon-other { background: rgba(14,165,233,0.18); color: #38bdf8; }
+    .bar-other { background: #0ea5e9; }
+
+    .status-item.status-pending { --status-color: #f59e0b; }
+    .status-item.status-under-review { --status-color: #6366f1; }
+    .status-item.status-documents-pending { --status-color: #06b6d4; }
+    .status-item.status-approved { --status-color: #10b981; }
+    .status-item.status-rejected { --status-color: #ef4444; }
+    .status-item.status-loan-disbursed { --status-color: #16a34a; }
+    .status-item.status-cancelled { --status-color: #94a3b8; }
+    .status-item.status-hold { --status-color: #ea580c; }
+    .status-item.status-abnd { --status-color: #6b7280; }
+    .status-item.status-other { --status-color: #0ea5e9; }
+
+    /* ── Status empty state ── */
+    .status-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+    .status-empty svg {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      display: block;
+      opacity: 0.35;
+    }
+    .status-empty p {
+      font-size: 13px;
+    }
+
+    /* Legend color dots for chart context */
+    .chart-legend-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .chart-legend-row:hover {
+      background: var(--bg-card-hover);
+    }
+    .chart-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 1100px) {
+      .status-dist-grid {
+        grid-template-columns: 1fr;
+      }
+      .status-dist-chart {
+        min-height: 220px;
+      }
+      .status-dist-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 768px) {
+      .status-dist-card .card-body {
+        padding: 18px;
+      }
+      .status-dist-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .status-dist-header h3 {
+        font-size: 15px;
+      }
+      .status-dist-total-badge {
+        align-self: stretch;
+        justify-content: center;
+      }
+      .status-dist-list {
+        grid-template-columns: 1fr;
+      }
+      .status-item {
+        min-height: 96px;
+      }
+    }
+  </style>
 </head>
 <body>
 <div class="app-layout">
@@ -25,7 +401,11 @@
         <div class="nav-section-title">Main</div>
         <a href="/employee/dashboard.html" class="nav-item active"><span class="nav-icon emoji-sm">📊</span> Dashboard</a>
         <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon emoji-sm">➕</span> Add Customer</a>
+        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon emoji-sm">👥</span> My Customers</a>
         <a href="/employee/loans.html" class="nav-item"><span class="nav-icon emoji-sm">💼</span> My Loans</a>
+        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon emoji-sm">🧮</span> EMI Calculator</a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> My Assigned Data</a>
+        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> APR</a>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -44,44 +424,123 @@
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
       <div class="topbar-title"><h2><span class="emoji">📊</span>My Dashboard</h2><p id="greeting">Welcome back!</p></div>
-      <div class="topbar-actions">
-        <a href="/employee/add-customer.html" class="btn btn-primary btn-sm"><span class="emoji-sm">➕</span>Add Customer</a>
-      </div>
     </div>
 
     <div class="page-content">
+      <!-- Filters bar -->
+      <div class="filters-bar">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="emoji-sm">📅</span>
+          <select id="period-filter" onchange="updateDashboardView()">
+            <option value="">All Time</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+            <option value="custom">Custom Date Range</option>
+          </select>
+        </div>
+        
+        <div id="custom-date-container" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;">
+          <input type="date" id="start-date" onchange="updateDashboardView()" />
+          <span style="color:var(--text-secondary);font-size:13px;">to</span>
+          <input type="date" id="end-date" onchange="updateDashboardView()" />
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="emoji-sm">📍</span>
+          <select id="area-filter" onchange="updateDashboardView()">
+            <option value="">All Areas</option>
+          </select>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="emoji-sm">💼</span>
+          <select id="status-filter" onchange="updateDashboardView()">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Under Review">Under Review</option>
+            <option value="Documents Pending">Documents Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Loan Disbursed">Loan Disbursed</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Hold">Hold</option>
+            <option value="ABND">ABND (Abandoned)</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
       <div class="stats-grid">
-        <a href="/employee/add-customer.html" style="text-decoration:none;color:inherit">
-          <div class="stat-card" role="button">
+        <a href="/employee/my-customers.html" style="text-decoration:none;color:inherit" title="View all my customers" aria-label="My Customers — click to view customer list">
+          <div class="stat-card" role="button" tabindex="0">
             <div class="stat-icon">👥</div>
             <div class="stat-value" id="stat-customers">—</div>
             <div class="stat-label"><span class="emoji-sm">👥</span>My Customers</div>
           </div>
         </a>
 
-        <a href="/employee/loans.html" style="text-decoration:none;color:inherit">
-          <div class="stat-card" role="button">
+        <a href="/employee/loans.html" style="text-decoration:none;color:inherit" title="View all loan applications" aria-label="Total Loans — click to view all loans">
+          <div class="stat-card" role="button" tabindex="0">
             <div class="stat-icon">💼</div>
             <div class="stat-value" id="stat-loans">—</div>
             <div class="stat-label"><span class="emoji-sm">💼</span>Total Loans</div>
           </div>
         </a>
 
-        <a href="/employee/loans.html?status=pending" style="text-decoration:none;color:inherit">
-          <div class="stat-card" role="button">
+        <a href="/employee/loans.html?status=pending" style="text-decoration:none;color:inherit" title="View pending loan applications" aria-label="Pending Loans — click to filter by Pending status">
+          <div class="stat-card" role="button" tabindex="0">
             <div class="stat-icon">⏳</div>
             <div class="stat-value" id="stat-pending">—</div>
             <div class="stat-label"><span class="emoji-sm">⏳</span>Pending</div>
           </div>
         </a>
 
-        <a href="/employee/loans.html?status=approved" style="text-decoration:none;color:inherit">
-          <div class="stat-card" role="button">
+        <a href="/employee/loans.html?status=approved" style="text-decoration:none;color:inherit" title="View approved loan applications" aria-label="Approved Loans — click to filter by Approved status">
+          <div class="stat-card" role="button" tabindex="0">
             <div class="stat-icon">✅</div>
             <div class="stat-value" id="stat-approved">—</div>
             <div class="stat-label"><span class="emoji-sm">✅</span>Approved</div>
           </div>
         </a>
+      </div>
+
+      <!-- ═══ Loan Status Distribution Card (Redesigned) ═══ -->
+      <div class="card status-dist-card">
+        <div class="card-body">
+          <div class="status-dist-header">
+            <h3>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M4 20H20"/><path d="M8 20V7"/><path d="M12 20V4"/><path d="M16 20v-9"/></svg>
+              Loan Applications Status Distribution
+            </h3>
+            <span class="status-dist-total-badge" id="chart-total-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
+              <span id="badge-count">0</span> <span id="badge-label">applications</span>
+            </span>
+          </div>
+
+          <div class="status-dist-grid">
+            <!-- Left: Donut Chart -->
+            <div class="status-dist-chart" id="chart-wrapper">
+              <canvas id="loan-pie-chart"></canvas>
+              <div class="status-dist-chart-center" id="chart-center-total">
+                <strong id="chart-center-count">0</strong>
+                <span id="chart-center-label">applications</span>
+              </div>
+              <div class="status-dist-chart-empty" id="no-data-msg">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M4 20H20"/><path d="M8 20V7"/><path d="M12 20V4"/><path d="M16 20v-9"/></svg>
+                <p>No loan applications found matching the selected criteria.</p>
+              </div>
+            </div>
+
+            <!-- Right: Status List -->
+            <div>
+              <div class="status-dist-list" id="status-list-container">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Quick actions -->
@@ -102,28 +561,6 @@
         </a>
       </div>
 
-      <div class="content-grid">
-        <!-- Recent Loans -->
-        <div class="card">
-          <div class="card-header"><h3><span class="emoji-sm">🕒</span>Recent Loans</h3><a href="/employee/loans.html" class="btn btn-secondary btn-sm">View All</a></div>
-          <div class="table-wrapper">
-            <table>
-              <thead><tr><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
-              <tbody id="recent-loans"><tr><td colspan="4" class="text-center text-muted">Loading...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-        <!-- Recent Customers -->
-        <div class="card">
-          <div class="card-header"><h3><span class="emoji-sm">📋</span>Recent Customers</h3><a href="/employee/add-customer.html" class="btn btn-secondary btn-sm">Add New</a></div>
-          <div class="table-wrapper">
-            <table>
-              <thead><tr><th>Name</th><th>Phone</th><th>Area</th></tr></thead>
-              <tbody id="recent-customers"><tr><td colspan="3" class="text-center text-muted">Loading...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
   </main>
 </div>
@@ -159,6 +596,24 @@
 <script>
   let customerModalListenerAttached = false;
   const user = requireRole('employee');
+  let allLoans = [];
+  let allCustomers = [];
+  let loanChart = null;
+
+  // ── Status configuration ──
+  const STATUS_CONFIG = [
+    { key: 'Pending',      label: 'Pending',           iconPath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>',          iconClass: 'icon-pending',      barClass: 'bar-pending',      chartColor: '#f59e0b' },
+    { key: 'Under Review', label: 'Under Review',      iconPath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>',                iconClass: 'icon-under-review',      barClass: 'bar-under-review',      chartColor: '#6366f1' },
+    { key: 'Documents Pending', label: 'Documents Pending', iconPath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg>', iconClass: 'icon-documents-pending', barClass: 'bar-documents-pending', chartColor: '#06b6d4' },
+    { key: 'Approved',     label: 'Approved',          iconPath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>',                                        iconClass: 'icon-approved',     barClass: 'bar-approved',     chartColor: '#10b981' },
+    { key: 'Rejected',     label: 'Rejected',          iconPath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',  iconClass: 'icon-rejected',     barClass: 'bar-rejected',     chartColor: '#ef4444' },
+    { key: 'Loan Disbursed', label: 'Loan Disbursed',  iconPath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>', iconClass: 'icon-loan-disbursed', barClass: 'bar-loan-disbursed', chartColor: '#16a34a' },
+    { key: 'Cancelled',    label: 'Cancelled',         iconPath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',             iconClass: 'icon-cancelled',    barClass: 'bar-cancelled',    chartColor: '#94a3b8' },
+    { key: 'Hold',         label: 'Hold',              iconPath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="14" y1="8" x2="14" y2="16"/></svg>',                 iconClass: 'icon-hold',         barClass: 'bar-hold',         chartColor: '#ea580c' },
+    { key: 'ABND',         label: 'ABND',              iconPath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>',                                          iconClass: 'icon-abnd',         barClass: 'bar-abnd',         chartColor: '#6b7280' },
+    { key: 'Other',        label: 'Other',             iconPath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M9 10a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z"/></svg>', iconClass: 'icon-other',        barClass: 'bar-other',        chartColor: '#0ea5e9' }
+  ];
+
   if (user) {
     renderSidebarUser();
     document.getElementById('greeting').textContent = `Welcome back, ${user.name}!`;
@@ -166,24 +621,272 @@
   }
 
   async function loadDashboard() {
-    const res = await api.get('/employee/dashboard');
-    if (!res?.ok) return;
-    const d = res.data.data;
+    document.getElementById('stat-customers').textContent = 'Loading...';
+    document.getElementById('stat-loans').textContent = 'Loading...';
+    document.getElementById('stat-pending').textContent = 'Loading...';
+    document.getElementById('stat-approved').textContent = 'Loading...';
 
-    document.getElementById('stat-customers').textContent = d.totalCustomers;
-    document.getElementById('stat-loans').textContent = d.totalLoans;
-    document.getElementById('stat-pending').textContent = d.pending;
-    document.getElementById('stat-approved').textContent = d.approved;
+    const [loansRes, customersRes] = await Promise.all([
+      api.get('/employee/loans'),
+      api.get('/employee/customers')
+    ]);
 
-    const loansTbody = document.getElementById('recent-loans');
-    loansTbody.innerHTML = d.recentLoans.length
-      ? d.recentLoans.map(l => `<tr><td>${l.customer_name}</td><td>${formatCurrency(l.amount)}</td><td>${statusBadge(l.status)}</td><td>${formatDate(l.created_at)}</td></tr>`).join('')
-      : '<tr><td colspan="4" class="text-center text-muted">No loans yet.</td></tr>';
+    if (loansRes?.ok) {
+      allLoans = loansRes.data.data || [];
+    }
+    if (customersRes?.ok) {
+      allCustomers = customersRes.data.data || [];
+    }
 
-    const custTbody = document.getElementById('recent-customers');
-    custTbody.innerHTML = d.recentCustomers.length
-      ? d.recentCustomers.map(c => `<tr><td><span style="cursor:pointer;color:var(--color-primary);text-decoration:underline;" onclick="openCustomerDetail(${c.id})">${c.name}</span></td><td>${c.phone}</td><td>${c.area}</td></tr>`).join('')
-      : '<tr><td colspan="3" class="text-center text-muted">No customers yet.</td></tr>';
+    populateAreaFilter();
+    updateDashboardView();
+    setupThemeObserver();
+  }
+
+  function populateAreaFilter() {
+    const areaSelect = document.getElementById('area-filter');
+    const currentVal = areaSelect.value;
+    areaSelect.innerHTML = '<option value="">All Areas</option>';
+    
+    const areas = [...new Set(allCustomers.map(c => c.area).filter(Boolean))].sort();
+    areas.forEach(area => {
+      const opt = document.createElement('option');
+      opt.value = area;
+      opt.textContent = area;
+      areaSelect.appendChild(opt);
+    });
+    
+    if (areas.includes(currentVal)) {
+      areaSelect.value = currentVal;
+    }
+  }
+
+  function updateDashboardView() {
+    const period = document.getElementById('period-filter').value;
+    const startDateVal = document.getElementById('start-date').value;
+    const endDateVal = document.getElementById('end-date').value;
+    const area = document.getElementById('area-filter').value;
+    const status = document.getElementById('status-filter').value;
+
+    const customDateContainer = document.getElementById('custom-date-container');
+    customDateContainer.style.display = period === 'custom' ? 'flex' : 'none';
+
+    let filteredLoans = [...allLoans];
+    let filteredCustomers = [...allCustomers];
+
+    const now = new Date();
+    let startDate = null;
+    let endDate = null;
+
+    if (period === 'week') {
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else if (period === 'month') {
+      startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    } else if (period === 'year') {
+      startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+    } else if (period === 'custom') {
+      if (startDateVal) { startDate = new Date(startDateVal); startDate.setHours(0,0,0,0); }
+      if (endDateVal)   { endDate = new Date(endDateVal);     endDate.setHours(23,59,59,999); }
+    }
+
+    if (startDate) {
+      filteredLoans = filteredLoans.filter(l => new Date(l.created_at) >= startDate);
+      filteredCustomers = filteredCustomers.filter(c => new Date(c.created_at) >= startDate);
+    }
+    if (endDate) {
+      filteredLoans = filteredLoans.filter(l => new Date(l.created_at) <= endDate);
+      filteredCustomers = filteredCustomers.filter(c => new Date(c.created_at) <= endDate);
+    }
+    if (area) {
+      filteredLoans = filteredLoans.filter(l => l.area === area);
+      filteredCustomers = filteredCustomers.filter(c => c.area === area);
+    }
+    if (status) {
+      filteredLoans = filteredLoans.filter(l => l.status === status);
+    }
+
+    document.getElementById('stat-customers').textContent = filteredCustomers.length;
+    document.getElementById('stat-loans').textContent = filteredLoans.length;
+    document.getElementById('stat-pending').textContent = filteredLoans.filter(l => l.status === 'Pending').length;
+    document.getElementById('stat-approved').textContent = filteredLoans.filter(l => l.status === 'Approved').length;
+
+    renderStatusDistribution(filteredLoans);
+  }
+
+  function getCardBgColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--bg-card').trim() || '#ffffff';
+  }
+
+  function renderStatusDistribution(loans) {
+    const total = loans.length;
+
+    // Build counts map
+    const countsMap = {};
+    STATUS_CONFIG.forEach(c => countsMap[c.key] = 0);
+    loans.forEach(l => {
+      if (countsMap[l.status] !== undefined) countsMap[l.status]++;
+      else countsMap['Other']++;
+    });
+
+    // Update total badge
+    const badgeCount = document.getElementById('badge-count');
+    const badgeLabel = document.getElementById('badge-label');
+    const chartCenter = document.getElementById('chart-center-total');
+    const chartCenterCount = document.getElementById('chart-center-count');
+    const chartCenterLabel = document.getElementById('chart-center-label');
+    badgeCount.textContent = total;
+    badgeLabel.textContent = total === 1 ? 'application' : 'applications';
+    chartCenterCount.textContent = total;
+    chartCenterLabel.textContent = total === 1 ? 'application' : 'applications';
+
+    // ── Populate status list ──
+    const container = document.getElementById('status-list-container');
+    let listHtml = '';
+    STATUS_CONFIG.forEach(cfg => {
+      const count = countsMap[cfg.key] || 0;
+      const pct = total > 0 ? (count / total * 100) : 0;
+      const pctDisplay = pct.toFixed(1);
+      const isZero = count === 0;
+      const zeroClass = isZero ? ' status-item-zero' : '';
+      const statusClass = 'status-' + cfg.key.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+      listHtml += `
+        <div class="status-item ${statusClass}${zeroClass}">
+          <div class="status-icon ${cfg.iconClass}">${cfg.iconPath}</div>
+          <div class="status-info">
+            <div class="status-name">${cfg.label}</div>
+            <div class="status-bar-wrap">
+              <div class="status-bar-fill ${cfg.barClass}" style="width: ${pct}%"></div>
+            </div>
+          </div>
+          <div class="status-stats">
+            <div class="status-count">${count}</div>
+            <div class="status-pct">${pctDisplay}%</div>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = listHtml;
+
+    // ── Update / Create Chart ──
+    const canvas = document.getElementById('loan-pie-chart');
+    const noData = document.getElementById('no-data-msg');
+    const chartWrapper = document.getElementById('chart-wrapper');
+
+    const labels = [];
+    const dataVals = [];
+    const bgColors = [];
+
+    STATUS_CONFIG.forEach(cfg => {
+      const count = countsMap[cfg.key] || 0;
+      if (count > 0) {
+        labels.push(cfg.label);
+        dataVals.push(count);
+        bgColors.push(cfg.chartColor);
+      }
+    });
+
+    const hasData = dataVals.length > 0;
+
+    if (!hasData) {
+      if (loanChart) { loanChart.destroy(); loanChart = null; }
+      canvas.style.display = 'none';
+      chartCenter.style.display = 'none';
+      noData.style.display = 'block';
+      return;
+    }
+
+    canvas.style.display = 'block';
+    chartCenter.style.display = 'flex';
+    noData.style.display = 'none';
+
+    // Pie chart label plugin
+    const pieLabelsPlugin = {
+      id: 'pieLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        ctx.save();
+        chart.data.datasets.forEach((dataset, i) => {
+          const meta = chart.getDatasetMeta(i);
+          meta.data.forEach((element, index) => {
+            const val = dataset.data[index];
+            if (!val || val === 0) return;
+            const sum = dataset.data.reduce((a, b) => a + b, 0);
+            const pct = ((val / sum) * 100).toFixed(1) + '%';
+            let pos;
+            if (typeof element.tooltipPosition === 'function') pos = element.tooltipPosition(true);
+            else pos = { x: element.x, y: element.y };
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const angle = element.endAngle - element.startAngle;
+            if (angle > 0.25) ctx.fillText(pct, pos.x, pos.y);
+          });
+        });
+        ctx.restore();
+      }
+    };
+
+    const borderColor = getCardBgColor();
+
+    if (loanChart) {
+      loanChart.data.labels = labels;
+      loanChart.data.datasets[0].data = dataVals;
+      loanChart.data.datasets[0].backgroundColor = bgColors;
+      loanChart.data.datasets[0].borderColor = borderColor;
+      loanChart.update();
+    } else {
+      loanChart = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: dataVals,
+            backgroundColor: bgColors,
+            borderWidth: 2,
+            borderColor: borderColor,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(0,0,0,0.8)',
+              padding: 10,
+              cornerRadius: 8,
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  const dataset = context.dataset;
+                  const sum = dataset.data.reduce((a, b) => a + b, 0);
+                  const pct = ((value / sum) * 100).toFixed(1) + '%';
+                  return ` ${label}: ${value} (${pct})`;
+                }
+              }
+            }
+          }
+        },
+        plugins: [pieLabelsPlugin]
+      });
+    }
+  }
+
+  let themeObserver = null;
+  function setupThemeObserver() {
+    if (themeObserver) return;
+    themeObserver = new MutationObserver(() => {
+      if (loanChart) {
+        loanChart.data.datasets[0].borderColor = getCardBgColor();
+        loanChart.update();
+      }
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   }
 
   function openCustomerModal() {
@@ -197,9 +900,7 @@
   }
 
   function closeCustomerDetailOnOverlay(event) {
-    if (event.target.id === 'customer-detail-modal') {
-      closeCustomerModal();
-    }
+    if (event.target.id === 'customer-detail-modal') closeCustomerModal();
   }
 
   function openMyCustomersModal() {
@@ -214,16 +915,13 @@
   }
 
   function closeMyCustomersOnOverlay(event) {
-    if (event.target.id === 'my-customers-modal') {
-      closeMyCustomersModal();
-    }
+    if (event.target.id === 'my-customers-modal') closeMyCustomersModal();
   }
 
   function syncCustomerModalListener() {
     const detailOpen = document.getElementById('customer-detail-modal').classList.contains('show');
     const listOpen = document.getElementById('my-customers-modal').classList.contains('show');
     const shouldAttach = detailOpen || listOpen;
-
     if (shouldAttach && !customerModalListenerAttached) {
       document.addEventListener('keydown', handleEscapeKey);
       customerModalListenerAttached = true;
@@ -239,7 +937,6 @@
       document.getElementById('my-customers-modal-content').innerHTML = `<div style="color:red;padding:20px;text-align:center;">${res?.data?.message || 'Failed to load customers'}</div>`;
       return;
     }
-
     const list = res.data.data || [];
     const rows = list.length
       ? list.map((c, i) => `
@@ -252,7 +949,6 @@
           </tr>
         `).join('')
       : '<tr><td colspan="5" class="text-center text-muted">No customers yet.</td></tr>';
-
     document.getElementById('my-customers-modal-content').innerHTML = `
       <div class="table-wrapper">
         <table>
@@ -267,11 +963,8 @@
     if (event.key === 'Escape') {
       const detailOpen = document.getElementById('customer-detail-modal').classList.contains('show');
       const listOpen = document.getElementById('my-customers-modal').classList.contains('show');
-      if (detailOpen) {
-        closeCustomerModal();
-      } else if (listOpen) {
-        closeMyCustomersModal();
-      }
+      if (detailOpen) closeCustomerModal();
+      else if (listOpen) closeMyCustomersModal();
     }
   }
 
@@ -285,61 +978,29 @@
     const c = res.data.data.customer;
     const docs = res.data.data.documents || [];
 
-    const escapeHtml = (value) => String(value ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-
     function resolveFileUrl(path) {
       if (!path) return '#';
       if (path.startsWith('http://') || path.startsWith('https://')) return path;
-      const uploadsBase = (typeof api !== 'undefined' && api.uploadsBase) ? api.uploadsBase : (window.api && window.api.uploadsBase) ? window.api.uploadsBase : null;
-      return uploadsBase ? uploadsBase + path : path;
+      const ub = (typeof api !== 'undefined' && api.uploadsBase) ? api.uploadsBase : (window.api && window.api.uploadsBase) ? window.api.uploadsBase : null;
+      return ub ? ub + path : path;
     }
 
     const content = `
       <div style="padding:16px;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-          <div>
-            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Name</label>
-            <p style="font-size:14px;margin-top:4px;">${c.name || '—'}</p>
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Phone</label>
-            <p style="font-size:14px;margin-top:4px;">${c.phone || '—'}</p>
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Email</label>
-            <p style="font-size:14px;margin-top:4px;">${c.email || '—'}</p>
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Area</label>
-            <p style="font-size:14px;margin-top:4px;">${c.area || '—'}</p>
-          </div>
-          <div style="grid-column: span 2;">
-            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Address</label>
-            <p style="font-size:14px;margin-top:4px;white-space:pre-line;">${c.address || '—'}</p>
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Joined</label>
-            <p style="font-size:14px;margin-top:4px;">${formatDate(c.created_at) || '—'}</p>
-          </div>
+          <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Name</label><p style="font-size:14px;margin-top:4px;">${c.name || '—'}</p></div>
+          <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Phone</label><p style="font-size:14px;margin-top:4px;">${c.phone || '—'}</p></div>
+          <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Email</label><p style="font-size:14px;margin-top:4px;">${c.email || '—'}</p></div>
+          <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Area</label><p style="font-size:14px;margin-top:4px;">${c.area || '—'}</p></div>
+          <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Net Salary</label><p style="font-size:14px;margin-top:4px;">${c.net_salary != null ? '₹' + Number(c.net_salary).toLocaleString('en-IN') : '—'}</p></div>
+          <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Total Obligation</label><p style="font-size:14px;margin-top:4px;">${c.total_obligation != null ? '₹' + Number(c.total_obligation).toLocaleString('en-IN') : '—'}</p></div>
+          <div style="grid-column:span 2;"><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Address</label><p style="font-size:14px;margin-top:4px;white-space:pre-line;">${c.address || '—'}</p></div>
+          <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Joined</label><p style="font-size:14px;margin-top:4px;">${formatDate(c.created_at) || '—'}</p></div>
         </div>
-
-        <h4 style="margin: 16px 0 8px;font-size:12px;text-transform:uppercase;color:var(--text-secondary);font-weight:600;">Uploaded Documents (${docs.length})</h4>
-        <div style="margin-bottom:20px;max-height:180px;overflow-y:auto;border: 1px solid var(--border-color);border-radius:8px;padding:8px;">
-          ${docs.length ? docs.map(d => `
-            <div class="doc-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;font-size:13px;">
-              <span>${escapeHtml(d.doc_type)} — ${escapeHtml(d.file_name)}${d.document_password ? ` <span style="color:var(--text-muted);">| Password: ${escapeHtml(d.document_password)}</span>` : ''}</span>
-              <div style="display:flex;gap:6px;">
-                <a href="${resolveFileUrl(d.file_path)}" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 8px; font-size:11px;">View</a>
-                <button class="btn btn-danger btn-sm" onclick="deleteUploadedDoc(${d.id}, this)" style="padding: 4px 8px; font-size:11px;">Delete</button>
-              </div>
-            </div>`).join('') : '<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:12px 0;">No documents uploaded.</p>'}
+        <h4 style="margin:16px 0 8px;font-size:12px;text-transform:uppercase;color:var(--text-secondary);font-weight:600;">Uploaded Documents (${docs.length})</h4>
+        <div style="margin-bottom:20px;max-height:180px;overflow-y:auto;border:1px solid var(--border-color);border-radius:8px;padding:8px;">
+          ${docs.length ? docs.map(d => '<div class="doc-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;font-size:13px;"><span>' + (d.doc_type || '') + ' — ' + (d.file_name || '') + (d.document_password ? ' <span style="color:var(--text-muted);">| Password: ' + d.document_password + '</span>' : '') + '</span><div style="display:flex;gap:6px;"><a href="' + resolveFileUrl(d.file_path) + '" target="_blank" class="btn btn-secondary btn-sm" style="padding:4px 8px;font-size:11px;">View</a><button class="btn btn-danger btn-sm" onclick="deleteUploadedDoc(' + d.id + ', this)" style="padding:4px 8px;font-size:11px;">Delete</button></div></div>').join('') : '<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:12px 0;">No documents uploaded.</p>'}
         </div>
-
         <div style="border-top:1px solid var(--border-color);padding-top:16px;display:flex;gap:8px;">
           <a href="/employee/loans.html?customer_id=${c.id}" class="btn btn-primary" style="flex:1;text-align:center;">View Loans</a>
           <button class="btn btn-secondary" style="flex:1;" onclick="closeCustomerModal()">Close</button>
@@ -354,16 +1015,10 @@
     btn.disabled = true;
     btn.textContent = 'Deleting...';
     const res = await api.delete(`/employee/documents/${id}`);
-    if (!res?.ok) {
-      btn.disabled = false;
-      btn.textContent = 'Delete';
-      return alert(res?.data?.message || 'Failed to delete document.');
-    }
+    if (!res?.ok) { btn.disabled = false; btn.textContent = 'Delete'; return alert(res?.data?.message || 'Failed to delete document.'); }
     alert('Document deleted successfully.');
     const docRow = btn.closest('.doc-row');
-    if (docRow) {
-      docRow.remove();
-    }
+    if (docRow) docRow.remove();
   }
 </script>
 </body>

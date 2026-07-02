@@ -20,6 +20,1272 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
   <link rel="stylesheet" href="/css/styles.css" />
+  <style>
+    /* ── Premium Analytics Section ── */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .analytics-card {
+      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255,255,255,0.96) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(16,32,51,0.06);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    :root[data-theme='dark'] .analytics-card {
+      background: linear-gradient(135deg, rgba(10,19,32,0.94) 0%, rgba(14,25,42,0.98) 100%);
+      border-color: rgba(151,176,210,0.14);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.28);
+    }
+    .analytics-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: 0 16px 32px rgba(16,32,51,0.12);
+      transform: translateY(-4px);
+    }
+    :root[data-theme='dark'] .analytics-card:hover {
+      border-color: rgba(139,180,255,0.2);
+      box-shadow: 0 20px 36px rgba(0,0,0,0.34);
+    }
+    .analytics-card-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--table-row-border);
+      background: linear-gradient(90deg, rgba(247,250,255,0.98) 0%, rgba(240,245,252,0.98) 100%);
+    }
+    :root[data-theme='dark'] .analytics-card-header {
+      background: linear-gradient(90deg, rgba(12,22,36,0.96) 0%, rgba(15,28,46,0.98) 100%);
+      border-bottom-color: rgba(151,176,210,0.12);
+    }
+    .analytics-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .analytics-card-title svg { color: var(--accent-secondary); flex-shrink: 0; }
+    .analytics-card-body {
+      padding: 16px 20px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .analytics-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 8px 4px;
+      background: linear-gradient(135deg, rgba(47,111,237,0.04) 0%, transparent 100%);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    :root[data-theme='dark'] .metric-item {
+      background: linear-gradient(135deg, rgba(139,180,255,0.06) 0%, transparent 100%);
+      border-color: rgba(151,176,210,0.1);
+    }
+    .metric-item:hover {
+      border-color: var(--border-strong);
+      background: linear-gradient(135deg, rgba(47,111,237,0.08) 0%, transparent 100%);
+    }
+    .metric-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .metric-value { font-size: 18px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+    .metric-sub { font-size: 10px; font-weight: 500; color: var(--text-secondary); margin-left: 2px; }
+    .metric-value.metric-up { color: var(--success); }
+    .metric-value.metric-down { color: var(--danger); }
+    .analytics-chart-wrapper { flex: 1; position: relative; min-height: 200px; }
+    .analytics-chart-wrapper canvas { width: 100% !important; height: 100% !important; }
+    .status-chart-layout {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      flex: 1;
+    }
+    .status-donut-wrapper {
+      flex-shrink: 0;
+      width: 160px;
+      height: 160px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .status-donut-wrapper canvas { width: 100% !important; height: 100% !important; }
+    .status-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .status-empty-state svg { opacity: 0.5; }
+    .status-legend-wrapper { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+      font-size: 12px;
+    }
+    .legend-item:hover { background: linear-gradient(90deg, rgba(47,111,237,0.05) 0%, transparent 100%); }
+    :root[data-theme='dark'] .legend-item:hover { background: linear-gradient(90deg, rgba(139,180,255,0.06) 0%, transparent 100%); }
+    .legend-item-muted { opacity: 0.5; }
+    .legend-item-muted:hover { opacity: 0.8; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-label {
+      flex: 1;
+      color: var(--text-secondary);
+      font-weight: 500;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .legend-count {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 13px;
+      min-width: 24px;
+      text-align: right;
+    }
+    .legend-pct {
+      color: var(--text-muted);
+      font-size: 11px;
+      min-width: 38px;
+      text-align: right;
+    }
+    .legend-muted-sep {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      padding: 8px 8px 2px;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+    }
+    @media (max-width: 1024px) {
+      .status-chart-layout { flex-direction: column; align-items: center; }
+      .status-donut-wrapper { width: 140px; height: 140px; }
+    }
+    @media (max-width: 768px) {
+      .analytics-grid { grid-template-columns: 1fr; gap: 16px; }
+      .analytics-metrics { grid-template-columns: repeat(2, 1fr); }
+      .status-donut-wrapper { width: 120px; height: 120px; }
+    }
+    /* ── Premium Loan Status Breakdown Cards ── */
+    .status-breakdown-layout {
+      display: flex;
+      gap: 20px;
+      flex: 1;
+      align-items: stretch;
+    }
+    .status-donut-column {
+      flex-shrink: 0;
+      width: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-donut-column .status-donut-wrapper {
+      width: 130px;
+      height: 130px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .status-donut-column .status-donut-wrapper canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+    .status-total-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-align: center;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+    :root[data-theme='dark'] .status-total-badge {
+      background: rgba(10,19,32,0.7);
+    }
+    .status-total-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-total-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .status-cards-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+    .status-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: 10px;
+    }
+    .status-card {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 12px 12px;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: default;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    :root[data-theme='dark'] .status-card {
+      background: rgba(10,19,32,0.6);
+    }
+    .status-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--status-color);
+      border-radius: 3px 3px 0 0;
+      transition: height 0.2s ease;
+    }
+    .status-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--status-color);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    :root[data-theme='dark'] .status-card:hover {
+      box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+    }
+    .status-card:hover::before {
+      height: 4px;
+    }
+    .status-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--status-bg);
+      color: var(--status-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+    .status-card:hover .status-card-icon {
+      transform: scale(1.1);
+    }
+    .status-card-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .status-card-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .status-card-stats {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .status-card-count {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .status-card-pct {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .status-card-progress {
+      height: 4px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    :root[data-theme='dark'] .status-card-progress {
+      background: rgba(255,255,255,0.08);
+    }
+    .status-card-progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--status-color);
+      width: 0;
+      animation: statusProgressFill 0.8s ease-out forwards;
+    }
+    @keyframes statusProgressFill {
+      from { width: 0 !important; }
+    }
+    /* ── Other Statuses (zero-value) ── */
+    .status-other-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+    }
+    :root[data-theme='dark'] .status-other-section {
+      background: rgba(10,19,32,0.4);
+    }
+    .status-other-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
+    .status-other-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .status-other-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      cursor: default;
+      background: var(--pill-bg, rgba(0,0,0,0.04));
+      color: var(--pill-color, #6b7280);
+      border: 1px solid var(--pill-border, rgba(0,0,0,0.06));
+    }
+    :root[data-theme='dark'] .status-other-pill {
+      --pill-bg: rgba(255,255,255,0.04);
+      --pill-border: rgba(255,255,255,0.08);
+    }
+    .status-other-pill:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .status-other-pill svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    @media (max-width: 1024px) {
+      .status-breakdown-layout { flex-direction: column; align-items: center; }
+      .status-donut-column { width: 120px; }
+      .status-donut-column .status-donut-wrapper { width: 110px; height: 110px; }
+      .status-cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    }
+    @media (max-width: 768px) {
+      .analytics-grid { grid-template-columns: 1fr; gap: 16px; }
+      .analytics-metrics { grid-template-columns: repeat(2, 1fr); }
+      .status-donut-column .status-donut-wrapper { width: 100px; height: 100px; }
+      .status-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .status-card { padding: 12px 10px; }
+      .status-card-count { font-size: 18px; }
+    }
+
+    /* ── Employees Overview Panel ── */
+    .employee-insights-card {
+      margin-bottom: 24px;
+      border: 1px solid rgba(151, 176, 210, 0.22);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.94) 0%, rgba(248,251,255,0.92) 56%, rgba(241,248,247,0.88) 100%);
+      box-shadow: 0 16px 40px rgba(16, 32, 51, 0.1);
+      overflow: hidden;
+    }
+    :root[data-theme='dark'] .employee-insights-card {
+      background:
+        linear-gradient(135deg, rgba(10,19,32,0.94) 0%, rgba(13,25,43,0.92) 55%, rgba(8,31,35,0.7) 100%);
+      border-color: rgba(151,176,210,0.14);
+      box-shadow: 0 24px 58px rgba(0,0,0,0.38);
+    }
+    .employee-insights-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.48);
+    }
+    :root[data-theme='dark'] .employee-insights-header {
+      background: rgba(255,255,255,0.025);
+      border-bottom-color: rgba(151,176,210,0.13);
+    }
+    .employee-insights-title-group,
+    .employee-panel-title,
+    .employee-detail-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .employee-insights-icon,
+    .employee-panel-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(47,111,237,0.14), rgba(15,139,113,0.12));
+      border: 1px solid rgba(47,111,237,0.16);
+      color: var(--accent);
+    }
+    .employee-insights-icon {
+      width: 42px;
+      height: 42px;
+    }
+    .employee-panel-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+    }
+    .employee-insights-icon svg,
+    .employee-panel-icon svg,
+    .employee-empty-icon svg {
+      width: 19px;
+      height: 19px;
+      stroke-width: 2;
+    }
+    .employee-insights-kicker {
+      margin: 0 0 3px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+    .employee-insights-title,
+    .employee-panel-heading,
+    .employee-detail-heading {
+      margin: 0;
+      color: var(--text-primary);
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .employee-insights-title { font-size: 18px; }
+    .employee-panel-heading,
+    .employee-detail-heading { font-size: 15px; }
+    .employee-insights-close,
+    .employee-refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border-radius: 999px;
+      font-weight: 800;
+    }
+    .employee-insights-close svg,
+    .employee-refresh-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+    .employee-insights-body {
+      padding: 16px 20px 20px;
+    }
+    .employee-insights-layout {
+      display: grid;
+      grid-template-columns: minmax(276px, 316px) minmax(0, 1fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+    .employee-roster-panel,
+    .employee-detail-panel {
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.6);
+      box-shadow: 0 10px 22px rgba(16,32,51,0.06);
+      overflow: hidden;
+    }
+    :root[data-theme='dark'] .employee-roster-panel,
+    :root[data-theme='dark'] .employee-detail-panel {
+      background: rgba(255,255,255,0.035);
+      border-color: rgba(151,176,210,0.13);
+      box-shadow: 0 16px 34px rgba(0,0,0,0.26);
+    }
+    .employee-panel-header,
+    .employee-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.42);
+    }
+    :root[data-theme='dark'] .employee-panel-header,
+    :root[data-theme='dark'] .employee-detail-header {
+      background: rgba(255,255,255,0.025);
+      border-bottom-color: rgba(151,176,210,0.12);
+    }
+    .employee-count-pill {
+      flex: 0 0 auto;
+      padding: 5px 9px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .employee-list {
+      max-height: 410px;
+      overflow: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .employee-list-item {
+      width: 100%;
+      min-height: 68px;
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      padding: 10px 11px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.56);
+      color: var(--text-primary);
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+    :root[data-theme='dark'] .employee-list-item {
+      background: rgba(6,12,22,0.42);
+      border-color: rgba(151,176,210,0.12);
+    }
+    .employee-list-item {
+      position: relative;
+    }
+    .employee-list-item::before {
+      content: '';
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      border-radius: 14px 0 0 14px;
+      background: transparent;
+      pointer-events: none;
+    }
+    .employee-list-item:hover,
+    .employee-list-item.active {
+      transform: translateY(-1px);
+      border-color: rgba(47,111,237,0.22);
+      background: rgba(47,111,237,0.06);
+      box-shadow: 0 8px 18px rgba(16,32,51,0.08);
+    }
+    .employee-list-item.active {
+      box-shadow: 0 0 0 1px rgba(47,111,237,0.08), 0 10px 22px rgba(16,32,51,0.1);
+    }
+    .employee-list-item.active::before {
+      background: var(--accent-secondary);
+    }
+    .employee-avatar {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(15,39,71,0.92), rgba(47,111,237,0.86));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: 0;
+      box-shadow: 0 8px 18px rgba(16,32,51,0.12);
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+    .employee-avatar.has-photo {
+      border: 1px solid rgba(47,111,237,0.16);
+      background: var(--bg-card);
+      box-shadow: 0 8px 20px rgba(16,32,51,0.14);
+    }
+    :root[data-theme='dark'] .employee-avatar.has-photo {
+      border-color: rgba(151,176,210,0.2);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+    }
+    .employee-avatar img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      border-radius: inherit;
+    }
+    .employee-avatar-fallback {
+      position: relative;
+      z-index: 1;
+      line-height: 1;
+    }
+    .employee-avatar.has-photo .employee-avatar-fallback {
+      display: none;
+    }
+    .employee-list-copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .employee-list-name {
+      display: block;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.25;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .employee-list-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+    .employee-list-email {
+      display: block;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 650;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .employee-loan-badge {
+      flex: 0 0 auto;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(47,111,237,0.14);
+      background: rgba(47,111,237,0.08);
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .employee-detail-body {
+      padding: 14px;
+    }
+    .employee-selected-card {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--bg-card);
+      margin-bottom: 12px;
+      box-shadow: 0 8px 18px rgba(16,32,51,0.06);
+    }
+    :root[data-theme='dark'] .employee-selected-card {
+      background: rgba(6,12,22,0.48);
+      border-color: rgba(151,176,210,0.14);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.24);
+    }
+    .employee-selected-card .employee-avatar {
+      width: 52px;
+      height: 52px;
+      font-size: 15px;
+    }
+    .employee-selected-name {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 17px;
+      font-weight: 850;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+    .employee-selected-meta {
+      margin: 5px 0 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+    .employee-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .employee-status-pill.inactive {
+      border-color: rgba(180,69,69,0.18);
+      background: rgba(180,69,69,0.08);
+      color: var(--danger);
+    }
+    .employee-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .employee-contact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .employee-contact-item {
+      min-width: 0;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.58);
+    }
+    :root[data-theme='dark'] .employee-contact-item {
+      background: rgba(6,12,22,0.48);
+      border-color: rgba(151,176,210,0.12);
+    }
+    .employee-contact-item span {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .employee-contact-item p {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-weight: 750;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+    .employee-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .employee-metric-card {
+      min-height: 96px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid rgba(var(--metric-rgb, 47,111,237), 0.18);
+      border-radius: 16px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    :root[data-theme='dark'] .employee-metric-card {
+      background: rgba(6,12,22,0.46);
+      border-color: rgba(var(--metric-rgb, 47,111,237), 0.2);
+    }
+    .employee-metric-card:hover,
+    .employee-metric-card:focus-visible {
+      transform: translateY(-3px);
+      border-color: rgba(var(--metric-rgb, 47,111,237), 0.42);
+      box-shadow: 0 14px 30px rgba(16,32,51,0.13);
+      outline: none;
+    }
+    .employee-metric-card.active {
+      border-color: rgba(var(--metric-rgb, 47,111,237), 0.5);
+      box-shadow: 0 0 0 3px rgba(var(--metric-rgb, 47,111,237), 0.12), 0 14px 30px rgba(16,32,51,0.13);
+    }
+    .employee-metric-card.loans { --metric-rgb: 47,111,237; }
+    .employee-metric-card.pending { --metric-rgb: 217,119,6; }
+    .employee-metric-card.approved { --metric-rgb: 5,150,105; }
+    .employee-metric-card.customers { --metric-rgb: 15,139,113; }
+    .employee-metric-icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 11px;
+      background: rgba(var(--metric-rgb, 47,111,237), 0.12);
+      color: rgb(var(--metric-rgb, 47,111,237));
+    }
+    .employee-metric-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+    .employee-metric-value {
+      color: var(--text-primary);
+      font-size: 24px;
+      font-weight: 850;
+      line-height: 0.95;
+    }
+    .employee-metric-label {
+      margin-top: 4px;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+    .employee-view-message {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px 13px;
+      border: 1px dashed var(--border-strong);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.42);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 650;
+      line-height: 1.45;
+    }
+    :root[data-theme='dark'] .employee-view-message {
+      background: rgba(6,12,22,0.32);
+    }
+    .employee-view-message svg {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      color: var(--accent);
+    }
+    .employee-view-output {
+      display: none;
+      margin-top: 14px;
+    }
+    .employee-empty-state {
+      display: flex;
+      min-height: 220px;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+    .employee-empty-state-inner {
+      max-width: 340px;
+    }
+    .employee-empty-icon {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      border-radius: 16px;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .employee-empty-state h4 {
+      margin: 0 0 6px;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-weight: 850;
+    }
+    .employee-empty-state p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .employee-view-summary {
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.54);
+    }
+    :root[data-theme='dark'] .employee-view-summary {
+      background: rgba(6,12,22,0.42);
+      border-color: rgba(151,176,210,0.12);
+    }
+    .employee-view-summary p {
+      margin: 0;
+    }
+    .employee-view-kicker {
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .employee-view-total {
+      margin-top: 5px;
+      color: var(--text-primary);
+      font-size: 22px;
+      font-weight: 850;
+      line-height: 1;
+    }
+    .employee-view-sub {
+      margin-top: 7px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .employee-view-output .table-wrapper {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg-card);
+      box-shadow: 0 8px 18px rgba(16,32,51,0.05);
+    }
+    .employee-view-output table {
+      min-width: 100%;
+    }
+    .employee-view-output thead th {
+      padding: 9px 11px;
+      font-size: 10px;
+    }
+    .employee-view-output tbody td {
+      padding: 10px 11px;
+      font-size: 12px;
+    }
+    .employee-view-output .badge {
+      padding: 3px 7px;
+      font-size: 9px;
+      box-shadow: none;
+    }
+    .customer-detail-shell {
+      display: grid;
+      gap: 12px;
+      color: var(--text-primary);
+    }
+    .customer-detail-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 15px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--bg-card);
+      box-shadow: 0 8px 18px rgba(16,32,51,0.06);
+    }
+    :root[data-theme='dark'] .customer-detail-hero {
+      background: rgba(6,12,22,0.48);
+      border-color: rgba(151,176,210,0.14);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.24);
+    }
+    .customer-detail-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .customer-detail-avatar {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(15,39,71,0.92), rgba(47,111,237,0.84));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 8px 18px rgba(16,32,51,0.1);
+      flex: 0 0 auto;
+    }
+    .customer-detail-copy {
+      min-width: 0;
+    }
+    .customer-detail-kicker {
+      margin: 0 0 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .customer-detail-name {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 850;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }
+    .customer-detail-subtitle {
+      margin: 4px 0 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 650;
+      overflow-wrap: anywhere;
+    }
+    .customer-detail-pill {
+      flex: 0 0 auto;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .customer-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .customer-detail-stat {
+      min-width: 0;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.58);
+    }
+    :root[data-theme='dark'] .customer-detail-stat {
+      background: rgba(6,12,22,0.44);
+      border-color: rgba(151,176,210,0.12);
+    }
+    .customer-detail-stat-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .customer-detail-stat-value {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+    .customer-detail-stat.address {
+      grid-column: 1 / -1;
+    }
+    .customer-detail-section {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--bg-card);
+      overflow: hidden;
+      box-shadow: 0 8px 18px rgba(16,32,51,0.05);
+    }
+    :root[data-theme='dark'] .customer-detail-section {
+      border-color: rgba(151,176,210,0.12);
+      background: rgba(6,12,22,0.42);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+    }
+    .customer-detail-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.44);
+    }
+    :root[data-theme='dark'] .customer-detail-section-header {
+      background: rgba(255,255,255,0.025);
+      border-bottom-color: rgba(151,176,210,0.12);
+    }
+    .customer-detail-section-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 850;
+      color: var(--text-primary);
+    }
+    .customer-detail-count {
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .customer-document-list {
+      display: grid;
+      gap: 8px;
+      padding: 12px 14px 14px;
+    }
+    .customer-document-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.56);
+    }
+    :root[data-theme='dark'] .customer-document-item {
+      background: rgba(6,12,22,0.42);
+      border-color: rgba(151,176,210,0.12);
+    }
+    .customer-document-copy {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+    .customer-document-title {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+    .customer-document-meta {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+    .customer-document-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .customer-empty-state--compact {
+      min-height: 132px;
+      padding: 14px 16px 16px;
+    }
+    .customer-empty-state--compact .employee-empty-state-inner {
+      max-width: 300px;
+    }
+    .customer-loans-table {
+      padding: 0;
+    }
+    .customer-loans-table table {
+      min-width: 100%;
+    }
+    .customer-loans-table thead th {
+      padding: 9px 11px;
+      font-size: 10px;
+    }
+    .customer-loans-table tbody td {
+      padding: 10px 11px;
+      font-size: 12px;
+    }
+    @media (max-width: 1120px) {
+      .employee-insights-layout {
+        grid-template-columns: 1fr;
+      }
+      .employee-list {
+        max-height: 300px;
+      }
+    }
+    @media (max-width: 760px) {
+      .employee-insights-header,
+      .employee-detail-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .employee-insights-body {
+        padding: 14px;
+      }
+      .employee-contact-grid,
+      .employee-metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .employee-selected-card {
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+      .employee-selected-card .employee-status-pill {
+        grid-column: 1 / -1;
+        width: fit-content;
+      }
+      .customer-detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 520px) {
+      .employee-list-item {
+        grid-template-columns: 38px minmax(0, 1fr);
+      }
+      .employee-contact-grid,
+      .employee-metrics-grid {
+        grid-template-columns: 1fr;
+      }
+      .customer-detail-grid {
+        grid-template-columns: 1fr;
+      }
+      .customer-detail-stat.address {
+        grid-column: auto;
+      }
+      .customer-detail-hero,
+      .customer-detail-section-header,
+      .employee-insights-header,
+      .employee-detail-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -39,6 +1305,9 @@
         <a href="/admin/employees.html" class="nav-item"><span class="nav-icon emoji-sm">👥</span> Employees</a>
         <a href="/admin/customers.html" class="nav-item"><span class="nav-icon emoji-sm">📋</span> Customers</a>
         <a href="/admin/loans.html" class="nav-item"><span class="nav-icon emoji-sm">💼</span> Loan Applications</a>
+        <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon emoji-sm">🧮</span> EMI Calculator</a>
+        <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> Data Excel Document</a>
+        <a href="/admin/apr.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> APR</a>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -57,7 +1326,8 @@
   <main class="main-content">
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2><span class="emoji">📊</span>Dashboard</h2><p>Portfolio overview and loan operations</p></div>
+      <div class="topbar-title"><h2><span class="emoji">📊</span>Dashboard</h2>
+        <p>Unified loan and customer management</p></div>
       <div class="topbar-actions">
         <span id="current-date" style="font-size:13px;color:var(--text-secondary);"></span>
       </div>
@@ -73,39 +1343,111 @@
         </div>
       </div>
 
-      <div id="employees-insights" class="card" style="display:none;margin-bottom:28px;">
-        <div class="card-header">
-          <h3><span class="emoji-sm">👥</span>Employees Overview</h3>
-          <button class="btn btn-secondary btn-sm" onclick="toggleEmployeesInsights()">Close</button>
-        </div>
-        <div class="card-body">
-          <div style="display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start;">
-            <div class="card" style="margin:0;">
-              <div class="card-header"><h3 style="font-size:14px;"><span class="emoji-sm">👤</span>Employee Names</h3></div>
-              <div id="employee-list" style="max-height:420px;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:8px;"></div>
+      <section id="employees-insights" class="employee-insights-card" style="display:none;">
+        <div class="employee-insights-header">
+          <div class="employee-insights-title-group">
+            <span class="employee-insights-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </span>
+            <div>
+              <p class="employee-insights-kicker">Team performance</p>
+              <h3 class="employee-insights-title">Employees Overview</h3>
             </div>
-            <div class="card" style="margin:0;">
-              <div class="card-header">
-                <h3 id="employee-detail-title" style="font-size:14px;"><span class="emoji-sm">ℹ️</span>Select an employee</h3>
-                <button class="btn btn-secondary btn-sm" onclick="refreshEmployeeDetails()">Refresh</button>
+          </div>
+          <button class="btn btn-secondary btn-sm employee-insights-close" onclick="toggleEmployeesInsights()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+            Close
+          </button>
+        </div>
+        <div class="employee-insights-body">
+          <div class="employee-insights-layout">
+            <aside class="employee-roster-panel">
+              <div class="employee-panel-header">
+                <div class="employee-panel-title">
+                  <span class="employee-panel-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+                  </span>
+                  <h3 class="employee-panel-heading">Employee Names</h3>
+                </div>
+                <span class="employee-count-pill" id="employee-count-pill">0 employees</span>
               </div>
-              <div class="card-body" id="employee-detail-body">
-                <p style="color:var(--text-secondary);font-size:13px;">Click an employee name to see their work details, recent loan activity, and customers added.</p>
+              <div id="employee-list" class="employee-list"></div>
+            </aside>
+            <section class="employee-detail-panel">
+              <div class="employee-detail-header">
+                <div class="employee-detail-title-row">
+                  <span class="employee-panel-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  </span>
+                  <h3 id="employee-detail-title" class="employee-detail-heading">Select an employee</h3>
+                </div>
+                <button class="btn btn-secondary btn-sm employee-refresh-btn" onclick="refreshEmployeeDetails()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"></path><path d="M21 21v-5h-5"></path></svg>
+                  Refresh
+                </button>
               </div>
+              <div class="employee-detail-body" id="employee-detail-body">
+                <div class="employee-empty-state">
+                  <div class="employee-empty-state-inner">
+                    <span class="employee-empty-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+                    </span>
+                    <h4>Select an employee</h4>
+                    <p>Choose a team member to review profile details, loan progress, and customer activity.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- Analytics Section -->
+      <div class="analytics-grid" id="analytics-section">
+        <!-- Monthly Loan Trend -->
+        <div class="analytics-card">
+          <div class="analytics-card-header">
+            <div class="analytics-card-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M4 20H20"/><path d="M8 20V7"/><path d="M12 20V4"/><path d="M16 20v-9"/></svg>
+              Monthly Loan Trend
+            </div>
+          </div>
+          <div class="analytics-card-body">
+            <div class="analytics-metrics" id="trend-metrics"></div>
+            <div class="analytics-chart-wrapper">
+              <canvas id="chart-trend"></canvas>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Charts + Recent -->
-      <div class="content-grid">
-        <div class="card">
-          <div class="card-header"><h3><span class="emoji-sm">📈</span>Monthly Loan Trend</h3></div>
-          <div class="card-body"><div class="chart-container"><canvas id="chart-trend"></canvas></div></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3><span class="emoji-sm">🔎</span>Loan Status Breakdown</h3></div>
-          <div class="card-body"><div class="chart-container"><canvas id="chart-status"></canvas></div></div>
+        <!-- Loan Status Breakdown -->
+        <div class="analytics-card">
+          <div class="analytics-card-header">
+            <div class="analytics-card-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+              Loan Status Breakdown
+            </div>
+          </div>
+          <div class="analytics-card-body">
+            <div class="status-breakdown-layout" id="status-breakdown">
+              <div class="status-donut-column">
+                <div class="status-donut-wrapper">
+                  <div id="status-empty-state" class="status-empty-state" style="display:none;">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+                    <p>No loan data available yet</p>
+                  </div>
+                  <canvas id="chart-status"></canvas>
+                </div>
+                <div class="status-total-badge" id="status-total-badge">
+                  <span class="status-total-label">Total Loans</span>
+                  <span class="status-total-value" id="status-total-value">0</span>
+                </div>
+              </div>
+              <div class="status-cards-area">
+                <div class="status-cards-grid" id="status-cards-grid"></div>
+                <div id="status-other-section" style="display:none;"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -128,7 +1470,7 @@
 
 <!-- Customer Detail Modal (reused on dashboard) -->
 <div class="modal-overlay" id="detail-modal">
-  <div class="modal" style="max-width:600px;">
+  <div class="modal customer-detail-modal" style="max-width:720px;">
     <div class="modal-header">
       <h3 id="detail-title">Customer Details</h3>
       <button class="modal-close" onclick="closeDetail()">Close</button>
@@ -154,12 +1496,6 @@
     if (!res?.ok) return;
     const { customer, documents, loans } = res.data.data;
     document.getElementById('detail-title').textContent = `Customer: ${customer.name}`;
-    const escapeHtml = (value) => String(value ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
     function resolveFileUrl(path) {
       if (!path) return '#';
       if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -167,26 +1503,119 @@
       return uploadsBase ? uploadsBase + path : path;
     }
 
+    const safeName = dashboardEscapeHtml(customer.name || 'Customer');
+    const safePhone = dashboardEscapeHtml(customer.phone || '—');
+    const safeArea = dashboardEscapeHtml(customer.area || '—');
+    const safeAddress = dashboardEscapeHtml(customer.address || '—');
+    const safeNetSalary = customer.net_salary !== undefined && customer.net_salary !== null ? `₹${Number(customer.net_salary).toLocaleString('en-IN')}` : '—';
+    const safeObligation = customer.total_obligation !== undefined && customer.total_obligation !== null ? `₹${Number(customer.total_obligation).toLocaleString('en-IN')}` : '—';
+    const customerDocs = documents.map((doc) => {
+      const docType = dashboardEscapeHtml(doc.doc_type || 'Document');
+      const fileName = dashboardEscapeHtml(doc.file_name || 'File');
+      const password = doc.document_password ? `<span class="customer-detail-count">Password: ${dashboardEscapeHtml(doc.document_password)}</span>` : '';
+      return `
+        <div class="customer-document-item">
+          <div class="customer-document-copy">
+            <p class="customer-document-title">${docType}</p>
+            <p class="customer-document-meta">${fileName}${doc.document_password ? ` · ${dashboardEscapeHtml(doc.document_password)}` : ''}</p>
+          </div>
+          <div class="customer-document-actions">
+            ${password}
+            <a href="${resolveFileUrl(doc.file_path)}" target="_blank" class="btn btn-secondary btn-sm">View</a>
+          </div>
+        </div>`;
+    }).join('');
+
+    const customerLoans = loans.map((loan) => `
+      <tr>
+        <td>${formatCurrency(loan.amount)}</td>
+        <td>${dashboardEscapeHtml(loan.purpose || 'General')}</td>
+        <td>${dashboardEscapeHtml(loan.disbursement_amount !== undefined && loan.disbursement_amount !== null ? formatCurrency(loan.disbursement_amount) : '—')}</td>
+        <td>${statusBadge(loan.status)}</td>
+        <td>${dashboardEscapeHtml(loan.created_at ? formatDate(loan.created_at) : '—')}</td>
+      </tr>`).join('');
+
     document.getElementById('detail-body').innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
-        <div><span style="color:var(--text-muted);font-size:12px;">Phone</span><p style="font-weight:600;">${customer.phone}</p></div>
-        <div><span style="color:var(--text-muted);font-size:12px;">Area</span><p style="font-weight:600;">${customer.area}</p></div>
-        <div style="grid-column:span 2"><span style="color:var(--text-muted);font-size:12px;">Address</span><p>${customer.address}</p></div>
+      <div class="customer-detail-shell">
+        <div class="customer-detail-hero">
+          <div class="customer-detail-profile">
+            <span class="customer-detail-avatar" aria-hidden="true">${dashboardEscapeHtml(employeeInitials(customer.name))}</span>
+            <div class="customer-detail-copy">
+              <p class="customer-detail-kicker">Customer profile</p>
+              <h4 class="customer-detail-name">${safeName}</h4>
+              <p class="customer-detail-subtitle">${safePhone}${customer.area ? ` · ${safeArea}` : ''}</p>
+            </div>
+          </div>
+          <span class="customer-detail-pill">Loans: ${loans.length}</span>
+        </div>
+
+        <div class="customer-detail-grid">
+          <div class="customer-detail-stat">
+            <span class="customer-detail-stat-label">Phone</span>
+            <p class="customer-detail-stat-value">${safePhone}</p>
+          </div>
+          <div class="customer-detail-stat">
+            <span class="customer-detail-stat-label">Area</span>
+            <p class="customer-detail-stat-value">${safeArea}</p>
+          </div>
+          <div class="customer-detail-stat">
+            <span class="customer-detail-stat-label">Net Salary</span>
+            <p class="customer-detail-stat-value">${safeNetSalary}</p>
+          </div>
+          <div class="customer-detail-stat">
+            <span class="customer-detail-stat-label">Total Obligation</span>
+            <p class="customer-detail-stat-value">${safeObligation}</p>
+          </div>
+          <div class="customer-detail-stat address">
+            <span class="customer-detail-stat-label">Address</span>
+            <p class="customer-detail-stat-value">${safeAddress}</p>
+          </div>
+        </div>
+
+        <section class="customer-detail-section">
+          <div class="customer-detail-section-header">
+            <h4 class="customer-detail-section-title">Documents</h4>
+            <span class="customer-detail-count">${documents.length}</span>
+          </div>
+          ${documents.length ? `<div class="customer-document-list">${customerDocs}</div>` : `
+            <div class="employee-empty-state customer-empty-state--compact">
+              <div class="employee-empty-state-inner">
+                <span class="employee-empty-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5"></path><path d="M9 12h6"></path><path d="M9 16h6"></path></svg>
+                </span>
+                <h4>No documents uploaded</h4>
+                <p>This customer has no uploaded files yet.</p>
+              </div>
+            </div>`}
+        </section>
+
+        <section class="customer-detail-section">
+          <div class="customer-detail-section-header">
+            <h4 class="customer-detail-section-title">Loans</h4>
+            <span class="customer-detail-count">${loans.length}</span>
+          </div>
+          ${loans.length ? `
+            <div class="table-wrapper customer-loans-table">
+              <table>
+                <thead>
+                  <tr><th>Amount</th><th>Purpose</th><th>Disbursed</th><th>Status</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                  ${customerLoans}
+                </tbody>
+              </table>
+            </div>` : `
+            <div class="employee-empty-state customer-empty-state--compact">
+              <div class="employee-empty-state-inner">
+                <span class="employee-empty-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+                </span>
+                <h4>No loans found</h4>
+                <p>No loan records are linked to this customer yet.</p>
+              </div>
+            </div>`}
+        </section>
       </div>
-      <h4 style="margin-bottom:12px;font-size:14px;">Documents (${documents.length})</h4>
-      <div style="margin-bottom:20px;">
-        ${documents.length ? documents.map(d => `
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;">
-            <span>${escapeHtml(d.doc_type)} — ${escapeHtml(d.file_name)}${d.document_password ? ` <span style="color:var(--text-muted);">| Password: ${escapeHtml(d.document_password)}</span>` : ''}</span>
-            <a href="${resolveFileUrl(d.file_path)}" target="_blank" class="btn btn-secondary btn-sm">View</a>
-          </div>`).join('') : '<p style="color:var(--text-muted);">No documents uploaded.</p>'}
-      </div>
-      <h4 style="margin-bottom:12px;font-size:14px;">Loans (${loans.length})</h4>
-      ${loans.length ? loans.map(l => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;">
-          <span>${formatCurrency(l.amount)} — ${l.purpose || 'General'}</span>
-          ${statusBadge(l.status)}
-        </div>`).join('') : '<p style="color:var(--text-muted);">No loans.</p>'}
     `;
     document.getElementById('detail-modal').classList.add('show');
   }
@@ -208,6 +1637,97 @@
   let dashboardEmployees = [];
   let selectedEmployeeId = null;
   let selectedEmployeeView = null;
+  let chartTrendInstance = null;
+  let chartStatusInstance = null;
+
+  function destroyChartInstance(name) {
+    if (name === 'trend' && chartTrendInstance) { chartTrendInstance.destroy(); chartTrendInstance = null; }
+    if (name === 'status' && chartStatusInstance) { chartStatusInstance.destroy(); chartStatusInstance = null; }
+  }
+
+  function getCSSVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function dashboardEscapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function employeeInitials(name) {
+    const words = String(name || 'Employee').trim().split(/\s+/).filter(Boolean);
+    const initials = words.slice(0, 2).map(word => word.charAt(0).toUpperCase()).join('');
+    return initials || 'E';
+  }
+
+  function resolveEmployeeImageUrl(path) {
+    const imagePath = String(path || '').trim();
+    if (!imagePath) return '';
+    if (/^(https?:|data:|blob:)/i.test(imagePath)) return imagePath;
+    const uploadsBase = (typeof api !== 'undefined' && api.uploadsBase) ? api.uploadsBase : '';
+    if (!uploadsBase) return imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `${uploadsBase.replace(/\/$/, '')}/${imagePath.replace(/^\//, '')}`;
+  }
+
+  function getEmployeeProfilePicture(employee) {
+    const imagePath = employee?.profile_picture
+      || employee?.profilePicture
+      || employee?.profile?.profile_picture
+      || employee?.avatar_url
+      || employee?.photo_url
+      || employee?.avatar
+      || '';
+    return resolveEmployeeImageUrl(imagePath);
+  }
+
+  function employeeAvatarHtml(employee, extraClass = '') {
+    const photoUrl = getEmployeeProfilePicture(employee);
+    const initials = dashboardEscapeHtml(employeeInitials(employee?.name));
+    const classes = `employee-avatar${photoUrl ? ' has-photo' : ''}${extraClass ? ` ${extraClass}` : ''}`;
+
+    if (!photoUrl) {
+      return `<span class="${classes}" aria-hidden="true"><span class="employee-avatar-fallback">${initials}</span></span>`;
+    }
+
+    return `<span class="${classes}" aria-hidden="true"><img src="${dashboardEscapeHtml(photoUrl)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.classList.remove('has-photo');"><span class="employee-avatar-fallback">${initials}</span></span>`;
+  }
+
+  async function hydrateEmployeeProfile(employee) {
+    if (!employee || employee._profileLoaded || getEmployeeProfilePicture(employee)) return employee;
+    try {
+      const res = await api.get(`/profile/admin/employees/${employee.id}`);
+      const profileUser = res?.ok ? res.data?.data?.user : null;
+      if (profileUser) {
+        const { password, ...safeProfileUser } = profileUser;
+        Object.assign(employee, safeProfileUser);
+      }
+    } catch (err) {
+      console.warn('[Dashboard] Failed to load employee profile photo', err);
+    }
+    employee._profileLoaded = true;
+    return employee;
+  }
+
+  function pluralize(count, singular, plural = `${singular}s`) {
+    return `${count} ${count === 1 ? singular : plural}`;
+  }
+
+  function employeeEmptyState(title = 'Select an employee', copy = 'Choose a team member to review profile details, loan progress, and customer activity.') {
+    return `
+      <div class="employee-empty-state">
+        <div class="employee-empty-state-inner">
+          <span class="employee-empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+          </span>
+          <h4>${dashboardEscapeHtml(title)}</h4>
+          <p>${dashboardEscapeHtml(copy)}</p>
+        </div>
+      </div>`;
+  }
 
   function refreshEmployeeDetails() {
     if (!selectedEmployeeId) {
@@ -246,20 +1766,28 @@
 
   function renderEmployeeList() {
     const listEl = document.getElementById('employee-list');
+    const countEl = document.getElementById('employee-count-pill');
+    if (countEl) countEl.textContent = pluralize(dashboardEmployees.length, 'employee');
     if (!dashboardEmployees.length) {
-      listEl.innerHTML = '<p style="padding:12px;color:var(--text-secondary);font-size:13px;">No employees found.</p>';
+      listEl.innerHTML = employeeEmptyState('No employees found', 'Employees will appear here once they are added to the system.');
       return;
     }
 
     listEl.innerHTML = dashboardEmployees.map(emp => {
       const metrics = buildEmployeeMetrics(emp);
+      const isSelected = selectedEmployeeId === emp.id;
+      const safeName = dashboardEscapeHtml(emp.name || 'Employee');
+      const safeEmail = dashboardEscapeHtml(emp.email || 'No email');
       return `
-        <button type="button" class="btn btn-secondary" onclick="selectEmployee(${emp.id})" style="justify-content:space-between;width:100%;text-align:left;padding:12px 14px;display:flex;align-items:center;gap:12px;${selectedEmployeeId === emp.id ? 'border-color: var(--accent); background: var(--accent-soft);' : ''}">
-          <span>
-            <strong style="display:block;font-size:14px;">${emp.name}</strong>
-            <small style="color:var(--text-muted);">${emp.email}</small>
+        <button type="button" class="employee-list-item${isSelected ? ' active' : ''}" onclick='selectEmployee(${JSON.stringify(emp.id)})'>
+          ${employeeAvatarHtml(emp)}
+          <span class="employee-list-copy">
+            <strong class="employee-list-name">${safeName}</strong>
+            <span class="employee-list-meta">
+              <small class="employee-list-email">${safeEmail}</small>
+              <span class="employee-loan-badge">${pluralize(metrics.totalLoans, 'loan')}</span>
+            </span>
           </span>
-          <span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${metrics.totalLoans} loans</span>
         </button>`;
     }).join('');
   }
@@ -287,7 +1815,6 @@
         api.get('/admin/loans')
       ]);
       if (!empRes?.ok || !custRes?.ok || !loanRes?.ok) {
-        // if API fails, fall back to a safe sample employee for local/demo view
         dashboardEmployees = [];
         dashboardCustomers = [];
         dashboardLoans = [];
@@ -297,7 +1824,6 @@
         dashboardLoans = loanRes.data.data;
       }
 
-      // If backend returned no data (local demo), inject a sample employee 'aryan' with example metrics
       if (!dashboardEmployees.length) {
         dashboardEmployees = [{
           id: 999900,
@@ -307,35 +1833,26 @@
           is_active: true,
           created_at: '2026-04-30T00:00:00Z'
         }];
-
-        // create 9 sample loans: 6 Pending, 1 Approved, 2 Rejected
         dashboardLoans = [];
         for (let i = 0; i < 6; i++) dashboardLoans.push({ applied_by_name: 'aryan', amount: 50000 + i * 1000, status: 'Pending' });
         dashboardLoans.push({ applied_by_name: 'aryan', amount: 75000, status: 'Approved' });
         dashboardLoans.push({ applied_by_name: 'aryan', amount: 20000, status: 'Rejected' });
         dashboardLoans.push({ applied_by_name: 'aryan', amount: 30000, status: 'Rejected' });
-
-        // create 9 sample customers added by aryan
         dashboardCustomers = Array.from({ length: 9 }).map((_, idx) => ({ id: 7000 + idx, name: `Customer ${idx+1}`, added_by_name: 'aryan', area: 'Demo Area', created_at: '2026-04-15T00:00:00Z' }));
       }
     }
 
     renderEmployeeList();
-
     const detailTitle = document.getElementById('employee-detail-title');
     const detailBody = document.getElementById('employee-detail-body');
     if (detailTitle) detailTitle.textContent = 'Select an employee';
     if (detailBody) {
-      detailBody.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">Click an employee name to see their work details.</p>';
+      detailBody.innerHTML = employeeEmptyState();
     }
   }
 
   async function renderEmployeeDetails(id, forceReload = false) {
-    if (forceReload) {
-      dashboardCustomers = [];
-      dashboardLoans = [];
-    }
-
+    if (forceReload) { dashboardCustomers = []; dashboardLoans = []; }
     if (!dashboardEmployees.length || (!dashboardCustomers.length && !dashboardLoans.length)) {
       const [empRes, custRes, loanRes] = await Promise.all([
         api.get('/admin/employees'),
@@ -352,30 +1869,61 @@
     if (!employee) return;
 
     selectedEmployeeId = id;
+    await hydrateEmployeeProfile(employee);
+    renderEmployeeList();
     const metrics = buildEmployeeMetrics(employee);
     const detailTitle = document.getElementById('employee-detail-title');
     const detailBody = document.getElementById('employee-detail-body');
 
-    detailTitle.textContent = employee.name;
-    detailBody.innerHTML = `
-      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px;">
-        <div><span style="color:var(--text-muted);font-size:12px;">Email</span><p style="font-weight:600;">${employee.email}</p></div>
-        <div><span style="color:var(--text-muted);font-size:12px;">Phone</span><p style="font-weight:600;">${employee.phone || '—'}</p></div>
-        <div><span style="color:var(--text-muted);font-size:12px;">Status</span><p style="font-weight:600;">${employee.is_active ? 'Active' : 'Inactive'}</p></div>
-        <div><span style="color:var(--text-muted);font-size:12px;">Joined</span><p style="font-weight:600;">${formatDate(employee.created_at)}</p></div>
-      </div>
-      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px;">
-        <div class="stat-card" role="button" tabindex="0" onclick="showEmployeeView('loans')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('loans')" style="cursor:pointer;"><div class="stat-icon">L</div><div class="stat-value">${metrics.totalLoans}</div><div class="stat-label">Loans Applied</div></div>
-        <div class="stat-card" role="button" tabindex="0" onclick="showEmployeeView('pending')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('pending')" style="cursor:pointer;"><div class="stat-icon">⏳</div><div class="stat-value">${metrics.pending}</div><div class="stat-label">Pending</div></div>
-        <div class="stat-card" role="button" tabindex="0" onclick="showEmployeeView('approved')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('approved')" style="cursor:pointer;"><div class="stat-icon">A</div><div class="stat-value">${metrics.approved}</div><div class="stat-label">Approved</div></div>
-        <div class="stat-card" role="button" tabindex="0" onclick="showEmployeeView('customers')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('customers')" style="cursor:pointer;"><div class="stat-icon">C</div><div class="stat-value">${metrics.employeeCustomers.length}</div><div class="stat-label">Customers Added</div></div>
-      </div>
-      <div id="employee-view-message" style="padding:14px 16px;border:1px dashed var(--border);border-radius:12px;color:var(--text-secondary);font-size:13px;">
-        Click one of the buttons above to see this employee's loan or customer details.
-      </div>
-      <div id="employee-view-output" style="display:none;margin-top:18px;"></div>
-    `;
+    const safeName = dashboardEscapeHtml(employee.name || 'Employee');
+    const safeEmail = dashboardEscapeHtml(employee.email || '—');
+    const safePhone = dashboardEscapeHtml(employee.phone || '—');
+    const statusText = employee.is_active ? 'Active' : 'Inactive';
+    const joinedText = employee.created_at ? formatDate(employee.created_at) : '—';
+    const detailSubtitle = `${safeEmail}${employee.phone ? ` | ${safePhone}` : ''}`;
 
+    detailTitle.textContent = employee.name || 'Employee';
+    detailBody.innerHTML = `
+      <div class="employee-selected-card">
+        ${employeeAvatarHtml(employee)}
+        <div>
+          <h4 class="employee-selected-name">${safeName}</h4>
+          <p class="employee-selected-meta">${detailSubtitle}</p>
+        </div>
+        <span class="employee-status-pill${employee.is_active ? '' : ' inactive'}">
+          <span class="employee-status-dot"></span>
+          ${statusText}
+        </span>
+      </div>
+      <div class="employee-contact-grid">
+        <div class="employee-contact-item"><span>Email</span><p>${safeEmail}</p></div>
+        <div class="employee-contact-item"><span>Phone</span><p>${safePhone}</p></div>
+        <div class="employee-contact-item"><span>Status</span><p>${statusText}</p></div>
+        <div class="employee-contact-item"><span>Joined</span><p>${dashboardEscapeHtml(joinedText)}</p></div>
+      </div>
+      <div class="employee-metrics-grid">
+        <button class="employee-metric-card loans" type="button" data-employee-view="loans" onclick="showEmployeeView('loans')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('loans')">
+          <span class="employee-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg></span>
+          <span><span class="employee-metric-value">${metrics.totalLoans}</span><span class="employee-metric-label">Loans Applied</span></span>
+        </button>
+        <button class="employee-metric-card pending" type="button" data-employee-view="pending" onclick="showEmployeeView('pending')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('pending')">
+          <span class="employee-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></span>
+          <span><span class="employee-metric-value">${metrics.pending}</span><span class="employee-metric-label">Pending</span></span>
+        </button>
+        <button class="employee-metric-card approved" type="button" data-employee-view="approved" onclick="showEmployeeView('approved')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('approved')">
+          <span class="employee-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-5"></path></svg></span>
+          <span><span class="employee-metric-value">${metrics.approved}</span><span class="employee-metric-label">Approved</span></span>
+        </button>
+        <button class="employee-metric-card customers" type="button" data-employee-view="customers" onclick="showEmployeeView('customers')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('customers')">
+          <span class="employee-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path></svg></span>
+          <span><span class="employee-metric-value">${metrics.employeeCustomers.length}</span><span class="employee-metric-label">Customers Added</span></span>
+        </button>
+      </div>
+      <div id="employee-view-message" class="employee-view-message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+        <span>Click one of the KPI cards above to review this employee's loan or customer details.</span>
+      </div>
+      <div id="employee-view-output" class="employee-view-output"></div>`;
     selectedEmployeeView = null;
   }
 
@@ -384,18 +1932,23 @@
     selectedEmployeeView = view;
     const employee = dashboardEmployees.find(emp => emp.id === selectedEmployeeId);
     if (!employee) return;
-
     const metrics = buildEmployeeMetrics(employee);
     const messageEl = document.getElementById('employee-view-message');
     const outputEl = document.getElementById('employee-view-output');
-
+    document.querySelectorAll('.employee-metric-card').forEach(card => {
+      card.classList.toggle('active', card.getAttribute('data-employee-view') === view);
+    });
     messageEl.style.display = 'none';
     outputEl.style.display = 'block';
 
     if (view === 'customers') {
       outputEl.innerHTML = `
-        <div style="margin-bottom:18px;">
-          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">Customers Added by ${employee.name}</p>
+        <div class="employee-view-summary">
+          <p class="employee-view-kicker">Customers Added by ${dashboardEscapeHtml(employee.name)}</p>
+          <p class="employee-view-total">${metrics.employeeCustomers.length}</p>
+          <p class="employee-view-sub">Customer records created by this employee.</p>
+        </div>
+        <div>
           <div class="table-wrapper">
             <table>
               <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Area</th><th>Date</th></tr></thead>
@@ -403,10 +1956,10 @@
                 ${metrics.employeeCustomers.length ? metrics.employeeCustomers.map((customer, index) => `
                   <tr>
                     <td>${index + 1}</td>
-                    <td>${customer.name}</td>
-                    <td>${customer.phone}</td>
-                    <td>${customer.area}</td>
-                    <td>${formatDate(customer.created_at)}</td>
+                    <td>${dashboardEscapeHtml(customer.name || '—')}</td>
+                    <td>${dashboardEscapeHtml(customer.phone || '—')}</td>
+                    <td>${dashboardEscapeHtml(customer.area || '—')}</td>
+                    <td>${dashboardEscapeHtml(customer.created_at ? formatDate(customer.created_at) : '—')}</td>
                   </tr>`).join('') : '<tr><td colspan="5" class="text-center text-muted">No customers added yet.</td></tr>'}
               </tbody>
             </table>
@@ -417,23 +1970,16 @@
 
     const statusFilter = view === 'loans' ? null : view === 'pending' ? 'Pending' : view === 'approved' ? 'Approved' : view === 'rejected' ? 'Rejected' : null;
     const filteredLoans = statusFilter ? metrics.employeeLoans.filter(loan => loan.status === statusFilter) : metrics.employeeLoans;
-    const titleMap = {
-      loans: 'All Loans Applied',
-      pending: 'Pending Loans',
-      approved: 'Approved Loans',
-      rejected: 'Rejected Loans'
-    };
-
+    const titleMap = { loans: 'All Loans Applied', pending: 'Pending Loans', approved: 'Approved Loans', rejected: 'Rejected Loans' };
     const totalLoanAmount = filteredLoans.reduce((sum, loan) => sum + Number(loan.amount || 0), 0);
 
     outputEl.innerHTML = `
-      <div style="margin-bottom:18px;">
-        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;">${titleMap[view] || 'Loans'}</p>
-        <p style="font-size:22px;font-weight:800;">${filteredLoans.length}</p>
-        <p style="font-size:13px;color:var(--text-secondary);margin-top:6px;">Total loan amount handled: ${formatCurrency(totalLoanAmount)}</p>
+      <div class="employee-view-summary">
+        <p class="employee-view-kicker">${dashboardEscapeHtml(titleMap[view] || 'Loans')}</p>
+        <p class="employee-view-total">${filteredLoans.length}</p>
+        <p class="employee-view-sub">Total loan amount handled: ${formatCurrency(totalLoanAmount)}</p>
       </div>
-      <div style="margin-bottom:18px;">
-        <h4 style="font-size:14px;margin-bottom:10px;">Recent Loans</h4>
+      <div>
         <div class="table-wrapper">
           <table>
             <thead><tr><th>#</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
@@ -441,16 +1987,295 @@
               ${filteredLoans.length ? filteredLoans.slice(0, 5).map((loan, index) => `
                 <tr onclick="viewCustomerDetail(${loan.customer_id})" style="cursor:pointer">
                   <td>${index + 1}</td>
-                  <td>${loan.customer_name}</td>
+                  <td>${dashboardEscapeHtml(loan.customer_name || '—')}</td>
                   <td>${formatCurrency(loan.amount)}</td>
                   <td>${statusBadge(loan.status)}</td>
-                  <td>${formatDate(loan.created_at)}</td>
+                  <td>${dashboardEscapeHtml(loan.created_at ? formatDate(loan.created_at) : '—')}</td>
                 </tr>`).join('') : '<tr><td colspan="5" class="text-center text-muted">No loan activity yet.</td></tr>'}
             </tbody>
           </table>
         </div>
       </div>`;
   }
+
+  // ── Premium Analytics Chart Functions ──
+
+  function renderTrendMetrics(loans) {
+    const container = document.getElementById('trend-metrics');
+    if (!loans.monthlyTrend || !loans.monthlyTrend.length) {
+      container.innerHTML = '';
+      return;
+    }
+    const trend = loans.monthlyTrend;
+    const totalLoans = trend.reduce((s, m) => s + m.count, 0);
+    const currentMonthCount = trend[trend.length - 1]?.count || 0;
+    const highestMonth = trend.reduce((max, m) => m.count > max.count ? m : max, trend[0]);
+    const prevMonthCount = trend.length > 1 ? trend[trend.length - 2].count : 0;
+    const change = currentMonthCount - prevMonthCount;
+    const changePercent = prevMonthCount > 0 ? ((change / prevMonthCount) * 100).toFixed(1) : null;
+
+    container.innerHTML = `
+      <div class="metric-item">
+        <span class="metric-label">Total Loans</span>
+        <span class="metric-value">${totalLoans}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Current Month</span>
+        <span class="metric-value">${currentMonthCount}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Highest Month</span>
+        <span class="metric-value">${highestMonth.count} <span class="metric-sub">${highestMonth.month}</span></span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Growth</span>
+        <span class="metric-value ${change > 0 ? 'metric-up' : change < 0 ? 'metric-down' : ''}">
+          ${change > 0 ? '+' : ''}${change}${changePercent !== null ? ` (${changePercent}%)` : ''}
+        </span>
+      </div>`;
+  }
+
+  function renderTrendChart(months, counts) {
+    destroyChartInstance('trend');
+    const ctx = document.getElementById('chart-trend');
+    if (!months || !months.length) {
+      ctx.style.display = 'none';
+      document.querySelector('#trend-metrics').innerHTML = `
+        <div class="metric-item" style="grid-column:1/-1;justify-content:center;padding:20px;">
+          <span style="color:var(--text-secondary);font-size:14px;">No loan data available yet</span>
+        </div>`;
+      return;
+    }
+    ctx.style.display = 'block';
+
+    const textColor = getCSSVar('--text-secondary') || '#526173';
+    const gridColor = getCSSVar('--border') || 'rgba(151,176,210,0.14)';
+    const accentColor = getCSSVar('--accent-secondary') || '#2f6fed';
+    const cardBg = getCSSVar('--bg-card') || 'rgba(255,255,255,0.92)';
+
+    chartTrendInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [{
+          label: 'Loans',
+          data: counts,
+          borderColor: accentColor,
+          backgroundColor: (ctx) => {
+            const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height);
+            gradient.addColorStop(0, accentColor.replace(')', ',0.25)'));
+            gradient.addColorStop(0.5, accentColor.replace(')', ',0.12)'));
+            gradient.addColorStop(1, accentColor.replace(')', ',0.02)'));
+            return gradient;
+          },
+          fill: true,
+          tension: 0.35,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: accentColor,
+          pointBorderColor: cardBg,
+          pointBorderWidth: 2,
+          borderWidth: 2.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: getCSSVar('--bg-card') || '#1a2635',
+            titleColor: getCSSVar('--text-primary') || '#eef4ff',
+            bodyColor: getCSSVar('--text-secondary') || '#c0ccda',
+            borderColor: getCSSVar('--border') || 'rgba(151,176,210,0.18)',
+            borderWidth: 1,
+            padding: 12,
+            cornerRadius: 8,
+            boxPadding: 6,
+            callbacks: {
+              label: (ctx) => ` Loans: ${ctx.parsed.y}`
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+              color: textColor,
+              font: { size: 11 },
+              padding: 6
+            },
+            grid: {
+              color: gridColor,
+              drawBorder: false
+            }
+          },
+          x: {
+            ticks: {
+              color: textColor,
+              font: { size: 11 },
+              maxRotation: months.length > 6 ? 45 : 0,
+              padding: 6
+            },
+            grid: {
+              display: false,
+              drawBorder: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // ── Status Chart ──
+
+  // ── Status Icons (SVG paths) ──
+  const STATUS_ICONS = {
+    'Loan Disbursed': '<svg viewBox="0 0 24 24"><path d="M12 2l-8 4v12l8 4 8-4V6l-8-4z"/><path d="M8 12l2 2 4-4"/></svg>',
+    'Approved': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l2 2 4-4"/></svg>',
+    'Pending': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
+    'Rejected': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+    'Hold': '<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M10 10v4"/><path d="M14 10v4"/></svg>',
+    'Cancelled': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6"/></svg>',
+    'ABND': '<svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><path d="M4 4l16 16"/></svg>',
+    'Other': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 12h.01M12 16h.01"/></svg>',
+    'Under Review': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 8.5h5M9.5 12h5M9.5 15.5h3"/></svg>',
+    'Documents Pending': '<svg viewBox="0 0 24 24"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>'
+  };
+
+  const STATUS_META = [
+    { key: 'Loan Disbursed', label: 'Loan Disbursed', color: '#059669', bgColor: 'rgba(5,150,105,0.12)' },
+    { key: 'Approved', label: 'Approved', color: '#3b82f6', bgColor: 'rgba(59,130,246,0.12)' },
+    { key: 'Pending', label: 'Pending', color: '#d97706', bgColor: 'rgba(217,119,6,0.12)' },
+    { key: 'Rejected', label: 'Rejected', color: '#dc2626', bgColor: 'rgba(220,38,38,0.12)' },
+    { key: 'Under Review', label: 'Under Review', color: '#6366f1', bgColor: 'rgba(99,102,241,0.12)' },
+    { key: 'Documents Pending', label: 'Documents Pending', color: '#0891b2', bgColor: 'rgba(8,145,178,0.12)' },
+    { key: 'Hold', label: 'Hold', color: '#ea580c', bgColor: 'rgba(234,88,12,0.12)' },
+    { key: 'Cancelled', label: 'Cancelled', color: '#6b7280', bgColor: 'rgba(107,114,128,0.12)' },
+    { key: 'ABND', label: 'ABND', color: '#475569', bgColor: 'rgba(71,85,105,0.12)' },
+    { key: 'Other', label: 'Other', color: '#94a3b8', bgColor: 'rgba(148,163,184,0.12)' }
+  ];
+
+  const STATUS_ORDER = ['Loan Disbursed', 'Approved', 'Pending', 'Rejected', 'Hold', 'Under Review', 'Documents Pending', 'Cancelled', 'ABND', 'Other'];
+
+  function renderStatusChart(statusMap) {
+    destroyChartInstance('status');
+
+    // Sort statuses by the defined order
+    const allStatuses = STATUS_ORDER.map(key => STATUS_META.find(s => s.key === key)).filter(Boolean);
+
+    const total = Object.values(statusMap).reduce((s, v) => s + v, 0);
+    document.getElementById('status-total-value').textContent = total;
+
+    if (total === 0) {
+      document.getElementById('chart-status').style.display = 'none';
+      document.getElementById('status-empty-state').style.display = 'flex';
+      document.getElementById('status-cards-grid').innerHTML = '';
+      document.getElementById('status-other-section').style.display = 'none';
+      return;
+    }
+    document.getElementById('chart-status').style.display = 'block';
+    document.getElementById('status-empty-state').style.display = 'none';
+
+    // Separate active (>0) and zero-value statuses
+    const activeStatuses = allStatuses.filter(s => (statusMap[s.key] || 0) > 0);
+    const zeroStatuses = allStatuses.filter(s => (statusMap[s.key] || 0) === 0);
+
+    // ── Build Donut Chart ──
+    const labels = activeStatuses.map(s => s.label);
+    const data = activeStatuses.map(s => statusMap[s.key] || 0);
+    const bgColors = activeStatuses.map(s => s.bgColor.replace('0.12', '0.85'));
+    const ctx = document.getElementById('chart-status');
+    const cardBg = getCSSVar('--bg-card') || '#ffffff';
+
+    chartStatusInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: activeStatuses.map(s => s.color),
+          borderColor: cardBg,
+          borderWidth: 2.5,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: getCSSVar('--bg-card') || '#1a2635',
+            titleColor: getCSSVar('--text-primary') || '#eef4ff',
+            bodyColor: getCSSVar('--text-secondary') || '#c0ccda',
+            borderColor: getCSSVar('--border') || 'rgba(151,176,210,0.18)',
+            borderWidth: 1,
+            padding: 12,
+            cornerRadius: 8,
+            callbacks: {
+              label: (ctx) => {
+                const val = ctx.parsed;
+                const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                return ` ${ctx.label}: ${val} (${pct}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // ── Build Stat Cards for active statuses ──
+    const gridEl = document.getElementById('status-cards-grid');
+    gridEl.innerHTML = activeStatuses.map(s => {
+      const count = statusMap[s.key] || 0;
+      const pct = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+      const icon = STATUS_ICONS[s.key] || STATUS_ICONS['Other'];
+      return `
+        <div class="status-card" style="--status-color: ${s.color}; --status-bg: ${s.bgColor};">
+          <div class="status-card-header">
+            <div class="status-card-icon">${icon}</div>
+            <span class="status-card-name">${s.label}</span>
+          </div>
+          <div class="status-card-stats">
+            <span class="status-card-count">${count}</span>
+            <span class="status-card-pct">${pct}%</span>
+          </div>
+          <div class="status-card-progress">
+            <div class="status-card-progress-fill" style="width: ${pct}%;"></div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // ── Build "Other Statuses" pills for zero-value statuses ──
+    const otherSection = document.getElementById('status-other-section');
+    if (zeroStatuses.length > 0) {
+      otherSection.style.display = 'block';
+      otherSection.innerHTML = `
+        <div class="status-other-section">
+          <span class="status-other-label">Other Statuses</span>
+          <div class="status-other-pills">
+            ${zeroStatuses.map(s => {
+              const icon = STATUS_ICONS[s.key] || STATUS_ICONS['Other'];
+              return `
+                <span class="status-other-pill" style="--pill-color: ${s.color};">
+                  ${icon} ${s.label}
+                </span>`;
+            }).join('')}
+          </div>
+        </div>`;
+    } else {
+      otherSection.style.display = 'none';
+    }
+  }
+
+  // ── Main Dashboard Load ──
 
   async function loadDashboard() {
     const res = await api.get('/admin/dashboard');
@@ -461,7 +2286,6 @@
     loans.statusBreakdown.forEach(s => statusMap[s.status] = parseInt(s.count));
 
     document.getElementById('stat-employees').textContent = totalEmployees;
-
     await loadEmployeesOverviewData();
 
     // Recent loans table
@@ -480,41 +2304,23 @@
         </tr>`).join('');
     }
 
-    // Charts
-    const months = loans.monthlyTrend.map(m => m.month);
+    // Set Chart defaults for dark mode support
+    Chart.defaults.color = getCSSVar('--text-secondary') || '#526173';
+    Chart.defaults.borderColor = getCSSVar('--border') || 'rgba(151,176,210,0.14)';
+
+    // Monthly Trend Chart
+    const months = loans.monthlyTrend.map(m => {
+      const parts = m.month.split('-');
+      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return monthNames[parseInt(parts[1]) - 1] + ' ' + parts[0].slice(2);
+    });
     const counts = loans.monthlyTrend.map(m => m.count);
 
-    const chartDefaults = { color: '#4d5c57', borderColor: 'rgba(77, 92, 87, 0.18)' };
-    Chart.defaults.color = chartDefaults.color;
-    Chart.defaults.borderColor = chartDefaults.borderColor;
+    renderTrendMetrics(loans);
+    renderTrendChart(months, counts);
 
-    new Chart(document.getElementById('chart-trend'), {
-      type: 'bar',
-      data: {
-        labels: months,
-        datasets: [{
-          label: 'Loans',
-          data: counts,
-          backgroundColor: 'rgba(90, 122, 82, 0.55)',
-          borderColor: '#2f6fed',
-          borderWidth: 1, borderRadius: 6
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-    });
-
-    new Chart(document.getElementById('chart-status'), {
-      type: 'doughnut',
-      data: {
-        labels: ['Pending', 'Approved', 'Rejected'],
-        datasets: [{
-          data: [statusMap['Pending']||0, statusMap['Approved']||0, statusMap['Rejected']||0],
-          backgroundColor: ['rgba(245,158,11,0.8)', 'rgba(16,185,129,0.8)', 'rgba(239,68,68,0.8)'],
-          borderWidth: 0
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '65%' }
-    });
+    // Status Breakdown Chart
+    renderStatusChart(statusMap);
   }
 </script>
 </body>

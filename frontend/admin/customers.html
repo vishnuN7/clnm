@@ -14,6 +14,381 @@
     .filter-option:hover {
       background: var(--bg-card-hover) !important;
     }
+
+    .customer-detail-modal {
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+      max-width: 860px;
+      max-height: calc(100vh - 40px);
+      padding: 0;
+      overflow: hidden;
+    }
+
+    :root[data-theme='dark'] .customer-detail-modal {
+      background: linear-gradient(135deg, #0a1320 0%, #0f1c2e 100%);
+    }
+
+    .customer-detail-modal .modal-header {
+      margin: 0;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(90deg, rgba(247, 250, 255, 0.98) 0%, rgba(239, 246, 252, 0.98) 100%);
+    }
+
+    :root[data-theme='dark'] .customer-detail-modal .modal-header {
+      background: linear-gradient(90deg, rgba(12, 22, 36, 0.98) 0%, rgba(14, 28, 44, 0.98) 100%);
+      border-bottom-color: rgba(151, 176, 210, 0.12);
+    }
+
+    .customer-detail-modal .modal-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      line-height: 1;
+    }
+
+    .customer-detail-body {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 24px;
+      font-size: 14px;
+    }
+
+    .customer-detail-hero {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(15, 39, 71, 0.08) 0%, rgba(47, 111, 237, 0.08) 48%, rgba(15, 139, 113, 0.09) 100%),
+        var(--bg-card);
+    }
+
+    :root[data-theme='dark'] .customer-detail-hero {
+      background:
+        linear-gradient(135deg, rgba(139, 180, 255, 0.14) 0%, rgba(93, 212, 199, 0.08) 100%),
+        rgba(9, 17, 29, 0.92);
+    }
+
+    .customer-avatar-large {
+      display: grid;
+      place-items: center;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent) 0%, #2f6fed 100%);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0;
+      box-shadow: 0 10px 22px rgba(15, 39, 71, 0.2);
+    }
+
+    .customer-hero-copy {
+      min-width: 0;
+    }
+
+    .detail-kicker {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .customer-hero-copy h3 {
+      margin: 0 0 8px;
+      color: var(--text-primary);
+      font-size: 22px;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .customer-hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .customer-hero-meta span,
+    .customer-id-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 9px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.66);
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    :root[data-theme='dark'] .customer-hero-meta span,
+    :root[data-theme='dark'] .customer-id-pill {
+      background: rgba(9, 17, 29, 0.54);
+    }
+
+    .customer-id-pill {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .customer-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .customer-stat {
+      min-width: 0;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+    }
+
+    .customer-stat span {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .customer-stat strong {
+      color: var(--text-primary);
+      font-size: 18px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-section {
+      margin-top: 18px;
+    }
+
+    .detail-section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .detail-section-heading h4 {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .detail-section-heading span {
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .customer-info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .customer-info-field {
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.54);
+    }
+
+    :root[data-theme='dark'] .customer-info-field {
+      background: rgba(9, 17, 29, 0.42);
+    }
+
+    .customer-info-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .customer-info-field span {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .customer-info-field p {
+      margin: 0;
+      color: var(--text-primary);
+      font-weight: 700;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .customer-list-stack {
+      display: grid;
+      gap: 8px;
+    }
+
+    .customer-list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+    }
+
+    .customer-list-main {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 10px;
+    }
+
+    .customer-list-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .customer-list-icon svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .customer-list-text {
+      min-width: 0;
+    }
+
+    .customer-list-text p {
+      margin: 0;
+      color: var(--text-primary);
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .customer-list-text span {
+      display: block;
+      margin-top: 3px;
+      color: var(--text-muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .customer-list-side {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .customer-empty-state {
+      padding: 18px;
+      border: 1px dashed var(--border-strong);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.42);
+      color: var(--text-secondary);
+    }
+
+    :root[data-theme='dark'] .customer-empty-state {
+      background: rgba(9, 17, 29, 0.3);
+    }
+
+    .customer-empty-state strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .customer-empty-state span {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .customer-detail-modal .modal-actions {
+      margin: 0;
+      padding: 16px 24px 22px;
+      border-top: 1px solid var(--border);
+    }
+
+    .customer-detail-modal .modal-actions .btn {
+      width: auto;
+    }
+
+    @media (max-width: 760px) {
+      .customer-detail-modal {
+        max-height: calc(100vh - 24px);
+      }
+
+      .customer-detail-modal .modal-header,
+      .customer-detail-body,
+      .customer-detail-modal .modal-actions {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .customer-detail-hero {
+        grid-template-columns: auto 1fr;
+      }
+
+      .customer-id-pill {
+        grid-column: 1 / -1;
+        justify-self: start;
+      }
+
+      .customer-stat-grid,
+      .customer-info-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .customer-list-item {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .customer-list-side {
+        justify-content: flex-start;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .customer-stat-grid,
+      .customer-info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .customer-hero-copy h3 {
+        font-size: 19px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -32,6 +407,11 @@
         <a href="/admin/employees.html" class="nav-item"><span class="nav-icon emoji-sm">👥</span> Employees</a>
         <a href="/admin/customers.html" class="nav-item active"><span class="nav-icon emoji-sm">📋</span> Customers</a>
         <a href="/admin/loans.html" class="nav-item"><span class="nav-icon emoji-sm">💼</span> Loan Applications</a>
+        <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon emoji-sm">🧮</span> EMI Calculator</a>
+
+        <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> Data Excel Document</a>
+        <a href="/admin/apr.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> APR</a>
+
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -58,6 +438,14 @@
           <span class="search-icon">Search</span>
           <input type="text" id="search-input" class="form-control" placeholder="Search by name or phone..." oninput="loadCustomers()" style="width:100%;" />
         </div>
+
+        <div id="custom-date-container" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:13px;color:var(--text-secondary);margin-left:8px;">📅 Custom:</span>
+          <input type="date" id="start-date" onchange="loadCustomers()" style="max-width:135px;padding:6px 10px;font-size:13px;" />
+          <span style="color:var(--text-secondary);font-size:13px;">to</span>
+          <input type="date" id="end-date" onchange="loadCustomers()" style="max-width:135px;padding:6px 10px;font-size:13px;" />
+        </div>
+
         <div class="area-filter-container" style="position: relative; max-width: 150px;">
           <input type="text" id="area-search-input" class="form-control" placeholder="Search areas..." oninput="filterAreaOptions()" />
           <div id="area-dropdown" class="area-dropdown" style="position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0 0 8px 8px; max-height: 250px; overflow-y: auto; display: none; z-index: 1000; box-shadow: 0 8px 16px rgba(31, 43, 39, 0.12); min-width: 140px;">
@@ -84,10 +472,11 @@
                 <div class="filter-option" onclick="applyDateFilter('week', 'This Week')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-primary);transition:background 0.2s;">This Week</div>
                 <div class="filter-option" onclick="applyDateFilter('month', 'This Month')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-primary);transition:background 0.2s;">This Month</div>
                 <div class="filter-option" onclick="applyDateFilter('year', 'This Year')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-primary);transition:background 0.2s;">This Year</div>
+                <div class="filter-option" onclick="applyDateFilter('custom', 'Custom Range')" style="padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-primary);transition:background 0.2s;">Custom Range</div>
               </div>
             </div>
             <!-- Download CSV Button -->
-            <button class="btn btn-primary btn-sm" id="download-csv-btn" onclick="downloadCSV()" style="display:none;align-items:center;gap:6px;">
+            <button class="btn btn-primary btn-sm" id="download-csv-btn" onclick="downloadCSV()" style="display:inline-flex;align-items:center;gap:6px;">
               <span class="emoji-sm">📥</span>Download CSV
             </button>
           </div>
@@ -104,13 +493,13 @@
 </div>
 
 <!-- Customer Detail Modal -->
-<div class="modal-overlay" id="detail-modal">
-  <div class="modal" style="max-width:600px;">
+<div class="modal-overlay" id="detail-modal" onclick="closeDetailOnOverlay(event)">
+  <div class="modal customer-detail-modal" onclick="event.stopPropagation()">
     <div class="modal-header">
       <h3 id="detail-title">Customer Details</h3>
-      <button class="modal-close" onclick="closeDetail()">Close</button>
+      <button class="modal-close" onclick="closeDetail()" title="Close" aria-label="Close">&times;</button>
     </div>
-    <div id="detail-body" style="font-size:14px;"></div>
+    <div id="detail-body" class="customer-detail-body"></div>
     <div class="modal-actions"><button class="btn btn-secondary" onclick="closeDetail()">Close</button></div>
   </div>
 </div>
@@ -118,6 +507,7 @@
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20260516c"></script>
 <script>
+  let selectedPeriod = '';
   const user = requireRole('admin');
   if (user) { 
     renderSidebarUser(); 
@@ -132,10 +522,16 @@
       areaDropdown.style.display = 'block';
     });
     
-    // Close dropdown when clicking outside
+    // Close dropdown when clicking outside and prevent desync
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.area-filter-container')) {
-        areaDropdown.style.display = 'none';
+        if (areaDropdown.style.display === 'block') {
+          areaDropdown.style.display = 'none';
+          // Revert search input text to the currently active filter value
+          const activeFilter = document.getElementById('area-filter').value;
+          areaSearchInput.value = activeFilter || '';
+          filterAreaOptions(); // reset options display
+        }
       }
     });
   }
@@ -182,17 +578,25 @@
   }
 
   function filterAreaOptions() {
-    const searchValue = document.getElementById('area-search-input').value.toLowerCase();
+    const searchValue = document.getElementById('area-search-input').value.trim();
+
+    // Clear area filter if user clears the text box and it was previously selected
+    const activeFilter = document.getElementById('area-filter');
+    if (searchValue === '' && activeFilter.value !== '') {
+      activeFilter.value = '';
+      loadCustomers();
+    }
+
     const options = document.querySelectorAll('.area-option');
     options.forEach(option => {
-      const optionText = option.getAttribute('data-value').toLowerCase();
+      const optionText = (option.getAttribute('data-value') || '').toLowerCase();
       if (searchValue === '') {
-        option.style.display = option.getAttribute('data-value') === '' ? 'block' : 'block';
+        option.style.display = 'block';
       } else {
         if (option.getAttribute('data-value') === '') {
           option.style.display = 'none';
         } else {
-          option.style.display = optionText.includes(searchValue) ? 'block' : 'none';
+          option.style.display = optionText.includes(searchValue.toLowerCase()) ? 'block' : 'none';
         }
       }
     });
@@ -202,7 +606,19 @@
     const search = document.getElementById('search-input').value;
     const area = document.getElementById('area-filter').value;
     const period = selectedPeriod;
-    const qs = buildQueryString({ search, area, period });
+    let startDate = '';
+    let endDate = '';
+    if (period === 'custom') {
+      startDate = document.getElementById('start-date').value;
+      endDate = document.getElementById('end-date').value;
+      if (startDate && endDate && startDate > endDate) {
+        const tbody = document.getElementById('customers-tbody');
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger" style="font-weight:500;padding:20px;">⚠️ Start Date cannot be after End Date.</td></tr>';
+        document.getElementById('count-badge').textContent = `0 customers`;
+        return;
+      }
+    }
+    const qs = buildQueryString({ search, area, period, startDate, endDate });
     const tbody = document.getElementById('customers-tbody');
     tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>';
     try {
@@ -246,13 +662,63 @@
     const res = await api.get(`/admin/customers/${id}`);
     if (!res?.ok) return;
     const { customer, documents, loans } = res.data.data;
-    document.getElementById('detail-title').textContent = `Customer: ${customer.name}`;
+    const docs = Array.isArray(documents) ? documents : [];
+    const loanList = Array.isArray(loans) ? loans : [];
+    document.getElementById('detail-title').textContent = 'Customer Details';
     const escapeHtml = (value) => String(value ?? '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+    const textOrDash = (value) => {
+      const text = String(value ?? '').trim();
+      return text ? escapeHtml(text) : '&mdash;';
+    };
+    const moneyOrDash = (value) => {
+      if (value === undefined || value === null || value === '') return '&mdash;';
+      const amount = Number(value);
+      return Number.isFinite(amount) ? formatCurrency(amount) : '&mdash;';
+    };
+    const dateOrDash = (value) => {
+      if (!value) return '&mdash;';
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? '&mdash;' : escapeHtml(formatDate(value));
+    };
+    const getInitials = (name) => {
+      const initials = String(name || 'Customer')
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(part => part.charAt(0))
+        .join('')
+        .toUpperCase();
+      return escapeHtml(initials || 'C');
+    };
+    const field = (label, value, extraClass = '') => `
+      <div class="customer-info-field ${extraClass}">
+        <span>${label}</span>
+        <p>${value}</p>
+      </div>`;
+    const renderStatusBadge = (status) => {
+      const classMap = {
+        Pending: 'badge-pending',
+        'Under Review': 'badge-under-review',
+        'Documents Pending': 'badge-documents-pending',
+        Approved: 'badge-approved',
+        'Loan Disbursed': 'badge-loan-disbursed',
+        Cancelled: 'badge-cancelled',
+        Rejected: 'badge-rejected',
+        Hold: 'badge-hold',
+        ABND: 'badge-abnd',
+        Other: 'badge-other'
+      };
+      return `<span class="badge ${classMap[status] || 'badge-other'}">${textOrDash(status || 'Other')}</span>`;
+    };
+    const icons = {
+      document: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6"/><path d="M9 17h4"/></svg>',
+      loan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01"/><path d="M17 14h.01"/><path d="M12 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>'
+    };
     function resolveFileUrl(path) {
       if (!path) return '#';
       if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -261,32 +727,124 @@
     }
 
     document.getElementById('detail-body').innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
-        <div><span style="color:var(--text-muted);font-size:12px;">Phone</span><p style="font-weight:600;">${customer.phone}</p></div>
-        <div><span style="color:var(--text-muted);font-size:12px;">Area</span><p style="font-weight:600;">${customer.area}</p></div>
-        <div style="grid-column:span 2"><span style="color:var(--text-muted);font-size:12px;">Address</span><p>${customer.address}</p></div>
+      <div class="customer-detail-hero">
+        <div class="customer-avatar-large">${getInitials(customer.name)}</div>
+        <div class="customer-hero-copy">
+          <span class="detail-kicker">Customer Profile</span>
+          <h3>${textOrDash(customer.name)}</h3>
+          <div class="customer-hero-meta">
+            <span>${textOrDash(customer.phone)}</span>
+            <span>${textOrDash(customer.email)}</span>
+            <span>${textOrDash(customer.area)}</span>
+          </div>
+        </div>
+        <div class="customer-id-pill">ID #${textOrDash(customer.id)}</div>
       </div>
-      <h4 style="margin-bottom:12px;font-size:14px;">Documents (${documents.length})</h4>
-      <div style="margin-bottom:20px;">
-        ${documents.length ? documents.map(d => `
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;">
-            <span>${escapeHtml(d.doc_type)} — ${escapeHtml(d.file_name)}${d.document_password ? ` <span style="color:var(--text-muted);">| Password: ${escapeHtml(d.document_password)}</span>` : ''}</span>
-            <a href="${resolveFileUrl(d.file_path)}" target="_blank" class="btn btn-secondary btn-sm">View</a>
-          </div>`).join('') : '<p style="color:var(--text-muted);">No documents uploaded.</p>'}
+
+      <div class="customer-stat-grid">
+        <div class="customer-stat"><span>Net Salary</span><strong>${moneyOrDash(customer.net_salary)}</strong></div>
+        <div class="customer-stat"><span>Total Obligation</span><strong>${moneyOrDash(customer.total_obligation)}</strong></div>
+        <div class="customer-stat"><span>Documents</span><strong>${docs.length}</strong></div>
+        <div class="customer-stat"><span>Loans</span><strong>${loanList.length}</strong></div>
       </div>
-      <h4 style="margin-bottom:12px;font-size:14px;">Loans (${loans.length})</h4>
-      ${loans.length ? loans.map(l => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;">
-          <span>${formatCurrency(l.amount)} — ${l.purpose || 'General'}</span>
-          ${statusBadge(l.status)}
-        </div>`).join('') : '<p style="color:var(--text-muted);">No loans.</p>'}
+
+      <section class="detail-section">
+        <div class="detail-section-heading">
+          <h4>Contact & Profile</h4>
+          <span>Added ${dateOrDash(customer.created_at)}</span>
+        </div>
+        <div class="customer-info-grid">
+          ${field('Phone', textOrDash(customer.phone))}
+          ${field('Email', textOrDash(customer.email))}
+          ${field('Area', textOrDash(customer.area))}
+          ${field('Net Salary', moneyOrDash(customer.net_salary))}
+          ${field('Total Obligation', moneyOrDash(customer.total_obligation))}
+          ${field('Added By', textOrDash(customer.added_by_name))}
+          ${field('Address', textOrDash(customer.address), 'full')}
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <div class="detail-section-heading">
+          <h4>Documents</h4>
+          <span>${docs.length} file${docs.length === 1 ? '' : 's'}</span>
+        </div>
+        <div class="customer-list-stack">
+          ${docs.length ? docs.map(d => {
+            const meta = [
+              d.file_name ? escapeHtml(d.file_name) : null,
+              d.uploaded_by_name ? `Uploaded by ${escapeHtml(d.uploaded_by_name)}` : null,
+              d.uploaded_at ? `Uploaded ${dateOrDash(d.uploaded_at)}` : null,
+              d.document_password ? `Password: ${escapeHtml(d.document_password)}` : null
+            ].filter(Boolean).join(' | ');
+            return `
+              <div class="customer-list-item">
+                <div class="customer-list-main">
+                  <span class="customer-list-icon">${icons.document}</span>
+                  <div class="customer-list-text">
+                    <p>${textOrDash(d.doc_type)}</p>
+                    <span>${meta || '&mdash;'}</span>
+                  </div>
+                </div>
+                <a href="${escapeHtml(resolveFileUrl(d.file_path))}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">View</a>
+              </div>`;
+          }).join('') : `
+            <div class="customer-empty-state">
+              <strong>No documents uploaded</strong>
+              <span>This customer does not have files attached.</span>
+            </div>`}
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <div class="detail-section-heading">
+          <h4>Loans</h4>
+          <span>${loanList.length} record${loanList.length === 1 ? '' : 's'}</span>
+        </div>
+        <div class="customer-list-stack">
+          ${loanList.length ? loanList.map(l => {
+            const meta = [
+              l.purpose ? escapeHtml(l.purpose) : 'General',
+              l.applied_by_name ? `Applied by ${escapeHtml(l.applied_by_name)}` : null,
+              l.created_at ? `Applied ${dateOrDash(l.created_at)}` : null,
+              l.disbursement_amount ? `Disbursed ${moneyOrDash(l.disbursement_amount)}` : null
+            ].filter(Boolean).join(' | ');
+            return `
+              <div class="customer-list-item">
+                <div class="customer-list-main">
+                  <span class="customer-list-icon">${icons.loan}</span>
+                  <div class="customer-list-text">
+                    <p>${moneyOrDash(l.amount)}</p>
+                    <span>${meta}</span>
+                  </div>
+                </div>
+                <div class="customer-list-side">${renderStatusBadge(l.status)}</div>
+              </div>`;
+          }).join('') : `
+            <div class="customer-empty-state">
+              <strong>No loans</strong>
+              <span>No loan records are linked to this customer.</span>
+            </div>`}
+        </div>
+      </section>
     `;
     document.getElementById('detail-modal').classList.add('show');
   }
 
   function closeDetail() { document.getElementById('detail-modal').classList.remove('show'); }
 
-  let selectedPeriod = '';
+  function closeDetailOnOverlay(event) {
+    if (event.target.id === 'detail-modal') {
+      closeDetail();
+    }
+  }
+
+  // Close modal on Escape key press
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeDetail();
+    }
+  });
 
   function toggleFilterMenu() {
     const menu = document.getElementById('filter-menu');
@@ -307,12 +865,13 @@
     document.getElementById('current-filter-label').textContent = `(${label})`;
     document.getElementById('filter-menu').style.display = 'none';
     
-    // Show/hide Download CSV button based on filter presence
-    const csvBtn = document.getElementById('download-csv-btn');
-    if (period) {
-      csvBtn.style.display = 'inline-flex';
+    const customDateContainer = document.getElementById('custom-date-container');
+    if (period === 'custom') {
+      customDateContainer.style.display = 'flex';
     } else {
-      csvBtn.style.display = 'none';
+      customDateContainer.style.display = 'none';
+      document.getElementById('start-date').value = '';
+      document.getElementById('end-date').value = '';
     }
     
     loadCustomers();
@@ -322,8 +881,14 @@
     const search = document.getElementById('search-input').value;
     const area   = document.getElementById('area-filter').value;
     const period = selectedPeriod;
+    let startDate = '';
+    let endDate = '';
+    if (period === 'custom') {
+      startDate = document.getElementById('start-date').value;
+      endDate = document.getElementById('end-date').value;
+    }
     const token  = typeof getToken === 'function' ? getToken() : '';
-    const qs = buildQueryString({ search, area, period, token });
+    const qs = buildQueryString({ search, area, period, startDate, endDate, token });
     
     const apiBase = (typeof api !== 'undefined' && api.base)
       ? api.base

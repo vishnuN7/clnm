@@ -2,17 +2,17 @@ const db = require('../config/db');
 
 const UserModel = {
   async findByEmail(email) {
-    const [rows] = await db.query('SELECT * FROM users WHERE email = ? AND is_active = 1', [email]);
+    const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
     return rows[0] || null;
   },
 
   async findById(id) {
-    const [rows] = await db.query('SELECT id, name, email, password, role, phone, is_active, created_at FROM users WHERE id = ?', [id]);
+    const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
     return rows[0] || null;
   },
 
   async getAll(role = null) {
-    let sql = 'SELECT id, name, email, password, role, phone, is_active, created_at FROM users';
+    let sql = 'SELECT * FROM users';
     const params = [];
     if (role) {
       sql += ' WHERE role = ?';
@@ -23,10 +23,10 @@ const UserModel = {
     return rows;
   },
 
-  async create({ name, email, password, role, phone }) {
+  async create({ name, email, password, role, phone, department }) {
     const [result] = await db.query(
-      'INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)',
-      [name, email, password, role || 'employee', phone || null]
+      'INSERT INTO users (name, email, password, role, phone, department) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, email, password, role || 'employee', phone || null, department || 'Operations']
     );
     return result.insertId;
   },
@@ -43,6 +43,11 @@ const UserModel = {
 
   async updatePassword(id, hashedPassword) {
     const [result] = await db.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, id]);
+    return result.affectedRows;
+  },
+
+  async removeEmployee(id) {
+    const [result] = await db.query('DELETE FROM users WHERE id = ? AND role = ?', [id, 'employee']);
     return result.affectedRows;
   }
 };
