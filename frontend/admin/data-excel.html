@@ -3,12 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — Data Excel Document</title>
+  <title>CLN Lending Suite — Excel Data Management</title>
   <meta name="description" content="Admin Data Excel Document — Upload, assign, monitor and export Excel task sheets." />
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -332,7 +345,7 @@
         <a href="/admin/data-excel.html" class="nav-item active">
           <span class="nav-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
-          </span> Data Excel Document
+          </span> Excel Data Management
         </a>
         <a href="/admin/apr.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> APR</a>
 
@@ -356,9 +369,9 @@
       <div class="topbar-title">
         <h2>
           <svg style="width:22px;height:22px;vertical-align:middle;margin-right:8px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
-          Data Excel Document
+          Excel Data Management
         </h2>
-        <p>Upload, Assign, Monitor &amp; Export Employee Excel Tasks</p>
+        <p>Upload, assign, monitor, and export employee Excel tasks.</p>
       </div>
       <div class="topbar-actions excel-topbar-actions">
         <button class="btn btn-primary btn-sm" onclick="openUploadModal()" id="btn-upload-main">
@@ -402,7 +415,7 @@
       <!-- Tab navigation -->
       <div class="seg-nav">
         <button class="seg-btn active" onclick="switchTab('tab-files')"     id="btn-tab-files">All Files</button>
-        <button class="seg-btn"        onclick="switchTab('tab-monitor')"   id="btn-tab-monitor">Live Monitor</button>
+        <button class="seg-btn"        onclick="switchTab('tab-monitor')"   id="btn-tab-monitor">Live Monitoring</button>
         <button class="seg-btn"        onclick="switchTab('tab-audit')"     id="btn-tab-audit">Audit Trail</button>
         <button class="seg-btn"        onclick="switchTab('tab-reports')"   id="btn-tab-reports">Reports</button>
       </div>
@@ -415,7 +428,7 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
               <input id="files-search" type="text" placeholder="Search files..." style="max-width:200px;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;" oninput="renderFilesTable()" />
               <select id="files-status-filter" onchange="renderFilesTable()" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;">
-                <option value="">All Status</option>
+                <option value="">All Statuses</option>
                 <option value="Assigned">Assigned</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Completed">Completed</option>
@@ -742,7 +755,6 @@
 const user = requireRole('admin');
 if (user) {
   renderSidebarUser();
-  applyTheme(getResolvedTheme());
   applyIconography();
   applyActionButtonIcons();
   document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-IN', {weekday:'short',year:'numeric',month:'short',day:'numeric'});

@@ -19,6 +19,19 @@
   </script>
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <style>
     /* ── Premium Analytics Section ── */
@@ -448,6 +461,356 @@
       .status-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .status-card { padding: 12px 10px; }
       .status-card-count { font-size: 18px; }
+    }
+
+    /* Employees Weekly Performance */
+    .weekly-performance-card {
+      overflow: hidden;
+    }
+    .weekly-performance-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--table-row-border);
+      background: linear-gradient(90deg, rgba(247,250,255,0.98) 0%, rgba(240,245,252,0.98) 100%);
+    }
+    :root[data-theme='dark'] .weekly-performance-header {
+      background: linear-gradient(90deg, rgba(12,22,36,0.96) 0%, rgba(15,28,46,0.98) 100%);
+      border-bottom-color: rgba(151,176,210,0.12);
+    }
+    .weekly-performance-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .weekly-performance-icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(47,111,237,0.14), rgba(15,139,113,0.12));
+      border: 1px solid rgba(47,111,237,0.16);
+      color: var(--accent);
+      flex: 0 0 auto;
+    }
+    .weekly-performance-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.2;
+    }
+    .weekly-performance-title-group h3 {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 18px;
+      font-weight: 850;
+      line-height: 1.2;
+    }
+    .weekly-performance-title-group p {
+      margin: 4px 0 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .weekly-performance-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+    .weekly-date-pill {
+      min-width: 132px;
+      padding: 7px 11px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg-card);
+      text-align: right;
+      box-shadow: 0 8px 18px rgba(16,32,51,0.05);
+    }
+    :root[data-theme='dark'] .weekly-date-pill {
+      background: rgba(6,12,22,0.44);
+      border-color: rgba(151,176,210,0.13);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+    }
+    .weekly-date-pill span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: 0.35px;
+    }
+    .weekly-date-pill strong {
+      display: block;
+      margin-top: 3px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 850;
+      line-height: 1.15;
+    }
+    .weekly-refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .weekly-refresh-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+    .weekly-performance-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--table-row-border);
+      background: rgba(255,255,255,0.36);
+    }
+    :root[data-theme='dark'] .weekly-performance-summary {
+      background: rgba(255,255,255,0.02);
+      border-bottom-color: rgba(151,176,210,0.1);
+    }
+    .weekly-summary-item {
+      min-width: 0;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg-card);
+    }
+    :root[data-theme='dark'] .weekly-summary-item {
+      background: rgba(6,12,22,0.42);
+      border-color: rgba(151,176,210,0.12);
+    }
+    .weekly-summary-label {
+      display: block;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.35px;
+    }
+    .weekly-summary-value {
+      display: block;
+      margin-top: 5px;
+      color: var(--text-primary);
+      font-size: 20px;
+      font-weight: 850;
+      line-height: 1;
+    }
+    .weekly-performance-table-wrap {
+      border-radius: 0;
+      border: 0;
+      box-shadow: none;
+    }
+    .weekly-performance-table {
+      min-width: 1060px;
+    }
+    .weekly-performance-table th {
+      white-space: nowrap;
+    }
+    .weekly-performance-table tbody tr {
+      position: relative;
+      transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+    .weekly-performance-table tbody tr.weekly-row {
+      cursor: pointer;
+    }
+    .weekly-performance-table tbody tr.weekly-row:hover {
+      background: rgba(47,111,237,0.05);
+      box-shadow: inset 3px 0 0 rgba(47,111,237,0.34);
+    }
+    :root[data-theme='dark'] .weekly-performance-table tbody tr.weekly-row:hover {
+      background: rgba(139,180,255,0.06);
+    }
+    .weekly-performance-table tbody tr.top-performer {
+      background: linear-gradient(90deg, rgba(245,158,11,0.12), transparent 52%);
+      box-shadow: inset 4px 0 0 #f59e0b;
+    }
+    :root[data-theme='dark'] .weekly-performance-table tbody tr.top-performer {
+      background: linear-gradient(90deg, rgba(245,158,11,0.16), transparent 56%);
+      box-shadow: inset 4px 0 0 #fbbf24;
+    }
+    .weekly-rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .top-performer .weekly-rank {
+      border-color: rgba(245,158,11,0.45);
+      background: rgba(245,158,11,0.13);
+      color: #92400e;
+    }
+    :root[data-theme='dark'] .top-performer .weekly-rank {
+      color: #fbbf24;
+    }
+    .weekly-employee-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 210px;
+    }
+    .weekly-employee-copy {
+      min-width: 0;
+      display: grid;
+      gap: 3px;
+    }
+    .weekly-employee-name {
+      display: block;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 850;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .weekly-employee-email {
+      display: block;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 650;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .weekly-count {
+      color: var(--text-primary);
+      font-weight: 800;
+    }
+    .weekly-count.is-muted {
+      color: var(--text-muted);
+    }
+    .weekly-success {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 72px;
+      color: var(--text-primary);
+      font-weight: 850;
+    }
+    .weekly-success-bar {
+      width: 46px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--border);
+      overflow: hidden;
+    }
+    .weekly-success-fill {
+      display: block;
+      height: 100%;
+      width: var(--success-width, 0%);
+      border-radius: inherit;
+      background: var(--success-color, var(--accent));
+    }
+    .performance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--badge-border, var(--border));
+      background: var(--badge-bg, var(--bg-secondary));
+      color: var(--badge-color, var(--text-secondary));
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .performance-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 3px var(--dot-ring, rgba(47,111,237,0.1));
+    }
+    .performance-badge.excellent,
+    .performance-badge.very-good {
+      --badge-bg: rgba(5,150,105,0.1);
+      --badge-border: rgba(5,150,105,0.2);
+      --badge-color: #047857;
+      --dot-ring: rgba(5,150,105,0.12);
+    }
+    .performance-badge.good {
+      --badge-bg: rgba(217,119,6,0.1);
+      --badge-border: rgba(217,119,6,0.2);
+      --badge-color: #b45309;
+      --dot-ring: rgba(217,119,6,0.13);
+    }
+    .performance-badge.average {
+      --badge-bg: rgba(234,88,12,0.1);
+      --badge-border: rgba(234,88,12,0.2);
+      --badge-color: #c2410c;
+      --dot-ring: rgba(234,88,12,0.13);
+    }
+    .performance-badge.needs-attention {
+      --badge-bg: rgba(220,38,38,0.1);
+      --badge-border: rgba(220,38,38,0.2);
+      --badge-color: #b91c1c;
+      --dot-ring: rgba(220,38,38,0.12);
+    }
+    :root[data-theme='dark'] .performance-badge.excellent,
+    :root[data-theme='dark'] .performance-badge.very-good {
+      --badge-color: #34d399;
+    }
+    :root[data-theme='dark'] .performance-badge.good {
+      --badge-color: #fbbf24;
+    }
+    :root[data-theme='dark'] .performance-badge.average {
+      --badge-color: #fb923c;
+    }
+    :root[data-theme='dark'] .performance-badge.needs-attention {
+      --badge-color: #f87171;
+    }
+    @media (max-width: 900px) {
+      .weekly-performance-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .weekly-performance-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .weekly-date-pill {
+        text-align: left;
+      }
+      .weekly-performance-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 560px) {
+      .weekly-performance-header,
+      .weekly-performance-summary {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+      .weekly-performance-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .weekly-date-pill,
+      .weekly-refresh-btn {
+        width: 100%;
+      }
+      .weekly-refresh-btn {
+        justify-content: center;
+      }
+      .weekly-performance-summary {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* ── Employees Overview Panel ── */
@@ -1327,7 +1690,7 @@
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
       <div class="topbar-title"><h2><span class="emoji">📊</span>Dashboard</h2>
-        <p>Unified loan and customer management</p></div>
+        <p>Unified Loan and Customer Management</p></div>
       <div class="topbar-actions">
         <span id="current-date" style="font-size:13px;color:var(--text-secondary);"></span>
       </div>
@@ -1451,19 +1814,52 @@
         </div>
       </div>
 
-      <!-- Recent Loans -->
-      <div class="card full-table">
-          <div class="card-header">
-          <h3><span class="emoji-sm">🕒</span>Recent Loan Applications</h3>
-          <a href="/admin/loans.html" class="btn btn-secondary btn-sm"><span class="emoji-sm">📄</span>View All →</a>
+      <!-- Employees Weekly Performance -->
+      <section class="card full-table weekly-performance-card" aria-labelledby="weekly-performance-title">
+        <div class="weekly-performance-header">
+          <div class="weekly-performance-title-group">
+            <span class="weekly-performance-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"></path><path d="M4 19h16"></path><path d="m7 14 3-3 3 2 5-6"></path><path d="M18 7h-4"></path><path d="M18 7v4"></path></svg>
+            </span>
+            <div>
+              <h3 id="weekly-performance-title">Employees Weekly Performance</h3>
+              <p>Current Week Performance</p>
+            </div>
+          </div>
+          <div class="weekly-performance-actions">
+            <div class="weekly-date-pill" title="Current week">
+              <span>Current Week</span>
+              <strong id="weekly-current-date">--</strong>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm weekly-refresh-btn" onclick="loadWeeklyPerformance(true)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"></path><path d="M21 21v-5h-5"></path></svg>
+              Refresh
+            </button>
+          </div>
         </div>
-        <div class="table-wrapper">
-          <table>
-            <thead><tr><th>ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Applied By</th><th>Date</th></tr></thead>
-            <tbody id="recent-loans-tbody"><tr><td colspan="6" class="text-center text-muted">Loading...</td></tr></tbody>
+        <div class="weekly-performance-summary" id="weekly-performance-summary"></div>
+        <div class="table-wrapper weekly-performance-table-wrap">
+          <table class="weekly-performance-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Employee</th>
+                <th>Customers Added</th>
+                <th>Loans Applied</th>
+                <th>Approved</th>
+                <th>Rejected</th>
+                <th>Pending</th>
+                <th>Disbursed</th>
+                <th>Success Rate</th>
+                <th>Performance</th>
+              </tr>
+            </thead>
+            <tbody id="weekly-performance-tbody">
+              <tr><td colspan="10" class="text-center text-muted">Loading weekly performance...</td></tr>
+            </tbody>
           </table>
         </div>
-      </div>
+      </section>
     </div>
   </main>
 </div>
@@ -1505,7 +1901,7 @@
 
     const safeName = dashboardEscapeHtml(customer.name || 'Customer');
     const safePhone = dashboardEscapeHtml(customer.phone || '—');
-    const safeArea = dashboardEscapeHtml(customer.area || '—');
+    const safeCity = dashboardEscapeHtml(customer.area || '—');
     const safeAddress = dashboardEscapeHtml(customer.address || '—');
     const safeNetSalary = customer.net_salary !== undefined && customer.net_salary !== null ? `₹${Number(customer.net_salary).toLocaleString('en-IN')}` : '—';
     const safeObligation = customer.total_obligation !== undefined && customer.total_obligation !== null ? `₹${Number(customer.total_obligation).toLocaleString('en-IN')}` : '—';
@@ -1543,7 +1939,7 @@
             <div class="customer-detail-copy">
               <p class="customer-detail-kicker">Customer profile</p>
               <h4 class="customer-detail-name">${safeName}</h4>
-              <p class="customer-detail-subtitle">${safePhone}${customer.area ? ` · ${safeArea}` : ''}</p>
+              <p class="customer-detail-subtitle">${safePhone}${customer.area ? ` · ${safeCity}` : ''}</p>
             </div>
           </div>
           <span class="customer-detail-pill">Loans: ${loans.length}</span>
@@ -1555,8 +1951,8 @@
             <p class="customer-detail-stat-value">${safePhone}</p>
           </div>
           <div class="customer-detail-stat">
-            <span class="customer-detail-stat-label">Area</span>
-            <p class="customer-detail-stat-value">${safeArea}</p>
+            <span class="customer-detail-stat-label">City</span>
+            <p class="customer-detail-stat-value">${safeCity}</p>
           </div>
           <div class="customer-detail-stat">
             <span class="customer-detail-stat-label">Net Salary</span>
@@ -1675,6 +2071,7 @@
 
   function getEmployeeProfilePicture(employee) {
     const imagePath = employee?.profile_picture
+      || employee?.profileImage
       || employee?.profilePicture
       || employee?.profile?.profile_picture
       || employee?.avatar_url
@@ -1694,6 +2091,149 @@
     }
 
     return `<span class="${classes}" aria-hidden="true"><img src="${dashboardEscapeHtml(photoUrl)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.classList.remove('has-photo');"><span class="employee-avatar-fallback">${initials}</span></span>`;
+  }
+
+  function performanceMeta(rate) {
+    const successRate = Number(rate) || 0;
+    if (successRate >= 80) return { label: 'Excellent', className: 'excellent', color: '#059669' };
+    if (successRate >= 60) return { label: 'Very Good', className: 'very-good', color: '#059669' };
+    if (successRate >= 40) return { label: 'Good', className: 'good', color: '#d97706' };
+    if (successRate >= 20) return { label: 'Average', className: 'average', color: '#ea580c' };
+    return { label: 'Needs Attention', className: 'needs-attention', color: '#dc2626' };
+  }
+
+  function formatSuccessRate(rate) {
+    const numericRate = Number(rate) || 0;
+    return Number.isInteger(numericRate) ? `${numericRate}%` : `${numericRate.toFixed(1)}%`;
+  }
+
+  function getCurrentWeekLabelFallback() {
+    const today = new Date();
+    const day = today.getDay();
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diffToMonday);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const start = monday.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', timeZone: 'Asia/Kolkata' });
+    const end = sunday.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' });
+    return `${start} - ${end}`;
+  }
+
+  function weeklyNumberCell(value) {
+    const count = Number(value) || 0;
+    return `<span class="weekly-count${count ? '' : ' is-muted'}">${count}</span>`;
+  }
+
+  function weeklyMetric(employee, camelKey, snakeKey) {
+    return Number(employee?.[camelKey] ?? employee?.[snakeKey] ?? 0) || 0;
+  }
+
+  function normalizeWeeklyPerformancePayload(responseData) {
+    const payload = responseData?.data && Array.isArray(responseData.data.employees)
+      ? responseData.data
+      : responseData || {};
+    return {
+      ...payload,
+      employees: Array.isArray(payload.employees) ? payload.employees : [],
+      summary: payload.summary || {}
+    };
+  }
+
+  function renderWeeklyPerformanceSummary(rows, summary = null) {
+    const summaryEl = document.getElementById('weekly-performance-summary');
+    if (!summaryEl) return;
+    const employees = Number(summary?.employees ?? summary?.employee_count ?? rows.length) || 0;
+    const customers = Number(summary?.customersAdded ?? summary?.customers_added ?? rows.reduce((sum, emp) => sum + weeklyMetric(emp, 'customersAdded', 'customers_added'), 0)) || 0;
+    const loans = Number(summary?.loansApplied ?? summary?.loans_applied ?? rows.reduce((sum, emp) => sum + weeklyMetric(emp, 'loansApplied', 'loans_applied'), 0)) || 0;
+    const disbursed = Number(summary?.loanDisbursed ?? summary?.loan_disbursed ?? rows.reduce((sum, emp) => sum + weeklyMetric(emp, 'disbursed', 'disbursed'), 0)) || 0;
+    summaryEl.innerHTML = `
+      <div class="weekly-summary-item"><span class="weekly-summary-label">Employees</span><span class="weekly-summary-value">${employees}</span></div>
+      <div class="weekly-summary-item"><span class="weekly-summary-label">Customers Added</span><span class="weekly-summary-value">${customers}</span></div>
+      <div class="weekly-summary-item"><span class="weekly-summary-label">Loans Applied</span><span class="weekly-summary-value">${loans}</span></div>
+      <div class="weekly-summary-item"><span class="weekly-summary-label">Loan Disbursed</span><span class="weekly-summary-value">${disbursed}</span></div>`;
+  }
+
+  async function loadWeeklyPerformance(forceReload = false) {
+    const tbody = document.getElementById('weekly-performance-tbody');
+    const currentDateEl = document.getElementById('weekly-current-date');
+    const refreshBtn = document.querySelector('.weekly-refresh-btn');
+    if (!tbody) return;
+
+    if (refreshBtn) refreshBtn.disabled = true;
+    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Loading weekly performance...</td></tr>';
+
+    try {
+      const res = await api.get('/admin/dashboard/weekly-employee-performance');
+      if (!res?.ok) {
+        if (currentDateEl) currentDateEl.textContent = getCurrentWeekLabelFallback();
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Unable to load weekly performance.</td></tr>';
+        renderWeeklyPerformanceSummary([]);
+        return;
+      }
+
+      const data = normalizeWeeklyPerformancePayload(res.data);
+      const rows = data.employees;
+      if (currentDateEl) currentDateEl.textContent = data.weekLabel || (data.currentDate ? formatDate(data.currentDate) : formatDate(new Date()));
+      renderWeeklyPerformanceSummary(rows, data.summary);
+
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">No employees found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map((employee, index) => {
+        const rate = Number(employee.successRate ?? employee.success_rate ?? 0) || 0;
+        const meta = performanceMeta(rate);
+        const isTop = index === 0 && (weeklyMetric(employee, 'loansApplied', 'loans_applied') > 0 || weeklyMetric(employee, 'customersAdded', 'customers_added') > 0);
+        const safeName = dashboardEscapeHtml(employee.name || 'Employee');
+        const safeEmail = dashboardEscapeHtml(employee.email || 'No email');
+        const safeId = Number(employee.employeeId ?? employee.id) || 0;
+        return `
+          <tr class="weekly-row${isTop ? ' top-performer' : ''}" onclick="openEmployeePerformanceProfile(${safeId})" tabindex="0" onkeydown="if(event.key==='Enter' || event.key===' ') openEmployeePerformanceProfile(${safeId})">
+            <td><span class="weekly-rank">#${index + 1}</span></td>
+            <td>
+              <div class="weekly-employee-cell">
+                ${employeeAvatarHtml(employee)}
+                <span class="weekly-employee-copy">
+                  <strong class="weekly-employee-name">${safeName}</strong>
+                  <small class="weekly-employee-email">${safeEmail}</small>
+                </span>
+              </div>
+            </td>
+            <td>${weeklyNumberCell(weeklyMetric(employee, 'customersAdded', 'customers_added'))}</td>
+            <td>${weeklyNumberCell(weeklyMetric(employee, 'loansApplied', 'loans_applied'))}</td>
+            <td>${weeklyNumberCell(employee.approved)}</td>
+            <td>${weeklyNumberCell(employee.rejected)}</td>
+            <td>${weeklyNumberCell(employee.pending)}</td>
+            <td>${weeklyNumberCell(employee.disbursed)}</td>
+            <td>
+              <span class="weekly-success">
+                ${formatSuccessRate(rate)}
+                <span class="weekly-success-bar" aria-hidden="true"><span class="weekly-success-fill" style="--success-width:${Math.min(100, Math.max(0, rate))}%;--success-color:${meta.color};"></span></span>
+              </span>
+            </td>
+            <td><span class="performance-badge ${meta.className}"><span class="performance-dot"></span>${meta.label}</span></td>
+          </tr>`;
+      }).join('');
+    } catch (err) {
+      console.error('[Dashboard] Weekly performance error:', err);
+      if (currentDateEl) currentDateEl.textContent = getCurrentWeekLabelFallback();
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Unable to load weekly performance.</td></tr>';
+      renderWeeklyPerformanceSummary([]);
+    } finally {
+      if (refreshBtn) refreshBtn.disabled = false;
+    }
+  }
+
+  async function openEmployeePerformanceProfile(id) {
+    const employeeId = Number(id);
+    if (!employeeId) return;
+    const panel = document.getElementById('employees-insights');
+    if (panel) panel.style.display = 'block';
+    await loadEmployeesOverviewData();
+    selectEmployee(employeeId);
+    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   async function hydrateEmployeeProfile(employee) {
@@ -1742,9 +2282,10 @@
   }
 
   function buildEmployeeMetrics(employee) {
+    const employeeId = String(employee.id ?? '');
     const employeeName = normalizeEmployeeName(employee.name);
-    const employeeLoans = dashboardLoans.filter(l => normalizeEmployeeName(l.applied_by_name) === employeeName);
-    const employeeCustomers = dashboardCustomers.filter(c => normalizeEmployeeName(c.added_by_name) === employeeName);
+    const employeeLoans = dashboardLoans.filter(l => String(l.applied_by ?? '') === employeeId || (!l.applied_by && normalizeEmployeeName(l.applied_by_name) === employeeName));
+    const employeeCustomers = dashboardCustomers.filter(c => String(c.added_by ?? '') === employeeId || (!c.added_by && normalizeEmployeeName(c.added_by_name) === employeeName));
 
     const statusCounts = employeeLoans.reduce((acc, loan) => {
       acc[loan.status] = (acc[loan.status] || 0) + 1;
@@ -1824,22 +2365,6 @@
         dashboardLoans = loanRes.data.data;
       }
 
-      if (!dashboardEmployees.length) {
-        dashboardEmployees = [{
-          id: 999900,
-          name: 'aryan',
-          email: 'aryan@gmail.com',
-          phone: '12356799',
-          is_active: true,
-          created_at: '2026-04-30T00:00:00Z'
-        }];
-        dashboardLoans = [];
-        for (let i = 0; i < 6; i++) dashboardLoans.push({ applied_by_name: 'aryan', amount: 50000 + i * 1000, status: 'Pending' });
-        dashboardLoans.push({ applied_by_name: 'aryan', amount: 75000, status: 'Approved' });
-        dashboardLoans.push({ applied_by_name: 'aryan', amount: 20000, status: 'Rejected' });
-        dashboardLoans.push({ applied_by_name: 'aryan', amount: 30000, status: 'Rejected' });
-        dashboardCustomers = Array.from({ length: 9 }).map((_, idx) => ({ id: 7000 + idx, name: `Customer ${idx+1}`, added_by_name: 'aryan', area: 'Demo Area', created_at: '2026-04-15T00:00:00Z' }));
-      }
     }
 
     renderEmployeeList();
@@ -1951,7 +2476,7 @@
         <div>
           <div class="table-wrapper">
             <table>
-              <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Area</th><th>Date</th></tr></thead>
+              <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>City</th><th>Date</th></tr></thead>
               <tbody>
                 ${metrics.employeeCustomers.length ? metrics.employeeCustomers.map((customer, index) => `
                   <tr>
@@ -2286,23 +2811,7 @@
     loans.statusBreakdown.forEach(s => statusMap[s.status] = parseInt(s.count));
 
     document.getElementById('stat-employees').textContent = totalEmployees;
-    await loadEmployeesOverviewData();
-
-    // Recent loans table
-    const tbody = document.getElementById('recent-loans-tbody');
-    if (!loans.recentLoans.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No loans yet.</td></tr>';
-    } else {
-      tbody.innerHTML = loans.recentLoans.map(l => `
-        <tr onclick="viewCustomerDetail(${l.customer_id})" style="cursor:pointer">
-          <td>#${l.id}</td>
-          <td>${l.customer_name}</td>
-          <td>${formatCurrency(l.amount)}</td>
-          <td>${statusBadge(l.status)}</td>
-          <td>${l.applied_by_name}</td>
-          <td>${formatDate(l.created_at)}</td>
-        </tr>`).join('');
-    }
+    await Promise.all([loadEmployeesOverviewData(), loadWeeklyPerformance()]);
 
     // Set Chart defaults for dark mode support
     Chart.defaults.color = getCSSVar('--text-secondary') || '#526173';

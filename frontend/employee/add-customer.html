@@ -3,34 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add Customer — CLN Employee</title>
-  <meta name="theme-color" content="#5a7a52" />
+  <title>Add Customer - CLN Employee</title>
+  <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
-<div class="app-layout">
+<div class="app-layout add-customer-page">
   <aside class="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div><h2><span class="emoji-sm">💼</span>CLN System</h2><span>Employee Portal</span></div>
+      <div class="sidebar-logo">
+        <div class="logo-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 10h16"/><path d="M6 10V7l6-3 6 3v3"/><path d="M5 20h14"/><path d="M7 20v-7"/><path d="M12 20v-7"/><path d="M17 20v-7"/></svg>
+        </div>
+        <div>
+          <h2>CLN System</h2>
+          <span>Employee Portal</span>
+        </div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon emoji-sm">📊</span> Dashboard</a>
-        <a href="/employee/add-customer.html" class="nav-item active"><span class="nav-icon emoji-sm">➕</span> Add Customer</a>
-        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon emoji-sm">👥</span> My Customers</a>
-        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon emoji-sm">💼</span> My Loans</a>
-        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon emoji-sm">🧮</span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> My Assigned Data</a>
-        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> APR</a>
-
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M4 20H20"/><path d="M8 20V7"/><path d="M12 20V4"/><path d="M16 20v-9"/></svg></span> Dashboard</a>
+        <a href="/employee/add-customer.html" class="nav-item active"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span> Add Customer</a>
+        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-1.5a4.5 4.5 0 0 0-4.5-4.5h-1A4.5 4.5 0 0 0 7 19.5V21"/><circle cx="11.5" cy="8" r="3.5"/><path d="M19 21v-1a3.5 3.5 0 0 0-2.5-3.35"/><path d="M16.5 4.75a3 3 0 0 1 0 5.9"/></svg></span> My Customers</a>
+        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10 7V6a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 12h18"/><path d="M9 12v2h6v-2"/></svg></span> My Loans</a>
+        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg></span> EMI Calculator</a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> My Assigned Records</a>
+        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/></svg></span> APR</a>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -42,106 +59,193 @@
     </div>
   </aside>
 
-  <!-- Mobile overlay -->
   <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 
   <main class="main-content">
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2><span class="emoji">➕</span>Add Customer</h2><p>Register a new customer and upload documents</p></div>
+      <div class="topbar-title">
+        <h2><span class="title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span>Add Customer</h2>
+        <p>Register customer details, then upload the required documents.</p>
+      </div>
     </div>
-    <div class="page-content">
-      <div id="page-alert" class="alert"></div>
-      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:start;" class="add-customer-grid">
 
-        <!-- Customer Form -->
-        <div class="card">
-          <div class="card-header"><h3><span class="emoji-sm">📋</span>Customer Details</h3></div>
-          <div class="card-body">
-            <div class="form-group">
-              <label>Quick Paste Details (Optional)</label>
-              <textarea id="cust-quick-paste" class="form-control" rows="10"></textarea>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="fillFromQuickPaste()">Fill Fields from Paste</button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="insertPasteSample()">Insert Sample Template</button>
-              </div>
-              <p style="font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.4;">Tip: As soon as you paste, Name, Mobile, Area and Address are auto-filled. You can still use <strong>Fill Fields from Paste</strong> if needed.</p>
-            </div>
-            <div class="form-group"><label>Full Name *</label><input type="text" id="cust-name" class="form-control" placeholder="e.g. Rahul Sharma" /></div>
-            <div class="form-group"><label>Phone Number *</label><input type="tel" id="cust-phone" class="form-control" placeholder="10-digit mobile" maxlength="10" /></div>
-            <div class="form-group"><label>Email *</label><input type="email" id="cust-email" class="form-control" placeholder="e.g. rahul.sharma@example.com" /></div>
-            <div class="form-group"><label>Area *</label><input type="text" id="cust-area" class="form-control" placeholder="e.g. Koramangala" list="area-list" /><datalist id="area-list"></datalist></div>
-            <div class="form-group">
-              <label>Net Salary *</label>
-              <div style="position:relative;">
-                <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                <input type="text" id="cust-net-salary" class="form-control" placeholder="Enter customer's monthly net salary" style="padding-left:28px;" inputmode="numeric" required />
+    <div class="page-content add-customer-content">
+      <div id="page-alert" class="alert add-customer-alert"></div>
+
+      <div class="add-customer-grid">
+        <div class="customer-column customer-left-column">
+        <section class="card customer-form-card">
+          <div class="card-header crm-card-header">
+            <div class="card-title-group">
+              <span class="section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5h6v3H9z"/><path d="M8 12h8"/><path d="M8 16h6"/></svg></span>
+              <div>
+                <h3>Customer Details</h3>
+                <p>Capture verified identity, contact, location, and income information.</p>
               </div>
             </div>
-            <div class="form-group">
-              <label>Total Obligation</label>
-              <div style="position:relative;">
-                <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                <input type="text" id="cust-total-obligation" class="form-control" placeholder="Enter customer's total monthly obligations" style="padding-left:28px;" inputmode="numeric" />
-              </div>
-            </div>
-            <div class="form-group"><label>Full Address *</label><textarea id="cust-address" class="form-control" rows="3" placeholder="Door no., Street, City, PIN"></textarea></div>
-            <button class="btn btn-primary" onclick="addCustomer()" id="add-cust-btn"><span class="emoji-sm">➕</span>Add Customer</button>
           </div>
+          <div class="card-body">
+            <form class="customer-details-form" onsubmit="event.preventDefault(); addCustomer();">
+              <div class="field-grid">
+                <div class="form-group">
+                  <label for="cust-name">Full Name <span>*</span></label>
+                  <input type="text" id="cust-name" class="form-control" placeholder="Rahul Sharma" autocomplete="name" required />
+                </div>
+                <div class="form-group">
+                  <label for="cust-phone">Phone Number <span>*</span></label>
+                  <input type="tel" id="cust-phone" class="form-control" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" autocomplete="tel" required />
+                </div>
+                <div class="form-group">
+                  <label for="cust-email">Email <span>*</span></label>
+                  <input type="email" id="cust-email" class="form-control" placeholder="rahul.sharma@example.com" autocomplete="email" required />
+                </div>
+                <div class="form-group">
+                  <label for="cust-area">City <span>*</span></label>
+                  <input type="text" id="cust-area" class="form-control" placeholder="Bengaluru" list="area-list" autocomplete="address-level2" required />
+                  <datalist id="area-list"></datalist>
+                </div>
+                <div class="form-group">
+                  <label for="cust-net-salary">Monthly Net Salary <span>*</span></label>
+                  <div class="input-with-affix">
+                    <span class="input-affix">₹</span>
+                    <input type="text" id="cust-net-salary" class="form-control" placeholder="Monthly net salary" inputmode="numeric" required />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="cust-total-obligation">Total Monthly Obligations</label>
+                  <div class="input-with-affix">
+                    <span class="input-affix">₹</span>
+                    <input type="text" id="cust-total-obligation" class="form-control" placeholder="Monthly obligations" inputmode="numeric" />
+                  </div>
+                </div>
+                <div class="form-group form-span-2">
+                  <label for="cust-address">Full Address <span>*</span></label>
+                  <textarea id="cust-address" class="form-control" rows="4" placeholder="House/Flat No., Street, City, PIN Code" autocomplete="street-address" required></textarea>
+                </div>
+              </div>
+
+              <div class="form-submit-row">
+                <button class="btn btn-primary add-customer-submit" type="submit" id="add-cust-btn">
+                  <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span>
+                  Add Customer
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section id="customer-added-section" class="card customer-added-card" style="display:none;">
+          <div class="card-header crm-card-header compact">
+            <div class="card-title-group">
+              <span class="section-icon success" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.8 2.8L16 9.5"/></svg></span>
+              <div>
+                <h3>Customer Added</h3>
+                <p>Continue with the loan application.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="new-customer-info" class="added-summary">
+              <div><span>Customer name</span><strong id="added-customer-name">-</strong></div>
+              <div><span>Phone</span><strong id="added-customer-phone">-</strong></div>
+              <div><span>City</span><strong id="added-customer-area">-</strong></div>
+              <div><span>Date</span><strong id="added-customer-date">-</strong></div>
+            </div>
+            <a href="/employee/loans.html" class="btn btn-primary btn-fit create-loan-button" id="create-loan-link">
+              <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 7V6a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 12h18"/><path d="M9 12v2h6v-2"/></svg></span>
+              Create Loan Application
+            </a>
+          </div>
+        </section>
         </div>
 
-        <!-- Upload Section -->
-        <div id="upload-section" style="display:none;">
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-header"><h3><span class="emoji-sm">✅</span>Customer Added</h3></div>
-            <div class="card-body">
-              <p id="new-customer-info" style="font-size:14px;color:var(--text-secondary);"></p>
-              <a href="/employee/loans.html" class="btn btn-primary" style="margin-top:12px;display:inline-flex;" id="create-loan-link"><span class="emoji-sm">💼</span>Create Loan Application</a>
+        <div class="customer-column customer-right-column">
+        <section class="card quick-paste-card">
+          <div class="card-header crm-card-header compact">
+            <div class="card-title-group">
+              <span class="section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/><rect x="5" y="3" width="14" height="18" rx="2"/></svg></span>
+              <div>
+                <h3>Quick Paste Details</h3>
+                <p>Paste a filled customer sheet to prefill matching fields.</p>
+              </div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-header"><h3><span class="emoji-sm">📁</span>Upload Documents</h3></div>
-            <div class="card-body">
+          <div class="card-body">
+            <div class="form-group">
+              <label for="cust-quick-paste">Customer Sheet</label>
+              <textarea id="cust-quick-paste" class="form-control" rows="6" placeholder="Paste customer details here"></textarea>
+            </div>
+            <div class="quick-paste-actions">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="fillFromQuickPaste()">
+                <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 12h8"/><path d="M12 8v8"/><rect x="4" y="4" width="16" height="16" rx="2"/></svg></span>
+                Fill Fields from Paste
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="insertPasteSample()">
+                <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6"/><path d="M9 17h4"/></svg></span>
+                Insert Sample Template
+              </button>
+            </div>
+            <p class="helper-text">Name, phone, email, city, address, and net income are detected automatically when available.</p>
+          </div>
+        </section>
+
+        <section id="upload-section" class="card upload-documents-card" style="display:none;">
+          <div class="card-header crm-card-header compact">
+            <div class="card-title-group">
+              <span class="section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 20h16"/></svg></span>
+              <div>
+                <h3>Upload Documents</h3>
+                <p>Attach KYC and income proof files for this customer.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="upload-form-grid">
               <div class="form-group">
-                <label>Document Type</label>
+                <label for="doc-type">Document Type</label>
                 <select id="doc-type" class="form-control" onchange="handleDocTypeChange()">
-                  <option value="Aadhar">Aadhar Card</option>
-                  <option value="PAN">PAN Card</option>
-                  <option value="3M Bank Statement">3M Bank Statement</option>
-                  <option value="3M Salary Slip">3M Salary Slip</option>
+                  <option value="Aadhaar Card">Aadhaar Card</option>
+                  <option value="PAN Card">PAN Card</option>
+                  <option value="Passport Size Photograph">Passport Size Photograph</option>
+                  <option value="3 Months Bank Statement">3 Months Bank Statement</option>
+                  <option value="6 Months Bank Statement">6 Months Bank Statement</option>
+                  <option value="3 Months Salary Slips">3 Months Salary Slips</option>
+                  <option value="6 Months Salary Slips">6 Months Salary Slips</option>
+                  <option value="Form 16">Form 16</option>
+                  <option value="Cancelled Cheque">Cancelled Cheque</option>
+                  <option value="Existing Loan Statement">Existing Loan Statement</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
               <div class="form-group" id="other-doc-type-group" style="display:none;">
-                <label>Specify Document Type *</label>
-                <input type="text" id="other-doc-type" class="form-control" placeholder="e.g. Driving License" />
+                <label for="other-doc-type">Specify Document Type <span>*</span></label>
+                <input type="text" id="other-doc-type" class="form-control" placeholder="Driving License" />
               </div>
               <div class="form-group">
-                <label>Select File(s) (PDF, JPG, PNG — max 5MB each)</label>
+                <label for="doc-file">File Upload</label>
                 <input type="file" id="doc-file" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp" multiple />
+                <p class="helper-text">PDF, JPG, PNG, or WebP. Max 5MB per file.</p>
               </div>
               <div class="form-group">
-                <label>Document Password</label>
+                <label for="doc-password">Document Password</label>
                 <div class="password-input-wrapper">
                   <input type="password" id="doc-password" class="form-control" placeholder="Enter document password" autocomplete="off" />
                   <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" aria-label="Show Password" title="Show Password">
-                    <span class="eye-icon" aria-hidden="true"></span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg>
                   </button>
                 </div>
               </div>
-              <button class="btn btn-secondary" onclick="uploadDocument()" id="upload-btn"><span class="emoji-sm">📤</span>Upload Document</button>
-              <div id="uploaded-docs" style="margin-top:16px;"></div>
             </div>
+            <button class="btn btn-secondary upload-document-button" onclick="uploadDocument()" id="upload-btn">
+              <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 20h16"/></svg></span>
+              Upload Document
+            </button>
+            <div id="uploaded-docs" class="uploaded-docs-list"></div>
           </div>
-        </div>
-
-        <div id="upload-placeholder" class="card" style="text-align:center;padding:60px 20px;">
-          <div class="empty-icon" style="font-size:48px;margin-bottom:16px;">📄</div>
-          <h3 style="font-size:15px;color:var(--text-secondary);">Add a customer first</h3>
-          <p style="font-size:13px;color:var(--text-muted);margin-top:8px;">Document upload will appear here after adding the customer.</p>
+        </section>
         </div>
       </div>
-
     </div>
   </main>
 </div>
@@ -150,15 +254,35 @@
 <script src="/js/api.js?v=20260516c"></script>
 <script>
   let newCustomerId = null;
+  const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
+  const ALLOWED_DOCUMENT_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png', 'webp'];
   const user = requireRole('employee');
+
   if (user) {
     renderSidebarUser();
     loadAreas();
   }
 
-  // Initialize currency input formatters
   const netSalaryInput = document.getElementById('cust-net-salary');
   const totalObligationInput = document.getElementById('cust-total-obligation');
+  const phoneInput = document.getElementById('cust-phone');
+
+  function iconMarkup(name) {
+    return typeof window.clnIcon === 'function' ? window.clnIcon(name) : '';
+  }
+
+  function refreshDynamicIcons() {
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (err) {}
+    }
+  }
+
+  function setButtonState(button, isBusy, label, iconName) {
+    if (!button) return;
+    button.disabled = isBusy;
+    button.innerHTML = `${iconMarkup(iconName)}<span>${isBusy ? `${label}...` : label}</span>`;
+    refreshDynamicIcons();
+  }
 
   function formatInputValue(input) {
     const rawVal = input.value.replace(/[^0-9]/g, '');
@@ -169,6 +293,40 @@
     input.value = Number(rawVal).toLocaleString('en-IN');
   }
 
+  function clearFieldErrors() {
+    document.querySelectorAll('.add-customer-page .form-control.is-invalid').forEach((el) => {
+      el.classList.remove('is-invalid');
+      el.removeAttribute('aria-invalid');
+    });
+  }
+
+  function showValidationError(message, fieldId) {
+    const field = fieldId ? document.getElementById(fieldId) : null;
+    if (field) {
+      field.classList.add('is-invalid');
+      field.setAttribute('aria-invalid', 'true');
+      field.focus();
+    }
+    showAlert('page-alert', message, 'error');
+  }
+
+  document.querySelectorAll('.add-customer-page .form-control').forEach((field) => {
+    field.addEventListener('input', () => {
+      field.classList.remove('is-invalid');
+      field.removeAttribute('aria-invalid');
+    });
+    field.addEventListener('change', () => {
+      field.classList.remove('is-invalid');
+      field.removeAttribute('aria-invalid');
+    });
+  });
+
+  if (phoneInput) {
+    phoneInput.addEventListener('input', () => {
+      phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+    });
+  }
+
   netSalaryInput.addEventListener('input', () => formatInputValue(netSalaryInput));
   totalObligationInput.addEventListener('input', () => formatInputValue(totalObligationInput));
 
@@ -176,12 +334,13 @@
     const res = await api.get('/employee/areas');
     if (!res?.ok) return;
     const dl = document.getElementById('area-list');
-    res.data.data.forEach(a => {
-      dl.innerHTML += `<option value="${a}">`;
+    dl.innerHTML = '';
+    (res.data.data || []).forEach((area) => {
+      const option = document.createElement('option');
+      option.value = area;
+      dl.appendChild(option);
     });
   }
-
-
 
   function extractValueByLabel(text, labels) {
     const lines = text.split(/\r?\n/);
@@ -190,7 +349,7 @@
       if (!line) continue;
       for (const label of labels) {
         const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(`^${escaped}\\s*(?:[:\\-–—])?\\s*(.+)$`, 'i');
+        const regex = new RegExp(`^${escaped}\\s*(?:[:\\-\\u2013\\u2014])?\\s*(.+)$`, 'i');
         const match = line.match(regex);
         if (match && match[1]) return match[1].trim();
       }
@@ -204,52 +363,56 @@
   }
 
   function insertPasteSample() {
-    const sample = `📋 DETAILS SHEET (Kindly Fill In)
+    const sample = `DETAILS SHEET (Kindly Fill In)
 
-👤 Personal Details
+Personal Details
 
-Full Name – 
-Required Loan Amount – 
-Loan Tenure – 
-Mobile Number – 
-Marital Status – 
-Mother’s Name – 
-Spouse’s Name (if applicable) – 
-Aadhaar Number – 
-PAN Number – 
-Current Residential Address – 
-Years at Current Address – 
-Personal Gmail ID – 
-House Type – Owned / Rented – 
-Highest Education Qualification – 
+Full Name -
+Required Loan Amount -
+Loan Tenure -
+Mobile Number -
+Marital Status -
+Mother's Name -
+Spouse's Name (if applicable) -
+Aadhaar Number -
+PAN Number -
+Current Residential Address -
+City -
+Years at Current Address -
+Personal Gmail ID -
+House Type - Owned / Rented -
+Highest Education Qualification -
 
+Employment Details
 
-🏢 Employment Details
-
-Company Name – 
-Company Address – 
-Official Email ID – 
-Current Work Experience – 
-Total Work Experience – 
-Net Monthly Income (₹) – `;
+Company Name -
+Company Address -
+Official Email ID -
+Current Work Experience -
+Total Work Experience -
+Net Monthly Income (Rs) -`;
     document.getElementById('cust-quick-paste').value = sample;
   }
 
-  function fillFromQuickPaste() {
-    const raw = document.getElementById('cust-quick-paste').value.trim();
-    if (!raw) return showAlert('page-alert', 'Paste customer details first.', 'warning');
-
-    const parsed = parseQuickPasteDetails(raw);
-
+  function applyParsedQuickPaste(parsed) {
     if (parsed.fullName) document.getElementById('cust-name').value = parsed.fullName;
     if (parsed.mobileNumber) document.getElementById('cust-phone').value = parsed.mobileNumber;
     if (parsed.personalGmailId) document.getElementById('cust-email').value = parsed.personalGmailId;
+    if (parsed.area) document.getElementById('cust-area').value = parsed.area;
     if (parsed.currentResidentialAddress) document.getElementById('cust-address').value = parsed.currentResidentialAddress;
     if (parsed.netMonthlyIncome) {
       const sanitized = parsed.netMonthlyIncome.replace(/[^0-9]/g, '');
       document.getElementById('cust-net-salary').value = sanitized ? Number(sanitized).toLocaleString('en-IN') : '';
     }
+  }
 
+  function fillFromQuickPaste() {
+    clearFieldErrors();
+    const raw = document.getElementById('cust-quick-paste').value.trim();
+    if (!raw) return showValidationError('Paste customer details first.', 'cust-quick-paste');
+
+    const parsed = parseQuickPasteDetails(raw);
+    applyParsedQuickPaste(parsed);
     sessionStorage.setItem('cln_quick_paste_details', JSON.stringify(parsed));
     showAlert('page-alert', 'Fields filled from pasted details. Please verify before submitting.', 'success');
   }
@@ -259,16 +422,7 @@ Net Monthly Income (₹) – `;
     if (!raw) return;
 
     const parsed = parseQuickPasteDetails(raw);
-
-    if (parsed.fullName) document.getElementById('cust-name').value = parsed.fullName;
-    if (parsed.mobileNumber) document.getElementById('cust-phone').value = parsed.mobileNumber;
-    if (parsed.personalGmailId) document.getElementById('cust-email').value = parsed.personalGmailId;
-    if (parsed.currentResidentialAddress) document.getElementById('cust-address').value = parsed.currentResidentialAddress;
-    if (parsed.netMonthlyIncome) {
-      const sanitized = parsed.netMonthlyIncome.replace(/[^0-9]/g, '');
-      document.getElementById('cust-net-salary').value = sanitized ? Number(sanitized).toLocaleString('en-IN') : '';
-    }
-
+    applyParsedQuickPaste(parsed);
     sessionStorage.setItem('cln_quick_paste_details', JSON.stringify(parsed));
   }
 
@@ -286,11 +440,12 @@ Net Monthly Income (₹) – `;
       loanTenure: extractValueByLabel(raw, ['Loan Tenure', 'Tenure']),
       mobileNumber: sanitizePhone(extractValueByLabel(raw, ['Mobile Number', 'Phone Number', 'Mob no', 'Mobile'])),
       maritalStatus: extractValueByLabel(raw, ['Marital Status']),
-      motherName: extractValueByLabel(raw, ['Mother’s Name', "Mother's Name", 'Mother name']),
-      spouseName: extractValueByLabel(raw, ['Spouse’s Name (if applicable)', "Spouse's Name", 'Spouse name']),
-      aadhaarNumber: extractValueByLabel(raw, ['Aadhaar Number', 'Aadhar Number', 'Aadhar card', 'Aadhar Card', 'Aadhar']),
+      motherName: extractValueByLabel(raw, ["Mother's Name", 'Mother name']),
+      spouseName: extractValueByLabel(raw, ["Spouse's Name (if applicable)", "Spouse's Name", 'Spouse name']),
+      aadhaarNumber: extractValueByLabel(raw, ['Aadhaar Number', 'Aadhar Number', 'Aadhar card', 'Aadhaar Card', 'Aadhar Card', 'Aadhar']),
       panNumber: extractValueByLabel(raw, ['PAN Number', 'PAN card', 'Pan card']),
-      currentResidentialAddress: extractValueByLabel(raw, ['Current Residential Address', 'Current address', 'Address']),
+      currentResidentialAddress: extractValueByLabel(raw, ['Current Residential Address', 'Current address', 'Full Address', 'Address']),
+      area: extractValueByLabel(raw, ['City', 'Area', 'Location', 'Locality']),
       yearsAtCurrentAddress: extractValueByLabel(raw, ['Years at Current Address', 'Address years']),
       personalGmailId: extractValueByLabel(raw, ['Personal Gmail ID', 'Personal gmail', 'Personal Email', 'Gmail ID', 'Gmail', 'Email']),
       houseType: extractValueByLabel(raw, ['House Type', 'House - Owned/Rented', 'House']),
@@ -300,13 +455,22 @@ Net Monthly Income (₹) – `;
       officialEmailId: extractValueByLabel(raw, ['Official Email ID', 'Office email id', 'Office email']),
       currentWorkExperience: extractValueByLabel(raw, ['Current Work Experience', 'Experience']),
       totalWorkExperience: extractValueByLabel(raw, ['Total Work Experience', 'Total experience']),
-      netMonthlyIncome: extractValueByLabel(raw, ['Net Monthly Income (₹)', 'Net monthly income'])
+      netMonthlyIncome: extractValueByLabel(raw, ['Net Monthly Income (Rs)', 'Net Monthly Income', 'Net monthly income', 'Net Salary'])
     };
   }
 
+  function setAddedCustomerSummary(name, phone, area, createdAt) {
+    document.getElementById('added-customer-name').textContent = name;
+    document.getElementById('added-customer-phone').textContent = phone;
+    document.getElementById('added-customer-area').textContent = area;
+    document.getElementById('added-customer-date').textContent = `${formatDate(createdAt)} ${formatTime(createdAt)}`;
+  }
+
   async function addCustomer() {
+    clearFieldErrors();
+
     const name = document.getElementById('cust-name').value.trim();
-    const phone = document.getElementById('cust-phone').value.trim();
+    const phone = sanitizePhone(document.getElementById('cust-phone').value);
     const email = document.getElementById('cust-email').value.trim();
     const area = document.getElementById('cust-area').value.trim();
     const address = document.getElementById('cust-address').value.trim();
@@ -314,20 +478,25 @@ Net Monthly Income (₹) – `;
     const netSalaryRaw = document.getElementById('cust-net-salary').value.replace(/[^0-9]/g, '');
     const totalObligationRaw = document.getElementById('cust-total-obligation').value.replace(/[^0-9]/g, '');
 
-    if (!name || !phone || !email || !area || !address || !netSalaryRaw) {
-      return showAlert('page-alert', 'All fields except Total Obligation are required.', 'error');
-    }
-    if (!/^\d{10}$/.test(phone)) return showAlert('page-alert', 'Enter a valid 10-digit phone number.', 'error');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showAlert('page-alert', 'Enter a valid email address (e.g., rahul.sharma@example.com).', 'error');
+    document.getElementById('cust-phone').value = phone;
+
+    if (!name) return showValidationError('Full Name is required.', 'cust-name');
+    if (!phone) return showValidationError('Phone Number is required.', 'cust-phone');
+    if (!/^\d{10}$/.test(phone)) return showValidationError('Enter a valid 10-digit phone number.', 'cust-phone');
+    if (!email) return showValidationError('Email is required.', 'cust-email');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showValidationError('Enter a valid email address.', 'cust-email');
+    if (!area) return showValidationError('City is required.', 'cust-area');
+    if (!netSalaryRaw) return showValidationError('Net Salary is required.', 'cust-net-salary');
+    if (!address) return showValidationError('Full Address is required.', 'cust-address');
 
     const netSalary = parseFloat(netSalaryRaw);
     const totalObligation = totalObligationRaw ? parseFloat(totalObligationRaw) : 0;
 
-    if (isNaN(netSalary) || netSalary < 0) {
-      return showAlert('page-alert', 'Net Salary must be a non-negative number.', 'error');
+    if (isNaN(netSalary) || netSalary <= 0) {
+      return showValidationError('Net Salary must be greater than 0.', 'cust-net-salary');
     }
     if (isNaN(totalObligation) || totalObligation < 0) {
-      return showAlert('page-alert', 'Total Obligation must be a non-negative number.', 'error');
+      return showValidationError('Total Obligation must be a non-negative number.', 'cust-total-obligation');
     }
 
     const finalAddress = quickPaste
@@ -335,7 +504,8 @@ Net Monthly Income (₹) – `;
       : address;
 
     const btn = document.getElementById('add-cust-btn');
-    btn.disabled = true; btn.textContent = 'Adding...';
+    setButtonState(btn, true, 'Adding', 'plus');
+
     const res = await api.post('/employee/customers', {
       name,
       phone,
@@ -345,11 +515,12 @@ Net Monthly Income (₹) – `;
       net_salary: netSalary,
       total_obligation: totalObligation
     });
-    btn.disabled = false; btn.textContent = 'Add Customer';
-    if (!res?.ok) return showAlert('page-alert', res?.data?.message || 'Error.', 'error');
-    newCustomerId = res.data.id;
-    
-    // Store quick paste data for loan form auto-fill
+
+    setButtonState(btn, false, 'Add Customer', 'plus');
+    if (!res?.ok) return showAlert('page-alert', res?.data?.message || 'Unable to add customer.', 'error');
+
+    newCustomerId = res.data.id || res.data.customer?.id;
+
     if (quickPaste) {
       const parsedQuickPaste = parseQuickPasteDetails(quickPaste);
       sessionStorage.setItem('cln_auto_loan_data', JSON.stringify({
@@ -360,16 +531,19 @@ Net Monthly Income (₹) – `;
         parsed_details: parsedQuickPaste
       }));
     }
-    
-    showAlert('page-alert', `Customer "${name}" added!`, 'success');
-    const createdAt = res.data.customer?.created_at;
-    const createdStamp = createdAt ? ` | ${formatDate(createdAt)} ${formatTime(createdAt)}` : '';
-    document.getElementById('new-customer-info').textContent = `${name} | ${phone} | ${area}${createdStamp}`;
+
+    const createdAt = res.data.customer?.created_at || new Date().toISOString();
+    setAddedCustomerSummary(name, phone, area, createdAt);
     document.getElementById('create-loan-link').href = `/employee/loans.html?customer_id=${newCustomerId}`;
+    document.getElementById('customer-added-section').style.display = 'block';
     document.getElementById('upload-section').style.display = 'block';
-    document.getElementById('upload-placeholder').style.display = 'none';
-    ['cust-name','cust-phone','cust-email','cust-area','cust-address','cust-quick-paste','cust-net-salary','cust-total-obligation'].forEach(id => document.getElementById(id).value = '');
-    loadMyCustomers();
+    showAlert('page-alert', `Customer "${name}" added successfully.`, 'success');
+
+    ['cust-name','cust-phone','cust-email','cust-area','cust-address','cust-quick-paste','cust-net-salary','cust-total-obligation'].forEach((id) => {
+      document.getElementById(id).value = '';
+    });
+
+    if (typeof loadMyCustomers === 'function') loadMyCustomers();
   }
 
   function handleDocTypeChange() {
@@ -383,38 +557,62 @@ Net Monthly Income (₹) – `;
     }
   }
 
+  function validateDocumentFiles(files) {
+    if (!files.length) {
+      showValidationError('Select at least one document file.', 'doc-file');
+      return false;
+    }
+
+    for (const file of files) {
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      if (!ALLOWED_DOCUMENT_EXTENSIONS.includes(ext)) {
+        showValidationError('Only PDF, JPG, PNG, and WebP files are allowed.', 'doc-file');
+        return false;
+      }
+      if (file.size > MAX_DOCUMENT_BYTES) {
+        showValidationError(`"${file.name}" exceeds the 5MB limit.`, 'doc-file');
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   async function uploadDocument() {
+    clearFieldErrors();
     if (!newCustomerId) return showAlert('page-alert', 'Add a customer first.', 'error');
+
     const files = Array.from(document.getElementById('doc-file').files || []);
     let docType = document.getElementById('doc-type').value;
-    
+
     if (docType === 'Other') {
       const otherVal = document.getElementById('other-doc-type').value.trim();
-      if (!otherVal) return showAlert('page-alert', 'Please specify the document type.', 'error');
+      if (!otherVal) return showValidationError('Please specify the document type.', 'other-doc-type');
       docType = otherVal;
     }
 
+    if (!validateDocumentFiles(files)) return;
+
     const documentPassword = document.getElementById('doc-password').value.trim();
-    if (!files.length) return showAlert('page-alert', 'Select at least one file.', 'error');
     const form = new FormData();
     files.forEach((file) => form.append('documents', file));
     form.append('doc_type', docType);
     if (documentPassword) form.append('document_password', documentPassword);
+
     const btn = document.getElementById('upload-btn');
-    btn.disabled = true; btn.textContent = 'Uploading...';
+    setButtonState(btn, true, 'Uploading', 'upload');
     const res = await api.upload(`/employee/documents/${newCustomerId}`, form);
-    btn.disabled = false; btn.textContent = '⬆️ Upload Document';
+    setButtonState(btn, false, 'Upload Document', 'upload');
+
     if (!res?.ok) return showAlert('page-alert', res?.data?.message || 'Upload failed.', 'error');
-    showAlert('page-alert', `${files.length} document${files.length > 1 ? 's' : ''} uploaded!`, 'success');
-    
-    // Clear and reset inputs
+    showAlert('page-alert', `${files.length} document${files.length > 1 ? 's' : ''} uploaded successfully.`, 'success');
+
     document.getElementById('doc-file').value = '';
     document.getElementById('doc-password').value = '';
     document.getElementById('other-doc-type').value = '';
     document.getElementById('other-doc-type-group').style.display = 'none';
-    document.getElementById('doc-type').value = 'Aadhar';
+    document.getElementById('doc-type').value = 'Aadhaar Card';
 
-    // Reset password visibility state
     const passwordInput = document.getElementById('doc-password');
     const toggleBtn = document.querySelector('.toggle-password');
     if (passwordInput && toggleBtn) {
@@ -429,13 +627,14 @@ Net Monthly Income (₹) – `;
     }
 
     const uploadedDocuments = Array.isArray(res.data.documents) ? res.data.documents : [];
-    const safePassword = documentPassword || res.data.document?.document_password || '';
+    const safePassword = documentPassword || res.data?.document?.document_password || '';
     const escapeHtml = (value) => String(value ?? '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+
     function resolveFileUrl(path) {
       if (!path) return '#';
       if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -446,18 +645,25 @@ Net Monthly Income (₹) – `;
     const docsToRender = uploadedDocuments.length ? uploadedDocuments : files.map((file) => ({ file_name: file.name, file_path: '' }));
     document.getElementById('uploaded-docs').innerHTML += docsToRender.map((doc, index) => {
       const uploadedAt = doc?.uploaded_at || doc?.updated_at || null;
-      const uploadedStamp = uploadedAt ? ` <span style="color:var(--text-muted);font-size:12px;">(${formatDate(uploadedAt)} ${formatTime(uploadedAt)})</span>` : '';
+      const uploadedStamp = uploadedAt ? `${formatDate(uploadedAt)} ${formatTime(uploadedAt)}` : 'Just now';
+      const fileName = doc?.file_name || files[index]?.name || 'Document';
       return `
-      <div class="doc-row" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-card);border-radius:8px;margin-bottom:6px;font-size:13px;">
-        <span>Uploaded</span><span>${escapeHtml(docType)} — ${escapeHtml(doc?.file_name || files[index].name)}</span>
-        <span style="color:var(--text-muted);">Password: ${escapeHtml(safePassword || 'Not set')}</span>
-        <span style="margin-left:8px;">${uploadedStamp}</span>
-        <div style="margin-left:auto;display:flex;gap:6px;">
-          ${doc?.file_path ? `<a href="${resolveFileUrl(doc.file_path)}" target="_blank" class="btn btn-secondary btn-sm">View</a>` : ''}
-          ${doc?.id ? `<button class="btn btn-danger btn-sm" onclick="deleteUploadedDoc(${doc.id}, this)">Delete</button>` : ''}
-        </div>
-      </div>`;
+        <div class="doc-row">
+          <div class="doc-row-main">
+            <span class="doc-row-icon">${iconMarkup('fileLines')}</span>
+            <div>
+              <strong>${escapeHtml(docType)}</strong>
+              <span>${escapeHtml(fileName)}</span>
+              <small>Password: ${escapeHtml(safePassword || 'Not set')} - ${escapeHtml(uploadedStamp)}</small>
+            </div>
+          </div>
+          <div class="doc-row-actions">
+            ${doc?.file_path ? `<a href="${resolveFileUrl(doc.file_path)}" target="_blank" class="btn btn-secondary btn-sm">${iconMarkup('download')}<span>View</span></a>` : ''}
+            ${doc?.id ? `<button class="btn btn-danger btn-sm" onclick="deleteUploadedDoc(${doc.id}, this)">${iconMarkup('xCircle')}<span>Delete</span></button>` : ''}
+          </div>
+        </div>`;
     }).join('');
+    refreshDynamicIcons();
   }
 
   async function deleteUploadedDoc(id, btn) {
@@ -467,17 +673,15 @@ Net Monthly Income (₹) – `;
     const res = await api.delete(`/employee/documents/${id}`);
     if (!res?.ok) {
       btn.disabled = false;
-      btn.textContent = 'Delete';
+      btn.innerHTML = `${iconMarkup('xCircle')}<span>Delete</span>`;
+      refreshDynamicIcons();
       return showAlert('page-alert', res?.data?.message || 'Failed to delete document.', 'error');
     }
     showAlert('page-alert', 'Document deleted successfully.', 'success');
     const docRow = btn.closest('.doc-row');
-    if (docRow) {
-      docRow.remove();
-    }
+    if (docRow) docRow.remove();
   }
 
-  // ── Show/Hide Document Password Toggle ──────────────────────
   const DOC_EYE_PATHS = {
     eye: '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>',
     eyeOff: '<path d="M3 3l18 18"/><path d="M10.5 10.5a2.5 2.5 0 1 0 3 3"/><path d="M6.2 6.2C3.9 7.9 2 12 2 12s3.5 6 10 6c1.3 0 2.5-.2 3.6-.6"/><path d="M14.6 4.6C13.8 4.2 12.9 4 12 4c-6.5 0-10 8-10 8a20.1 20.1 0 0 0 4.8 5.7"/>'
@@ -496,7 +700,6 @@ Net Monthly Income (₹) – `;
       svg.setAttribute('stroke-linecap', 'round');
       svg.setAttribute('stroke-linejoin', 'round');
       svg.setAttribute('aria-hidden', 'true');
-      // Remove span placeholder so SVG is the only child
       btn.innerHTML = '';
       btn.appendChild(svg);
     }

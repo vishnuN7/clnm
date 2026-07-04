@@ -6,5 +6,5 @@ window.__CLN_API_BASE__ = window.__CLN_API_BASE__ || (() => {
     return 'http://localhost:5000';
   }
 
-  return 'https://clnm.onrender.com';
+  return 'https://clnm-backend.onrender.com';
 })();

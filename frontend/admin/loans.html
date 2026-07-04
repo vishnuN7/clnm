@@ -9,6 +9,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <style>
     /* ── Update Status Side Drawer ───────────────────────── */
@@ -1141,7 +1154,7 @@
   <main class="main-content">
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2><span class="emoji">💼</span>Loan Applications</h2><p>Review, filter and export all loan activity</p></div>
+      <div class="topbar-title"><h2><span class="emoji">💼</span>Loan Applications</h2><p>Review, filter, and export all loan activity</p></div>
       <div class="topbar-actions">
         <button class="btn btn-success btn-sm" onclick="exportCSV()"><span class="emoji-sm">📥</span>Export CSV</button>
       </div>
@@ -1264,16 +1277,16 @@
               </label>
               <div class="loan-search-box">
                 <i data-lucide="search"></i>
-                <input type="text" id="search-input" class="form-control" placeholder="Search customer name/phone..." oninput="loadLoans()" />
+                <input type="text" id="search-input" class="form-control" placeholder="Search by customer name or phone number..." oninput="loadLoans()" />
               </div>
             </div>
 
             <div class="loan-filter-field">
               <label class="filter-label" for="area-filter">
                 <i data-lucide="map-pin"></i>
-                Area
+                City
               </label>
-              <select id="area-filter" onchange="loadLoans()"><option value="">All Areas</option></select>
+              <select id="area-filter" onchange="loadLoans()"><option value="">All Cities</option></select>
             </div>
 
             <div class="loan-filter-field">
@@ -1290,7 +1303,7 @@
                 Status
               </label>
               <select id="status-filter" onchange="loadLoans()">
-                <option value="">All</option>
+                <option value="">All Statuses</option>
                 <option value="Pending">Pending</option>
                 <option value="Under Review">Under Review</option>
                 <option value="Documents Pending">Documents Pending</option>
@@ -1361,14 +1374,14 @@
                 <th>#</th>
                 <th>Customer</th>
                 <th>Phone</th>
-                <th>Area</th>
+                <th>City</th>
                 <th>Amount</th>
                 <th>Banks</th>
                 <th>Status</th>
                 <th>Applied By</th>
                 <th>Login Date</th>
                 <th>Upload Date</th>
-                <th>Disbursement Date</th>
+                <th>Disbursed Date</th>
                 <th>Disbursement Amount</th>
                 <th>Actions</th>
               </tr>

@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CLN Lending Suite — My Profile</title>
   <meta name="description" content="Employee Profile — manage personal info, upload KYC documents, bank details, and emergency contacts." />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -132,7 +145,7 @@
         <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users"></i></span> My Customers</a>
         <a href="/employee/loans.html"       class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase"></i></span> My Loans</a>
         <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> My Assigned Data</a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> My Assigned Records</a>
         <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line"></i></span> APR</a>
 
       </div>
@@ -152,7 +165,7 @@
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()"><i class="fas fa-bars"></i> Menu</button>
       <div class="topbar-title">
         <h2><i class="fas fa-id-card-clip" style="margin-right:8px; color:#10b981;"></i>My Profile</h2>
-        <p>Manage your information, upload documents, and keep your profile complete.</p>
+        <p>Manage your personal information, upload documents, and keep your profile up to date.</p>
       </div>
       <div class="topbar-actions"></div>
     </div>
@@ -203,20 +216,20 @@
           <!-- ── Right: Tabbed Sections ── -->
           <div>
             <div class="profile-tabs">
-              <button class="ptab active" onclick="switchTab('personal')"><i class="fas fa-user"></i> Personal Info</button>
+              <button class="ptab active" onclick="switchTab('personal')"><i class="fas fa-user"></i> Personal Information</button>
               <button class="ptab" onclick="switchTab('kyc')"><i class="fas fa-id-card"></i> KYC Documents</button>
               <button class="ptab" onclick="switchTab('bank')"><i class="fas fa-building-columns"></i> Bank Details</button>
-              <button class="ptab" onclick="switchTab('emergency')"><i class="fas fa-triangle-exclamation"></i> Emergency</button>
+              <button class="ptab" onclick="switchTab('emergency')"><i class="fas fa-triangle-exclamation"></i> Emergency Contact</button>
               <button class="ptab" onclick="switchTab('security')"><i class="fas fa-shield-halved"></i> Security</button>
             </div>
 
             <!-- Personal Info -->
             <div class="ptab-panel active" id="panel-personal">
               <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-user"></i></div><div><h3>Personal Information</h3><p>Update your profile and identification details</p></div></div>
+                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-user"></i></div><div><h3>Personal Information</h3><p>Update your personal and identification details.</p></div></div>
                 <div class="sec-body">
                   <div class="form-grid">
-                    <div class="form-group"><label>Full Name</label><input type="text" id="pi-name" class="readonly-field" readonly aria-readonly="true" /></div>
+                    <div class="form-group"><label>Enter the full name</label><input type="text" id="pi-name" class="readonly-field" readonly aria-readonly="true" /></div>
                     <div class="form-group"><label>Phone Number</label><input type="tel" id="pi-phone" class="readonly-field" readonly aria-readonly="true" /></div>
                     <div class="form-group"><label>Email Address</label><input type="email" id="pi-email" class="readonly-field" readonly aria-readonly="true" /></div>
                     <div class="form-group"><label>Date of Birth</label><input type="date" id="pi-dob" /></div>
@@ -231,11 +244,11 @@
                       </select>
                     </div>
                     <div class="form-group"><label>City</label><input type="text" id="pi-city" placeholder="City" /></div>
-                    <div class="form-group full"><label>Current Address</label><input type="text" id="pi-address" placeholder="Current residential address" /></div>
-                    <div class="form-group full"><label>Permanent Address</label><input type="text" id="pi-perm-address" placeholder="Permanent address as per Govt ID" /></div>
+                    <div class="form-group full"><label>Current Address</label><input type="text" id="pi-address" placeholder="Enter your current residential address" /></div>
+                    <div class="form-group full"><label>Permanent Address</label><input type="text" id="pi-perm-address" placeholder="Permanent address as per your government-issued ID" /></div>
                     <div class="form-group"><label>State</label><input type="text" id="pi-state" placeholder="State" /></div>
                     <div class="form-group"><label>Country</label><input type="text" id="pi-country" placeholder="Country" /></div>
-                    <div class="form-group"><label>Postal Code</label><input type="text" id="pi-postal" placeholder="Postal / Pin Code" /></div>
+                    <div class="form-group"><label>Postal Code</label><input type="text" id="pi-postal" placeholder="PIN Code" /></div>
                   </div>
                   <div class="form-actions">
                     <button class="btn btn-secondary" onclick="loadProfile()"><i class="fas fa-xmark" style="margin-right:4px;"></i> Cancel</button>
@@ -249,7 +262,7 @@
             <div class="ptab-panel" id="panel-kyc">
               <!-- KYC Status Banner -->
               <div class="sec-card" id="kyc-status-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-clipboard-check"></i></div><div><h3>Verification Status</h3><p>Your current KYC documentation review state</p></div></div>
+                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-clipboard-check"></i></div><div><h3>Verification Status</h3><p>Your current KYC document verification status.</p></div></div>
                 <div class="sec-body">
                   <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                     <span id="kyc-status-badge">—</span>
@@ -260,10 +273,10 @@
               </div>
               <!-- Aadhaar -->
               <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-id-card"></i></div><div><h3>Aadhaar Card</h3><p>Upload front and back of your Aadhaar card</p></div></div>
+                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-id-card"></i></div><div><h3>Aadhaar Card</h3><p>Upload the front and back of your Aadhaar card.</p></div></div>
                 <div class="sec-body">
                   <div class="form-grid">
-                    <div class="form-group full"><label>Aadhaar Number</label><input type="text" id="aadhaar-number" placeholder="XXXX XXXX XXXX" maxlength="20" /></div>
+                    <div class="form-group full"><label>Aadhaar Number</label><input type="text" id="aadhaar-number" placeholder="XXXX XXXX 1234" maxlength="20" /></div>
                   </div>
                   <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
                     <div>
@@ -271,8 +284,8 @@
                       <div id="aadhaar-front-preview"></div>
                       <div class="doc-upload-area" onclick="document.getElementById('aadhaar-front-input').click()">
                         <div class="icon"><i class="fas fa-cloud-arrow-up"></i></div>
-                        <p style="font-weight:600; color:var(--text-primary);">Click to upload Aadhaar Front</p>
-                        <p style="margin-top:3px;">JPG, PNG, WEBP, PDF — max 5MB</p>
+                        <p style="font-weight:600; color:var(--text-primary);">Click to upload the front of your Aadhaar card.</p>
+                        <p style="margin-top:3px;">JPG, PNG, WEBP, or PDF • Maximum file size: 5 MB</p>
                       </div>
                       <input type="file" id="aadhaar-front-input" accept="image/*,.pdf" style="display:none" onchange="uploadKYC(event,'aadhaar_front')" />
                     </div>
@@ -281,8 +294,8 @@
                       <div id="aadhaar-back-preview"></div>
                       <div class="doc-upload-area" onclick="document.getElementById('aadhaar-back-input').click()">
                         <div class="icon"><i class="fas fa-cloud-arrow-up"></i></div>
-                        <p style="font-weight:600; color:var(--text-primary);">Click to upload Aadhaar Back</p>
-                        <p style="margin-top:3px;">JPG, PNG, WEBP, PDF — max 5MB</p>
+                        <p style="font-weight:600; color:var(--text-primary);">Click to upload the back of your Aadhaar card.</p>
+                        <p style="margin-top:3px;">JPG, PNG, WEBP, or PDF • Maximum file size: 5 MB</p>
                       </div>
                       <input type="file" id="aadhaar-back-input" accept="image/*,.pdf" style="display:none" onchange="uploadKYC(event,'aadhaar_back')" />
                     </div>
@@ -291,7 +304,7 @@
               </div>
               <!-- PAN -->
               <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-file-invoice"></i></div><div><h3>PAN Card</h3><p>Upload your official Permanent Account Number (PAN) document</p></div></div>
+                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-file-invoice"></i></div><div><h3>PAN Card</h3><p>Upload your Permanent Account Number (PAN) card.</p></div></div>
                 <div class="sec-body">
                   <div class="form-grid">
                     <div class="form-group"><label>PAN Number</label><input type="text" id="pan-number" placeholder="ABCDE1234F" maxlength="10" style="text-transform:uppercase;" /></div>
@@ -300,8 +313,8 @@
                     <div id="pan-preview"></div>
                     <div class="doc-upload-area" onclick="document.getElementById('pan-input').click()">
                       <div class="icon"><i class="fas fa-cloud-arrow-up"></i></div>
-                      <p style="font-weight:600; color:var(--text-primary);">Click to upload PAN Card</p>
-                      <p style="margin-top:3px;">JPG, PNG, WEBP, PDF — max 5MB</p>
+                      <p style="font-weight:600; color:var(--text-primary);">Click to upload your PAN card.</p>
+                      <p style="margin-top:3px;">JPG, PNG, WEBP, or PDF • Maximum file size: 5 MB</p>
                     </div>
                     <input type="file" id="pan-input" accept="image/*,.pdf" style="display:none" onchange="uploadKYC(event,'pan_card')" />
                   </div>
@@ -312,14 +325,14 @@
             <!-- Bank Details -->
             <div class="ptab-panel" id="panel-bank">
               <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-building-columns"></i></div><div><h3>Bank Details</h3><p>Your salary and disbursement bank account information</p></div></div>
+                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-building-columns"></i></div><div><h3>Bank Details</h3><p>Manage your salary and loan disbursement bank account details.</p></div></div>
                 <div class="sec-body">
                   <div class="form-grid">
-                    <div class="form-group full"><label>Account Holder Name</label><input type="text" id="b-holder" placeholder="As printed on bank passbook or statement" /></div>
-                    <div class="form-group"><label>Bank Name</label><input type="text" id="b-bank" placeholder="e.g. State Bank of India" /></div>
+                    <div class="form-group full"><label>Account Holder Name</label><input type="text" id="b-holder" placeholder="Enter the name exactly as printed on your bank passbook or account statement." /></div>
+                    <div class="form-group"><label>Bank Name</label><input type="text" id="b-bank" placeholder="e.g., State Bank of India" /></div>
                     <div class="form-group"><label>IFSC Code</label><input type="text" id="b-ifsc" placeholder="SBIN0001234" style="text-transform:uppercase;" /></div>
-                    <div class="form-group"><label>Account Number</label><input type="text" id="b-account" placeholder="Account number" /></div>
-                    <div class="form-group"><label>Branch Name</label><input type="text" id="b-branch" placeholder="Branch location" /></div>
+                    <div class="form-group"><label>Enter your account number</label><input type="text" id="b-account" placeholder="Enter your account number" /></div>
+                    <div class="form-group"><label>Branch Name</label><input type="text" id="b-branch" placeholder="Enter the branch name" /></div>
                   </div>
                   <div class="form-actions">
                     <button class="btn btn-secondary" onclick="loadProfile()"><i class="fas fa-xmark" style="margin-right:4px;"></i> Cancel</button>
@@ -332,13 +345,13 @@
             <!-- Emergency Contact -->
             <div class="ptab-panel" id="panel-emergency">
               <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-triangle-exclamation"></i></div><div><h3>Emergency Contact</h3><p>Primary contact person in case of urgent emergency</p></div></div>
+                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-triangle-exclamation"></i></div><div><h3>Emergency Contact</h3><p>Primary contact person in case of an emergency</p></div></div>
                 <div class="sec-body">
                   <div class="form-grid">
-                    <div class="form-group"><label>Contact Name</label><input type="text" id="e-name" placeholder="Full name" /></div>
+                    <div class="form-group"><label>Contact Name</label><input type="text" id="e-name" placeholder="Enter the full name" /></div>
                     <div class="form-group"><label>Relationship</label>
                       <select id="e-relation">
-                        <option value="">Select Relationship</option>
+                        <option value="">Select a relationship</option>
                         <option value="Spouse">Spouse</option>
                         <option value="Parent">Parent</option>
                         <option value="Sibling">Sibling</option>
@@ -347,12 +360,12 @@
                         <option value="Other">Other</option>
                       </select>
                     </div>
-                    <div class="form-group"><label>Primary Mobile</label><input type="tel" id="e-mobile" placeholder="+91 XXXXX XXXXX" /></div>
-                    <div class="form-group"><label>Alternate Number</label><input type="tel" id="e-alt" placeholder="+91 XXXXX XXXXX" /></div>
+                    <div class="form-group"><label>Primary Mobile Number</label><input type="tel" id="e-mobile" placeholder="+91 XXXXX XXXXX" /></div>
+                    <div class="form-group"><label>Alternate Mobile Number</label><input type="tel" id="e-alt" placeholder="+91 XXXXX XXXXX" /></div>
                   </div>
                   <div class="form-actions">
                     <button class="btn btn-secondary" onclick="loadProfile()"><i class="fas fa-xmark" style="margin-right:4px;"></i> Cancel</button>
-                    <button class="btn btn-primary" onclick="saveEmergencyContact()"><i class="fas fa-check" style="margin-right:4px;"></i> Save Contact</button>
+                    <button class="btn btn-primary" onclick="saveEmergencyContact()"><i class="fas fa-check" style="margin-right:4px;"></i> Save Emergency Contact</button>
                   </div>
                 </div>
               </div>
@@ -361,7 +374,7 @@
             <!-- Security -->
             <div class="ptab-panel" id="panel-security">
               <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-key"></i></div><div><h3>Change Password</h3><p>Update your login password securely</p></div></div>
+                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-key"></i></div><div><h3>Change Password</h3><p>Update your account password securely</p></div></div>
                 <div class="sec-body">
                   <div class="form-grid">
                     <div class="form-group full"><label>Current Password</label>
@@ -431,7 +444,7 @@
     // KYC Status
     const kvsMap = { Pending: 'kyc-pending', Approved: 'kyc-approved', Rejected: 'kyc-rejected' };
     const kvsIcon = { Pending: 'fas fa-clock-rotate-left', Approved: 'fas fa-circle-check', Rejected: 'fas fa-circle-xmark' };
-    const kvsText  = { Pending: 'Documents submitted, awaiting admin review.', Approved: 'Your KYC documents have been verified.', Rejected: 'Documents rejected. Please re-upload.' };
+    const kvsText  = { Pending: 'Your documents have been submitted and are awaiting administrator review.', Approved: 'Your KYC documents have been verified.', Rejected: 'Documents rejected. Please re-upload.' };
     const kvs = u.verification_status || 'Pending';
     const statusBadge = document.getElementById('kyc-status-badge');
     statusBadge.innerHTML = `<span class="kyc-status ${kvsMap[kvs]}"><i class="${kvsIcon[kvs]}"></i> ${kvs}</span>`;
@@ -486,7 +499,7 @@
     if (!filePath) { container.innerHTML = ''; return; }
     const ext = filePath.split('.').pop().toLowerCase();
     if (ext === 'pdf') {
-      container.innerHTML = `<div class="doc-preview-pdf"><i class="fas fa-file-pdf" style="color:#ef4444; font-size:16px;"></i> <a href="${filePath}" target="_blank" style="color:var(--accent-secondary); text-decoration:none;">View Uploaded PDF</a></div>`;
+      container.innerHTML = `<div class="doc-preview-pdf"><i class="fas fa-file-pdf" style="color:#ef4444; font-size:16px;"></i> <a href="${filePath}" target="_blank" style="color:var(--accent-secondary); text-decoration:none;">View Uploaded Document</a></div>`;
     } else {
       container.innerHTML = `<img src="${filePath}" class="doc-preview" alt="Document Preview" />`;
     }

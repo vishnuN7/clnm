@@ -9,6 +9,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -404,7 +417,7 @@
         <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon emoji-sm">👥</span> My Customers</a>
         <a href="/employee/loans.html" class="nav-item"><span class="nav-icon emoji-sm">💼</span> My Loans</a>
         <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon emoji-sm">🧮</span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> My Assigned Data</a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> My Assigned Records</a>
         <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> APR</a>
       </div>
     </nav>
@@ -449,14 +462,14 @@
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="emoji-sm">📍</span>
           <select id="area-filter" onchange="updateDashboardView()">
-            <option value="">All Areas</option>
+            <option value="">All Cities</option>
           </select>
         </div>
 
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="emoji-sm">💼</span>
           <select id="status-filter" onchange="updateDashboardView()">
-            <option value="">All Statuses</option>
+            <option value="">All Statuses </option>
             <option value="Pending">Pending</option>
             <option value="Under Review">Under Review</option>
             <option value="Documents Pending">Documents Pending</option>
@@ -511,7 +524,7 @@
           <div class="status-dist-header">
             <h3>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M4 20H20"/><path d="M8 20V7"/><path d="M12 20V4"/><path d="M16 20v-9"/></svg>
-              Loan Applications Status Distribution
+              Loan Aoolication Status Distribution
             </h3>
             <span class="status-dist-total-badge" id="chart-total-badge">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
@@ -549,14 +562,14 @@
           <div class="card" style="padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background=''">
             <div class="stat-icon" style="font-size:36px;margin-bottom:12px;">➕</div>
             <h3 style="font-size:15px;"><span class="emoji-sm">➕</span>Add New Customer</h3>
-            <p style="color:var(--text-secondary);font-size:13px;margin-top:4px;">Register a customer and attach documents</p>
+            <p style="color:var(--text-secondary);font-size:13px;margin-top:4px;">Register a new customer and upload the required documents</p>
           </div>
         </a>
         <a href="/employee/loans.html" style="text-decoration:none;">
           <div class="card" style="padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background=''">
             <div class="stat-icon" style="font-size:36px;margin-bottom:12px;">💼</div>
             <h3 style="font-size:15px;"><span class="emoji-sm">💼</span>Manage Loans</h3>
-            <p style="color:var(--text-secondary);font-size:13px;margin-top:4px;">Create and manage loan applications</p>
+            <p style="color:var(--text-secondary);font-size:13px;margin-top:4px;">Create, track, and manage loan applications</p>
           </div>
         </a>
       </div>
@@ -646,7 +659,7 @@
   function populateAreaFilter() {
     const areaSelect = document.getElementById('area-filter');
     const currentVal = areaSelect.value;
-    areaSelect.innerHTML = '<option value="">All Areas</option>';
+    areaSelect.innerHTML = '<option value="">All Cities</option>';
     
     const areas = [...new Set(allCustomers.map(c => c.area).filter(Boolean))].sort();
     areas.forEach(area => {
@@ -735,9 +748,9 @@
     const chartCenterCount = document.getElementById('chart-center-count');
     const chartCenterLabel = document.getElementById('chart-center-label');
     badgeCount.textContent = total;
-    badgeLabel.textContent = total === 1 ? 'application' : 'applications';
+    badgeLabel.textContent = total === 1 ? 'Aoolication' : 'Aoolications';
     chartCenterCount.textContent = total;
-    chartCenterLabel.textContent = total === 1 ? 'application' : 'applications';
+    chartCenterLabel.textContent = total === 1 ? 'Aoolication' : 'Aoolications';
 
     // ── Populate status list ──
     const container = document.getElementById('status-list-container');
@@ -952,7 +965,7 @@
     document.getElementById('my-customers-modal-content').innerHTML = `
       <div class="table-wrapper">
         <table>
-          <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Area</th><th>Date</th></tr></thead>
+          <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>City</th><th>Date</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
@@ -991,7 +1004,7 @@
           <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Name</label><p style="font-size:14px;margin-top:4px;">${c.name || '—'}</p></div>
           <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Phone</label><p style="font-size:14px;margin-top:4px;">${c.phone || '—'}</p></div>
           <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Email</label><p style="font-size:14px;margin-top:4px;">${c.email || '—'}</p></div>
-          <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Area</label><p style="font-size:14px;margin-top:4px;">${c.area || '—'}</p></div>
+          <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">City</label><p style="font-size:14px;margin-top:4px;">${c.area || '—'}</p></div>
           <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Net Salary</label><p style="font-size:14px;margin-top:4px;">${c.net_salary != null ? '₹' + Number(c.net_salary).toLocaleString('en-IN') : '—'}</p></div>
           <div><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Total Obligation</label><p style="font-size:14px;margin-top:4px;">${c.total_obligation != null ? '₹' + Number(c.total_obligation).toLocaleString('en-IN') : '—'}</p></div>
           <div style="grid-column:span 2;"><label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Address</label><p style="font-size:14px;margin-top:4px;white-space:pre-line;">${c.address || '—'}</p></div>

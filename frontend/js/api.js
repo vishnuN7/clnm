@@ -33,30 +33,96 @@ const UPLOADS_BASE = API_BASE.replace(/\/api$/i, '');
 const THEME_STORAGE_KEY = 'cln_theme';
 
 function getStoredTheme() {
-  return localStorage.getItem(THEME_STORAGE_KEY);
+  try {
+    return localStorage.getItem(THEME_STORAGE_KEY);
+  } catch (err) {
+    return null;
+  }
 }
 
 function getResolvedTheme() {
   const stored = getStoredTheme();
   if (stored === 'light' || stored === 'dark') return stored;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function setStoredTheme(theme) {
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch (err) {}
+}
+
+function updateThemeColorMeta(theme) {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (!meta) return;
+  meta.setAttribute('content', theme === 'dark' ? '#07111e' : '#0f2747');
+}
+
+function runThemeChangeAnimation() {
+  const root = document.documentElement;
+  root.classList.remove('theme-transitioning');
+  void root.offsetWidth;
+  root.classList.add('theme-transitioning');
+  window.clearTimeout(runThemeChangeAnimation.timer);
+  runThemeChangeAnimation.timer = window.setTimeout(() => {
+    root.classList.remove('theme-transitioning');
+  }, 720);
 }
 
 function updateThemeToggleButtons() {
   const current = document.documentElement.getAttribute('data-theme') || 'dark';
   const next = current === 'dark' ? 'light' : 'dark';
-  const label = next === 'light' ? 'Light' : 'Dark';
+  const nextLabel = next === 'light' ? 'sunrise mode' : 'night mode';
   document.querySelectorAll('.theme-toggle').forEach((btn) => {
-    btn.textContent = label;
-    btn.setAttribute('aria-label', `Switch to ${next} theme`);
-    btn.title = `Switch to ${next} theme`;
+    if (!btn.classList.contains('orbit-theme-toggle')) return;
+    btn.dataset.themeState = current;
+    btn.setAttribute('aria-pressed', current === 'dark' ? 'true' : 'false');
+    btn.setAttribute('aria-label', `Switch to ${nextLabel}`);
+    btn.title = `Switch to ${nextLabel}`;
   });
 }
 
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
+function applyTheme(theme, options = {}) {
+  const resolvedTheme = theme === 'light' || theme === 'dark' ? theme : getResolvedTheme();
+  const previousTheme = document.documentElement.getAttribute('data-theme');
+  const shouldAnimate = Boolean(options.animate && previousTheme && previousTheme !== resolvedTheme);
+
+  document.documentElement.setAttribute('data-theme', resolvedTheme);
+  setStoredTheme(resolvedTheme);
+  updateThemeColorMeta(resolvedTheme);
+  if (shouldAnimate) runThemeChangeAnimation();
   updateThemeToggleButtons();
+  window.dispatchEvent(new CustomEvent('cln:themechange', { detail: { theme: resolvedTheme } }));
+}
+
+function createOrbitThemeToggleMarkup() {
+  return `
+    <span class="orbit-atmosphere" aria-hidden="true">
+      <span class="orbit-cloud orbit-cloud-a"></span>
+      <span class="orbit-cloud orbit-cloud-b"></span>
+      <span class="orbit-star orbit-star-a"></span>
+      <span class="orbit-star orbit-star-b"></span>
+      <span class="orbit-star orbit-star-c"></span>
+      <span class="orbit-star orbit-star-d"></span>
+      <svg class="orbit-galaxy" viewBox="0 0 92 42" aria-hidden="true" focusable="false">
+        <path d="M20 28c14-14 38-16 54-4" />
+        <path d="M30 31c10-8 24-9 34-3" />
+      </svg>
+    </span>
+    <svg class="orbit-path" viewBox="0 0 92 42" aria-hidden="true" focusable="false">
+      <path d="M21 21C32 8 58 8 71 21" />
+    </svg>
+    <span class="orbit-orb" aria-hidden="true">
+      <span class="orbit-orb-core">
+        <svg class="orbit-orb-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="4.2"></circle>
+          <path d="M12 2.8v2.5M12 18.7v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.8 12h2.5M18.7 12h2.5M4.2 19.8 6 18M18 6l1.8-1.8"></path>
+        </svg>
+        <svg class="orbit-orb-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M16.8 15.9A7.4 7.4 0 0 1 8.1 7.2 7.6 7.6 0 1 0 16.8 15.9Z"></path>
+        </svg>
+      </span>
+    </span>`;
 }
 
 function svgIcon(inner) {
@@ -716,16 +782,19 @@ function startIconObserver() {
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
-function toggleTheme() {
+function toggleTheme(event) {
+  if (event) event.preventDefault();
   const current = document.documentElement.getAttribute('data-theme') || 'dark';
-  applyTheme(current === 'dark' ? 'light' : 'dark');
+  applyTheme(current === 'dark' ? 'light' : 'dark', { animate: true });
 }
 
 function createThemeToggleButton() {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'btn btn-secondary btn-sm theme-toggle';
+  btn.className = 'theme-toggle orbit-theme-toggle';
+  btn.innerHTML = createOrbitThemeToggleMarkup();
   btn.addEventListener('click', toggleTheme);
+  updateThemeToggleButtons();
   return btn;
 }
 
@@ -738,9 +807,16 @@ function mountThemeToggle() {
       actions.className = 'topbar-actions';
       topbar.appendChild(actions);
     }
-    const themeToggle = actions.querySelector('.theme-toggle');
+    actions.querySelectorAll('.theme-toggle:not(.orbit-theme-toggle)').forEach((oldToggle) => {
+      oldToggle.replaceWith(createThemeToggleButton());
+    });
 
-    if (!themeToggle) {
+    const themeToggles = actions.querySelectorAll('.theme-toggle');
+    themeToggles.forEach((toggle, index) => {
+      if (index > 0) toggle.remove();
+    });
+
+    if (!actions.querySelector('.theme-toggle')) {
       const createdThemeToggle = createThemeToggleButton();
       actions.prepend(createdThemeToggle);
     }

@@ -9,6 +9,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <style>
     /* ── Update Status Side Drawer ───────────────────────── */
@@ -574,71 +587,137 @@
     }
 
     /* Create Loan Modal */
+    #create-modal {
+      z-index: 320;
+      padding: 28px;
+      background: rgba(6, 14, 26, 0.48);
+      backdrop-filter: blur(9px);
+    }
+
+    :root[data-theme='dark'] #create-modal {
+      background: rgba(2, 6, 12, 0.72);
+    }
+
     .create-loan-modal {
-      width: min(560px, calc(100vw - 24px));
+      display: flex;
+      flex-direction: column;
+      width: min(840px, calc(100vw - 40px));
+      max-width: 840px;
+      max-height: calc(100vh - 56px);
       padding: 0;
       overflow: visible;
-      border: 1px solid var(--border);
-      background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
-      box-shadow: 0 24px 70px rgba(16, 32, 51, 0.24);
+      border: 1px solid rgba(199, 211, 225, 0.84);
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 251, 255, 0.98) 100%);
+      box-shadow:
+        0 34px 90px rgba(16, 32, 51, 0.32),
+        0 1px 0 rgba(255, 255, 255, 0.78) inset;
+    }
+
+    #create-modal.show .create-loan-modal {
+      animation: createLoanModalIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes createLoanModalIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     :root[data-theme='dark'] .create-loan-modal {
-      background: linear-gradient(135deg, #0a1320 0%, #0f1c2e 100%);
-      border-color: rgba(151, 176, 210, 0.14);
-      box-shadow: 0 24px 76px rgba(0, 0, 0, 0.5);
+      background:
+        linear-gradient(180deg, rgba(11, 20, 34, 0.98) 0%, rgba(8, 16, 28, 0.98) 100%);
+      border-color: rgba(151, 176, 210, 0.18);
+      box-shadow:
+        0 34px 92px rgba(0, 0, 0, 0.62),
+        0 1px 0 rgba(255, 255, 255, 0.05) inset;
     }
 
     .create-loan-header {
-      align-items: flex-start;
-      gap: 14px;
-      padding: 22px 24px;
-      border-bottom: none;
-      background: linear-gradient(135deg, rgba(15, 39, 71, 0.96) 0%, rgba(47, 111, 237, 0.88) 60%, rgba(15, 139, 113, 0.82) 100%);
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 18px;
+      padding: 32px 34px 26px;
+      margin: 0;
+      border-bottom: 1px solid rgba(217, 227, 239, 0.82);
+      background:
+        linear-gradient(135deg, rgba(15, 39, 71, 0.98) 0%, rgba(33, 83, 147, 0.95) 58%, rgba(15, 139, 113, 0.9) 100%);
+      border-radius: 22px 22px 0 0;
     }
 
     :root[data-theme='dark'] .create-loan-header {
-      background: linear-gradient(135deg, rgba(8, 16, 28, 0.98) 0%, rgba(24, 51, 89, 0.94) 58%, rgba(18, 92, 89, 0.78) 100%);
+      border-bottom-color: rgba(151, 176, 210, 0.14);
+      background:
+        linear-gradient(135deg, rgba(8, 16, 28, 0.99) 0%, rgba(24, 51, 89, 0.96) 58%, rgba(18, 92, 89, 0.82) 100%);
+    }
+
+    .create-loan-hero-icon {
+      display: grid;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+    }
+
+    .create-loan-hero-icon svg {
+      width: 30px;
+      height: 30px;
+    }
+
+    .create-loan-title-block {
+      min-width: 0;
     }
 
     .create-loan-header h3 {
       margin: 0;
       color: #ffffff;
-      font-size: 22px;
-      line-height: 1.2;
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.18;
     }
 
-    .create-loan-kicker {
-      display: block;
-      margin-bottom: 5px;
-      color: rgba(255, 255, 255, 0.76);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0;
-      text-transform: uppercase;
+    .create-loan-subtitle {
+      margin: 6px 0 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 14px;
+      line-height: 1.45;
     }
 
     .create-loan-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       flex: 0 0 auto;
-      width: 38px;
-      height: 38px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.13);
       color: #ffffff;
-      font-size: 22px;
+      font-size: 26px;
       line-height: 1;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
     }
 
-    .create-loan-close:hover {
+    .create-loan-close:hover,
+    .create-loan-close:focus-visible {
       background: rgba(255, 255, 255, 0.24);
+      border-color: rgba(255, 255, 255, 0.38);
+      color: #ffffff;
+      outline: none;
+      transform: rotate(90deg) scale(1.04);
     }
 
     .create-loan-body {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      padding: 18px 24px 20px;
+      gap: 22px;
+      padding: 30px 34px 8px;
       overflow: visible;
     }
 
@@ -651,139 +730,295 @@
       display: none;
     }
 
-    .create-customer-card,
-    .create-field-card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg-card);
-      box-shadow: var(--shadow-soft);
-    }
-
-    :root[data-theme='dark'] .create-customer-card,
-    :root[data-theme='dark'] .create-field-card {
-      background: rgba(9, 17, 29, 0.58);
-      border-color: rgba(151, 176, 210, 0.14);
-    }
-
     .create-customer-card {
-      display: flex;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
-      gap: 13px;
-      padding: 14px;
+      gap: 16px;
+      padding: 18px;
+      border: 1px solid rgba(199, 211, 225, 0.92);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(231, 238, 248, 0.88) 0%, rgba(255, 255, 255, 0.84) 100%);
+      box-shadow: 0 10px 26px rgba(16, 32, 51, 0.08);
+    }
+
+    :root[data-theme='dark'] .create-customer-card {
+      background:
+        linear-gradient(135deg, rgba(139, 180, 255, 0.12) 0%, rgba(9, 17, 29, 0.7) 100%);
+      border-color: rgba(151, 176, 210, 0.18);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.26);
     }
 
     .create-card-icon {
       display: grid;
       place-items: center;
       flex: 0 0 auto;
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      background: var(--accent-soft);
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #ffffff;
       color: var(--accent);
+      border: 1px solid rgba(199, 211, 225, 0.9);
+      box-shadow: 0 8px 18px rgba(16, 32, 51, 0.1);
+    }
+
+    :root[data-theme='dark'] .create-card-icon {
+      background: rgba(6, 12, 22, 0.74);
+      border-color: rgba(151, 176, 210, 0.18);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
     }
 
     .create-card-icon svg {
-      width: 19px;
-      height: 19px;
+      width: 25px;
+      height: 25px;
     }
 
     .create-customer-copy {
       min-width: 0;
     }
 
+    .create-card-eyebrow,
     .create-field-label {
       display: flex;
       align-items: center;
       gap: 7px;
-      margin-bottom: 7px;
       color: var(--text-secondary);
       font-size: 12px;
       font-weight: 800;
+      letter-spacing: 0.2px;
+      line-height: 1.3;
     }
 
+    .create-field-label {
+      margin-bottom: 9px;
+    }
+
+    .create-card-eyebrow svg,
     .create-field-label svg {
-      width: 14px;
-      height: 14px;
+      width: 15px;
+      height: 15px;
       color: var(--accent);
+      flex: 0 0 auto;
+    }
+
+    .required-mark {
+      color: var(--danger);
+      margin-left: -2px;
     }
 
     .create-customer-name {
-      margin: 0;
+      margin: 6px 0 2px;
       color: var(--text-primary);
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 800;
-      line-height: 1.35;
+      line-height: 1.3;
       overflow-wrap: anywhere;
+    }
+
+    .create-customer-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .create-customer-phone svg {
+      width: 14px;
+      height: 14px;
+      color: var(--success);
+      flex: 0 0 auto;
     }
 
     .create-loan-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      align-items: start;
     }
 
     .create-field-card {
-      margin: 0;
-      padding: 14px;
       min-width: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .amount-input-shell {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .amount-prefix {
+      position: absolute;
+      left: 16px;
+      color: var(--text-secondary);
+      font-size: 15px;
+      font-weight: 800;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .amount-input-shell .form-control {
+      padding-left: 42px;
     }
 
     .create-loan-modal .form-control,
     .create-loan-modal .custom-select-trigger,
     .create-loan-modal .custom-select-search-input {
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.78);
+      min-height: 54px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.88);
+      border-color: rgba(199, 211, 225, 0.98);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    }
+
+    .create-loan-modal .form-control:hover,
+    .create-loan-modal .custom-select-trigger:hover {
+      border-color: var(--border-strong);
+      background: rgba(255, 255, 255, 0.98);
+    }
+
+    .create-loan-modal .form-control:focus,
+    .create-loan-modal .custom-select-trigger:focus,
+    .create-loan-modal .custom-select-trigger:focus-visible,
+    .create-loan-modal .custom-select-search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--border-focus), 0 10px 24px rgba(15, 39, 71, 0.09);
+      outline: none;
     }
 
     :root[data-theme='dark'] .create-loan-modal .form-control,
     :root[data-theme='dark'] .create-loan-modal .custom-select-trigger,
     :root[data-theme='dark'] .create-loan-modal .custom-select-search-input {
       background: rgba(6, 12, 22, 0.74);
+      border-color: rgba(151, 176, 210, 0.2);
     }
 
-    .create-loan-modal .custom-select-options {
-      z-index: 1400;
-      max-height: 300px;
+    :root[data-theme='dark'] .create-loan-modal .form-control:hover,
+    :root[data-theme='dark'] .create-loan-modal .custom-select-trigger:hover {
+      background: rgba(10, 19, 32, 0.92);
+      border-color: rgba(151, 176, 210, 0.34);
+    }
+
+    .create-loan-modal .form-control.is-invalid,
+    .create-loan-modal .custom-select-trigger.is-invalid,
+    .create-customer-card.is-invalid {
+      border-color: rgba(180, 69, 69, 0.72);
+      box-shadow: 0 0 0 4px rgba(180, 69, 69, 0.1);
+    }
+
+    .field-error {
+      display: none;
+      min-height: 18px;
+      margin-top: 7px;
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .field-error.show {
+      display: block;
     }
 
     .create-other-bank {
-      margin-top: 10px;
-      min-height: 72px;
+      margin-top: 12px;
+      min-height: 86px;
       resize: vertical;
     }
 
     .create-loan-actions {
-      padding: 16px 24px;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      padding: 22px 34px 30px;
       margin: 0;
-      border-top: 1px solid var(--border);
-      background: var(--bg-card);
+      border-top: 1px solid rgba(217, 227, 239, 0.82);
+      background: rgba(248, 251, 255, 0.9);
+      border-radius: 0 0 22px 22px;
     }
 
     :root[data-theme='dark'] .create-loan-actions {
-      background: rgba(9, 17, 29, 0.92);
+      background: rgba(8, 16, 28, 0.92);
       border-top-color: rgba(151, 176, 210, 0.14);
     }
 
     .create-loan-actions .btn {
       width: auto;
-      min-width: 132px;
+      min-width: 150px;
+      min-height: 50px;
+      border-radius: 14px;
+      font-weight: 800;
+    }
+
+    .create-loan-actions .create-cancel-btn {
+      background: transparent;
+      border-color: var(--border-strong);
+      color: var(--text-secondary);
+      box-shadow: none;
+    }
+
+    .create-loan-actions .create-cancel-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
+      border-color: var(--border-strong);
     }
 
     .create-submit-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 9px;
+      min-width: 246px;
+      background: linear-gradient(135deg, #0f8b71 0%, #0a725f 100%);
+      border-color: #0f8b71;
+      box-shadow: 0 14px 28px rgba(15, 139, 113, 0.24);
+      color: #ffffff;
     }
 
-    .create-submit-btn svg {
-      width: 16px;
-      height: 16px;
+    .create-submit-btn:hover {
+      background: linear-gradient(135deg, #13a184 0%, #0b7d68 100%);
+      border-color: #13a184;
+      box-shadow: 0 18px 32px rgba(15, 139, 113, 0.3);
+    }
+
+    .create-submit-btn svg,
+    .create-submit-icon {
+      width: 17px;
+      height: 17px;
       flex: 0 0 auto;
     }
 
-    /* ── Custom Bank/NBFC Select ──────────────────────────── */
+    .btn-spinner {
+      display: none;
+      width: 17px;
+      height: 17px;
+      border: 2px solid rgba(255, 255, 255, 0.42);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: createBtnSpin 0.8s linear infinite;
+    }
+
+    .create-submit-btn.is-loading .btn-spinner {
+      display: inline-block;
+    }
+
+    .create-submit-btn.is-loading .create-submit-icon {
+      display: none;
+    }
+
+    @keyframes createBtnSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Custom Bank/NBFC Select */
     .custom-select-wrapper {
       position: relative;
       width: 100%;
@@ -791,101 +1026,127 @@
     }
 
     .custom-select-trigger {
+      appearance: none;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 12px;
       width: 100%;
-      padding: 12px 14px;
+      padding: 0 15px;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 14px;
       color: var(--text-primary);
       font-size: 14px;
       font-family: inherit;
+      font-weight: 700;
+      text-align: left;
       cursor: pointer;
-      transition: border-color 0.2s, box-shadow 0.2s;
       line-height: 1.4;
-      min-height: 46px;
     }
 
-    .custom-select-trigger:hover {
-      border-color: var(--border-strong);
+    .custom-select-trigger:disabled {
+      cursor: not-allowed;
+      opacity: 0.72;
+      transform: none;
     }
 
-    .custom-select-trigger:focus,
-    .custom-select-trigger:focus-visible {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--border-focus);
-      outline: none;
+    .custom-select-text {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    :root[data-theme='dark'] .custom-select-trigger {
-      background: rgba(9, 17, 29, 0.88);
-      border-color: rgba(151, 176, 210, 0.18);
+    .custom-select-text.is-placeholder {
+      color: var(--text-muted);
+      font-weight: 700;
     }
 
-    :root[data-theme='dark'] .custom-select-trigger:focus,
-    :root[data-theme='dark'] .custom-select-trigger:focus-visible {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(139, 180, 255, 0.14), 0 0 16px rgba(47, 111, 237, 0.12);
+    .custom-select-arrow {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      flex: 0 0 auto;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .custom-select-arrow svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .custom-select-trigger[aria-expanded='true'] .custom-select-arrow {
+      transform: rotate(180deg);
     }
 
     .custom-select-options {
       display: none;
       position: absolute;
-      top: calc(100% + 4px);
+      top: calc(100% + 8px);
       left: 0;
       right: 0;
-      z-index: 210;
+      z-index: 1400;
       background: #ffffff;
-      border: 1px solid var(--border-strong);
-      border-radius: 10px;
-      box-shadow: 0 12px 32px rgba(16, 32, 51, 0.16);
-      max-height: 320px;
+      border: 1px solid rgba(199, 211, 225, 0.98);
+      border-radius: 16px;
+      box-shadow: 0 20px 48px rgba(16, 32, 51, 0.22);
+      max-height: min(360px, 50vh);
       overflow: hidden;
       flex-direction: column;
+      transform-origin: top center;
     }
 
     .custom-select-options.show {
       display: flex;
+      animation: customSelectIn 0.18s ease-out;
+    }
+
+    @keyframes customSelectIn {
+      from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     :root[data-theme='dark'] .custom-select-options {
       background: #0f1c2e;
-      border-color: rgba(151, 176, 210, 0.22);
-      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.42);
+      border-color: rgba(151, 176, 210, 0.24);
+      box-shadow: 0 22px 54px rgba(0, 0, 0, 0.56);
     }
 
     .custom-select-search-wrapper {
-      padding: 8px;
+      padding: 10px;
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
+      background: rgba(248, 251, 255, 0.94);
     }
 
     :root[data-theme='dark'] .custom-select-search-wrapper {
+      background: rgba(8, 16, 28, 0.9);
       border-bottom-color: rgba(151, 176, 210, 0.14);
     }
 
     .custom-select-search-input {
       width: 100%;
-      padding: 9px 11px;
+      min-height: 42px;
+      padding: 10px 12px;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
       background: var(--bg-card);
       color: var(--text-primary);
       font-size: 13px;
       font-family: inherit;
+      font-weight: 700;
       outline: none;
     }
 
     .custom-select-search-input::placeholder {
       color: var(--text-muted);
-    }
-
-    .custom-select-search-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--border-focus);
+      font-weight: 600;
     }
 
     :root[data-theme='dark'] .custom-select-search-input {
@@ -893,97 +1154,172 @@
       border-color: rgba(151, 176, 210, 0.18);
     }
 
-    :root[data-theme='dark'] .custom-select-search-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(139, 180, 255, 0.14);
-    }
-
     .custom-options-list {
       overflow-y: auto;
       overflow-x: hidden;
       flex: 1;
-      padding: 4px;
+      padding: 8px;
       scrollbar-width: thin;
+      scrollbar-color: var(--border-strong) transparent;
     }
 
     .custom-options-list::-webkit-scrollbar {
-      width: 5px;
+      width: 7px;
     }
 
     .custom-options-list::-webkit-scrollbar-thumb {
       background: var(--border-strong);
-      border-radius: 8px;
+      border-radius: 999px;
     }
 
     .custom-option {
-      padding: 9px 12px;
-      border-radius: 6px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 10px 40px 10px 13px;
+      border-radius: 10px;
       font-size: 13px;
+      font-weight: 700;
+      line-height: 1.35;
       color: var(--text-primary);
       cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+      white-space: normal;
+      overflow-wrap: anywhere;
     }
 
-    .custom-option:hover {
+    .custom-option:hover,
+    .custom-option.is-highlighted {
       background: var(--accent-soft);
+      color: var(--accent);
     }
 
     .custom-option.active {
-      background: var(--accent);
-      color: #ffffff;
-      font-weight: 600;
+      background: rgba(15, 139, 113, 0.12);
+      color: #0b725f;
+      font-weight: 800;
+    }
+
+    .custom-option.active::after {
+      content: "\2713";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #0f8b71;
+      font-size: 15px;
+      font-weight: 900;
     }
 
     .custom-option:first-child {
       color: var(--text-muted);
-      font-style: italic;
+      font-style: normal;
     }
 
     :root[data-theme='dark'] .custom-option {
       color: var(--text-primary);
     }
 
-    :root[data-theme='dark'] .custom-option:hover {
+    :root[data-theme='dark'] .custom-option:hover,
+    :root[data-theme='dark'] .custom-option.is-highlighted {
       background: rgba(139, 180, 255, 0.12);
+      color: var(--accent-hover);
     }
 
     :root[data-theme='dark'] .custom-option.active {
-      background: rgba(139, 180, 255, 0.22);
-      color: #ffffff;
+      background: rgba(70, 201, 168, 0.16);
+      color: #8cf1d7;
     }
 
-    @media (max-width: 720px) {
-      .drawer-header,
-      .drawer-body,
-      .drawer-footer,
-      .create-loan-header,
-      .create-loan-body,
-      .create-loan-actions {
-        padding-left: 16px;
-        padding-right: 16px;
+    :root[data-theme='dark'] .custom-option.active::after {
+      color: #8cf1d7;
+    }
+
+    @media (max-width: 760px) {
+      #create-modal {
+        padding: 10px;
       }
 
       .create-loan-modal {
-        width: calc(100vw - 20px);
+        width: 95vw;
+        max-height: calc(100dvh - 20px);
+        border-radius: 20px;
+        overflow-y: auto;
       }
 
-      .create-loan-actions {
-        flex-direction: column-reverse;
+      .create-loan-header {
+        gap: 12px;
+        padding: 24px 18px 22px;
+        border-radius: 20px 20px 0 0;
       }
 
-      .create-loan-actions .btn {
-        width: 100%;
+      .create-loan-hero-icon {
+        width: 50px;
+        height: 50px;
       }
 
+      .create-loan-hero-icon svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .create-loan-header h3 {
+        font-size: 20px;
+      }
+
+      .create-loan-subtitle {
+        font-size: 13px;
+      }
+
+      .create-loan-close {
+        width: 40px;
+        height: 40px;
+      }
+
+      .create-loan-body {
+        padding: 22px 18px 6px;
+        gap: 18px;
+      }
+
+      .create-customer-card {
+        align-items: flex-start;
+        padding: 16px;
+      }
+
+      .create-loan-grid,
       .drawer-summary-grid,
       .status-form-grid,
       .date-fields-grid,
       .history-meta-grid,
       .history-disbursement {
         grid-template-columns: 1fr;
+      }
+
+      .create-loan-actions {
+        flex-direction: column-reverse;
+        padding: 18px;
+        border-radius: 0 0 20px 20px;
+      }
+
+      .create-loan-actions .btn,
+      .create-submit-btn {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .custom-select-options {
+        position: relative;
+        top: auto;
+        margin-top: 8px;
+        max-height: 310px;
+      }
+
+      .drawer-header,
+      .drawer-body,
+      .drawer-footer {
+        padding-left: 16px;
+        padding-right: 16px;
       }
 
       .drawer-panel-header,
@@ -994,6 +1330,40 @@
 
       .drawer-helper {
         white-space: normal;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .create-loan-header {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+      }
+
+      .create-loan-hero-icon {
+        width: 44px;
+        height: 44px;
+      }
+
+      .create-loan-subtitle {
+        display: none;
+      }
+
+      .create-customer-card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #create-modal.show .create-loan-modal,
+      .custom-select-options.show,
+      .btn-spinner {
+        animation: none;
+      }
+
+      .create-loan-close,
+      .create-submit-btn,
+      .custom-option,
+      .custom-select-arrow {
+        transition: none;
       }
     }
   </style>
@@ -1015,7 +1385,7 @@
         <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon emoji-sm">👥</span> My Customers</a>
         <a href="/employee/loans.html" class="nav-item active"><span class="nav-icon emoji-sm">💼</span> My Loans</a>
         <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon emoji-sm">🧮</span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> My Assigned Data</a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> My Assigned Records</a>
         <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> APR</a>
 
       </div>
@@ -1045,7 +1415,7 @@
 
       <div class="filters-bar">
         <select id="status-filter" onchange="loadLoans()">
-          <option value="">All Status</option>
+          <option value="">All Statuses</option>
           <option value="Pending">Pending</option>
           <option value="Under Review">Under Review</option>
           <option value="Documents Pending">Documents Pending</option>
@@ -1092,12 +1462,12 @@
                 <th>#</th>
                 <th>Customer</th>
                 <th>Phone</th>
-                <th>Area</th>
+                <th>City</th>
                 <th>Amount</th>
                 <th>Banks</th>
                 <th>Status</th>
                 <th>Login Date</th>
-                <th>Upload Date</th>
+                <th>Application Date</th>
                 <th>Disbursement Date</th>
                 <th>Disbursement Amount</th>
                 <th>Actions</th>
@@ -1116,18 +1486,29 @@
 </div>
 
 <!-- ── Create Loan Modal ── -->
-<div class="modal-overlay" id="create-modal">
-  <div class="modal create-loan-modal modal-overflow-visible" role="dialog" aria-modal="true" aria-labelledby="create-loan-title">
+<div class="modal-overlay" id="create-modal" onclick="handleCreateOverlayClick(event)">
+  <div class="modal create-loan-modal modal-overflow-visible" role="dialog" aria-modal="true" aria-labelledby="create-loan-title" aria-describedby="create-loan-subtitle" tabindex="-1">
     <div class="modal-header create-loan-header">
-      <div>
-        <span class="create-loan-kicker">Loan request</span>
+      <span class="create-loan-hero-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 10h18"></path>
+          <path d="M5 10v9"></path>
+          <path d="M9 10v9"></path>
+          <path d="M15 10v9"></path>
+          <path d="M19 10v9"></path>
+          <path d="M4 19h16"></path>
+          <path d="M12 3 3 8h18l-9-5Z"></path>
+        </svg>
+      </span>
+      <div class="create-loan-title-block">
         <h3 id="create-loan-title">New Loan Application</h3>
+        <p id="create-loan-subtitle" class="create-loan-subtitle">Create a new personal loan request for the selected customer.</p>
       </div>
       <button type="button" class="modal-close create-loan-close" onclick="closeCreateModal()" title="Close" aria-label="Close">&times;</button>
     </div>
     <div class="create-loan-body">
       <div id="modal-alert" class="alert create-loan-alert"></div>
-      <div class="create-customer-card">
+      <div class="create-customer-card" id="create-customer-card" aria-labelledby="create-customer-label">
         <span class="create-card-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21a8 8 0 0 0-16 0"></path>
@@ -1136,23 +1517,42 @@
         </span>
         <div class="create-customer-copy">
           <input type="hidden" id="loan-customer" />
-          <span class="create-field-label">Customer *</span>
-          <p id="loan-customer-display" class="create-customer-name">&mdash;</p>
+          <span class="create-card-eyebrow" id="create-customer-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 21a8 8 0 0 0-16 0"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Customer <span class="required-mark" aria-hidden="true">*</span>
+          </span>
+          <p id="loan-customer-display" class="create-customer-name" aria-live="polite">Select customer</p>
+          <p class="create-customer-phone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.32 1.77.59 2.61a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.47-1.16a2 2 0 0 1 2.11-.45c.84.27 1.71.47 2.61.59A2 2 0 0 1 22 16.92Z"></path>
+            </svg>
+            <span id="loan-customer-phone">Phone not available</span>
+          </p>
+          <div id="customer-error" class="field-error" role="alert"></div>
         </div>
       </div>
       <div class="create-loan-grid">
         <div class="form-group create-field-card">
           <label class="create-field-label" for="loan-amount">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="12" x2="12" y1="2" y2="22"></line>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"></path>
+              <path d="M6 3h12"></path>
+              <path d="M6 8h12"></path>
+              <path d="M6 13l8 8"></path>
+              <path d="M6 13h4a4 4 0 0 0 0-8"></path>
             </svg>
-            Loan Amount (&#8377;) *
+            Loan Amount <span class="required-mark" aria-hidden="true">*</span>
           </label>
-          <input type="number" id="loan-amount" class="form-control" placeholder="e.g. 50000" min="1000" />
+          <div class="amount-input-shell">
+            <span class="amount-prefix" aria-hidden="true">&#8377;</span>
+            <input type="text" id="loan-amount" class="form-control" placeholder="Enter loan amount" inputmode="numeric" autocomplete="off" aria-describedby="loan-amount-error" oninput="formatLoanAmountInput(this); clearCreateFieldError('loan-amount')" />
+          </div>
+          <div id="loan-amount-error" class="field-error" role="alert"></div>
         </div>
         <div class="form-group create-field-card create-bank-card">
-          <label class="create-field-label">
+          <label class="create-field-label" id="loan-bank-label">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="3" y="10" width="18" height="10" rx="2"></rect>
               <path d="M5 10V7l7-4 7 4v3"></path>
@@ -1160,20 +1560,25 @@
               <path d="M12 14v3"></path>
               <path d="M16 14v3"></path>
             </svg>
-            Select NBFC / Bank
+            Bank / NBFC <span class="required-mark" aria-hidden="true">*</span>
           </label>
           <div class="custom-select-wrapper">
             <input type="hidden" id="loan-purpose" value="" />
-            <div class="custom-select-trigger" onclick="toggleCustomSelect(event)" id="custom-select-trigger">
-              <span id="custom-select-text">None selected</span>
-              <span class="custom-select-arrow">▼</span>
-            </div>
-            <div class="custom-select-options" id="custom-select-options">
+            <button type="button" class="custom-select-trigger" onclick="toggleCustomSelect(event)" onkeydown="handleCustomSelectKeydown(event)" id="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="custom-select-options" aria-labelledby="loan-bank-label custom-select-text" aria-describedby="loan-purpose-error">
+              <span id="custom-select-text" class="custom-select-text is-placeholder">Select NBFC / Bank</span>
+              <span class="custom-select-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m6 9 6 6 6-6"></path>
+                </svg>
+              </span>
+            </button>
+            <div class="custom-select-options" id="custom-select-options" role="listbox" aria-labelledby="loan-bank-label">
               <div class="custom-select-search-wrapper" onclick="event.stopPropagation()">
-                <input type="text" id="custom-select-search" class="custom-select-search-input" placeholder="Search bank..." oninput="filterCustomOptions(this.value)" autocomplete="off" />
+                <input type="text" id="custom-select-search" class="custom-select-search-input" placeholder="Search bank" oninput="filterCustomOptions(this.value)" onkeydown="handleCustomSearchKeydown(event)" autocomplete="off" aria-label="Search bank or NBFC" />
               </div>
               <div class="custom-options-list" id="custom-options-list">
-            <div class="custom-option" data-value="" onclick="selectCustomOption(this)">None selected</div>
+
+            <div class="custom-option" data-value="" onclick="selectCustomOption(this)">Select NBFC / Bank</div>
             <div class="custom-option" data-value="ABFL" onclick="selectCustomOption(this)">Aditya Birla Finance Limited</div>
         <div class="custom-option" data-value="AAVAS" onclick="selectCustomOption(this)">Aavas Financiers Limited</div>
         <div class="custom-option" data-value="APTUS" onclick="selectCustomOption(this)">Aptus Value Housing Finance India Limited</div>
@@ -1252,18 +1657,20 @@
               </div>
             </div>
           </div>
-          <textarea id="loan-purpose-other" class="form-control create-other-bank" rows="2" placeholder="If 'Other', Type Bank Name" style="display:none;"></textarea>
+          <textarea id="loan-purpose-other" class="form-control create-other-bank" rows="2" placeholder="Type bank or NBFC name" style="display:none;" aria-describedby="loan-purpose-error" oninput="clearCreateFieldError('loan-purpose')"></textarea>
+          <div id="loan-purpose-error" class="field-error" role="alert"></div>
         </div>
       </div>
     </div>
     <div class="modal-actions create-loan-actions">
-      <button type="button" class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
-      <button type="button" class="btn btn-primary create-submit-btn" onclick="createLoan()" id="create-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <button type="button" class="btn btn-secondary create-cancel-btn" onclick="closeCreateModal()">Cancel</button>
+      <button type="button" class="btn btn-primary create-submit-btn" onclick="createLoan()" id="create-btn" aria-live="polite">
+        <span class="btn-spinner" id="create-btn-spinner" aria-hidden="true"></span>
+        <svg class="create-submit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M22 2 11 13"></path>
           <path d="m22 2-7 20-4-9-9-4Z"></path>
         </svg>
-        <span id="create-btn-text">Submit Application</span>
+        <span id="create-btn-text">Submit Loan Application</span>
       </button>
     </div>
   </div>
@@ -1443,75 +1850,220 @@
     loadLoans();
   }
 
-  // ── Custom Bank Select ────────────────────────────────────
+  // Custom Bank Select
+  let customSelectIndex = -1;
+  let createModalLastActiveElement = null;
+
+  function getCustomOptions(visibleOnly = false) {
+    const options = Array.from(document.querySelectorAll('#custom-options-list .custom-option'));
+    return visibleOnly ? options.filter(opt => opt.style.display !== 'none' && !opt.hidden) : options;
+  }
+
+  function prepareCustomOptions() {
+    getCustomOptions().forEach((opt, index) => {
+      opt.setAttribute('role', 'option');
+      opt.setAttribute('tabindex', '-1');
+      if (!opt.id) opt.id = 'custom-option-' + index;
+      opt.setAttribute('aria-selected', opt.classList.contains('active') ? 'true' : 'false');
+    });
+  }
+
+  function openCustomSelect() {
+    const opts = document.getElementById('custom-select-options');
+    const trigger = document.getElementById('custom-select-trigger');
+    const searchInput = document.getElementById('custom-select-search');
+    if (!opts || !trigger || !searchInput) return;
+    prepareCustomOptions();
+    opts.classList.add('show');
+    trigger.setAttribute('aria-expanded', 'true');
+    searchInput.value = '';
+    filterCustomOptions('');
+    const visible = getCustomOptions(true);
+    const activeIndex = visible.findIndex(opt => opt.classList.contains('active'));
+    highlightCustomOption(activeIndex >= 0 ? activeIndex : 0);
+    setTimeout(() => searchInput.focus(), 40);
+  }
+
+  function closeCustomSelect(focusTrigger = false) {
+    const opts = document.getElementById('custom-select-options');
+    const trigger = document.getElementById('custom-select-trigger');
+    if (opts) opts.classList.remove('show');
+    if (trigger) {
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.removeAttribute('aria-activedescendant');
+      if (focusTrigger) trigger.focus();
+    }
+    customSelectIndex = -1;
+    getCustomOptions().forEach(opt => opt.classList.remove('is-highlighted'));
+  }
+
   function toggleCustomSelect(e) {
     if (e) e.stopPropagation();
     const opts = document.getElementById('custom-select-options');
-    const trigger = document.getElementById('custom-select-trigger');
-    const arrow = trigger.querySelector('.custom-select-arrow');
-    const isShowing = opts.classList.contains('show');
-    opts.classList.toggle('show');
-    if (!isShowing) {
-      arrow.style.transform = 'rotate(180deg)';
-      const searchInput = document.getElementById('custom-select-search');
-      searchInput.value = '';
-      filterCustomOptions('');
-      setTimeout(() => searchInput.focus(), 50);
-    } else {
-      arrow.style.transform = 'rotate(0deg)';
-    }
+    if (!opts) return;
+    if (opts.classList.contains('show')) closeCustomSelect(true);
+    else openCustomSelect();
   }
 
   function filterCustomOptions(query) {
-    const term = query.toLowerCase().trim();
-    const options = document.querySelectorAll('.custom-option');
+    const term = String(query || '').toLowerCase().trim();
+    const options = getCustomOptions();
     options.forEach(opt => {
       const text = opt.textContent.toLowerCase();
-      opt.style.display = (text.includes(term) || opt.getAttribute('data-value') === "") ? 'block' : 'none';
+      const value = opt.getAttribute('data-value') || '';
+      const shouldShow = !term || text.includes(term) || value === '';
+      opt.style.display = shouldShow ? 'flex' : 'none';
+      opt.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
     });
+    const visible = getCustomOptions(true);
+    const activeIndex = visible.findIndex(opt => opt.classList.contains('active'));
+    highlightCustomOption(activeIndex >= 0 ? activeIndex : 0);
+  }
+
+  function highlightCustomOption(index) {
+    const visible = getCustomOptions(true);
+    getCustomOptions().forEach(opt => opt.classList.remove('is-highlighted'));
+    if (!visible.length) {
+      customSelectIndex = -1;
+      return;
+    }
+    customSelectIndex = Math.max(0, Math.min(index, visible.length - 1));
+    const active = visible[customSelectIndex];
+    active.classList.add('is-highlighted');
+    document.getElementById('custom-select-trigger')?.setAttribute('aria-activedescendant', active.id);
+    active.scrollIntoView({ block: 'nearest' });
+  }
+
+  function moveCustomHighlight(delta) {
+    const visible = getCustomOptions(true);
+    if (!visible.length) return;
+    const next = customSelectIndex < 0 ? 0 : (customSelectIndex + delta + visible.length) % visible.length;
+    highlightCustomOption(next);
+  }
+
+  function handleCustomSelectKeydown(event) {
+    if (['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
+      event.preventDefault();
+      openCustomSelect();
+      if (event.key === 'ArrowUp') {
+        const visible = getCustomOptions(true);
+        highlightCustomOption(Math.max(visible.length - 1, 0));
+      }
+    }
+  }
+
+  function handleCustomSearchKeydown(event) {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      moveCustomHighlight(1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveCustomHighlight(-1);
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      const selected = getCustomOptions(true)[customSelectIndex];
+      if (selected) selectCustomOption(selected);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      closeCustomSelect(true);
+    }
   }
 
   function selectCustomOption(el) {
-    const val = el.getAttribute('data-value');
+    const val = el.getAttribute('data-value') || '';
     setLoanPurposeValue(val);
-    document.getElementById('custom-select-options').classList.remove('show');
-    const arrow = document.querySelector('.custom-select-arrow');
-    if (arrow) arrow.style.transform = 'rotate(0deg)';
+    closeCustomSelect(true);
+    clearCreateFieldError('loan-purpose');
   }
 
   function setLoanPurposeValue(val) {
-    document.getElementById('loan-purpose').value = val;
-    const options = document.querySelectorAll('.custom-option');
-    let text = 'None selected';
-    options.forEach(opt => {
-      if (opt.getAttribute('data-value') === val) {
-        text = opt.textContent;
-        opt.classList.add('active');
-      } else {
-        opt.classList.remove('active');
+    const purposeInput = document.getElementById('loan-purpose');
+    const textEl = document.getElementById('custom-select-text');
+    if (purposeInput) purposeInput.value = val || '';
+    let text = 'Select NBFC / Bank';
+    let matchedOption = false;
+    getCustomOptions().forEach(opt => {
+      const isActive = opt.getAttribute('data-value') === (val || '');
+      if (isActive && val) {
+        text = opt.textContent.trim();
+        matchedOption = true;
       }
+      opt.classList.toggle('active', isActive);
+      opt.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
-    document.getElementById('custom-select-text').textContent = text;
+    if (val && !matchedOption) text = val;
+    if (textEl) {
+      textEl.textContent = text;
+      textEl.classList.toggle('is-placeholder', !val);
+    }
     togglePurposeOther();
   }
 
   document.addEventListener('click', (e) => {
     const wrapper = document.querySelector('.custom-select-wrapper');
-    if (wrapper && !wrapper.contains(e.target)) {
-      const opts = document.getElementById('custom-select-options');
-      if (opts && opts.classList.contains('show')) {
-        opts.classList.remove('show');
-        const arrow = document.querySelector('.custom-select-arrow');
-        if (arrow) arrow.style.transform = 'rotate(0deg)';
-      }
-    }
+    if (wrapper && !wrapper.contains(e.target)) closeCustomSelect(false);
   });
 
   function togglePurposeOther() {
     const sel = document.getElementById('loan-purpose');
     const other = document.getElementById('loan-purpose-other');
     if (!sel || !other) return;
-    other.style.display = sel.value === 'Other' ? 'block' : 'none';
+    const showOther = sel.value === 'Other';
+    other.style.display = showOther ? 'block' : 'none';
+    if (showOther) other.focus({ preventScroll: true });
+    else other.value = '';
+  }
+
+  function formatLoanAmountInput(input) {
+    const raw = String(input.value || '').replace(/[^0-9]/g, '');
+    input.value = raw ? Number(raw).toLocaleString('en-IN') : '';
+  }
+
+  function setLoanAmountValue(value) {
+    const input = document.getElementById('loan-amount');
+    if (!input) return;
+    input.value = String(value || '').replace(/[^0-9]/g, '');
+    formatLoanAmountInput(input);
+  }
+
+  function getLoanAmountRaw() {
+    return String(document.getElementById('loan-amount')?.value || '').replace(/[^0-9]/g, '');
+  }
+
+  function setCreateFieldError(field, message) {
+    const map = {
+      customer: { input: document.getElementById('create-customer-card'), error: document.getElementById('customer-error') },
+      'loan-amount': { input: document.getElementById('loan-amount'), error: document.getElementById('loan-amount-error') },
+      'loan-purpose': { input: document.getElementById('custom-select-trigger'), error: document.getElementById('loan-purpose-error') }
+    };
+    const entry = map[field];
+    if (!entry) return;
+    entry.input?.classList.add('is-invalid');
+    if (entry.error) {
+      entry.error.textContent = message;
+      entry.error.classList.add('show');
+    }
+  }
+
+  function clearCreateFieldError(field) {
+    const fields = field ? [field] : ['customer', 'loan-amount', 'loan-purpose'];
+    fields.forEach(name => {
+      const input = name === 'customer'
+        ? document.getElementById('create-customer-card')
+        : name === 'loan-amount'
+          ? document.getElementById('loan-amount')
+          : document.getElementById('custom-select-trigger');
+      const error = name === 'customer'
+        ? document.getElementById('customer-error')
+        : name === 'loan-amount'
+          ? document.getElementById('loan-amount-error')
+          : document.getElementById('loan-purpose-error');
+      input?.classList.remove('is-invalid');
+      if (error) {
+        error.textContent = '';
+        error.classList.remove('show');
+      }
+    });
   }
 
   function extractValueByLabel(text, labels) {
@@ -1633,65 +2185,86 @@
     });
   }
 
-  // ── Create Loan Modal ─────────────────────────────────────
-  function openCreateModal(customerIdParam = null) {
-    document.getElementById('create-modal').classList.add('show');
+  // Create Loan Modal
+  function setCreateCustomer(customer) {
+    const idEl = document.getElementById('loan-customer');
+    const nameEl = document.getElementById('loan-customer-display');
+    const phoneEl = document.getElementById('loan-customer-phone');
+    if (customer) {
+      idEl.value = customer.id;
+      nameEl.textContent = customer.name || 'Selected customer';
+      phoneEl.textContent = customer.phone || 'Phone not available';
+      clearCreateFieldError('customer');
+    } else {
+      idEl.value = '';
+      nameEl.textContent = 'Select customer';
+      phoneEl.textContent = 'Phone not available';
+    }
+  }
+
+  function resetCreateModalState() {
     const modalAlert = document.getElementById('modal-alert');
     modalAlert.className = 'alert create-loan-alert';
     modalAlert.textContent = '';
-    document.getElementById('loan-customer-display').textContent = '—';
-    document.getElementById('loan-amount').value = '';
+    clearCreateFieldError();
+    setCreateCustomer(null);
+    setLoanAmountValue('');
     setLoanPurposeValue('');
     document.getElementById('loan-purpose-other').value = '';
     document.getElementById('loan-purpose-other').style.display = 'none';
-    document.getElementById('loan-customer').value = '';
+    setCreateLoading(false);
+    closeCustomSelect(false);
+  }
 
-    if (customerIdParam) {
-      api.get('/employee/customers').then(res => {
-        if (res?.ok) {
-          const customer = res.data.data.find(c => c.id === customerIdParam);
-          if (customer) {
-            document.getElementById('loan-customer').value = customerIdParam;
-            document.getElementById('loan-customer-display').textContent = `${customer.name} (${customer.phone})`;
-          }
-        }
-      });
-    }
+  function handleCreateOverlayClick(event) {
+    if (event.target === document.getElementById('create-modal')) closeCreateModal();
+  }
+
+  function focusCreateModal() {
+    const amountInput = document.getElementById('loan-amount');
+    const modal = document.querySelector('#create-modal .create-loan-modal');
+    setTimeout(() => (amountInput || modal)?.focus(), 60);
+  }
+
+  async function hydrateCreateCustomer(customerId) {
+    if (!customerId) return;
+    const res = await api.get('/employee/customers');
+    if (!res?.ok) return;
+    const customer = res.data.data.find(c => c.id === parseInt(customerId));
+    if (customer) setCreateCustomer(customer);
+  }
+
+  function openCreateModal(customerIdParam = null) {
+    createModalLastActiveElement = document.activeElement;
+    const overlay = document.getElementById('create-modal');
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    resetCreateModalState();
+
+    if (customerIdParam) hydrateCreateCustomer(customerIdParam);
 
     const autoData = sessionStorage.getItem('cln_auto_loan_data');
     if (autoData) {
       try {
         const data = JSON.parse(autoData);
-        if (!customerIdParam) {
-          api.get('/employee/customers').then(res => {
-            if (res?.ok) {
-              const customer = res.data.data.find(c => c.id === parseInt(data.customer_id));
-              if (customer) {
-                document.getElementById('loan-customer').value = data.customer_id;
-                document.getElementById('loan-customer-display').textContent = `${customer.name} (${customer.phone})`;
-              }
-            }
-          });
-        }
-        if (data.loan_amount) document.getElementById('loan-amount').value = data.loan_amount;
+        if (!customerIdParam && data.customer_id) hydrateCreateCustomer(data.customer_id);
+        if (data.loan_amount) setLoanAmountValue(data.loan_amount);
         if (data.purpose) {
           setLoanPurposeValue(data.purpose);
           if (data.purpose === 'Other' && data.purpose_other) {
             const otherInput = document.getElementById('loan-purpose-other');
-            if (otherInput) {
-              otherInput.style.display = 'block';
-              otherInput.value = data.purpose_other;
-            }
+            otherInput.style.display = 'block';
+            otherInput.value = data.purpose_other;
           }
         } else if (data.full_details) {
           const p = extractValueByLabel(data.full_details, ['Purpose', 'Loan Purpose', 'Purpose of Loan']);
           if (p) {
-            const opt = Array.from(document.querySelectorAll('.custom-option')).find(o =>
-              o.getAttribute('data-value').toLowerCase() === p.toLowerCase() || o.textContent.toLowerCase() === p.toLowerCase()
+            const opt = getCustomOptions().find(o =>
+              (o.getAttribute('data-value') || '').toLowerCase() === p.toLowerCase() ||
+              o.textContent.trim().toLowerCase() === p.toLowerCase()
             );
-            if (opt) {
-              setLoanPurposeValue(opt.getAttribute('data-value'));
-            } else {
+            if (opt) setLoanPurposeValue(opt.getAttribute('data-value'));
+            else {
               setLoanPurposeValue('Other');
               const other = document.getElementById('loan-purpose-other');
               other.style.display = 'block';
@@ -1700,38 +2273,127 @@
           }
         }
       } catch (e) { console.error('Failed to parse auto loan data:', e); }
-    } else {
-      if (!customerIdParam) document.getElementById('loan-customer-display').textContent = 'Please add a customer first';
+    } else if (!customerIdParam) {
+      document.getElementById('loan-customer-display').textContent = 'Please add a customer first';
     }
+
+    prepareCustomOptions();
+    focusCreateModal();
   }
 
   function closeCreateModal() {
     document.getElementById('create-modal').classList.remove('show');
-    document.getElementById('loan-amount').value = '';
+    closeCustomSelect(false);
+    setLoanAmountValue('');
+    document.body.style.overflow = '';
+    if (createModalLastActiveElement && typeof createModalLastActiveElement.focus === 'function') {
+      createModalLastActiveElement.focus();
+    }
+  }
+
+  function setCreateLoading(isLoading) {
+    const btn = document.getElementById('create-btn');
+    const btnText = document.getElementById('create-btn-text');
+    if (!btn || !btnText) return;
+    btn.disabled = isLoading;
+    btn.classList.toggle('is-loading', isLoading);
+    btnText.textContent = isLoading ? 'Submitting...' : 'Submit Loan Application';
+  }
+
+  function validateCreateLoanForm() {
+    clearCreateFieldError();
+    let firstInvalid = null;
+    const customer_id = document.getElementById('loan-customer').value;
+    const amount = getLoanAmountRaw();
+    const purpose = document.getElementById('loan-purpose').value || '';
+    const other = document.getElementById('loan-purpose-other').value.trim();
+
+    if (!customer_id) {
+      setCreateFieldError('customer', 'Customer is required.');
+      firstInvalid = firstInvalid || document.getElementById('create-customer-card');
+    }
+    if (!amount) {
+      setCreateFieldError('loan-amount', 'Loan amount is required.');
+      firstInvalid = firstInvalid || document.getElementById('loan-amount');
+    }
+    if (!purpose) {
+      setCreateFieldError('loan-purpose', 'Please select a bank.');
+      firstInvalid = firstInvalid || document.getElementById('custom-select-trigger');
+    } else if (purpose === 'Other' && !other) {
+      setCreateFieldError('loan-purpose', 'Please enter the bank or NBFC name.');
+      firstInvalid = firstInvalid || document.getElementById('loan-purpose-other');
+    }
+
+    if (firstInvalid) {
+      firstInvalid.focus?.();
+      return null;
+    }
+
+    return {
+      customer_id,
+      amount,
+      purpose: purpose === 'Other' ? other : purpose
+    };
   }
 
   async function createLoan() {
-    const customer_id = document.getElementById('loan-customer').value;
-    const amount = document.getElementById('loan-amount').value;
-    let purpose = document.getElementById('loan-purpose').value || '';
-    const other = document.getElementById('loan-purpose-other').value.trim();
-    if (purpose === 'Other') purpose = other || '';
-    if (!customer_id || !amount) return showAlert('modal-alert', 'Customer and amount are required.', 'error');
-    const btn = document.getElementById('create-btn');
-    const btnText = document.getElementById('create-btn-text');
-    btn.disabled = true;
-    if (btnText) btnText.textContent = 'Submitting...';
-    else btn.textContent = 'Submitting...';
-    const res = await api.post('/employee/loans', { customer_id, amount, purpose });
-    btn.disabled = false;
-    if (btnText) btnText.textContent = 'Submit Application';
-    else btn.textContent = 'Submit Application';
-    if (!res?.ok) return showAlert('modal-alert', res?.data?.message || 'Error.', 'error');
-    closeCreateModal();
-    showAlert('page-alert', 'Loan application created!', 'success');
-    sessionStorage.removeItem('cln_auto_loan_data');
-    loadLoans();
+    const payload = validateCreateLoanForm();
+    if (!payload) return;
+    setCreateLoading(true);
+    try {
+      const res = await api.post('/employee/loans', payload);
+      if (!res?.ok) return showAlert('modal-alert', res?.data?.message || 'Error.', 'error');
+      closeCreateModal();
+      showAlert('page-alert', 'Loan application created!', 'success');
+      sessionStorage.removeItem('cln_auto_loan_data');
+      loadLoans();
+    } catch (err) {
+      console.error('Create loan failed:', err);
+      showAlert('modal-alert', 'Unable to submit loan application. Please try again.', 'error');
+    } finally {
+      setCreateLoading(false);
+    }
   }
+
+  document.addEventListener('keydown', (event) => {
+    const overlay = document.getElementById('create-modal');
+    if (!overlay?.classList.contains('show')) return;
+    const modal = overlay.querySelector('.create-loan-modal');
+    const dropdownOpen = document.getElementById('custom-select-options')?.classList.contains('show');
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      if (dropdownOpen) closeCustomSelect(true);
+      else closeCreateModal();
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      const target = event.target;
+      const isTextarea = target?.tagName === 'TEXTAREA';
+      const isSearch = target?.id === 'custom-select-search';
+      const isButton = target?.tagName === 'BUTTON';
+      if (!isTextarea && !isSearch && !isButton) {
+        event.preventDefault();
+        createLoan();
+      }
+      return;
+    }
+
+    if (event.key !== 'Tab' || !modal) return;
+    const focusable = Array.from(modal.querySelectorAll('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+      .filter(el => el.offsetParent !== null || el === document.activeElement);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
 
   // ── Status Drawer ─────────────────────────────────────────
   async function openStatusDrawer(loanId) {

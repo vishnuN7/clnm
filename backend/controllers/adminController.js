@@ -28,6 +28,152 @@ const adminController = {
   },
 
   // ── Employees ───────────────────────────────────────────────
+  async getEmployeeWeeklyPerformance(req, res) {
+    try {
+      const [[week]] = await db.query(`
+        SELECT
+          week_start,
+          week_end,
+          week_end_exclusive,
+          DATE_FORMAT(week_start, '%Y-%m-%d 00:00:00') AS week_start_at,
+          DATE_FORMAT(week_end, '%Y-%m-%d 23:59:59') AS week_end_at,
+          DATE_FORMAT(week_end_exclusive, '%Y-%m-%d 00:00:00') AS week_end_exclusive_at,
+          DATE_FORMAT(week_start, '%Y-%m-%d') AS week_start_date,
+          DATE_FORMAT(week_end, '%Y-%m-%d') AS week_end_date,
+          DATE_FORMAT(CURDATE(), '%Y-%m-%d') AS current_date_value,
+          CONCAT(DATE_FORMAT(week_start, '%d %b'), ' - ', DATE_FORMAT(week_end, '%d %b %Y')) AS week_label
+        FROM (
+          SELECT
+            DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) AS week_start,
+            DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY) AS week_end,
+            DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 7 DAY) AS week_end_exclusive
+        ) week_range
+      `);
+
+      const [employeeRows] = await db.query(`
+        SELECT
+          id,
+          name,
+          email,
+          phone,
+          profile_picture,
+          COALESCE(NULLIF(current_status, ''), CASE WHEN is_active = 1 THEN 'Active' ELSE 'Inactive' END) AS status,
+          created_at
+        FROM users
+        WHERE role = 'employee'
+        ORDER BY name ASC
+      `);
+
+      const [customerRows] = await db.query(`
+        SELECT added_by AS employee_id, COUNT(*) AS customers_added
+        FROM customers
+        WHERE added_by IS NOT NULL
+          AND created_at >= ?
+          AND created_at < ?
+        GROUP BY added_by
+      `, [week.week_start_at, week.week_end_exclusive_at]);
+
+      const [loanRows] = await db.query(`
+        SELECT
+          applied_by AS employee_id,
+          COUNT(*) AS loans_applied,
+          SUM(CASE WHEN status = 'Approved' THEN 1 ELSE 0 END) AS approved,
+          SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) AS rejected,
+          SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) AS pending,
+          SUM(CASE WHEN status = 'Loan Disbursed' THEN 1 ELSE 0 END) AS disbursed
+        FROM loans
+        WHERE applied_by IS NOT NULL
+          AND created_at >= ?
+          AND created_at < ?
+        GROUP BY applied_by
+      `, [week.week_start_at, week.week_end_exclusive_at]);
+
+      const customerCountByEmployee = new Map(
+        customerRows.map((row) => [String(row.employee_id), Number(row.customers_added || 0)])
+      );
+      const loanCountByEmployee = new Map(
+        loanRows.map((row) => [String(row.employee_id), {
+          loansApplied: Number(row.loans_applied || 0),
+          approved: Number(row.approved || 0),
+          rejected: Number(row.rejected || 0),
+          pending: Number(row.pending || 0),
+          disbursed: Number(row.disbursed || 0)
+        }])
+      );
+
+      const employees = employeeRows.map((row) => {
+        const employeeId = String(row.id);
+        const customersAdded = customerCountByEmployee.get(employeeId) || 0;
+        const loanCounts = loanCountByEmployee.get(employeeId) || {
+          loansApplied: 0,
+          approved: 0,
+          rejected: 0,
+          pending: 0,
+          disbursed: 0
+        };
+        const successRate = loanCounts.loansApplied > 0
+          ? Number(((loanCounts.disbursed / loanCounts.loansApplied) * 100).toFixed(1))
+          : 0;
+        let performance = 'Needs Attention';
+        if (successRate >= 80) performance = 'Excellent';
+        else if (successRate >= 60) performance = 'Very Good';
+        else if (successRate >= 40) performance = 'Good';
+        else if (successRate >= 20) performance = 'Average';
+
+        return {
+          employeeId: row.id,
+          name: row.name || 'Employee',
+          email: row.email || null,
+          phone: row.phone || null,
+          profileImage: row.profile_picture || null,
+          profilePicture: row.profile_picture || null,
+          status: row.status || null,
+          createdAt: row.created_at || null,
+          customersAdded,
+          loansApplied: loanCounts.loansApplied,
+          approved: loanCounts.approved,
+          rejected: loanCounts.rejected,
+          pending: loanCounts.pending,
+          disbursed: loanCounts.disbursed,
+          successRate,
+          performance
+        };
+      });
+
+      const summary = employees.reduce((acc, employee) => {
+        acc.customersAdded += employee.customersAdded;
+        acc.loansApplied += employee.loansApplied;
+        acc.loanDisbursed += employee.disbursed;
+        return acc;
+      }, {
+        employees: employees.length,
+        customersAdded: 0,
+        loansApplied: 0,
+        loanDisbursed: 0
+      });
+
+      const payload = {
+        weekLabel: week.week_label,
+        weekStart: week.week_start_at,
+        weekEnd: week.week_end_at,
+        weekStartDate: week.week_start_date,
+        weekEndDate: week.week_end_date,
+        currentDate: week.current_date_value,
+        summary,
+        employees
+      };
+
+      return res.json({
+        success: true,
+        data: payload,
+        ...payload
+      });
+    } catch (err) {
+      console.error('[Admin] Employee weekly performance error:', err);
+      return res.status(500).json({ success: false, message: 'Weekly employee performance is unavailable.' });
+    }
+  },
+
   async getEmployees(req, res) {
     try {
       const employees = await UserModel.getAll('employee');
@@ -577,7 +723,7 @@ const adminController = {
       });
 
       // Build CSV manually
-      const headers = ['ID', 'Customer', 'Area', 'Phone', 'Amount', 'Purpose', 'Status', 'Applied By', 'Login Date', 'Upload Date', 'Disbursement Date', 'Disbursement Amount'];
+      const headers = ['ID', 'Customer', 'City', 'Phone', 'Amount', 'Purpose', 'Status', 'Applied By', 'Login Date', 'Upload Date', 'Disbursement Date', 'Disbursement Amount'];
       const rows = loans.map(l => [
         l.id,
         `"${l.customer_name}"`,

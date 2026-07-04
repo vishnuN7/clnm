@@ -7,6 +7,8 @@ const adminController = require('../controllers/adminController');
 router.use(requireAdmin);
 
 // Dashboard
+router.get('/dashboard/weekly-employee-performance', adminController.getEmployeeWeeklyPerformance);
+router.get('/dashboard/employee-weekly-performance', adminController.getEmployeeWeeklyPerformance);
 router.get('/dashboard', adminController.getDashboard);
 
 // Employees

@@ -9,6 +9,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <style>
     /* ── Documents Modal ── */
@@ -586,7 +599,7 @@
         <a href="/employee/my-customers.html" class="nav-item active"><span class="nav-icon emoji-sm">👥</span> My Customers</a>
         <a href="/employee/loans.html" class="nav-item"><span class="nav-icon emoji-sm">💼</span> My Loans</a>
         <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon emoji-sm">🧮</span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> My Assigned Data</a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg></span> My Assigned Records</a>
         <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> APR</a>
 
       </div>
@@ -627,7 +640,7 @@
               <th>#</th>
               <th>Name</th>
               <th>Phone</th>
-              <th>Area</th>
+              <th>City</th>
               <th>Date</th>
               <th>Time</th>
               <th>Documents</th>
@@ -684,10 +697,16 @@
           <div class="form-group">
             <label>Document Type</label>
             <select id="modal-doc-type" class="form-control" onchange="handleModalDocTypeChange()">
-              <option value="Aadhar">Aadhar Card</option>
-              <option value="PAN">PAN Card</option>
-              <option value="3M Bank Statement">3M Bank Statement</option>
-              <option value="3M Salary Slip">3M Salary Slip</option>
+              <option value="Aadhaar Card">Aadhaar Card</option>
+              <option value="PAN Card">PAN Card</option>
+              <option value="Passport Size Photograph">Passport Size Photograph</option>
+              <option value="3 Months Bank Statement">3 Months Bank Statement</option>
+              <option value="6 Months Bank Statement">6 Months Bank Statement</option>
+              <option value="3 Months Salary Slips">3 Months Salary Slips</option>
+              <option value="6 Months Salary Slips">6 Months Salary Slips</option>
+              <option value="Form 16">Form 16</option>
+              <option value="Cancelled Cheque">Cancelled Cheque</option>
+              <option value="Existing Loan Statement">Existing Loan Statement</option>
               <option value="Other">Other</option>
             </select>
           </div>
@@ -867,7 +886,7 @@
   }
 
   function resetDocsUploadForm() {
-    document.getElementById('modal-doc-type').value = 'Aadhar';
+    document.getElementById('modal-doc-type').value = 'Aadhaar Card';
     document.getElementById('modal-other-doc-type').value = '';
     document.getElementById('modal-other-doc-type-group').style.display = 'none';
     document.getElementById('modal-doc-file').value = '';
@@ -975,7 +994,7 @@
             <p style="font-size:14px;margin-top:4px;">${c.email || '—'}</p>
           </div>
           <div>
-            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">Area</label>
+            <label style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:600;">City</label>
             <p style="font-size:14px;margin-top:4px;">${c.area || '—'}</p>
           </div>
           <div>
@@ -1094,7 +1113,7 @@
             ${field('Name', textOrDash(c.name))}
             ${field('Phone', textOrDash(c.phone))}
             ${field('Email', textOrDash(c.email))}
-            ${field('Area', textOrDash(c.area))}
+            ${field('City', textOrDash(c.area))}
             ${field('Net Salary', moneyOrDash(c.net_salary))}
             ${field('Total Obligation', moneyOrDash(c.total_obligation))}
             ${field('Address', textOrDash(c.address), 'full')}

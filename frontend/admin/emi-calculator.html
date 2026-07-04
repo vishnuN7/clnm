@@ -9,6 +9,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <style>
     /* Tabs Navigation */
@@ -481,7 +494,7 @@
         <!-- Input section (Left) -->
         <div class="card" style="margin-bottom:0; height:100%;">
           <div class="card-header">
-            <h3><span class="emoji-sm">🧮</span>Calculator Inputs</h3>
+            <h3><span class="emoji-sm">🧮</span>Loan Details</h3>
           </div>
           <div class="card-body">
             <form id="emi-form" onsubmit="event.preventDefault();">
@@ -572,7 +585,7 @@
             <!-- Pie Chart Card -->
             <div class="card" style="margin-bottom:0;">
               <div class="card-header">
-                <h3>Breakdown</h3>
+                <h3>Loan Breakdown</h3>
               </div>
               <div class="card-body" style="display:flex; flex-direction:column; gap:20px; min-height:260px; justify-content:center; padding: 20px;">
                 <div style="display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap;">
@@ -581,7 +594,7 @@
                   </div>
                   <div style="flex:1; min-width:220px;" id="breakdown-details-container">
                     <div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px 0;">
-                      Enter values above and click Calculate to view breakdown.
+                      Enter the loan details above and click Calculate to view the breakdown.
                     </div>
                   </div>
                 </div>
@@ -591,7 +604,7 @@
             <!-- Amortization Chart Card -->
             <div class="card" style="margin-bottom:0;">
               <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-                <h3>Payment Amortization Trend</h3>
+                <h3>Amortization Schedule</h3>
                 <div class="chart-header-actions">
                   <div class="input-toggle-group">
                     <button type="button" class="input-toggle-btn active" id="btn-chart-monthly" onclick="setChartGrouping('monthly')">Monthly</button>
@@ -612,9 +625,9 @@
         <div class="table-controls-wrapper">
           <div class="table-controls-left">
             <div class="table-search-box">
-              <input type="text" id="table-search" class="form-control" placeholder="Search schedule (e.g. Month 12, July 2026)..." oninput="handleSearch()" />
+              <input type="text" id="table-search" class="form-control" placeholder="Search schedule (e.g. Month 12)" oninput="handleSearch()" />
             </div>
-            <select id="table-limit" onchange="handleLimitChange()" style="width:80px; padding:8px 12px; border-radius:6px; border:1px solid var(--border);">
+            <select id="table-limit" onchange="handleLimitChange()" style="width: 100px; padding:8px 12px; border-radius:6px; border:1px solid var(--border);">
               <option value="12">12 / page</option>
               <option value="24">24 / page</option>
               <option value="60">60 / page</option>
@@ -625,13 +638,13 @@
           <div class="table-controls-right">
             <div class="export-btn-group">
               <button class="btn btn-secondary export-btn" onclick="exportPDF()">
-                <span class="emoji-sm">📥</span>PDF Report
+                <span class="emoji-sm">📥</span>Export PDF
               </button>
               <button class="btn btn-secondary export-btn" onclick="exportExcel()">
-                <span class="emoji-sm">📊</span>Excel Export
+                <span class="emoji-sm">📊</span>Export Excel
               </button>
               <button class="btn btn-secondary export-btn" onclick="exportCSV()">
-                <span class="emoji-sm">📄</span>CSV Export
+                <span class="emoji-sm">📄</span>Export CSV
               </button>
               <button class="btn btn-secondary export-btn" onclick="window.print()">
                 <span class="emoji-sm">🖨️</span>Print
@@ -655,7 +668,7 @@
             </thead>
             <tbody id="schedule-tbody">
               <tr>
-                <td colspan="7" class="text-center text-muted" style="padding:40px 0;">Enter values above and click Calculate to view schedule.</td>
+                <td colspan="7" class="text-center text-muted" style="padding:40px 0;">Enter the loan details above and click Calculate to view the amortization schedule.</td>
               </tr>
             </tbody>
           </table>
@@ -676,7 +689,7 @@
           </div>
           <div class="card-body">
             <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">
-              Enter details for two loan options to compare EMIs, interest payable, and total repayment amounts.
+              Enter the details for two loan options to compare EMIs, total interest payable, and total repayment amounts.
             </p>
             <form id="compare-form" onsubmit="event.preventDefault();">
               <div class="compare-columns-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
@@ -692,27 +705,27 @@
                     <label for="compare-principal-1">Loan Amount (₹) *</label>
                     <div style="position:relative;">
                       <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                      <input type="text" id="compare-principal-1" class="form-control compare-principal-input" placeholder="e.g. 10,00,000" style="padding-left:28px;" required />
+                      <input type="text" id="compare-principal-1" class="form-control compare-principal-input" placeholder="e.g., 10,00,000" style="padding-left:28px;" required />
                     </div>
                     <div class="error-msg" id="err-compare-principal-1" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
                   </div>
                   
                   <div class="form-group">
                     <label for="compare-rate-1">Interest Rate (% p.a.) *</label>
-                    <input type="number" id="compare-rate-1" step="0.01" class="form-control" placeholder="e.g. 10.5" required />
+                    <input type="number" id="compare-rate-1" step="0.01" class="form-control" placeholder="e.g., 10.5" required />
                     <div class="error-msg" id="err-compare-rate-1" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
                   </div>
                   
                   <div class="form-group">
                     <label for="compare-tenure-1">Loan Tenure (Months) *</label>
-                    <input type="number" id="compare-tenure-1" class="form-control" placeholder="e.g. 60" required />
+                    <input type="number" id="compare-tenure-1" class="form-control" placeholder="e.g., 60" required />
                     <div class="error-msg" id="err-compare-tenure-1" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
                   </div>
 
                   <div class="form-group">
                     <label for="compare-bank-1">Bank / NBFC (Optional)</label>
                     <select id="compare-bank-1" class="form-control">
-                      <option value="">Select Bank (optional)</option>
+                      <option value="">Select a Bank / NBFC (Optional)</option>
                       <option value="ABFL">Aditya Birla Finance Limited</option>
                       <option value="AAVAS">Aavas Financiers Limited</option>
                       <option value="APTUS">Aptus Value Housing Finance India Limited</option>
@@ -803,7 +816,7 @@
                     <label for="compare-principal-2">Loan Amount (₹) *</label>
                     <div style="position:relative;">
                       <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                      <input type="text" id="compare-principal-2" class="form-control compare-principal-input" placeholder="e.g. 10,00,000" style="padding-left:28px;" required />
+                      <input type="text" id="compare-principal-2" class="form-control compare-principal-input" placeholder="e.g., 10,00,000" style="padding-left:28px;" required />
                     </div>
                     <div class="error-msg" id="err-compare-principal-2" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
                   </div>
@@ -816,14 +829,14 @@
                   
                   <div class="form-group">
                     <label for="compare-tenure-2">Loan Tenure (Months) *</label>
-                    <input type="number" id="compare-tenure-2" class="form-control" placeholder="e.g. 60" required />
+                    <input type="number" id="compare-tenure-2" class="form-control" placeholder="e.g., 60" required />
                     <div class="error-msg" id="err-compare-tenure-2" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
                   </div>
 
                   <div class="form-group">
                     <label for="compare-bank-2">Bank / NBFC (Optional)</label>
                     <select id="compare-bank-2" class="form-control">
-                      <option value="">Select Bank (optional)</option>
+                      <option value="">Select a Bank / NBFC (Optional)</option>
                       <option value="ABFL">Aditya Birla Finance Limited</option>
                       <option value="AAVAS">Aavas Financiers Limited</option>
                       <option value="APTUS">Aptus Value Housing Finance India Limited</option>
@@ -936,7 +949,7 @@
             <div class="stat-card" style="border-left: 5px solid var(--warning);">
               <div class="stat-icon" style="color: var(--warning);">📈</div>
               <div class="primary-result-value" id="comp-interest-diff-val" style="color: var(--warning);">₹0</div>
-              <div class="results-header-text">Interest Cost Difference</div>
+              <div class="results-header-text">Interest Payable Difference</div>
             </div>
           </div>
 
@@ -947,10 +960,10 @@
               
               <div class="export-btn-group" style="margin:0;">
                 <button class="btn btn-secondary export-btn" onclick="exportComparePDF()">
-                  <span class="emoji-sm">📥</span>PDF Report
+                  <span class="emoji-sm">📥</span>Export PDF
                 </button>
                 <button class="btn btn-secondary export-btn" onclick="exportCompareExcel()">
-                  <span class="emoji-sm">📊</span>Excel Export
+                  <span class="emoji-sm">📊</span>Export Excel
                 </button>
                 <button class="btn btn-secondary export-btn" onclick="window.print()">
                   <span class="emoji-sm">🖨️</span>Print
@@ -1581,7 +1594,7 @@
     if (detailsContainer) {
       detailsContainer.innerHTML = `
         <div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px 0;">
-          Enter values above and click Calculate to view breakdown.
+          Enter the loan details above and click Calculate to view the breakdown.
         </div>
       `;
     }
@@ -2146,7 +2159,7 @@
     const tbody = document.getElementById('compare-table-tbody');
     tbody.innerHTML = `
       <tr>
-        <td style="padding: 12px; font-weight: 500;">Principal Loan Amount</td>
+        <td style="padding: 12px; font-weight: 500;">Loan Amount (Principal)</td>
         <td style="padding: 12px;">${formatCell(opt1.p, highlightBetterClass(opt1.p, opt2.p, true))}</td>
         <td style="padding: 12px;">${formatCell(opt2.p, highlightBetterClass(opt2.p, opt1.p, true))}</td>
         <td style="padding: 12px; font-weight: 600;">₹${Math.round(Math.abs(opt1.p - opt2.p)).toLocaleString('en-IN')}</td>
@@ -2207,7 +2220,7 @@
       ["CLN Lending Suite - Loan Comparison Report"],
       [],
       ["Parameters", `Option 1 (${opt1.b || 'N/A'})`, `Option 2 (${opt2.b || 'N/A'})`, "Difference"],
-      ["Principal Loan Amount", Math.round(opt1.p), Math.round(opt2.p), Math.round(Math.abs(opt1.p - opt2.p))],
+      ["Loan Amount (Principal)", Math.round(opt1.p), Math.round(opt2.p), Math.round(Math.abs(opt1.p - opt2.p))],
       ["Interest Rate (% p.a.)", `${opt1.r}%`, `${opt2.r}%`, `${Math.abs(opt1.r - opt2.r).toFixed(2)}%`],
       ["Tenure (Months)", opt1.t, opt2.t, Math.abs(opt1.t - opt2.t)],
       ["Monthly EMI", Math.round(opt1.emi), Math.round(opt2.emi), Math.round(emiDiff)],
@@ -2270,7 +2283,7 @@
     doc.text(`Choosing Option ${betterOption} saves ₹${Math.round(savings).toLocaleString('en-IN')} overall compared to Option ${betterOption === 1 ? 2 : 1}.`, 40, 130);
     
     const tableData = [
-      ["Principal Loan Amount", `₹${Math.round(opt1.p).toLocaleString('en-IN')}`, `₹${Math.round(opt2.p).toLocaleString('en-IN')}`, `₹${Math.round(Math.abs(opt1.p - opt2.p)).toLocaleString('en-IN')}`],
+      ["Loan Amount (Principal)", `₹${Math.round(opt1.p).toLocaleString('en-IN')}`, `₹${Math.round(opt2.p).toLocaleString('en-IN')}`, `₹${Math.round(Math.abs(opt1.p - opt2.p)).toLocaleString('en-IN')}`],
       ["Interest Rate (% p.a.)", `${opt1.r}% p.a.`, `${opt2.r}% p.a.`, `${Math.abs(opt1.r - opt2.r).toFixed(2)}%`],
       ["Loan Tenure (Months)", `${opt1.t} Months`, `${opt2.t} Months`, `${Math.abs(opt1.t - opt2.t)} Months`],
       ["Monthly EMI", `₹${Math.round(opt1.emi).toLocaleString('en-IN')}`, `₹${Math.round(opt2.emi).toLocaleString('en-IN')}`, `₹${Math.round(emiDiff).toLocaleString('en-IN')}`],

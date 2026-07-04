@@ -9,6 +9,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <style>
     .filter-option:hover {
@@ -429,14 +442,14 @@
   <main class="main-content">
     <div class="topbar">
       <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2><span class="emoji">📋</span>Customers</h2><p>All active customer records</p></div>
+      <div class="topbar-title"><h2><span class="emoji">📋</span>Customers</h2><p>View and manage all active customer records</p></div>
     </div>
 
     <div class="page-content">
       <div class="filters-bar">
         <div class="search-box" style="flex:1;">
           <span class="search-icon">Search</span>
-          <input type="text" id="search-input" class="form-control" placeholder="Search by name or phone..." oninput="loadCustomers()" style="width:100%;" />
+          <input type="text" id="search-input" class="form-control" placeholder="Search by customer name or phone number..." oninput="loadCustomers()" style="width:100%;" />
         </div>
 
         <div id="custom-date-container" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -447,9 +460,9 @@
         </div>
 
         <div class="area-filter-container" style="position: relative; max-width: 150px;">
-          <input type="text" id="area-search-input" class="form-control" placeholder="Search areas..." oninput="filterAreaOptions()" />
+          <input type="text" id="area-search-input" class="form-control" placeholder="Search by city..." oninput="filterAreaOptions()" />
           <div id="area-dropdown" class="area-dropdown" style="position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0 0 8px 8px; max-height: 250px; overflow-y: auto; display: none; z-index: 1000; box-shadow: 0 8px 16px rgba(31, 43, 39, 0.12); min-width: 140px;">
-            <div class="area-option" data-value="" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 500; font-size: 13px; color: var(--text-primary); transition: background 0.2s;">All Areas</div>
+            <div class="area-option" data-value="" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 500; font-size: 13px; color: var(--text-primary); transition: background 0.2s;">All Cities</div>
           </div>
           <input type="hidden" id="area-filter" value="" />
         </div>
@@ -477,13 +490,13 @@
             </div>
             <!-- Download CSV Button -->
             <button class="btn btn-primary btn-sm" id="download-csv-btn" onclick="downloadCSV()" style="display:inline-flex;align-items:center;gap:6px;">
-              <span class="emoji-sm">📥</span>Download CSV
+              <span class="emoji-sm">📥</span>Export CSV
             </button>
           </div>
         </div>
         <div class="table-wrapper">
           <table>
-            <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Area</th><th>Address</th><th>Added By</th><th>Date</th><th>Actions</th></tr></thead>
+            <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>City</th><th>Address</th><th>Added By</th><th>Date</th><th>Actions</th></tr></thead>
             <tbody id="customers-tbody"><tr><td colspan="8" class="text-center text-muted">Loading...</td></tr></tbody>
           </table>
         </div>
@@ -540,7 +553,7 @@
     try {
       const res = await api.get('/admin/areas');
       const dropdown = document.getElementById('area-dropdown');
-      let html = '<div class="area-option" data-value="" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 500; font-size: 13px; color: var(--text-primary); transition: background 0.2s; display: block;">All Areas</div>';
+      let html = '<div class="area-option" data-value="" style="padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); font-weight: 500; font-size: 13px; color: var(--text-primary); transition: background 0.2s; display: block;">All Cities</div>';
       if (!res?.ok) {
         console.warn('Failed to load areas', res?.data?.message || res);
         dropdown.innerHTML = html;
@@ -756,7 +769,7 @@
         <div class="customer-info-grid">
           ${field('Phone', textOrDash(customer.phone))}
           ${field('Email', textOrDash(customer.email))}
-          ${field('Area', textOrDash(customer.area))}
+          ${field('City', textOrDash(customer.area))}
           ${field('Net Salary', moneyOrDash(customer.net_salary))}
           ${field('Total Obligation', moneyOrDash(customer.total_obligation))}
           ${field('Added By', textOrDash(customer.added_by_name))}

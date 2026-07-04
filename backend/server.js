@@ -202,13 +202,23 @@ async function ensurePasswordResetTable() {
 
 async function ensureDocumentsTable() {
   const allowedDocTypes = [
+    'Aadhaar Card',
+    'PAN Card',
+    'Passport Size Photograph',
+    '3 Months Bank Statement',
+    '6 Months Bank Statement',
+    '3 Months Salary Slips',
+    '6 Months Salary Slips',
+    'Form 16',
+    'Cancelled Cheque',
+    'Existing Loan Statement',
+    'Other',
     'Aadhar',
     'PAN',
     'Passport',
     'Driving License',
     '3M Bank Statement',
-    '3M Salary Slip',
-    'Other'
+    '3M Salary Slip'
   ];
 
   const enumValues = allowedDocTypes.map((value) => `'${value.replace(/'/g, "''")}'`).join(', ');
@@ -782,6 +792,8 @@ async function runMigrations() {
     await ensurePasswordResetTable();
     await ensureDocumentsTable();
     await ensureLoansTable();
+    await ensureWhatsAppTables();
+    await ensureBreakTimeTables();
 
     await ensureProfileTables();
     await ensureSettingsTables();

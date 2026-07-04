@@ -10,6 +10,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <style>
     /* Scoped styles for Employee Profile modal */
@@ -144,7 +157,7 @@
     #profile-modal .profile-avatar-large {
       width: 72px;
       height: 72px;
-      border-radius: 18px;
+      border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--accent-hover));
       display: flex;
       align-items: center;
@@ -546,7 +559,7 @@
       #profile-modal .profile-avatar-large {
         width: 58px;
         height: 58px;
-        border-radius: 14px;
+        border-radius: 50%;
         font-size: 22px;
       }
       #profile-modal #prof-name {
@@ -1056,19 +1069,62 @@
       align-items: center;
       gap: 10px;
     }
+    .employee-profile-trigger {
+      width: 100%;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      padding: 6px 8px 6px 6px;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+    .employee-profile-trigger:hover,
+    .employee-profile-trigger:focus-visible {
+      border-color: rgba(47, 111, 237, 0.22);
+      background: linear-gradient(135deg, rgba(47, 111, 237, 0.08), rgba(15, 139, 113, 0.05));
+      box-shadow: var(--shadow-soft);
+      outline: none;
+      transform: translateY(-1px);
+    }
+    :root[data-theme='dark'] .employee-profile-trigger:hover,
+    :root[data-theme='dark'] .employee-profile-trigger:focus-visible {
+      border-color: rgba(139, 180, 255, 0.2);
+      background: linear-gradient(135deg, rgba(139, 180, 255, 0.1), rgba(93, 212, 199, 0.05));
+    }
     .employee-avatar-mini {
       width: 34px;
       height: 34px;
-      border-radius: 10px;
+      border-radius: 50%;
       flex: 0 0 auto;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
       color: #ffffff;
       font-size: 13px;
       font-weight: 800;
       background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
       box-shadow: 0 5px 14px rgba(16, 32, 51, 0.12);
+    }
+    .employee-avatar-mini img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .employee-avatar-fallback {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      line-height: 1;
     }
     :root[data-theme='dark'] .employee-avatar-mini {
       box-shadow: 0 8px 18px rgba(0, 0, 0, 0.26);
@@ -1174,7 +1230,6 @@
       gap: 8px;
       min-width: 0;
     }
-    .employee-action-primary,
     .employee-action-menu {
       min-height: 34px;
       border: 1px solid var(--border);
@@ -1185,20 +1240,6 @@
       transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
       font-family: inherit;
     }
-    .employee-action-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      padding: 0 11px;
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 800;
-      white-space: nowrap;
-      background: linear-gradient(135deg, rgba(47, 111, 237, 0.08), rgba(15, 139, 113, 0.05));
-      border-color: rgba(47, 111, 237, 0.16);
-    }
-    .employee-action-primary:hover,
     .employee-action-menu:hover,
     .dropdown-container.open .employee-action-menu {
       background: var(--accent-soft);
@@ -1207,7 +1248,6 @@
       box-shadow: var(--shadow-soft);
       transform: translateY(-1px);
     }
-    .employee-action-primary svg,
     .employee-action-menu svg {
       width: 15px;
       height: 15px;
@@ -1414,11 +1454,8 @@
         display: none;
       }
       .employee-actions {
-        justify-content: stretch;
+        justify-content: flex-end;
         position: relative;
-      }
-      .employee-action-primary {
-        flex: 1 1 auto;
       }
       .employee-actions .dropdown-container {
         position: static;
@@ -1456,9 +1493,6 @@
       .employee-status-badge {
         white-space: normal;
         text-align: right;
-      }
-      .employee-action-primary span {
-        display: inline;
       }
     }
 
@@ -1824,7 +1858,7 @@
                   <span class="status-text" id="live-status-text">Checking Hours...</span>
                 </div>
                 <div class="live-clock" id="live-clock-time">--:--:-- --</div>
-                <div class="live-clock-meta" id="live-clock-meta">Asia/Kolkata timezone</div>
+                <div class="live-clock-meta" id="live-clock-meta">Asia/Kolkata Time Zone</div>
                 <div class="current-schedule-info" id="current-schedule-display">
                   Working Hours: --:-- - --:--
                 </div>
@@ -1839,7 +1873,7 @@
       <div class="toolbar-card">
         <div class="toolbar-search-container">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-field-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input type="text" id="search-input" class="toolbar-search-input" placeholder="Search employees by name or email..." oninput="renderTable()" />
+          <input type="text" id="search-input" class="toolbar-search-input" placeholder="Search by employee name or email..." oninput="renderTable()" />
         </div>
 
         <div class="toolbar-filters-container">
@@ -1879,7 +1913,7 @@
               <col style="width: 14%;" />
               <col style="width: 13%;" />
               <col style="width: 16%;" />
-              <col style="width: 150px;" />
+              <col style="width: 82px;" />
             </colgroup>
             <thead>
               <tr>
@@ -1889,7 +1923,7 @@
                 <th>Phone</th>
                 <th>Joined</th>
                 <th>Status</th>
-                <th style="text-align: right; padding-right: 24px;">Actions</th>
+                <th style="text-align: right; padding-right: 18px;">Actions</th>
               </tr>
             </thead>
             <tbody id="employees-tbody">
@@ -1989,6 +2023,11 @@
         <div class="profile-panel-shell">
           <div class="profile-tab-panel active" id="prof-panel-personal">
             <div class="info-grid">
+              <div class="info-item"><label>Employee ID</label><span id="prof-employee-id">-</span></div>
+              <div class="info-item"><label>Username</label><span id="prof-username">-</span></div>
+              <div class="info-item"><label>Role</label><span id="prof-role">-</span></div>
+              <div class="info-item"><label>Department</label><span id="prof-department">-</span></div>
+              <div class="info-item"><label>Account Status</label><span id="prof-account-status">-</span></div>
               <div class="info-item"><label>Date of Birth</label><span id="prof-dob">—</span></div>
               <div class="info-item"><label>Gender</label><span id="prof-gender">—</span></div>
               <div class="info-item"><label>City</label><span id="prof-city">—</span></div>
@@ -2245,10 +2284,6 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
             </button>
             <div id="dropdown-${e.id}" class="action-dropdown-menu">
-              <button type="button" class="action-dropdown-item" onclick="openProfileModal(${e.id})">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                View Profile
-              </button>
               <button type="button" class="action-dropdown-item" onclick='openPasswordModal(${e.id}, ${JSON.stringify(e.name)})'>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
                 Reset Password
@@ -2274,6 +2309,25 @@
     const parts = String(name || 'Employee').trim().split(/\s+/).filter(Boolean);
     if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
     return (parts[0]?.slice(0, 2) || 'E').toUpperCase();
+  }
+
+  function employeeAssetUrl(value) {
+    const path = String(value || '').trim();
+    if (!path) return '';
+    if (/^(https?:|data:|blob:)/i.test(path)) return path;
+    const base = api?.uploadsBase || '';
+    if (path.startsWith('/')) return base ? `${base}${path}` : path;
+    return base ? `${base}/${path}` : `/${path}`;
+  }
+
+  function renderEmployeeAvatar(employee, name) {
+    const initials = escapeHtml(employeeInitials(name));
+    const imageUrl = employeeAssetUrl(employee?.profile_picture);
+    return `
+      <span class="employee-avatar-mini" aria-hidden="true">
+        <span class="employee-avatar-fallback">${initials}</span>
+        ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'" />` : ''}
+      </span>`;
   }
 
   function formatEmployeeDate(value) {
@@ -2379,13 +2433,13 @@
       <tr>
         <td data-label="#" class="employee-index-cell">${i + 1}</td>
         <td data-label="Name" class="employee-name-cell">
-          <div class="employee-identity">
-            <span class="employee-avatar-mini" aria-hidden="true">${escapeHtml(employeeInitials(name))}</span>
+          <button type="button" class="employee-identity employee-profile-trigger" onclick="openProfileModal(${id})" title="Open full profile for ${escapeHtml(name)}" aria-label="Open full profile for ${escapeHtml(name)}">
+            ${renderEmployeeAvatar(e, name)}
             <span class="employee-name-copy">
               <span class="employee-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
               <span class="employee-role" title="${escapeHtml(designation)}">${escapeHtml(designation)}</span>
             </span>
-          </div>
+          </button>
         </td>
         <td data-label="Email" class="employee-email-cell"><span class="employee-email" title="${escapeHtml(email)}">${escapeHtml(email)}</span></td>
         <td data-label="Phone" class="employee-phone-cell"><span class="employee-phone">${escapeHtml(phone)}</span></td>
@@ -2393,10 +2447,6 @@
         <td data-label="Status" class="employee-status-cell"><span class="badge employee-status-badge ${status.badgeClass}">${escapeHtml(status.label)}</span></td>
         <td data-label="Actions" class="employee-actions-cell">
           <div class="employee-actions">
-            <button type="button" class="employee-action-primary" onclick="openProfileModal(${id})" title="View Profile" aria-label="View profile for ${escapeHtml(name)}">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-              <span>Profile</span>
-            </button>
             <div class="dropdown-container">
               <button type="button" class="employee-action-menu" onclick="toggleDropdown(event, ${id})" aria-label="More actions for ${escapeHtml(name)}" title="More actions">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
@@ -2482,6 +2532,11 @@
     document.getElementById('prof-kyc-status').textContent = '—';
     document.getElementById('prof-avatar').textContent = 'E';
     document.getElementById('prof-avatar').style.background = '';
+    document.getElementById('prof-employee-id').textContent = '-';
+    document.getElementById('prof-username').textContent = '-';
+    document.getElementById('prof-role').textContent = '-';
+    document.getElementById('prof-department').textContent = '-';
+    document.getElementById('prof-account-status').textContent = '-';
 
     const res = await api.get(`/profile/admin/employees/${id}`);
     if (!res?.ok) {
@@ -2506,10 +2561,11 @@
 
     // Avatar
     const profAvatar = document.getElementById('prof-avatar');
-    if (u.profile_picture) {
-      profAvatar.innerHTML = `<img src="${escapeHtml(u.profile_picture)}" alt="avatar" />`;
+    const profilePhotoUrl = employeeAssetUrl(u.profile_picture);
+    if (profilePhotoUrl) {
+      profAvatar.innerHTML = `<img src="${escapeHtml(profilePhotoUrl)}" alt="${escapeHtml(employeeName)} profile photo" onerror="this.style.display='none'" />`;
     } else {
-      profAvatar.innerHTML = escapeHtml(profileValue(u.name, 'Employee').charAt(0).toUpperCase());
+      profAvatar.innerHTML = escapeHtml(employeeInitials(employeeName));
     }
 
     // KYC status badge
@@ -2519,6 +2575,12 @@
     document.getElementById('prof-kyc-status').innerHTML = `<span class="badge ${badgeClass}">${escapeHtml(kvs)}</span>`;
 
     // Personal Tab
+    const accountStatus = getEmployeeStatusMeta(u);
+    document.getElementById('prof-employee-id').textContent = u.id ? `#${u.id}` : '-';
+    document.getElementById('prof-username').textContent = profileValue(u.username, '-');
+    document.getElementById('prof-role').textContent = profileValue(u.role, '-');
+    document.getElementById('prof-department').textContent = profileValue(u.department, '-');
+    document.getElementById('prof-account-status').innerHTML = `<span class="badge employee-status-badge ${accountStatus.badgeClass}">${escapeHtml(accountStatus.label)}</span>`;
     document.getElementById('prof-dob').textContent = u.date_of_birth ? formatDate(u.date_of_birth) : '—';
     document.getElementById('prof-gender').textContent = profileValue(u.gender);
     document.getElementById('prof-city').textContent = profileValue(u.city);

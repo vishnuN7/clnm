@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CLN Lending Suite — Admin Profile</title>
   <meta name="description" content="Admin profile management — update personal info, security, and preferences." />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/css/styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -284,12 +297,12 @@
           <!-- ── Right: Tabbed Sections ── -->
           <div>
             <div class="profile-tabs">
-              <button class="ptab active" onclick="switchTab('personal')"><i class="fas fa-user"></i> Personal Info</button>
+              <button class="ptab active" onclick="switchTab('personal')"><i class="fas fa-user"></i> Personal Information</button>
               <button class="ptab" onclick="switchTab('account')"><i class="fas fa-sliders"></i> Account</button>
               <button class="ptab" onclick="switchTab('security')"><i class="fas fa-shield-halved"></i> Security</button>
               <button class="ptab" onclick="switchTab('notifications')"><i class="fas fa-bell"></i> Notifications</button>
               <button class="ptab" onclick="switchTab('logs')"><i class="fas fa-list-check"></i> Activity</button>
-              <button class="ptab" onclick="switchTab('sysinfo')"><i class="fas fa-circle-info"></i> System Info</button>
+              <button class="ptab" onclick="switchTab('sysinfo')"><i class="fas fa-circle-info"></i> System Information</button>
             </div>
 
             <!-- Personal Info -->
@@ -297,22 +310,22 @@
               <div class="sec-card">
                 <div class="sec-head">
                   <div class="sec-head-icon"><i class="fas fa-user"></i></div>
-                  <div><h3>Personal Information</h3><p>Update your personal details and contact address</p></div>
+                  <div><h3>Personal Information</h3><p>Update your personal details and contact information.</p></div>
                 </div>
                 <div class="sec-body">
                   <div class="form-grid">
                     <div class="form-group"><label>Date of Birth</label><input type="date" id="pi-dob" /></div>
                     <div class="form-group"><label>Gender</label>
                       <select id="pi-gender">
-                        <option value="">Select Gender</option>
+                        <option value="">Select a gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                         <option value="Prefer not to say">Prefer not to say</option>
                       </select>
                     </div>
-                    <div class="form-group full"><label>Current Address</label><input type="text" id="pi-address" placeholder="Street address, apartment, locality…" /></div>
-                    <div class="form-group full"><label>Permanent Address</label><input type="text" id="pi-perm-address" placeholder="Same as above or permanent residential address" /></div>
+                    <div class="form-group full"><label>Current Address</label><input type="text" id="pi-address" placeholder="Enter your street address, apartment, and locality" /></div>
+                    <div class="form-group full"><label>Permanent Address</label><input type="text" id="pi-perm-address" placeholder="Enter your permanent residential address" /></div>
                     <div class="form-group"><label>City</label><input type="text" id="pi-city" placeholder="City" /></div>
                     <div class="form-group"><label>State</label><input type="text" id="pi-state" placeholder="State" /></div>
                     <div class="form-group"><label>Country</label><input type="text" id="pi-country" placeholder="Country" /></div>
@@ -362,14 +375,14 @@
                     <div class="form-group full">
                       <label>Current Password</label>
                       <div class="pw-toggle">
-                        <input type="password" id="pw-current" placeholder="Enter current password" />
+                        <input type="password" id="pw-current" placeholder="Enter your current password" />
                         <i class="fas fa-eye pw-eye" onclick="togglePw('pw-current', this)"></i>
                       </div>
                     </div>
                     <div class="form-group">
                       <label>New Password</label>
                       <div class="pw-toggle">
-                        <input type="password" id="pw-new" placeholder="Min 8 characters" oninput="checkPwStrength()" />
+                        <input type="password" id="pw-new" placeholder="Minimum 8 characters" oninput="checkPwStrength()" />
                         <i class="fas fa-eye pw-eye" onclick="togglePw('pw-new', this)"></i>
                       </div>
                       <div class="pw-strength">
@@ -380,7 +393,7 @@
                     <div class="form-group">
                       <label>Confirm New Password</label>
                       <div class="pw-toggle">
-                        <input type="password" id="pw-confirm" placeholder="Re-enter new password" />
+                        <input type="password" id="pw-confirm" placeholder="Re-enter your new password" />
                         <i class="fas fa-eye pw-eye" onclick="togglePw('pw-confirm', this)"></i>
                       </div>
                     </div>
@@ -393,7 +406,7 @@
               <div class="sec-card">
                 <div class="sec-head">
                   <div class="sec-head-icon"><i class="fas fa-user-shield"></i></div>
-                  <div><h3>Login History</h3><p>Recent signed-in sessions and device security logs</p></div>
+                  <div><h3>Login History</h3><p>View your recent sign-in sessions and device activity</p></div>
                 </div>
                 <div class="sec-body" id="login-history-list">
                   <p style="font-size:12px; color:var(--text-muted); font-style:italic;">Loading history…</p>
@@ -406,7 +419,7 @@
               <div class="sec-card">
                 <div class="sec-head">
                   <div class="sec-head-icon"><i class="fas fa-bell"></i></div>
-                  <div><h3>Notification Preferences</h3><p>Choose which system and communication alerts you receive</p></div>
+                  <div><h3>Notification Preferences</h3><p>Choose the system and communication notifications you want to receive</p></div>
                 </div>
                 <div class="sec-body">
                   <div class="toggle-row">
@@ -414,7 +427,7 @@
                     <label class="toggle-switch"><input type="checkbox" id="n-email" /><span class="toggle-slider"></span></label>
                   </div>
                   <div class="toggle-row">
-                    <div class="toggle-info"><h4>WhatsApp Notifications</h4><p>Receive immediate real-time WhatsApp alert messages</p></div>
+                    <div class="toggle-info"><h4>WhatsApp Notifications</h4><p>Receive real-time WhatsApp notifications</p></div>
                     <label class="toggle-switch"><input type="checkbox" id="n-whatsapp" /><span class="toggle-slider"></span></label>
                   </div>
                   <div class="toggle-row">
@@ -422,11 +435,11 @@
                     <label class="toggle-switch"><input type="checkbox" id="n-loans" /><span class="toggle-slider"></span></label>
                   </div>
                   <div class="toggle-row">
-                    <div class="toggle-info"><h4>Employee Activity Alerts</h4><p>Alerts when staff members perform key administrative actions</p></div>
+                    <div class="toggle-info"><h4>Employee Activity Alerts</h4><p>Receive alerts when employees perform key administrative actions</p></div>
                     <label class="toggle-switch"><input type="checkbox" id="n-emp" /><span class="toggle-slider"></span></label>
                   </div>
                   <div class="toggle-row">
-                    <div class="toggle-info"><h4>System Alerts</h4><p>Critical system and security alerts</p></div>
+                    <div class="toggle-info"><h4>System Alerts</h4><p>Receive critical system and security alerts</p></div>
                     <label class="toggle-switch"><input type="checkbox" id="n-sys" /><span class="toggle-slider"></span></label>
                   </div>
                   <div class="form-actions" style="margin-top:20px;">
@@ -441,7 +454,7 @@
               <div class="sec-card">
                 <div class="sec-head">
                   <div class="sec-head-icon"><i class="fas fa-list-check"></i></div>
-                  <div><h3>Activity Log</h3><p>Audit trial of your recent administrative actions</p></div>
+                  <div><h3>Activity Log</h3><p>Audit trail of your recent administrative actions</p></div>
                 </div>
                 <div class="sec-body" style="padding:0;">
                   <table class="log-table">
@@ -459,7 +472,7 @@
               <div class="sec-card">
                 <div class="sec-head">
                   <div class="sec-head-icon"><i class="fas fa-circle-info"></i></div>
-                  <div><h3>System Information</h3><p>Read-only administrator account and platform metadata</p></div>
+                  <div><h3>System Information</h3><p>View read-only administrator account and platform information</p></div>
                 </div>
                 <div class="sec-body">
                   <div class="sys-grid">
