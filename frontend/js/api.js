@@ -1070,12 +1070,39 @@ function showAlert(id, message, type = 'error') {
 }
 
 // ── Format helpers ────────────────────────────────────────────
+function parseDisplayDate(value) {
+  if (!value) return null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (typeof value === 'number') return new Date(value);
+  if (typeof value !== 'string') return null;
+
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    const parsed = new Date(`${trimmed}T00:00:00+05:30`);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?$/.test(trimmed)) {
+    const normalized = trimmed.includes('T') ? trimmed : trimmed.replace(' ', 'T');
+    const parsed = new Date(`${normalized}+05:30`);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  const parsed = new Date(trimmed);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
 function formatCurrency(amount) {
   return '₹' + Number(amount).toLocaleString('en-IN', { minimumFractionDigits: 0 });
 }
 
 function formatDate(date) {
-  return new Date(date).toLocaleDateString('en-IN', {
+  const parsedDate = parseDisplayDate(date);
+  if (!parsedDate) return '—';
+
+  return parsedDate.toLocaleDateString('en-IN', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -1084,7 +1111,10 @@ function formatDate(date) {
 }
 
 function formatTime(date) {
-  return new Date(date).toLocaleTimeString('en-IN', {
+  const parsedDate = parseDisplayDate(date);
+  if (!parsedDate) return '—';
+
+  return parsedDate.toLocaleTimeString('en-IN', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
