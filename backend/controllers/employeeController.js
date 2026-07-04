@@ -1,3 +1,4 @@
+const upload = require('../middleware/upload');
 const CustomerModel = require('../models/customerModel');
 const LoanModel = require('../models/loanModel');
 const DocumentModel = require('../models/documentModel');
@@ -187,15 +188,15 @@ const employeeController = {
       const uploadedDocuments = [];
 
       for (const file of files) {
-        const filePath = `/uploads/customer_${customerId}/${file.filename}`;
-        let fileData = null;
-        try {
-          if (file.path && fs.existsSync(file.path)) {
-            fileData = fs.readFileSync(file.path);
-          }
-        } catch (readErr) {
-          console.error('[Employee] Error reading file into buffer:', readErr.message);
-        }
+       const filePath = upload.getFileUrl(req, file);
+       let fileData = null;
+       try {
+         if (file.path && fs.existsSync(file.path)) {
+           fileData = fs.readFileSync(file.path);
+         }
+       } catch (readErr) {
+         console.error('[Employee] Error reading file into buffer:', readErr.message);
+       }
 
         const id = await DocumentModel.create({
           customer_id: customerId,

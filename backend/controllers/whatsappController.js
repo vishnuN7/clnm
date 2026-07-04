@@ -1,3 +1,4 @@
+const upload = require('../middleware/upload');
 const db               = require('../config/db');
 const whatsappService  = require('../utils/whatsappService');
 const baileysSession   = require('../utils/baileys-session');
@@ -343,7 +344,7 @@ const whatsappController = {
       let attachmentPath = null;
       if (req.file) {
         attachmentName = req.file.originalname;
-        attachmentPath = '/uploads/' + req.file.filename;
+        attachmentPath = upload.getFileUrl(req, req.file);
       }
 
       // 1. Log to DB first (always works, even if WhatsApp is offline)

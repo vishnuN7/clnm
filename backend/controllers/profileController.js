@@ -1,3 +1,4 @@
+const upload = require('../middleware/upload');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
@@ -181,7 +182,7 @@ const profileController = {
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       }
 
-      const relativePath = '/uploads/profile_pics/' + req.file.filename;
+      const relativePath = upload.getFileUrl(req, req.file);
       await db.query('UPDATE users SET profile_picture=? WHERE id=?', [relativePath, userId]);
 
       await logActivity(userId, 'Updated profile picture', req);
@@ -202,7 +203,7 @@ const profileController = {
         return res.status(400).json({ success: false, message: 'No file uploaded.' });
       }
 
-      const relativePath = '/uploads/kyc_docs/' + req.file.filename;
+      const relativePath = upload.getFileUrl(req, req.file);
 
       let updateField = null;
       let activity = '';
