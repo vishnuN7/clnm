@@ -97,8 +97,9 @@ const upload = multer({
 
 upload.getFileUrl = (req, file) => {
   if (useR2) {
-    // multer-s3 sets file.location to the full public R2 URL
-    return file.location;
+    // Build the public URL manually — file.location points to the
+    // private S3 API endpoint, not the public R2.dev URL
+    return `${process.env.R2_PUBLIC_URL}/${file.key}`;
   }
   const customerId = req.params.customerId || 'general';
   return `/uploads/customer_${customerId}/${file.filename}`;
