@@ -1,6 +1,6 @@
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-const { S3Client } = require('@aws-sdk/client-s3');
+const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const path = require('path');
 const fs = require('fs');
 
@@ -164,6 +164,27 @@ upload.kyc = multer({
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
 });
+
+// ─── Helper: delete a file from R2 (or local disk) given its stored URL ───
+
+upload.deleteFile = async (fileUrl) => {
+  if (!fileUrl) return;
+  try {
+    if (useR2 && fileUrl.startsWith(process.env.R2_PUBLIC_URL)) {
+      const key = fileUrl.replace(`${process.env.R2_PUBLIC_URL}/`, '');
+      await r2Client.send(new DeleteObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: key,
+      }));
+      console.log(`[R2] Deleted file: ${key}`);
+    } else if (!useR2 && fileUrl.startsWith('/uploads/')) {
+      const localPath = path.join(__dirname, '..', fileUrl);
+      if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
+    }
+  } catch (err) {
+    console.error('[Storage] Failed to delete file:', fileUrl, err.message);
+  }
+};
 
 console.log(`File storage: ${useR2 ? 'Cloudflare R2 ☁️' : 'Local disk 💾'}`);
 

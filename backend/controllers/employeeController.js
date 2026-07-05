@@ -122,6 +122,12 @@ const employeeController = {
         });
       }
 
+      // Delete all associated document files from storage (R2 or local disk)
+      const documents = await DocumentModel.getByCustomer(id);
+      for (const doc of documents) {
+        await upload.deleteFile(doc.file_path);
+      }
+
       await CustomerModel.delete(id);
       return res.json({ success: true, message: 'Customer deleted successfully.' });
     } catch (err) {
@@ -151,6 +157,12 @@ const employeeController = {
           if (loans.length > 0) {
             results.push({ id, success: false, reason: 'Has existing loans', loansCount: loans.length });
             continue;
+          }
+
+          // Delete all associated document files from storage (R2 or local disk)
+          const documents = await DocumentModel.getByCustomer(id);
+          for (const doc of documents) {
+            await upload.deleteFile(doc.file_path);
           }
 
           const affected = await CustomerModel.delete(id);
