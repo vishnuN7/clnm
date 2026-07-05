@@ -18,7 +18,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -27,10 +27,11 @@
     .profile-page { max-width: 1150px; margin: 0 auto; padding: 0 4px; }
     .profile-grid {
       display: grid;
-      grid-template-columns: 320px 1fr;
+      grid-template-columns: 320px minmax(0, 1fr);
       gap: 24px;
       align-items: start;
     }
+    .profile-grid > div { min-width: 0; }
     @media (max-width: 900px) { .profile-grid { grid-template-columns: 1fr; } }
 
     /* ── Overview Card ── */
@@ -100,12 +101,17 @@
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
 
     /* ── Tab Navigation ── */
-    .profile-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; background: var(--bg-secondary); padding: 6px; border-radius: 12px; border: 1px solid var(--border); }
+    .profile-tabs {
+      display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: nowrap;
+      overflow-x: auto; background: var(--bg-secondary); padding: 6px;
+      border-radius: 12px; border: 1px solid var(--border);
+      scrollbar-width: thin;
+    }
     .ptab {
-      padding: 9px 18px; border: none; border-radius: 8px;
-      font-size: 12.5px; font-weight: 600; cursor: pointer; color: var(--text-secondary);
+      flex: 0 0 auto; padding: 9px 7px; border: none; border-radius: 8px;
+      font-size: 11.75px; font-weight: 600; cursor: pointer; color: var(--text-secondary);
       background: transparent; transition: all 0.2s ease; white-space: nowrap;
-      display: inline-flex; align-items: center; gap: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
     }
     .ptab i { font-size: 13px; }
     .ptab:hover { color: var(--accent-secondary); background: var(--bg-card); }
@@ -493,7 +499,7 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260622a"></script>
+<script src="/js/api.js?v=20260705c"></script>
 <script>
   const user = requireRole('admin');
   if (user) { renderSidebarUser(); loadProfile(); }
