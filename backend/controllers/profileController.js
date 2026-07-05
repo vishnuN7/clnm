@@ -175,9 +175,9 @@ const profileController = {
         return res.status(400).json({ success: false, message: 'No file uploaded.' });
       }
 
-      // Delete old avatar if it exists
+      // Delete old avatar if it exists (only for local disk storage)
       const [userRows] = await db.query('SELECT profile_picture FROM users WHERE id = ?', [userId]);
-      if (userRows[0]?.profile_picture) {
+      if (userRows[0]?.profile_picture && userRows[0].profile_picture.startsWith('/uploads/')) {
         const oldPath = path.join(__dirname, '..', userRows[0].profile_picture);
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       }
@@ -210,17 +210,17 @@ const profileController = {
 
       if (doc_type === 'aadhaar_front') {
         const [old] = await db.query('SELECT aadhaar_front FROM users WHERE id=?', [userId]);
-        if (old[0]?.aadhaar_front) { const op = path.join(__dirname, '..', old[0].aadhaar_front); if (fs.existsSync(op)) fs.unlinkSync(op); }
+        if (old[0]?.aadhaar_front && old[0].aadhaar_front.startsWith('/uploads/')) { const op = path.join(__dirname, '..', old[0].aadhaar_front); if (fs.existsSync(op)) fs.unlinkSync(op); }
         await db.query('UPDATE users SET aadhaar_front=?, aadhaar_number=COALESCE(?, aadhaar_number) WHERE id=?', [relativePath, aadhaar_number || null, userId]);
         activity = 'Uploaded Aadhaar Front';
       } else if (doc_type === 'aadhaar_back') {
         const [old] = await db.query('SELECT aadhaar_back FROM users WHERE id=?', [userId]);
-        if (old[0]?.aadhaar_back) { const op = path.join(__dirname, '..', old[0].aadhaar_back); if (fs.existsSync(op)) fs.unlinkSync(op); }
+        if (old[0]?.aadhaar_back && old[0].aadhaar_back.startsWith('/uploads/')) { const op = path.join(__dirname, '..', old[0].aadhaar_back); if (fs.existsSync(op)) fs.unlinkSync(op); }
         await db.query('UPDATE users SET aadhaar_back=?, aadhaar_number=COALESCE(?, aadhaar_number) WHERE id=?', [relativePath, aadhaar_number || null, userId]);
         activity = 'Uploaded Aadhaar Back';
       } else if (doc_type === 'pan_card') {
         const [old] = await db.query('SELECT pan_card FROM users WHERE id=?', [userId]);
-        if (old[0]?.pan_card) { const op = path.join(__dirname, '..', old[0].pan_card); if (fs.existsSync(op)) fs.unlinkSync(op); }
+        if (old[0]?.pan_card && old[0].pan_card.startsWith('/uploads/')) { const op = path.join(__dirname, '..', old[0].pan_card); if (fs.existsSync(op)) fs.unlinkSync(op); }
         await db.query('UPDATE users SET pan_card=?, pan_number=COALESCE(?, pan_number) WHERE id=?', [relativePath, pan_number || null, userId]);
         activity = 'Uploaded PAN Card';
       } else {
@@ -388,7 +388,7 @@ const profileController = {
     try {
       const userId = req.user.id;
       const [userRows] = await db.query('SELECT profile_picture FROM users WHERE id = ?', [userId]);
-      if (userRows[0]?.profile_picture) {
+      if (userRows[0]?.profile_picture && userRows[0].profile_picture.startsWith('/uploads/')) {
         const oldPath = path.join(__dirname, '..', userRows[0].profile_picture);
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       }

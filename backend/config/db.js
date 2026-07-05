@@ -2,7 +2,6 @@ const mysql = require('mysql2/promise');
 
 const mysqlUrl = process.env.MYSQL_PUBLIC_URL || process.env.MYSQL_URL || process.env.DATABASE_URL || '';
 
-// Aiven MySQL requires SSL in production
 const sslConfig = process.env.NODE_ENV === 'production'
   ? { rejectUnauthorized: false }
   : false;
@@ -30,6 +29,11 @@ const poolConfig = mysqlUrl
     };
 
 const pool = mysql.createPool(poolConfig);
+
+// Force every connection to use IST (Indian Standard Time)
+pool.on('connection', (connection) => {
+  connection.query("SET time_zone = '+05:30'");
+});
 
 pool.getConnection()
   .then(conn => {
