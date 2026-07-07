@@ -71,7 +71,7 @@ const aprController = {
       // Present in date range (distinct employees)
       const [[presentRes]] = await db.query(`
         SELECT COUNT(DISTINCT employee_id) AS cnt FROM attendance_logs
-        WHERE DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) BETWEEN ? AND ?`,
+        WHERE DATE(login_time) BETWEEN ? AND ?`,
         [dateFrom, dateTo]
       );
       const presentToday = parseInt(presentRes.cnt) || 0;
@@ -100,14 +100,14 @@ const aprController = {
       // Logged in/out today (in IST date range)
       const [[loggedInRes]] = await db.query(`
         SELECT COUNT(DISTINCT employee_id) AS cnt FROM attendance_logs
-        WHERE DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) = ?`,
+        WHERE DATE(login_time) = ?`,
         [dateTo] // compare with today/latest date
       );
       const loggedInToday = parseInt(loggedInRes.cnt) || 0;
 
       const [[loggedOutRes]] = await db.query(`
         SELECT COUNT(DISTINCT employee_id) AS cnt FROM attendance_logs
-        WHERE logout_time IS NOT NULL AND DATE(CONVERT_TZ(logout_time, '+00:00', '+05:30')) = ?`,
+        WHERE logout_time IS NOT NULL AND DATE(logout_time) = ?`,
         [dateTo]
       );
       const loggedOutToday = parseInt(loggedOutRes.cnt) || 0;
@@ -122,15 +122,15 @@ const aprController = {
       const [sessions] = await db.query(`
         SELECT
           employee_id,
-          MIN(CONVERT_TZ(login_time, '+00:00', '+05:30')) AS first_login,
-          MAX(CASE WHEN logout_time IS NOT NULL THEN CONVERT_TZ(logout_time, '+00:00', '+05:30') END) AS last_logout,
+          MIN(login_time) AS first_login,
+          MAX(CASE WHEN logout_time IS NOT NULL THEN logout_time END) AS last_logout,
           ROUND(SUM(CASE
             WHEN logout_time IS NOT NULL
             THEN TIMESTAMPDIFF(SECOND, login_time, logout_time) / 3600.0
             ELSE TIMESTAMPDIFF(SECOND, login_time, NOW()) / 3600.0
           END), 2) AS working_hours
         FROM attendance_logs
-        WHERE DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+        WHERE DATE(login_time) BETWEEN ? AND ?
         GROUP BY employee_id`,
         [dateFrom, dateTo]
       );
@@ -272,7 +272,8 @@ const aprController = {
         if (r.login_time) {
           const firstLogin = new Date(r.login_time);
           const loginHr = firstLogin.getHours() + firstLogin.getMinutes() / 60;
-          attStatus = loginHr > 9.0 ? 'Late' : 'Present';
+          const LATE_THRESHOLD_HOUR = 9 + 20 / 60; // 9:20 AM (20-min grace period)
+          attStatus = loginHr > LATE_THRESHOLD_HOUR ? 'Late' : 'Present';
         }
 
         const workingHrs = r.working_seconds ? Number((r.working_seconds / 3600).toFixed(2)) : 0;
@@ -337,9 +338,9 @@ const aprController = {
           u.id AS employee_id,
           u.name AS employee_name,
           u.department,
-          DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) AS work_date,
-          MIN(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) AS first_login,
-          MAX(CASE WHEN al.logout_time IS NOT NULL THEN CONVERT_TZ(al.logout_time, '+00:00', '+05:30') END) AS last_logout,
+          DATE(al.login_time) AS work_date,
+          MIN(al.login_time) AS first_login,
+          MAX(CASE WHEN al.logout_time IS NOT NULL THEN al.logout_time END) AS last_logout,
           COUNT(al.id) AS total_sessions,
           ROUND(SUM(CASE
             WHEN al.logout_time IS NOT NULL
@@ -348,7 +349,7 @@ const aprController = {
           END), 2) AS total_working_hours
         FROM attendance_logs al
         JOIN users u ON u.id = al.employee_id
-        WHERE DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+        WHERE DATE(al.login_time) BETWEEN ? AND ?
       `;
       const sessionParams = [dateFrom, dateTo];
 
@@ -366,7 +367,7 @@ const aprController = {
           u.id,
           u.name,
           u.department,
-          DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30'))
+          DATE(al.login_time)
       `;
 
       const sql = `
@@ -383,11 +384,11 @@ const aprController = {
         LEFT JOIN (
           SELECT
             employee_id,
-            DATE(CONVERT_TZ(start_time, '+00:00', '+05:30')) AS work_date,
+            DATE(start_time) AS work_date,
             COALESCE(SUM(duration), 0) AS total_break_seconds
           FROM break_records
-          WHERE DATE(CONVERT_TZ(start_time, '+00:00', '+05:30')) BETWEEN ? AND ?
-          GROUP BY employee_id, DATE(CONVERT_TZ(start_time, '+00:00', '+05:30'))
+          WHERE DATE(start_time) BETWEEN ? AND ?
+          GROUP BY employee_id, DATE(start_time)
         ) breaks
           ON breaks.employee_id = sessions.employee_id
          AND breaks.work_date = sessions.work_date
@@ -403,7 +404,7 @@ const aprController = {
         const lastLogout = r.last_logout ? new Date(r.last_logout) : null;
         const logoutHr = lastLogout ? lastLogout.getHours() + lastLogout.getMinutes() / 60 : null;
 
-        const lateLogin = loginHr !== null && loginHr > OFFICE_START_HOUR ? 'Yes' : 'No';
+        const lateLogin = loginHr !== null && loginHr > (OFFICE_START_HOUR + 20 / 60) ? 'Yes' : 'No';
         const earlyLogout = lastLogout && logoutHr !== null && logoutHr < OFFICE_END_HOUR ? 'Yes' : 'No';
 
         const workingHrs = parseFloat(r.total_working_hours) || 0;
@@ -442,9 +443,9 @@ const aprController = {
         SELECT
           al.id,
           u.name AS employee_name,
-          DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) AS login_date,
-          CONVERT_TZ(al.login_time, '+00:00', '+05:30') AS login_time,
-          CONVERT_TZ(al.logout_time, '+00:00', '+05:30') AS logout_time,
+          DATE(al.login_time) AS login_date,
+          al.login_time AS login_time,
+          al.logout_time AS logout_time,
           al.ip_address,
           al.browser,
           al.device,
@@ -457,7 +458,7 @@ const aprController = {
           ) AS session_duration
         FROM attendance_logs al
         JOIN users u ON u.id = al.employee_id
-        WHERE DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+        WHERE DATE(al.login_time) BETWEEN ? AND ?
       `;
       const params = [dateFrom, dateTo];
 
@@ -500,11 +501,11 @@ const aprController = {
 
       const [trendRows] = await db.query(`
         SELECT
-          DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) AS day,
+          DATE(login_time) AS day,
           COUNT(DISTINCT employee_id) AS cnt,
           AVG(CASE WHEN logout_time IS NOT NULL THEN TIMESTAMPDIFF(SECOND, login_time, logout_time) ELSE TIMESTAMPDIFF(SECOND, login_time, NOW()) END) / 3600.0 AS avg_work
         FROM attendance_logs
-        WHERE DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+        WHERE DATE(login_time) BETWEEN ? AND ?
         GROUP BY day`, 
         [trendLabels[0], todayStr]
       );
@@ -545,7 +546,7 @@ const aprController = {
           COUNT(DISTINCT al.employee_id) AS present_count
         FROM users u
         LEFT JOIN attendance_logs al ON u.id = al.employee_id 
-          AND DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) = ?
+          AND DATE(al.login_time) = ?
         WHERE u.role = "employee" AND u.is_active = 1
         GROUP BY u.department
       `, [todayStr]);
@@ -616,9 +617,9 @@ const aprController = {
             WHERE applied_by = u.id AND status != "Pending" AND DATE(created_at) BETWEEN ? AND ?
           ) AS avg_processing_hours,
           (
-            SELECT COUNT(DISTINCT DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')))
+            SELECT COUNT(DISTINCT DATE(login_time))
             FROM attendance_logs
-            WHERE employee_id = u.id AND DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+            WHERE employee_id = u.id AND DATE(login_time) BETWEEN ? AND ?
           ) AS present_days
         FROM users u
         WHERE u.role = "employee" AND u.is_active = 1
@@ -706,7 +707,7 @@ const aprController = {
           MAX(duration) AS longest_duration,
           MIN(duration) AS shortest_duration
         FROM break_records
-        WHERE DATE(CONVERT_TZ(start_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+        WHERE DATE(start_time) BETWEEN ? AND ?
           AND duration IS NOT NULL
         GROUP BY break_type`,
         [dateFrom, dateTo]
@@ -789,11 +790,11 @@ const aprController = {
             SELECT ROUND(SUM(duration) / 3600.0, 2)
             FROM break_records
             WHERE employee_id = al.employee_id
-              AND DATE(CONVERT_TZ(start_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+              AND DATE(start_time) BETWEEN ? AND ?
               AND duration IS NOT NULL
           ) AS break_hours
         FROM attendance_logs al
-        WHERE DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) BETWEEN ? AND ?`,
+        WHERE DATE(login_time) BETWEEN ? AND ?`,
         [dateFrom, dateTo, dateFrom, dateTo]
       );
 
@@ -846,9 +847,9 @@ const aprController = {
             WHERE applied_by = u.id AND status = "Loan Disbursed" AND DATE(created_at) BETWEEN ? AND ?
           ) AS loans_disbursed,
           (
-            SELECT COUNT(DISTINCT DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')))
+            SELECT COUNT(DISTINCT DATE(login_time))
             FROM attendance_logs
-            WHERE employee_id = u.id AND DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+            WHERE employee_id = u.id AND DATE(login_time) BETWEEN ? AND ?
           ) AS present_days,
           (
             SELECT ROUND(SUM(CASE
@@ -856,7 +857,7 @@ const aprController = {
               ELSE TIMESTAMPDIFF(SECOND, login_time, NOW())
             END) / 3600.0, 2)
             FROM attendance_logs
-            WHERE employee_id = u.id AND DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+            WHERE employee_id = u.id AND DATE(login_time) BETWEEN ? AND ?
           ) AS working_hours
         FROM users u
         WHERE u.role = "employee" AND u.is_active = 1`,
@@ -1080,10 +1081,10 @@ const aprController = {
 
       const [rows] = await db.query(`
         SELECT 
-          DATE(CONVERT_TZ(start_time, '+00:00', '+05:30')) AS date,
+          DATE(start_time) AS date,
           break_type,
-          CONVERT_TZ(start_time, '+00:00', '+05:30') AS start_time,
-          CONVERT_TZ(end_time, '+00:00', '+05:30') AS end_time,
+          start_time AS start_time,
+          end_time AS end_time,
           duration,
           custom_reason AS remarks
         FROM break_records

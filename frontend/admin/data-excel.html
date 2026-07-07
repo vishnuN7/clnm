@@ -22,7 +22,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
@@ -526,6 +526,10 @@
               <tbody id="monitor-tbody"></tbody>
             </table>
           </div>
+          <div class="pag-row" id="monitor-pag" style="padding:12px 16px; display:none;">
+            <span class="pag-info" id="monitor-pag-info"></span>
+            <div class="pag-btns" id="monitor-pag-btns"></div>
+          </div>
         </div>
       </div>
 
@@ -743,7 +747,7 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260516c"></script>
+<script src="/js/api.js?v=20260705c"></script>
 <script>
 // ── Bootstrap ─────────────────────────────────────────────────────────────
 const user = requireRole('admin');
@@ -770,6 +774,13 @@ let fileToClose   = null;
 let fileToReassign = null;
 let monitorAllRecords = [];
 let monitorPollTimer  = null;
+
+let filesPage = 1;
+let monitorPage = 1;
+let auditPage = 1;
+const RECORDS_PER_PAGE = 20;
+
+let auditAllRecords = [];
 
 const DISP_OPTIONS = [
   'Connected','Not Connected','Ringing','Busy','Switched Off','Out of Coverage',
@@ -806,6 +817,7 @@ async function loadFiles() {
     const res = await apiFetch('/excel/files');
     allFiles  = res.files || [];
     updateKPIs();
+    filesPage = 1;
     renderFilesTable();
     populateFileSelects();
   } catch(e) {
@@ -842,13 +854,42 @@ function renderFilesTable() {
   const empty = document.getElementById('files-empty');
   const pag   = document.getElementById('files-pag');
 
-  if (filtered.length === 0) {
+  // Reset page if search or status filter changes
+  // To avoid resetting while user is on page 2 and clicks renderFilesTable without filter change, we can reset only if filters change.
+  // The simplest reliable way for client-side search is to reset page to 1 whenever loadFiles or a filter handler is invoked. Let's make sure it resets on inputs.
+  // We'll set filesPage = 1 in filter handlers. Let's look at HTML inputs. They call renderFilesTable() directly on input/change.
+  // So we can check if the call comes from input (we can reset inside renderFilesTable if the dataset changes, or simply reset filesPage = 1 when renderFilesTable is called, unless specified otherwise. Wait, if pagination buttons call renderFilesTable, we don't want to reset page to 1! So let's handle page change separately, or pass a flag, or do filter tracking).
+  // Let's use a state for active filters:
+  if (typeof renderFilesTable.lastSearch === 'undefined') {
+    renderFilesTable.lastSearch = '';
+    renderFilesTable.lastStatus = '';
+  }
+  if (renderFilesTable.lastSearch !== search || renderFilesTable.lastStatus !== statusF) {
+    filesPage = 1;
+    renderFilesTable.lastSearch = search;
+    renderFilesTable.lastStatus = statusF;
+  }
+
+  const total = filtered.length;
+  const totalPages = Math.ceil(total / RECORDS_PER_PAGE);
+
+  if (total === 0) {
     wrap.style.display = 'none'; empty.style.display = 'block'; pag.style.display = 'none';
     return;
   }
-  empty.style.display = 'none'; wrap.style.display = 'block'; pag.style.display = 'flex';
+  empty.style.display = 'none'; wrap.style.display = 'block';
+  
+  if (total > RECORDS_PER_PAGE) {
+    pag.style.display = 'flex';
+  } else {
+    pag.style.display = 'none';
+  }
 
-  tbody.innerHTML = filtered.map(f => {
+  const start = (filesPage - 1) * RECORDS_PER_PAGE;
+  const end = Math.min(start + RECORDS_PER_PAGE, total);
+  const paginated = filtered.slice(start, end);
+
+  tbody.innerHTML = paginated.map(f => {
     const pct     = f.completion_pct || 0;
     const empList = (f.assigned_employees||[]).slice(0,2).join(', ') + ((f.assigned_employees||[]).length > 2 ? ` +${f.assigned_employees.length-2}` : '');
     return `<tr>
@@ -879,7 +920,13 @@ function renderFilesTable() {
     </tr>`;
   }).join('');
 
-  document.getElementById('files-pag-info').textContent = `Showing ${filtered.length} of ${allFiles.length} files`;
+  document.getElementById('files-pag-info').textContent = `Showing ${start + 1}–${end} of ${total} files`;
+  document.getElementById('files-pag-btns').innerHTML = buildPageBtns(filesPage, totalPages, 'goFilesPage');
+}
+
+function goFilesPage(p) {
+  filesPage = p;
+  renderFilesTable();
 }
 
 // ── Load Employees ────────────────────────────────────────────────────────
@@ -1179,6 +1226,11 @@ function populateFileSelects() {
 async function loadMonitorData() {
   const fileId = document.getElementById('monitor-file-select').value;
   if (!fileId) return;
+  const fileChanged = loadMonitorData.lastFileId !== String(fileId);
+  if (fileChanged) {
+    monitorPage = 1;
+    loadMonitorData.lastFileId = String(fileId);
+  }
 
   try {
     const res = await apiFetch(`/excel/files/${fileId}/records?limit=500`);
@@ -1215,14 +1267,40 @@ function filterMonitorTable() {
   if (filter === 'completed')  records = records.filter(r => r.status === 'Completed');
   if (filter === 'pending')    records = records.filter(r => r.status === 'Pending');
 
+  if (typeof filterMonitorTable.lastSearch === 'undefined') {
+    filterMonitorTable.lastSearch = '';
+    filterMonitorTable.lastStatus = '';
+  }
+  if (filterMonitorTable.lastSearch !== search || filterMonitorTable.lastStatus !== filter) {
+    monitorPage = 1;
+    filterMonitorTable.lastSearch = search;
+    filterMonitorTable.lastStatus = filter;
+  }
+
   const loading = document.getElementById('monitor-loading');
   const wrap    = document.getElementById('monitor-table-wrap');
   const tbody   = document.getElementById('monitor-tbody');
+  const pag     = document.getElementById('monitor-pag');
 
-  if (monitorAllRecords.length === 0) { loading.style.display = 'block'; wrap.style.display = 'none'; return; }
+  if (monitorAllRecords.length === 0) { loading.style.display = 'block'; wrap.style.display = 'none'; pag.style.display = 'none'; return; }
   loading.style.display = 'none'; wrap.style.display = 'block';
 
-  tbody.innerHTML = records.map((r, i) => `<tr>
+  const total = records.length;
+  const totalPages = Math.ceil(total / RECORDS_PER_PAGE);
+  if (totalPages > 0 && monitorPage > totalPages) monitorPage = totalPages;
+  if (monitorPage < 1) monitorPage = 1;
+
+  if (total > RECORDS_PER_PAGE) {
+    pag.style.display = 'flex';
+  } else {
+    pag.style.display = 'none';
+  }
+
+  const start = (monitorPage - 1) * RECORDS_PER_PAGE;
+  const end = Math.min(start + RECORDS_PER_PAGE, total);
+  const paginated = records.slice(start, end);
+
+  tbody.innerHTML = paginated.map((r, i) => `<tr>
     <td style="color:var(--text-muted);font-size:11px;">${r.row_index}</td>
     <td style="font-weight:600;">${escHtml(r.phone_number)}</td>
     <td>${escHtml(r.employee_name || '—')}</td>
@@ -1231,6 +1309,14 @@ function filterMonitorTable() {
     <td>${statusBadge(r.status)}</td>
     <td style="font-size:12px;color:var(--text-secondary);">${r.updated_at ? fmtDatetime(r.updated_at) : '—'}</td>
   </tr>`).join('');
+
+  document.getElementById('monitor-pag-info').textContent = `Showing ${start + 1}–${end} of ${total} records`;
+  document.getElementById('monitor-pag-btns').innerHTML = buildPageBtns(monitorPage, totalPages, 'goMonitorPage');
+}
+
+function goMonitorPage(p) {
+  monitorPage = p;
+  filterMonitorTable();
 }
 
 function startMonitorPoll() {
@@ -1251,28 +1337,100 @@ async function loadAudit() {
   document.getElementById('audit-loading').style.display = 'block';
   document.getElementById('audit-table-wrap').style.display = 'none';
   document.getElementById('audit-empty').style.display = 'none';
+  document.getElementById('audit-pag').style.display = 'none';
+  
+  if (typeof loadAudit.lastFileId === 'undefined') {
+    loadAudit.lastFileId = '';
+  }
+  if (loadAudit.lastFileId !== fileId) {
+    auditPage = 1;
+    loadAudit.lastFileId = fileId;
+  }
+
   try {
     const res  = await apiFetch(url);
-    const rows = res.audit || [];
+    auditAllRecords = res.audit || [];
     document.getElementById('audit-loading').style.display = 'none';
-    if (rows.length === 0) { document.getElementById('audit-empty').style.display = 'block'; return; }
-    document.getElementById('audit-table-wrap').style.display = 'block';
-    document.getElementById('audit-tbody').innerHTML = rows.map(r => `<tr>
-      <td style="font-size:12px;white-space:nowrap;">${fmtDatetime(r.created_at)}</td>
-      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(r.file_name||'')}">${escHtml(r.file_name||'—')}</td>
-      <td>${escHtml(r.employee_name||'—')}</td>
-      <td style="font-weight:600;">${escHtml(r.phone_number)}</td>
-      <td>${r.old_disposition ? escHtml(r.old_disposition) : '<em style="color:var(--text-muted);">—</em>'}</td>
-      <td>${r.new_disposition ? `<span style="color:var(--accent);font-weight:600;">${escHtml(r.new_disposition)}</span>` : '<em style="color:var(--text-muted);">—</em>'}</td>
-      <td>${r.old_sub_disposition ? escHtml(r.old_sub_disposition) : '<em style="color:var(--text-muted);">—</em>'}</td>
-      <td>${r.new_sub_disposition ? `<span style="color:var(--accent);font-weight:600;">${escHtml(r.new_sub_disposition)}</span>` : '<em style="color:var(--text-muted);">—</em>'}</td>
-    </tr>`).join('');
-    document.getElementById('audit-pag').style.display = 'flex';
-    document.getElementById('audit-pag-info').textContent = `Showing ${rows.length} records`;
+    renderAuditPage();
   } catch(e) {
     document.getElementById('audit-loading').style.display = 'none';
     showToast('Failed to load audit trail.', 'error');
   }
+}
+
+function renderAuditPage() {
+  const rows = auditAllRecords;
+  const total = rows.length;
+  const totalPages = Math.ceil(total / RECORDS_PER_PAGE);
+
+  if (total === 0) {
+    document.getElementById('audit-empty').style.display = 'block';
+    document.getElementById('audit-table-wrap').style.display = 'none';
+    document.getElementById('audit-pag').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('audit-empty').style.display = 'none';
+  document.getElementById('audit-table-wrap').style.display = 'block';
+
+  if (total > RECORDS_PER_PAGE) {
+    document.getElementById('audit-pag').style.display = 'flex';
+  } else {
+    document.getElementById('audit-pag').style.display = 'none';
+  }
+
+  const start = (auditPage - 1) * RECORDS_PER_PAGE;
+  const end = Math.min(start + RECORDS_PER_PAGE, total);
+  const paginated = rows.slice(start, end);
+
+  document.getElementById('audit-tbody').innerHTML = paginated.map(r => `<tr>
+    <td style="font-size:12px;white-space:nowrap;">${fmtDatetime(r.created_at)}</td>
+    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(r.file_name||'')}">${escHtml(r.file_name||'—')}</td>
+    <td>${escHtml(r.employee_name||'—')}</td>
+    <td style="font-weight:600;">${escHtml(r.phone_number)}</td>
+    <td>${r.old_disposition ? escHtml(r.old_disposition) : '<em style="color:var(--text-muted);">—</em>'}</td>
+    <td>${r.new_disposition ? `<span style="color:var(--accent);font-weight:600;">${escHtml(r.new_disposition)}</span>` : '<em style="color:var(--text-muted);">—</em>'}</td>
+    <td>${r.old_sub_disposition ? escHtml(r.old_sub_disposition) : '<em style="color:var(--text-muted);">—</em>'}</td>
+    <td>${r.new_sub_disposition ? `<span style="color:var(--accent);font-weight:600;">${escHtml(r.new_sub_disposition)}</span>` : '<em style="color:var(--text-muted);">—</em>'}</td>
+  </tr>`).join('');
+
+  document.getElementById('audit-pag-info').textContent = `Showing ${start + 1}–${end} of ${total} audit logs`;
+  document.getElementById('audit-pag-btns').innerHTML = buildPageBtns(auditPage, totalPages, 'goAuditPage');
+}
+
+function goAuditPage(p) {
+  auditPage = p;
+  renderAuditPage();
+}
+
+function buildPageBtns(current, total, callbackName) {
+  if (total <= 1) return '';
+  let html = `<button class="pag-btn" ${current===1?'disabled':''} onclick="${callbackName}(${current-1})">Prev</button>`;
+  const pages = getPagPages(current, total);
+  for (const p of pages) {
+    if (p === '...') {
+      html += `<span class="pag-btn" style="cursor:default;pointer-events:none;">…</span>`;
+    } else {
+      html += `<button class="pag-btn${p===current?' active':''}" onclick="${callbackName}(${p})">${p}</button>`;
+    }
+  }
+  html += `<button class="pag-btn" ${current===total?'disabled':''} onclick="${callbackName}(${current+1})">Next</button>`;
+  return html;
+}
+
+function getPagPages(current, total) {
+  if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+  const pages = [];
+  if (current <= 4) {
+    for (let i = 1; i <= 5; i++) pages.push(i);
+    pages.push('...', total);
+  } else if (current >= total - 3) {
+    pages.push(1, '...');
+    for (let i = total - 4; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1, '...', current - 1, current, current + 1, '...', total);
+  }
+  return pages;
 }
 
 // ── Reports ───────────────────────────────────────────────────────────────

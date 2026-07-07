@@ -22,8 +22,75 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
   <style>
+    /* ── Table Pagination ─────────────────────────────────────────────── */
+    .tbl-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      padding: 12px 16px 10px;
+      flex-wrap: wrap;
+    }
+    .tbl-pg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+      font-family: inherit;
+    }
+    .tbl-pg-btn:hover:not(:disabled):not(.active) {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .tbl-pg-btn.active {
+      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(15,39,71,0.22);
+    }
+    .tbl-pg-btn:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    :root[data-theme='dark'] .tbl-pg-btn {
+      background: rgba(9,17,29,0.58);
+      border-color: rgba(151,176,210,0.14);
+      color: var(--text-secondary);
+    }
+    :root[data-theme='dark'] .tbl-pg-btn:hover:not(:disabled):not(.active) {
+      background: rgba(139,180,255,0.12);
+      border-color: rgba(139,180,255,0.4);
+      color: #8bb4ff;
+    }
+    :root[data-theme='dark'] .tbl-pg-btn.active {
+      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .tbl-pg-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-right: auto;
+    }
+    @media (max-width: 600px) {
+      .tbl-pagination { justify-content: center; }
+      .tbl-pg-info { width: 100%; text-align: center; margin-right: 0; }
+    }
     .filter-option:hover {
       background: var(--bg-card-hover) !important;
     }
@@ -498,6 +565,7 @@
             <tbody id="customers-tbody"><tr><td colspan="8" class="text-center text-muted">Loading...</td></tr></tbody>
           </table>
         </div>
+        <div id="customers-pagination"></div>
       </div>
     </div>
   </main>
@@ -516,9 +584,12 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260516c"></script>
+<script src="/js/api.js?v=20260705c"></script>
 <script>
   let selectedPeriod = '';
+  let customerPage = 1;
+  const CUSTOMERS_PER_PAGE = 20;
+  let allCustomersList = [];
   const user = requireRole('admin');
   if (user) { 
     renderSidebarUser(); 
@@ -626,12 +697,14 @@
         const tbody = document.getElementById('customers-tbody');
         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger" style="font-weight:500;padding:20px;">⚠️ Start Date cannot be after End Date.</td></tr>';
         document.getElementById('count-badge').textContent = `0 customers`;
+        document.getElementById('customers-pagination').innerHTML = '';
         return;
       }
     }
     const qs = buildQueryString({ search, area, period, startDate, endDate });
     const tbody = document.getElementById('customers-tbody');
     tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>';
+    document.getElementById('customers-pagination').innerHTML = '';
     try {
       const res = await api.get(`/admin/customers${qs}`);
       if (!res) {
@@ -645,28 +718,82 @@
         document.getElementById('count-badge').textContent = `— customers`;
         return;
       }
-      const list = res.data.data;
-      document.getElementById('count-badge').textContent = `${list.length} customers`;
-      if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No customers found.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = list.map((c, i) => `
-      <tr>
-        <td>${i+1}</td>
-        <td>${c.name}</td>
-        <td>${c.phone}</td>
-        <td><span class="badge badge-employee">${c.area}</span></td>
-        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.address}">${c.address}</td>
-        <td>${c.added_by_name}</td>
-        <td>${formatDate(c.created_at)}</td>
-        <td><button class="btn btn-secondary btn-sm" onclick="viewDetail(${c.id})"><span class="emoji-sm">🔎</span>View</button></td>
-      </tr>`).join('');
+      allCustomersList = res.data.data;
+      customerPage = 1;
+      document.getElementById('count-badge').textContent = `${allCustomersList.length} customers`;
+      renderCustomersPage();
     } catch (err) {
       console.error('Error loading customers', err);
       tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Error loading customers.</td></tr>';
       document.getElementById('count-badge').textContent = `— customers`;
     }
+  }
+
+  function renderCustomersPage() {
+    const list = allCustomersList;
+    const total = list.length;
+    const totalPages = Math.ceil(total / CUSTOMERS_PER_PAGE);
+    const start = (customerPage - 1) * CUSTOMERS_PER_PAGE;
+    const end = Math.min(start + CUSTOMERS_PER_PAGE, total);
+    const pageItems = list.slice(start, end);
+    const tbody = document.getElementById('customers-tbody');
+
+    if (!total) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No customer records found.</td></tr>';
+      document.getElementById('customers-pagination').innerHTML = '';
+      return;
+    }
+
+    tbody.innerHTML = pageItems.map((c, i) => `
+    <tr>
+      <td>${start + i + 1}</td>
+      <td>${c.name}</td>
+      <td>${c.phone}</td>
+      <td><span class="badge badge-employee">${c.area}</span></td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.address}">${c.address}</td>
+      <td>${c.added_by_name}</td>
+      <td>${formatDate(c.created_at)}</td>
+      <td><button class="btn btn-secondary btn-sm" onclick="viewDetail(${c.id})"><span class="emoji-sm">🔎</span>View</button></td>
+    </tr>`).join('');
+
+    document.getElementById('customers-pagination').innerHTML = buildCustomersPagination(total, customerPage, totalPages);
+  }
+
+  function buildCustomersPagination(total, current, totalPages) {
+    if (total <= CUSTOMERS_PER_PAGE) return '';
+    const start = (current - 1) * CUSTOMERS_PER_PAGE + 1;
+    const end = Math.min(current * CUSTOMERS_PER_PAGE, total);
+    let html = `<div class="tbl-pagination"><span class="tbl-pg-info">Showing ${start}–${end} of ${total} customers</span>`;
+    html += `<button class="tbl-pg-btn" ${current===1?'disabled':''} onclick="goCustomerPage(${current-1})">← Prev</button>`;
+    const pages = getPagPages(current, totalPages);
+    for (const p of pages) {
+      if (p === '...') html += `<span class="tbl-pg-btn" style="cursor:default;pointer-events:none;">…</span>`;
+      else html += `<button class="tbl-pg-btn${p===current?' active':''}" onclick="goCustomerPage(${p})">${p}</button>`;
+    }
+    html += `<button class="tbl-pg-btn" ${current===totalPages?'disabled':''} onclick="goCustomerPage(${current+1})">Next →</button>`;
+    html += '</div>';
+    return html;
+  }
+
+  function goCustomerPage(p) {
+    customerPage = p;
+    renderCustomersPage();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function getPagPages(current, total) {
+    if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+    const pages = [];
+    if (current <= 4) {
+      for (let i = 1; i <= 5; i++) pages.push(i);
+      pages.push('...', total);
+    } else if (current >= total - 3) {
+      pages.push(1, '...');
+      for (let i = total - 4; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1, '...', current - 1, current, current + 1, '...', total);
+    }
+    return pages;
   }
 
   async function viewDetail(id) {

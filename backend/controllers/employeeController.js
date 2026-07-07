@@ -90,6 +90,68 @@ const employeeController = {
     }
   },
 
+  async updateCustomer(req, res) {
+    try {
+      const { id } = req.params;
+      const customer = await CustomerModel.findById(id);
+      if (!customer) return res.status(404).json({ success: false, message: 'Customer not found.' });
+      if (String(customer.added_by) !== String(req.user.id)) {
+        return res.status(403).json({ success: false, message: 'You can update only your own customers.' });
+      }
+
+      const { name, phone, email, address, area, net_salary, total_obligation } = req.body;
+      const cleanName = String(name || '').trim();
+      const cleanPhone = String(phone || '').replace(/\D/g, '');
+      const cleanEmail = String(email || '').trim();
+      const cleanAddress = String(address || '').trim();
+      const cleanArea = String(area || '').trim();
+      const netSalaryText = String(net_salary ?? '').trim();
+      const obligationText = String(total_obligation ?? '').trim();
+      const numericRegex = /^\d+(?:\.\d+)?$/;
+
+      if (!cleanName || !cleanPhone || !cleanAddress || !cleanArea || !netSalaryText) {
+        return res.status(400).json({ success: false, message: 'Name, phone, city, full address, and net salary are required.' });
+      }
+      if (!/^\d{10}$/.test(cleanPhone)) {
+        return res.status(400).json({ success: false, message: 'Phone number must be 10 digits.' });
+      }
+      if (cleanEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        return res.status(400).json({ success: false, message: 'Enter a valid email address.' });
+      }
+      if (!numericRegex.test(netSalaryText)) {
+        return res.status(400).json({ success: false, message: 'Net Salary must be a numeric value.' });
+      }
+      if (obligationText && !numericRegex.test(obligationText)) {
+        return res.status(400).json({ success: false, message: 'Total Obligation must be a numeric value.' });
+      }
+
+      const parsedNetSalary = parseFloat(netSalaryText);
+      const parsedTotalObligation = obligationText ? parseFloat(obligationText) : 0;
+
+      if (!Number.isFinite(parsedNetSalary) || parsedNetSalary < 0) {
+        return res.status(400).json({ success: false, message: 'Net Salary must be a non-negative number.' });
+      }
+      if (!Number.isFinite(parsedTotalObligation) || parsedTotalObligation < 0) {
+        return res.status(400).json({ success: false, message: 'Total Obligation must be a non-negative number.' });
+      }
+
+      await CustomerModel.update(id, {
+        name: cleanName,
+        phone: cleanPhone,
+        email: cleanEmail || null,
+        address: cleanAddress,
+        area: cleanArea,
+        net_salary: parsedNetSalary,
+        total_obligation: parsedTotalObligation
+      });
+
+      const updatedCustomer = await CustomerModel.findById(id);
+      return res.json({ success: true, message: 'Customer details updated successfully.', customer: updatedCustomer });
+    } catch (err) {
+      console.error('[Employee] Update customer error:', err);
+      return res.status(500).json({ success: false, message: 'Failed to update customer details.' });
+    }
+  },
   async getCustomerDetail(req, res) {
     try {
       const { id } = req.params;

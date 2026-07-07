@@ -60,6 +60,17 @@ const CustomerModel = {
     return rows.map(r => r.area);
   },
 
+  async update(id, { name, phone, email, address, area, net_salary, total_obligation }) {
+    const [result] = await db.query(
+      `UPDATE customers
+       SET name = ?, phone = ?, email = ?, address = ?, area = ?,
+           net_salary = ?, total_obligation = ?
+       WHERE id = ?`,
+      [name, phone, email || null, address, area, net_salary, total_obligation, id]
+    );
+    return result.affectedRows;
+  },
+
   async delete(id) {
     const [result] = await db.query('DELETE FROM customers WHERE id=?', [id]);
     return result.affectedRows;

@@ -802,7 +802,7 @@ const breakTimeController = {
       }
 
       // ── Build WHERE clauses ──
-      const conditions = [`DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) BETWEEN ? AND ?`];
+      const conditions = [`DATE(al.login_time) BETWEEN ? AND ?`];
       const params = [dateFrom, dateTo];
 
       if (search) {
@@ -826,9 +826,9 @@ const breakTimeController = {
           u.designation AS role,
           u.department,
           u.current_status,
-          DATE(CONVERT_TZ(MIN(al.login_time), '+00:00', '+05:30')) AS work_date,
-          MIN(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) AS first_login,
-          MAX(CASE WHEN al.logout_time IS NOT NULL THEN CONVERT_TZ(al.logout_time, '+00:00', '+05:30') END) AS last_logout,
+          DATE(MIN(al.login_time)) AS work_date,
+          MIN(al.login_time) AS first_login,
+          MAX(CASE WHEN al.logout_time IS NOT NULL THEN al.logout_time END) AS last_logout,
           COUNT(al.id) AS total_sessions,
           ROUND(SUM(CASE
             WHEN al.logout_time IS NOT NULL
@@ -838,18 +838,18 @@ const breakTimeController = {
           (SELECT ROUND(SUM(br.duration)/3600.0, 2)
            FROM break_records br
            WHERE br.employee_id = u.id
-             AND DATE(CONVERT_TZ(br.start_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+             AND DATE(br.start_time) BETWEEN ? AND ?
              AND br.duration IS NOT NULL
           ) AS break_duration_hours,
           MAX(al.ip_address) AS ip_address,
           MAX(al.device) AS device,
           MAX(al.browser) AS browser,
           MAX(al.os) AS os,
-          MAX(CONVERT_TZ(u.last_active_at, '+00:00', '+05:30')) AS last_activity
+          MAX(u.last_active_at) AS last_activity
         FROM attendance_logs al
         JOIN users u ON u.id = al.employee_id
         WHERE ${whereClause}
-        GROUP BY u.id, DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30'))
+        GROUP BY u.id, DATE(al.login_time)
       `;
 
       // We need to insert break-duration params before the where params
@@ -867,7 +867,7 @@ const breakTimeController = {
         let attStatus = 'Present';
         if (!firstLogin) {
           attStatus = 'Absent';
-        } else if (loginHour !== null && loginHour > OFFICE_START_HOUR) {
+        } else if (loginHour !== null && loginHour > (OFFICE_START_HOUR + 20 / 60)) {
           attStatus = 'Late';
         }
 
@@ -948,11 +948,11 @@ const breakTimeController = {
       const [[totEmp]]       = await db.query(`SELECT COUNT(*) AS cnt FROM users WHERE role = 'employee' AND is_active = 1`);
       const [[loggedInToday]] = await db.query(`
         SELECT COUNT(DISTINCT employee_id) AS cnt FROM attendance_logs
-        WHERE DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) = ?`, [todayStr]);
+        WHERE DATE(login_time) = ?`, [todayStr]);
       const [[loggedOutToday]] = await db.query(`
         SELECT COUNT(DISTINCT employee_id) AS cnt FROM attendance_logs
         WHERE logout_time IS NOT NULL
-          AND DATE(CONVERT_TZ(logout_time, '+00:00', '+05:30')) = ?`, [todayStr]);
+          AND DATE(logout_time) = ?`, [todayStr]);
       const [[online]]       = await db.query(`
         SELECT COUNT(*) AS cnt FROM users
         WHERE role = 'employee' AND is_active = 1
@@ -969,8 +969,8 @@ const breakTimeController = {
       const [todaySessions] = await db.query(`
         SELECT
           u.id,
-          MIN(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) AS first_login,
-          MAX(CASE WHEN al.logout_time IS NOT NULL THEN CONVERT_TZ(al.logout_time, '+00:00', '+05:30') END) AS last_logout,
+          MIN(al.login_time) AS first_login,
+          MAX(CASE WHEN al.logout_time IS NOT NULL THEN al.logout_time END) AS last_logout,
           ROUND(SUM(CASE
             WHEN al.logout_time IS NOT NULL
             THEN TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time)/3600.0
@@ -978,7 +978,7 @@ const breakTimeController = {
           END), 2) AS working_hours
         FROM attendance_logs al
         JOIN users u ON u.id = al.employee_id
-        WHERE DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) = ?
+        WHERE DATE(al.login_time) = ?
         GROUP BY u.id`, [todayStr]);
 
       const [[breakTotal]] = await db.query(`
@@ -987,7 +987,7 @@ const breakTimeController = {
           ELSE TIMESTAMPDIFF(SECOND, start_time, NOW())
         END), 0) AS total_seconds
         FROM break_records
-        WHERE DATE(CONVERT_TZ(start_time, '+00:00', '+05:30')) = ?`, [todayStr]);
+        WHERE DATE(start_time) = ?`, [todayStr]);
 
       let present = 0, absent = 0, lateCount = 0, earlyLogoutCount = 0, overtimeEmployees = 0;
       let totalWorkingHrsToday = 0, loginTimes = [], logoutTimes = [];
@@ -1001,7 +1001,7 @@ const breakTimeController = {
           const d = new Date(s.first_login);
           const hr = d.getHours() + d.getMinutes()/60;
           loginTimes.push(hr);
-          if (hr > OFFICE_START_HOUR) lateCount++;
+          if (hr > (OFFICE_START_HOUR + 20 / 60)) lateCount++;
         }
         if (s.last_logout) {
           const d = new Date(s.last_logout);
@@ -1074,30 +1074,30 @@ const breakTimeController = {
       const [sessions] = await db.query(`
         SELECT
           id,
-          CONVERT_TZ(login_time, '+00:00', '+05:30') AS login_time,
+          login_time AS login_time,
           CASE WHEN logout_time IS NOT NULL
-               THEN CONVERT_TZ(logout_time, '+00:00', '+05:30')
+               THEN logout_time
                ELSE NULL END AS logout_time,
           total_working_hours,
           session_status,
           ip_address, device, browser, os
         FROM attendance_logs
         WHERE employee_id = ?
-          AND DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) = ?
+          AND DATE(login_time) = ?
         ORDER BY login_time ASC`, [id, targetDate]);
 
       // Break records for the day
       const [breaks] = await db.query(`
         SELECT
           break_type, custom_reason,
-          CONVERT_TZ(start_time, '+00:00', '+05:30') AS start_time,
+          start_time AS start_time,
           CASE WHEN end_time IS NOT NULL
-               THEN CONVERT_TZ(end_time, '+00:00', '+05:30')
+               THEN end_time
                ELSE NULL END AS end_time,
           duration, status
         FROM break_records
         WHERE employee_id = ?
-          AND DATE(CONVERT_TZ(start_time, '+00:00', '+05:30')) = ?
+          AND DATE(start_time) = ?
         ORDER BY start_time ASC`, [id, targetDate]);
 
       // Compute totals
@@ -1151,7 +1151,7 @@ const breakTimeController = {
       // ── Single query for 7-day trend (replaces 7 sequential DB calls) ──
       const [trendRows] = await db.query(`
         SELECT
-          DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) AS day,
+          DATE(login_time) AS day,
           COUNT(DISTINCT employee_id)                       AS cnt,
           ROUND(AVG(CASE
             WHEN logout_time IS NOT NULL
@@ -1159,7 +1159,7 @@ const breakTimeController = {
             ELSE NULL
           END), 2) AS avg_hrs
         FROM attendance_logs
-        WHERE DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) BETWEEN ? AND ?
+        WHERE DATE(login_time) BETWEEN ? AND ?
         GROUP BY day`, [startDateStr, todayStr]);
 
       // Map results by date string so missing days default to 0
@@ -1175,17 +1175,17 @@ const breakTimeController = {
           .then(([r]) => r),
         db.query(
           `SELECT COUNT(DISTINCT employee_id) AS cnt FROM attendance_logs
-           WHERE DATE(CONVERT_TZ(login_time, '+00:00', '+05:30')) = ?`,
+           WHERE DATE(login_time) = ?`,
           [todayStr]
         ).then(([r]) => r),
         db.query(
           `SELECT COUNT(DISTINCT al.employee_id) AS cnt FROM attendance_logs al
-           WHERE DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) = ?
-             AND HOUR(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) >= ?
+           WHERE DATE(al.login_time) = ?
+             AND TIME(al.login_time) > '09:20:00'
              AND al.id = (SELECT MIN(al2.id) FROM attendance_logs al2
                           WHERE al2.employee_id = al.employee_id
-                            AND DATE(CONVERT_TZ(al2.login_time, '+00:00', '+05:30')) = ?)`,
-          [todayStr, OFFICE_START_HOUR, todayStr]
+                            AND DATE(al2.login_time) = ?)`,
+          [todayStr, todayStr]
         ).then(([r]) => r),
         db.query(
           `SELECT u.name AS employee_name,
@@ -1196,7 +1196,7 @@ const breakTimeController = {
              END), 2) AS total_hours
            FROM attendance_logs al
            JOIN users u ON u.id = al.employee_id
-           WHERE DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) = ?
+           WHERE DATE(al.login_time) = ?
            GROUP BY al.employee_id
            ORDER BY total_hours DESC
            LIMIT 5`,

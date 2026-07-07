@@ -32,8 +32,75 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
   <style>
+    /* ── Table Pagination ─────────────────────────────────────────────── */
+    .tbl-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      padding: 12px 16px 10px;
+      flex-wrap: wrap;
+    }
+    .tbl-pg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+      font-family: inherit;
+    }
+    .tbl-pg-btn:hover:not(:disabled):not(.active) {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .tbl-pg-btn.active {
+      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(15,39,71,0.22);
+    }
+    .tbl-pg-btn:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    :root[data-theme='dark'] .tbl-pg-btn {
+      background: rgba(9,17,29,0.58);
+      border-color: rgba(151,176,210,0.14);
+      color: var(--text-secondary);
+    }
+    :root[data-theme='dark'] .tbl-pg-btn:hover:not(:disabled):not(.active) {
+      background: rgba(139,180,255,0.12);
+      border-color: rgba(139,180,255,0.4);
+      color: #8bb4ff;
+    }
+    :root[data-theme='dark'] .tbl-pg-btn.active {
+      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .tbl-pg-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-right: auto;
+    }
+    @media (max-width: 600px) {
+      .tbl-pagination { justify-content: center; }
+      .tbl-pg-info { width: 100%; text-align: center; margin-right: 0; }
+    }
     /* ── Premium Analytics Section ── */
     .analytics-grid {
       display: grid;
@@ -1376,6 +1443,82 @@
       font-size: 9px;
       box-shadow: none;
     }
+    .employee-record-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 86px;
+      padding: 18px;
+      border: 1px dashed var(--border-strong);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.42);
+      color: var(--text-secondary);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    :root[data-theme='dark'] .employee-record-empty {
+      background: rgba(6,12,22,0.32);
+      border-color: rgba(151,176,210,0.2);
+    }
+    .employee-view-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .employee-page-btn {
+      min-width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+    }
+    .employee-page-btn.employee-page-edge {
+      min-width: 74px;
+    }
+    .employee-page-btn:not(:disabled):hover,
+    .employee-page-btn:not(:disabled):focus-visible {
+      border-color: rgba(47,111,237,0.32);
+      color: var(--accent);
+      box-shadow: 0 6px 14px rgba(16,32,51,0.08);
+      outline: none;
+    }
+    .employee-page-btn.is-active {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(47,111,237,0.22);
+      cursor: default;
+    }
+    .employee-page-btn:disabled {
+      opacity: 0.52;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    :root[data-theme='dark'] .employee-page-btn {
+      background: rgba(6,12,22,0.58);
+      border-color: rgba(151,176,210,0.16);
+    }
+    :root[data-theme='dark'] .employee-page-btn.is-active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
     .customer-detail-shell {
       display: grid;
       gap: 12px;
@@ -1859,6 +2002,7 @@
             </tbody>
           </table>
         </div>
+        <div id="weekly-pagination"></div>
       </section>
     </div>
   </main>
@@ -1877,10 +2021,14 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260516c"></script>
+<script src="/js/api.js?v=20260705c"></script>
 <script>
+  let weeklyPage = 1;
+  const WEEKLY_PER_PAGE = 20;
+  let allWeeklyRows = [];
+
   const user = requireRole('admin');
-  if (user) {
+  if (user) { 
     renderSidebarUser();
     document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
     loadDashboard();
@@ -2033,6 +2181,8 @@
   let dashboardEmployees = [];
   let selectedEmployeeId = null;
   let selectedEmployeeView = null;
+  let employeeViewPage = 1;
+  const EMPLOYEE_VIEW_PAGE_SIZE = 10;
   let chartTrendInstance = null;
   let chartStatusInstance = null;
 
@@ -2162,6 +2312,7 @@
 
     if (refreshBtn) refreshBtn.disabled = true;
     tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Loading weekly performance...</td></tr>';
+    document.getElementById('weekly-pagination').innerHTML = '';
 
     try {
       const res = await api.get('/admin/dashboard/weekly-employee-performance');
@@ -2173,57 +2324,109 @@
       }
 
       const data = normalizeWeeklyPerformancePayload(res.data);
-      const rows = data.employees;
+      allWeeklyRows = data.employees;
       if (currentDateEl) currentDateEl.textContent = data.weekLabel || (data.currentDate ? formatDate(data.currentDate) : formatDate(new Date()));
-      renderWeeklyPerformanceSummary(rows, data.summary);
+      renderWeeklyPerformanceSummary(allWeeklyRows, data.summary);
+      weeklyPage = 1;
+      renderWeeklyPerformancePage();
 
-      if (!rows.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">No employees found.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = rows.map((employee, index) => {
-        const rate = Number(employee.successRate ?? employee.success_rate ?? 0) || 0;
-        const meta = performanceMeta(rate);
-        const isTop = index === 0 && (weeklyMetric(employee, 'loansApplied', 'loans_applied') > 0 || weeklyMetric(employee, 'customersAdded', 'customers_added') > 0);
-        const safeName = dashboardEscapeHtml(employee.name || 'Employee');
-        const safeEmail = dashboardEscapeHtml(employee.email || 'No email');
-        const safeId = Number(employee.employeeId ?? employee.id) || 0;
-        return `
-          <tr class="weekly-row${isTop ? ' top-performer' : ''}" onclick="openEmployeePerformanceProfile(${safeId})" tabindex="0" onkeydown="if(event.key==='Enter' || event.key===' ') openEmployeePerformanceProfile(${safeId})">
-            <td><span class="weekly-rank">#${index + 1}</span></td>
-            <td>
-              <div class="weekly-employee-cell">
-                ${employeeAvatarHtml(employee)}
-                <span class="weekly-employee-copy">
-                  <strong class="weekly-employee-name">${safeName}</strong>
-                  <small class="weekly-employee-email">${safeEmail}</small>
-                </span>
-              </div>
-            </td>
-            <td>${weeklyNumberCell(weeklyMetric(employee, 'customersAdded', 'customers_added'))}</td>
-            <td>${weeklyNumberCell(weeklyMetric(employee, 'loansApplied', 'loans_applied'))}</td>
-            <td>${weeklyNumberCell(employee.approved)}</td>
-            <td>${weeklyNumberCell(employee.rejected)}</td>
-            <td>${weeklyNumberCell(employee.pending)}</td>
-            <td>${weeklyNumberCell(employee.disbursed)}</td>
-            <td>
-              <span class="weekly-success">
-                ${formatSuccessRate(rate)}
-                <span class="weekly-success-bar" aria-hidden="true"><span class="weekly-success-fill" style="--success-width:${Math.min(100, Math.max(0, rate))}%;--success-color:${meta.color};"></span></span>
-              </span>
-            </td>
-            <td><span class="performance-badge ${meta.className}"><span class="performance-dot"></span>${meta.label}</span></td>
-          </tr>`;
-      }).join('');
     } catch (err) {
       console.error('[Dashboard] Weekly performance error:', err);
       if (currentDateEl) currentDateEl.textContent = getCurrentWeekLabelFallback();
       tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Unable to load weekly performance.</td></tr>';
-      renderWeeklyPerformanceSummary([]);
     } finally {
       if (refreshBtn) refreshBtn.disabled = false;
     }
+  }
+
+  function renderWeeklyPerformancePage() {
+    const list = allWeeklyRows;
+    const total = list.length;
+    const totalPages = Math.ceil(total / WEEKLY_PER_PAGE);
+    const start = (weeklyPage - 1) * WEEKLY_PER_PAGE;
+    const end = Math.min(start + WEEKLY_PER_PAGE, total);
+    const pageItems = list.slice(start, end);
+    const tbody = document.getElementById('weekly-performance-tbody');
+
+    if (!total) {
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">No employees found.</td></tr>';
+      document.getElementById('weekly-pagination').innerHTML = '';
+      return;
+    }
+
+    tbody.innerHTML = pageItems.map((employee, index) => {
+      const rate = Number(employee.successRate ?? employee.success_rate ?? 0) || 0;
+      const meta = performanceMeta(rate);
+      const globalIndex = start + index;
+      const isTop = globalIndex === 0 && (weeklyMetric(employee, 'loansApplied', 'loans_applied') > 0 || weeklyMetric(employee, 'customersAdded', 'customers_added') > 0);
+      const safeName = dashboardEscapeHtml(employee.name || 'Employee');
+      const safeEmail = dashboardEscapeHtml(employee.email || 'No email');
+      const safeId = Number(employee.employeeId ?? employee.id) || 0;
+      return `
+        <tr class="weekly-row${isTop ? ' top-performer' : ''}" onclick="openEmployeePerformanceProfile(${safeId})" tabindex="0" onkeydown="if(event.key==='Enter' || event.key===' ') openEmployeePerformanceProfile(${safeId})">
+          <td><span class="weekly-rank">#${globalIndex + 1}</span></td>
+          <td>
+            <div class="weekly-employee-cell">
+              ${employeeAvatarHtml(employee)}
+              <span class="weekly-employee-copy">
+                <strong class="weekly-employee-name">${safeName}</strong>
+                <small class="weekly-employee-email">${safeEmail}</small>
+              </span>
+            </div>
+          </td>
+          <td>${weeklyNumberCell(weeklyMetric(employee, 'customersAdded', 'customers_added'))}</td>
+          <td>${weeklyNumberCell(weeklyMetric(employee, 'loansApplied', 'loans_applied'))}</td>
+          <td>${weeklyNumberCell(employee.approved)}</td>
+          <td>${weeklyNumberCell(employee.rejected)}</td>
+          <td>${weeklyNumberCell(employee.pending)}</td>
+          <td>${weeklyNumberCell(employee.disbursed)}</td>
+          <td>
+            <span class="weekly-success">
+              ${formatSuccessRate(rate)}
+              <span class="weekly-success-bar" aria-hidden="true"><span class="weekly-success-fill" style="--success-width:${Math.min(100, Math.max(0, rate))}%;--success-color:${meta.color};"></span></span>
+            </span>
+          </td>
+          <td><span class="performance-badge ${meta.className}"><span class="performance-dot"></span>${meta.label}</span></td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('weekly-pagination').innerHTML = buildWeeklyPagination(total, weeklyPage, totalPages);
+  }
+
+  function buildWeeklyPagination(total, current, totalPages) {
+    if (total <= WEEKLY_PER_PAGE) return '';
+    const start = (current - 1) * WEEKLY_PER_PAGE + 1;
+    const end = Math.min(current * WEEKLY_PER_PAGE, total);
+    let html = `<div class="tbl-pagination"><span class="tbl-pg-info">Showing ${start}–${end} of ${total} employees</span>`;
+    html += `<button class="tbl-pg-btn" ${current===1?'disabled':''} onclick="goWeeklyPage(${current-1})">← Prev</button>`;
+    const pages = getPagPages(current, totalPages);
+    for (const p of pages) {
+      if (p === '...') html += `<span class="tbl-pg-btn" style="cursor:default;pointer-events:none;">…</span>`;
+      else html += `<button class="tbl-pg-btn${p===current?' active':''}" onclick="goWeeklyPage(${p})">${p}</button>`;
+    }
+    html += `<button class="tbl-pg-btn" ${current===totalPages?'disabled':''} onclick="goWeeklyPage(${current+1})">Next →</button>`;
+    html += '</div>';
+    return html;
+  }
+
+  function goWeeklyPage(p) {
+    weeklyPage = p;
+    renderWeeklyPerformancePage();
+  }
+
+  function getPagPages(current, total) {
+    if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+    const pages = [];
+    if (current <= 4) {
+      for (let i = 1; i <= 5; i++) pages.push(i);
+      pages.push('...', total);
+    } else if (current >= total - 3) {
+      pages.push(1, '...');
+      for (let i = total - 4; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1, '...', current - 1, current, current + 1, '...', total);
+    }
+    return pages;
   }
 
   async function openEmployeePerformanceProfile(id) {
@@ -2336,6 +2539,7 @@
   function selectEmployee(id) {
     selectedEmployeeId = id;
     selectedEmployeeView = null;
+    employeeViewPage = 1;
     renderEmployeeList();
     renderEmployeeDetails(id);
   }
@@ -2347,6 +2551,7 @@
       dashboardLoans = [];
       selectedEmployeeId = null;
       selectedEmployeeView = null;
+      employeeViewPage = 1;
     }
 
     if (!dashboardEmployees.length) {
@@ -2450,16 +2655,131 @@
       </div>
       <div id="employee-view-output" class="employee-view-output"></div>`;
     selectedEmployeeView = null;
+    employeeViewPage = 1;
   }
 
-  function showEmployeeView(view) {
-    if (!selectedEmployeeId) return;
-    selectedEmployeeView = view;
+  function employeeRecordEmptyState(message) {
+    return `<div class="employee-record-empty"><span>${dashboardEscapeHtml(message)}</span></div>`;
+  }
+
+  function getEmployeeViewPage(totalRecords, page = 1) {
+    const totalPages = Math.max(1, Math.ceil(totalRecords / EMPLOYEE_VIEW_PAGE_SIZE));
+    const requestedPage = Number(page) || 1;
+    return Math.min(totalPages, Math.max(1, requestedPage));
+  }
+
+  function renderEmployeeViewPagination(view, totalRecords, currentPage) {
+    if (totalRecords <= EMPLOYEE_VIEW_PAGE_SIZE) return '';
+
+    const totalPages = Math.ceil(totalRecords / EMPLOYEE_VIEW_PAGE_SIZE);
+    const viewArg = JSON.stringify(view);
+    const pageButtons = Array.from({ length: totalPages }, (_, index) => {
+      const pageNumber = index + 1;
+      const isActive = pageNumber === currentPage;
+      const pageAction = isActive ? ' aria-current="page"' : ` onclick='showEmployeeView(${viewArg}, ${pageNumber})'`;
+      return `<button type="button" class="employee-page-btn${isActive ? ' is-active' : ''}"${pageAction}>${pageNumber}</button>`;
+    }).join('');
+    const previousDisabled = currentPage === 1 ? ' disabled aria-disabled="true"' : '';
+    const nextDisabled = currentPage === totalPages ? ' disabled aria-disabled="true"' : '';
+    const previousPage = Math.max(1, currentPage - 1);
+    const nextPage = Math.min(totalPages, currentPage + 1);
+
+    return `
+      <nav class="employee-view-pagination" aria-label="Employee records pagination">
+        <button type="button" class="employee-page-btn employee-page-edge"${previousDisabled} onclick='showEmployeeView(${viewArg}, ${previousPage})'>Previous</button>
+        ${pageButtons}
+        <button type="button" class="employee-page-btn employee-page-edge"${nextDisabled} onclick='showEmployeeView(${viewArg}, ${nextPage})'>Next</button>
+      </nav>`;
+  }
+
+  function renderEmployeeCustomerView(employee, customers, page = 1) {
+    const currentPage = getEmployeeViewPage(customers.length, page);
+    const startIndex = (currentPage - 1) * EMPLOYEE_VIEW_PAGE_SIZE;
+    const visibleCustomers = customers.slice(startIndex, startIndex + EMPLOYEE_VIEW_PAGE_SIZE);
+    employeeViewPage = currentPage;
+
+    const recordsHtml = customers.length ? `
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>City</th><th>Date</th></tr></thead>
+          <tbody>
+            ${visibleCustomers.map((customer, index) => `
+              <tr>
+                <td>${startIndex + index + 1}</td>
+                <td>${dashboardEscapeHtml(customer.name || '-')}</td>
+                <td>${dashboardEscapeHtml(customer.phone || '-')}</td>
+                <td>${dashboardEscapeHtml(customer.area || '-')}</td>
+                <td>${dashboardEscapeHtml(customer.created_at ? formatDate(customer.created_at) : '-')}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>` : employeeRecordEmptyState('No customer records found for this employee.');
+
+    return `
+      <div class="employee-view-summary">
+        <p class="employee-view-kicker">Customers Added by ${dashboardEscapeHtml(employee.name || 'Employee')}</p>
+        <p class="employee-view-total">${customers.length}</p>
+        <p class="employee-view-sub">Customer records created by this employee.</p>
+      </div>
+      ${recordsHtml}
+      ${renderEmployeeViewPagination('customers', customers.length, currentPage)}`;
+  }
+
+  function getEmployeeLoanViewConfig(view) {
+    const configs = {
+      loans: { title: 'Loans Applied', status: null, emptyMessage: 'No loan records found for this employee.' },
+      pending: { title: 'Pending Loans', status: 'Pending', emptyMessage: 'No pending loan records found for this employee.' },
+      approved: { title: 'Approved Loans', status: 'Approved', emptyMessage: 'No approved loan records found for this employee.' },
+      rejected: { title: 'Rejected Loans', status: 'Rejected', emptyMessage: 'No rejected loan records found for this employee.' }
+    };
+    return configs[view] || configs.loans;
+  }
+
+  function renderEmployeeLoanView(view, loans, config, page = 1) {
+    const currentPage = getEmployeeViewPage(loans.length, page);
+    const startIndex = (currentPage - 1) * EMPLOYEE_VIEW_PAGE_SIZE;
+    const visibleLoans = loans.slice(startIndex, startIndex + EMPLOYEE_VIEW_PAGE_SIZE);
+    const totalLoanAmount = loans.reduce((sum, loan) => sum + Number(loan.amount || 0), 0);
+    employeeViewPage = currentPage;
+
+    const recordsHtml = loans.length ? `
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>#</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            ${visibleLoans.map((loan, index) => `
+              <tr onclick="viewCustomerDetail(${Number(loan.customer_id) || 0})" style="cursor:pointer">
+                <td>${startIndex + index + 1}</td>
+                <td>${dashboardEscapeHtml(loan.customer_name || '-')}</td>
+                <td>${formatCurrency(loan.amount)}</td>
+                <td>${statusBadge(loan.status)}</td>
+                <td>${dashboardEscapeHtml(loan.created_at ? formatDate(loan.created_at) : '-')}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>` : employeeRecordEmptyState(config.emptyMessage);
+
+    return `
+      <div class="employee-view-summary">
+        <p class="employee-view-kicker">${dashboardEscapeHtml(config.title)}</p>
+        <p class="employee-view-total">${loans.length}</p>
+        <p class="employee-view-sub">Total loan amount handled: ${formatCurrency(totalLoanAmount)}</p>
+      </div>
+      ${recordsHtml}
+      ${renderEmployeeViewPagination(view, loans.length, currentPage)}`;
+  }
+
+  function showEmployeeView(view, page = 1) {
+    const validViews = ['loans', 'pending', 'approved', 'customers', 'rejected'];
+    if (!selectedEmployeeId || !validViews.includes(view)) return;
+
     const employee = dashboardEmployees.find(emp => emp.id === selectedEmployeeId);
-    if (!employee) return;
-    const metrics = buildEmployeeMetrics(employee);
     const messageEl = document.getElementById('employee-view-message');
     const outputEl = document.getElementById('employee-view-output');
+    if (!employee || !messageEl || !outputEl) return;
+
+    selectedEmployeeView = view;
+    const metrics = buildEmployeeMetrics(employee);
     document.querySelectorAll('.employee-metric-card').forEach(card => {
       card.classList.toggle('active', card.getAttribute('data-employee-view') === view);
     });
@@ -2467,64 +2787,16 @@
     outputEl.style.display = 'block';
 
     if (view === 'customers') {
-      outputEl.innerHTML = `
-        <div class="employee-view-summary">
-          <p class="employee-view-kicker">Customers Added by ${dashboardEscapeHtml(employee.name)}</p>
-          <p class="employee-view-total">${metrics.employeeCustomers.length}</p>
-          <p class="employee-view-sub">Customer records created by this employee.</p>
-        </div>
-        <div>
-          <div class="table-wrapper">
-            <table>
-              <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>City</th><th>Date</th></tr></thead>
-              <tbody>
-                ${metrics.employeeCustomers.length ? metrics.employeeCustomers.map((customer, index) => `
-                  <tr>
-                    <td>${index + 1}</td>
-                    <td>${dashboardEscapeHtml(customer.name || '—')}</td>
-                    <td>${dashboardEscapeHtml(customer.phone || '—')}</td>
-                    <td>${dashboardEscapeHtml(customer.area || '—')}</td>
-                    <td>${dashboardEscapeHtml(customer.created_at ? formatDate(customer.created_at) : '—')}</td>
-                  </tr>`).join('') : '<tr><td colspan="5" class="text-center text-muted">No customers added yet.</td></tr>'}
-              </tbody>
-            </table>
-          </div>
-        </div>`;
+      outputEl.innerHTML = renderEmployeeCustomerView(employee, metrics.employeeCustomers, page);
       return;
     }
 
-    const statusFilter = view === 'loans' ? null : view === 'pending' ? 'Pending' : view === 'approved' ? 'Approved' : view === 'rejected' ? 'Rejected' : null;
-    const filteredLoans = statusFilter ? metrics.employeeLoans.filter(loan => loan.status === statusFilter) : metrics.employeeLoans;
-    const titleMap = { loans: 'All Loans Applied', pending: 'Pending Loans', approved: 'Approved Loans', rejected: 'Rejected Loans' };
-    const totalLoanAmount = filteredLoans.reduce((sum, loan) => sum + Number(loan.amount || 0), 0);
-
-    outputEl.innerHTML = `
-      <div class="employee-view-summary">
-        <p class="employee-view-kicker">${dashboardEscapeHtml(titleMap[view] || 'Loans')}</p>
-        <p class="employee-view-total">${filteredLoans.length}</p>
-        <p class="employee-view-sub">Total loan amount handled: ${formatCurrency(totalLoanAmount)}</p>
-      </div>
-      <div>
-        <div class="table-wrapper">
-          <table>
-            <thead><tr><th>#</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
-            <tbody>
-              ${filteredLoans.length ? filteredLoans.slice(0, 5).map((loan, index) => `
-                <tr onclick="viewCustomerDetail(${loan.customer_id})" style="cursor:pointer">
-                  <td>${index + 1}</td>
-                  <td>${dashboardEscapeHtml(loan.customer_name || '—')}</td>
-                  <td>${formatCurrency(loan.amount)}</td>
-                  <td>${statusBadge(loan.status)}</td>
-                  <td>${dashboardEscapeHtml(loan.created_at ? formatDate(loan.created_at) : '—')}</td>
-                </tr>`).join('') : '<tr><td colspan="5" class="text-center text-muted">No loan activity yet.</td></tr>'}
-            </tbody>
-          </table>
-        </div>
-      </div>`;
+    const config = getEmployeeLoanViewConfig(view);
+    const filteredLoans = config.status ? metrics.employeeLoans.filter(loan => loan.status === config.status) : metrics.employeeLoans;
+    outputEl.innerHTML = renderEmployeeLoanView(view, filteredLoans, config, page);
   }
 
-  // ── Premium Analytics Chart Functions ──
-
+  // Premium Analytics Chart Functions
   function renderTrendMetrics(loans) {
     const container = document.getElementById('trend-metrics');
     if (!loans.monthlyTrend || !loans.monthlyTrend.length) {

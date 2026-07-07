@@ -158,6 +158,38 @@ const ICON_SVG = {
   bank: svgIcon('<path d="M4 10h16"/><path d="M6 10V7l6-3 6 3v3"/><path d="M5 20h14"/><path d="M7 20v-7"/><path d="M12 20v-7"/><path d="M17 20v-7"/>'),
   cube: svgIcon('<path d="M12 2 4 6v12l8 4 8-4V6z"/><path d="M12 2v8l8-4"/><path d="M4 6l8 4 8-4"/>'),
   calculator: svgIcon('<rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>'),
+  chartPie: svgIcon('<path d="M11 3a9 9 0 1 0 9 9h-9z"/><path d="M14 3.5V10h6.5A7 7 0 0 0 14 3.5z"/>'),
+  addressBook: svgIcon('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h.01"/><circle cx="12" cy="10" r="2.5"/><path d="M8.5 17a3.8 3.8 0 0 1 7 0"/>'),
+  camera: svgIcon('<path d="M7 7h1.5L10 5h4l1.5 2H17a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3z"/><circle cx="12" cy="13" r="3"/>'),
+  phone: svgIcon('<path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3.1 5.2 2 2 0 0 1 5.1 3h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L9.1 10.6a16 16 0 0 0 4.3 4.3l1.2-1.2a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6A2 2 0 0 1 22 16.9z"/>'),
+  at: svgIcon('<circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/>'),
+  calendarDays: svgIcon('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/>'),
+  trash: svgIcon('<path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 14h10l1-14"/><path d="M9 7V4h6v3"/>'),
+  sliders: svgIcon('<path d="M4 6h10"/><path d="M18 6h2"/><circle cx="16" cy="6" r="2"/><path d="M4 12h2"/><path d="M10 12h10"/><circle cx="8" cy="12" r="2"/><path d="M4 18h12"/><path d="M20 18h0"/><circle cx="18" cy="18" r="2"/>'),
+  shield: svgIcon('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
+  bell: svgIcon('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>'),
+  listCheck: svgIcon('<path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="m3 6 1 1 2-2"/><path d="m3 12 1 1 2-2"/><path d="m3 18 1 1 2-2"/>'),
+  key: svgIcon('<circle cx="7.5" cy="14.5" r="3.5"/><path d="M10 12l8-8"/><path d="M15 7l2 2"/><path d="M13 9l2 2"/>'),
+  userShield: svgIcon('<circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 10.5-4"/><path d="M17 22s4-2 4-5v-3l-4-1.5-4 1.5v3c0 3 4 5 4 5z"/>'),
+  x: svgIcon('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
+  check: svgIcon('<path d="m5 12 4 4L19 6"/>'),
+  desktop: svgIcon('<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>'),
+  userPlus: svgIcon('<circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M18 8v6"/><path d="M15 11h6"/>'),
+  idCard: svgIcon('<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M13 10h5"/><path d="M13 14h4"/><path d="M6 16c.6-1.2 1.6-2 3-2s2.4.8 3 2"/>'),
+  alertTriangle: svgIcon('<path d="M12 3 22 20H2z"/><path d="M12 9v5"/><path d="M12 17h.01"/>'),
+  circle: svgIcon('<circle cx="12" cy="12" r="9"/>'),
+  coffee: svgIcon('<path d="M4 8h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M16 10h2a2 2 0 0 1 0 4h-2"/><path d="M6 2v2"/><path d="M10 2v2"/><path d="M14 2v2"/>'),
+  utensils: svgIcon('<path d="M4 3v8"/><path d="M7 3v8"/><path d="M4 7h3"/><path d="M6 11v10"/><path d="M17 3v18"/><path d="M14 3h3a3 3 0 0 1 0 6h-3"/>'),
+  play: svgIcon('<path d="M8 5v14l11-7z"/>'),
+  stop: svgIcon('<rect x="6" y="6" width="12" height="12" rx="2"/>'),
+  files: svgIcon('<path d="M8 7V5a2 2 0 0 1 2-2h6l4 4v9a2 2 0 0 1-2 2h-2"/><path d="M16 3v5h5"/><path d="M4 9h8l4 4v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/><path d="M12 9v5h5"/>'),
+  pauseCircle: svgIcon('<circle cx="12" cy="12" r="9"/><path d="M10 8v8"/><path d="M14 8v8"/>'),
+  archiveX: svgIcon('<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/><path d="M10 12l4 4"/><path d="M14 12l-4 4"/>'),
+  mapPin: svgIcon('<path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>'),
+  badgeCheck: svgIcon('<path d="M8.5 3.5 12 2l3.5 1.5L19 3l2 3-1 3.5 1 3.5-2 3-3.5-.5L12 22l-3.5-6.5L5 16l-2-3 1-3.5L3 6l2-3z"/><path d="m8.5 11.5 2.2 2.2 4.8-5"/>'),
+  calendarCheck: svgIcon('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M3 10h18"/><path d="m8 16 2.5 2.5L16 13"/>'),
+  uploadCloud: svgIcon('<path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20 16.6A5 5 0 0 0 18 7h-1.3A7 7 0 0 0 3.8 10.1A4.5 4.5 0 0 0 5 19h2"/><path d="M16 19h3"/>'),
+  indianRupee: svgIcon('<path d="M6 4h12"/><path d="M6 8h12"/><path d="M7 4h4a4 4 0 0 1 0 8H7l6 8"/>'),
   message: svgIcon('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>')
 };
 
@@ -202,6 +234,156 @@ function iconMarkup(name) {
 }
 
 window.clnIcon = iconMarkup;
+
+const FONT_AWESOME_ICON_MAP = new Map([
+  ['fa-chart-pie', 'chartPie'],
+  ['fa-users', 'users'],
+  ['fa-address-book', 'addressBook'],
+  ['fa-briefcase', 'briefcase'],
+  ['fa-calculator', 'calculator'],
+  ['fa-file-excel', 'fileLines'],
+  ['fa-chart-line', 'chartLine'],
+  ['fa-right-from-bracket', 'logout'],
+  ['fa-bars', 'bars'],
+  ['fa-user-gear', 'userShield'],
+  ['fa-camera', 'camera'],
+  ['fa-envelope', 'envelope'],
+  ['fa-phone', 'phone'],
+  ['fa-at', 'at'],
+  ['fa-calendar-days', 'calendarDays'],
+  ['fa-clock', 'clock'],
+  ['fa-trash-can', 'trash'],
+  ['fa-user', 'user'],
+  ['fa-user-plus', 'userPlus'],
+  ['fa-id-card', 'idCard'],
+  ['fa-id-card-clip', 'idCard'],
+  ['fa-building', 'bank'],
+  ['fa-building-columns', 'bank'],
+  ['fa-triangle-exclamation', 'alertTriangle'],
+  ['fa-clipboard-check', 'checkCircle'],
+  ['fa-cloud-arrow-up', 'uploadCloud'],
+  ['fa-file-invoice', 'fileLines'],
+  ['fa-clock-rotate-left', 'rotateLeft'],
+  ['fa-circle-xmark', 'xCircle'],
+  ['fa-file-pdf', 'fileLines'],
+  ['fa-phone-volume', 'phone'],
+  ['fa-circle', 'circle'],
+  ['fa-spinner', 'rotateLeft'],
+  ['fa-mug-hot', 'coffee'],
+  ['fa-coffee', 'coffee'],
+  ['fa-utensils', 'utensils'],
+  ['fa-user-clock', 'clock'],
+  ['fa-ellipsis-h', 'info'],
+  ['fa-play', 'play'],
+  ['fa-stop', 'stop'],
+  ['fa-history', 'rotateLeft'],
+  ['fa-sliders', 'sliders'],
+  ['fa-shield-halved', 'shield'],
+  ['fa-bell', 'bell'],
+  ['fa-list-check', 'listCheck'],
+  ['fa-circle-info', 'info'],
+  ['fa-xmark', 'x'],
+  ['fa-check', 'check'],
+  ['fa-key', 'key'],
+  ['fa-eye', 'eye'],
+  ['fa-eye-slash', 'eyeOff'],
+  ['fa-lock', 'lock'],
+  ['fa-user-shield', 'userShield'],
+  ['fa-circle-check', 'checkCircle'],
+  ['fa-desktop', 'desktop'],
+  ['fa-chrome', 'desktop'],
+  ['fa-firefox-browser', 'desktop'],
+  ['fa-safari', 'desktop'],
+  ['fa-edge', 'desktop']
+]);
+
+function resolveFontAwesomeIconName(el) {
+  if (!el || !el.classList) return null;
+  for (const className of el.classList) {
+    if (FONT_AWESOME_ICON_MAP.has(className)) return FONT_AWESOME_ICON_MAP.get(className);
+  }
+  return null;
+}
+
+function collectFontAwesomeIconElements(root) {
+  const selector = "i[class*='fa-'], .local-fa-icon[class*='fa-']";
+  const elements = [];
+  if (typeof Element !== 'undefined' && root instanceof Element && root.matches(selector)) {
+    elements.push(root);
+  }
+  if (root.querySelectorAll) {
+    elements.push(...root.querySelectorAll(selector));
+  }
+  return elements;
+}
+
+function applyFontAwesomeFallbackIcons(root = document) {
+  collectFontAwesomeIconElements(root).forEach((el) => {
+    if (el.matches('[data-lucide]')) return;
+    const iconName = resolveFontAwesomeIconName(el);
+    if (!iconName) return;
+    if (el.dataset.faIconized === iconName && el.querySelector('svg')) return;
+    el.innerHTML = ICON_SVG[iconName] || ICON_SVG.info;
+    el.dataset.faIconized = iconName;
+    el.classList.add('local-fa-icon');
+    el.setAttribute('aria-hidden', 'true');
+  });
+}
+
+const LUCIDE_FALLBACK_ICON_MAP = new Map([
+  ['archive-x', 'archiveX'],
+  ['badge-check', 'badgeCheck'],
+  ['calendar', 'calendarDays'],
+  ['calendar-check', 'calendarCheck'],
+  ['calendar-days', 'calendarDays'],
+  ['check-circle', 'checkCircle'],
+  ['check-circle-2', 'checkCircle'],
+  ['circle-help', 'info'],
+  ['files', 'files'],
+  ['hourglass', 'hourglass'],
+  ['indian-rupee', 'indianRupee'],
+  ['landmark', 'bank'],
+  ['map-pin', 'mapPin'],
+  ['message-square', 'message'],
+  ['message-square-text', 'message'],
+  ['pause-circle', 'pauseCircle'],
+  ['rotate-ccw', 'rotateLeft'],
+  ['search', 'search'],
+  ['sliders-horizontal', 'sliders'],
+  ['upload-cloud', 'uploadCloud'],
+  ['user-round', 'user'],
+  ['x-circle', 'xCircle']
+]);
+
+function resolveLucideFallbackIconName(el) {
+  const lucideName = el?.getAttribute?.('data-lucide');
+  if (!lucideName) return null;
+  return LUCIDE_FALLBACK_ICON_MAP.get(lucideName) || LUCIDE_MAP[lucideName] || null;
+}
+
+function collectLucideIconElements(root) {
+  const selector = 'i[data-lucide], .local-lucide-icon[data-lucide]';
+  const elements = [];
+  if (typeof Element !== 'undefined' && root instanceof Element && root.matches(selector)) {
+    elements.push(root);
+  }
+  if (root.querySelectorAll) {
+    elements.push(...root.querySelectorAll(selector));
+  }
+  return elements;
+}
+
+function applyLucideFallbackIcons(root = document) {
+  collectLucideIconElements(root).forEach((el) => {
+    const iconName = resolveLucideFallbackIconName(el);
+    if (!iconName) return;
+    if (el.dataset.lucideIconized === iconName && el.querySelector('svg')) return;
+    el.innerHTML = ICON_SVG[iconName] || ICON_SVG.info;
+    el.dataset.lucideIconized = iconName;
+    el.classList.add('local-lucide-icon');
+    el.setAttribute('aria-hidden', 'true');
+  });
+}
 
 const ICON_TEXT_MAP = new Map([
   ['📊', 'chartColumn'],
@@ -765,9 +947,16 @@ function startIconObserver() {
   const observer = new MutationObserver((mutations) => {
     let ranLucide = false;
     for (const mutation of mutations) {
+      if (mutation.type === 'attributes' && mutation.target instanceof Element) {
+        applyFontAwesomeFallbackIcons(mutation.target);
+        applyLucideFallbackIcons(mutation.target);
+        continue;
+      }
       for (const node of mutation.addedNodes) {
         if (!(node instanceof Element)) continue;
         applyIconography(node);
+        applyFontAwesomeFallbackIcons(node);
+        applyLucideFallbackIcons(node);
         applyActionButtonIcons(node);
         if (window.lucide) ranLucide = true;
       }
@@ -779,7 +968,7 @@ function startIconObserver() {
     }
   });
 
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
 }
 
 function toggleTheme(event) {
@@ -833,6 +1022,8 @@ function initTheme() {
   applyTheme(getResolvedTheme());
   mountThemeToggle();
   applyIconography();
+  applyFontAwesomeFallbackIcons();
+  applyLucideFallbackIcons();
   applyActionButtonIcons();
   startIconObserver();
 }

@@ -15,6 +15,7 @@ router.get('/customers', employeeController.getCustomers);
 router.post('/customers', employeeController.addCustomer);
 router.post('/customers/delete', employeeController.deleteCustomersBulk);
 router.get('/customers/:id', employeeController.getCustomerDetail);
+router.put('/customers/:id', employeeController.updateCustomer);
 router.delete('/customers/:id', employeeController.deleteCustomer);
 
 // Documents

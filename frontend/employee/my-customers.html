@@ -22,8 +22,75 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
   <style>
+    /* ── Table Pagination ─────────────────────────────────────────────── */
+    .tbl-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      padding: 12px 16px 10px;
+      flex-wrap: wrap;
+    }
+    .tbl-pg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+      font-family: inherit;
+    }
+    .tbl-pg-btn:hover:not(:disabled):not(.active) {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .tbl-pg-btn.active {
+      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(15,39,71,0.22);
+    }
+    .tbl-pg-btn:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    :root[data-theme='dark'] .tbl-pg-btn {
+      background: rgba(9,17,29,0.58);
+      border-color: rgba(151,176,210,0.14);
+      color: var(--text-secondary);
+    }
+    :root[data-theme='dark'] .tbl-pg-btn:hover:not(:disabled):not(.active) {
+      background: rgba(139,180,255,0.12);
+      border-color: rgba(139,180,255,0.4);
+      color: #8bb4ff;
+    }
+    :root[data-theme='dark'] .tbl-pg-btn.active {
+      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .tbl-pg-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-right: auto;
+    }
+    @media (max-width: 600px) {
+      .tbl-pagination { justify-content: center; }
+      .tbl-pg-info { width: 100%; text-align: center; margin-right: 0; }
+    }
     /* ── Documents Modal ── */
     .docs-modal-overlay {
       position: fixed;
@@ -217,6 +284,10 @@
       box-shadow: 0 30px 90px rgba(0,0,0,0.48);
     }
     .employee-customer-detail-modal .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
       margin: 0;
       padding: 18px 22px;
       border-bottom: 1px solid var(--border, rgba(151,176,210,0.18));
@@ -231,6 +302,40 @@
       color: var(--text-primary);
       font-size: 17px;
       font-weight: 850;
+      min-width: 0;
+    }
+    .employee-customer-header-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .employee-customer-edit-btn {
+      min-height: 36px;
+      padding: 8px 12px;
+      border-color: rgba(47,111,237,0.34);
+      background: rgba(47,111,237,0.08);
+      color: var(--accent, #2f6fed);
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .employee-customer-edit-btn:hover {
+      border-color: rgba(47,111,237,0.48);
+      background: rgba(47,111,237,0.13);
+      transform: translateY(-1px);
+    }
+    :root[data-theme='dark'] .employee-customer-edit-btn {
+      background: rgba(139,180,255,0.1);
+      border-color: rgba(139,180,255,0.22);
+      color: #8bb4ff;
+    }
+    .employee-customer-edit-btn svg,
+    .employee-customer-actions .btn svg {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 auto;
     }
     .employee-customer-detail-modal .modal-close {
       width: 36px;
@@ -437,6 +542,79 @@
       overflow-wrap: anywhere;
       white-space: pre-wrap;
     }
+    .employee-customer-additional-text {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+    .employee-customer-notice {
+      margin-bottom: 14px;
+      padding: 11px 13px;
+      border-radius: 10px;
+      border: 1px solid var(--border, rgba(151,176,210,0.18));
+      background: rgba(47,111,237,0.08);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.4;
+    }
+    .employee-customer-notice.success {
+      border-color: rgba(15,139,113,0.28);
+      background: rgba(15,139,113,0.1);
+      color: var(--success, #0f8b71);
+    }
+    .employee-customer-notice.error {
+      border-color: rgba(220,38,38,0.28);
+      background: rgba(220,38,38,0.08);
+      color: var(--danger, #dc2626);
+    }
+    .employee-customer-edit-input {
+      width: 100%;
+      min-height: 40px;
+      margin-top: 7px;
+      padding: 9px 10px;
+      border: 1px solid var(--border, rgba(151,176,210,0.18));
+      border-radius: 10px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 650;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+    textarea.employee-customer-edit-input {
+      min-height: 108px;
+      line-height: 1.45;
+      resize: vertical;
+    }
+    .employee-customer-edit-input:focus {
+      border-color: rgba(47,111,237,0.5);
+      box-shadow: 0 0 0 3px rgba(47,111,237,0.12);
+    }
+    :root[data-theme='dark'] .employee-customer-edit-input {
+      background: rgba(255,255,255,0.045);
+      border-color: rgba(151,176,210,0.14);
+    }
+    .employee-customer-field.has-error {
+      border-color: rgba(220,38,38,0.46);
+    }
+    .employee-customer-field.has-error .employee-customer-edit-input {
+      border-color: rgba(220,38,38,0.65);
+    }
+    .employee-customer-field-error {
+      display: block;
+      min-height: 15px;
+      margin-top: 5px;
+      color: var(--danger, #dc2626);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
     .employee-customer-doc-list {
       display: grid;
       gap: 8px;
@@ -536,6 +714,17 @@
       min-width: 130px;
       justify-content: center;
     }
+    .employee-customer-save-btn {
+      background: linear-gradient(135deg, #0f8b71 0%, #10614f 100%);
+      border-color: #0f8b71;
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(15,139,113,0.22);
+    }
+    .employee-customer-save-btn:hover {
+      background: linear-gradient(135deg, #10614f 0%, #0b4f42 100%);
+      border-color: #10614f;
+      color: #fff;
+    }
     @media (max-width: 760px) {
       .employee-customer-detail-modal {
         max-height: calc(100vh - 20px);
@@ -544,6 +733,12 @@
       .employee-customer-detail-body {
         padding-left: 16px;
         padding-right: 16px;
+      }
+      .employee-customer-detail-modal .modal-header {
+        align-items: flex-start;
+      }
+      .employee-customer-header-actions {
+        flex-wrap: wrap;
       }
       .employee-customer-hero {
         grid-template-columns: auto minmax(0, 1fr);
@@ -648,6 +843,7 @@
             <tbody id="my-customers-tbody"><tr><td colspan="9" class="text-center text-muted">Loading...</td></tr></tbody>
           </table>
         </div>
+        <div id="customers-pagination"></div>
         <div id="delete-action-bar" style="display:none;padding:12px 16px;background:rgba(239,68,68,0.1);border-top:1px solid var(--border);flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">
           <p id="selected-count" style="font-size:13px;color:var(--text-secondary);">0 selected</p>
           <button class="btn btn-danger" onclick="confirmDeleteSelected()">Delete Selected</button>
@@ -661,11 +857,17 @@
   <div class="modal-overlay" id="customer-detail-modal" onclick="if (event.target.id==='customer-detail-modal') closeCustomerModal()">
     <div class="modal employee-customer-detail-modal" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <h3>Customer Details</h3>
-        <button class="modal-close" onclick="closeCustomerModal()" title="Close" aria-label="Close customer details">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
-          Close
-        </button>
+        <h3 id="customer-detail-title">Customer Details</h3>
+        <div class="employee-customer-header-actions">
+          <button class="btn btn-secondary employee-customer-edit-btn" id="customer-edit-btn" onclick="enterCustomerEditMode()" style="display:none;" title="Edit customer" aria-label="Edit customer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+            <span>Edit Customer</span>
+          </button>
+          <button class="modal-close" onclick="closeCustomerModal()" title="Close" aria-label="Close customer details">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+            Close
+          </button>
+        </div>
       </div>
       <div id="customer-detail-content" class="employee-customer-detail-body">
         <div class="employee-customer-loading">Loading...</div>
@@ -732,7 +934,7 @@
   </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705a"></script>
+<script src="/js/api.js?v=20260705d"></script>
 <script>
   const user = requireRole('employee');
   if (user) {
@@ -744,6 +946,10 @@
   let allCustomers = [];
   let deleteMode = false;
   const selectedCustomers = new Set();
+  
+  let customersPage = 1;
+  const EMP_CUSTOMERS_PER_PAGE = 20;
+  let allFilteredCustomers = [];
 
   // ── Active docs modal customer ──────────────────────────────
   let activeDocsCustomerId = null;
@@ -752,40 +958,105 @@
     const res = await api.get('/employee/customers');
     if (!res?.ok) return;
     allCustomers = res.data.data;
-    renderCustomers(allCustomers);
+    customersPage = 1;
+    filterCustomers();
   }
 
   function filterCustomers() {
     const q = document.getElementById('customer-search').value.trim().toLowerCase();
-    if (!q) return renderCustomers(allCustomers);
-    renderCustomers(allCustomers.filter(c =>
-      c.name.toLowerCase().includes(q) || c.phone.includes(q)
-    ));
+    let list = allCustomers;
+    if (q) {
+      list = allCustomers.filter(c =>
+        c.name.toLowerCase().includes(q) || c.phone.includes(q)
+      );
+    }
+    
+    // Reset page if search changes
+    if (typeof filterCustomers.lastQ === 'undefined') {
+      filterCustomers.lastQ = '';
+    }
+    if (filterCustomers.lastQ !== q) {
+      customersPage = 1;
+      filterCustomers.lastQ = q;
+    }
+    
+    allFilteredCustomers = list;
+    renderCustomersPage();
   }
 
-  function renderCustomers(list) {
+  function renderCustomersPage() {
+    const list = allFilteredCustomers;
+    const total = list.length;
+    const totalPages = Math.ceil(total / EMP_CUSTOMERS_PER_PAGE);
+    const start = (customersPage - 1) * EMP_CUSTOMERS_PER_PAGE;
+    const end = Math.min(start + EMP_CUSTOMERS_PER_PAGE, total);
+    const pageItems = list.slice(start, end);
     const tbody = document.getElementById('my-customers-tbody');
-    tbody.innerHTML = list.length
-      ? list.map((c, i) => `
-        <tr>
-          <td class="checkbox-cell" style="display:none;width:40px;"><input type="checkbox" class="customer-checkbox" value="${c.id}" onchange="updateSelectedCount()" /></td>
-          <td>${i + 1}</td>
-          <td><span style="cursor:pointer;color:var(--color-primary);text-decoration:underline;" onclick="openCustomerDetail(${c.id})">${c.name}</span></td>
-          <td>${c.phone}</td>
-          <td>${c.area}</td>
-          <td>${formatDate(c.created_at)}</td>
-          <td>${formatTime(c.created_at)}</td>
-          <td><button class="btn-docs" onclick="openDocsModal(${c.id}, '${c.name.replace(/'/g,"\\'")}')">View Docs</button></td>
-          <td><a href="/employee/loans.html?customer_id=${c.id}" class="btn-new-loan">Create Loan</a></td>
-        </tr>
-      `).join('')
-      : '<tr><td colspan="9" class="text-center text-muted">No customers found.</td></tr>';
+
+    if (!total) {
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No customers found.</td></tr>';
+      document.getElementById('customers-pagination').innerHTML = '';
+      return;
+    }
+
+    tbody.innerHTML = pageItems.map((c, i) => `
+      <tr>
+        <td class="checkbox-cell" style="display:none;width:40px;"><input type="checkbox" class="customer-checkbox" value="${c.id}" onchange="updateSelectedCount()" /></td>
+        <td>${start + i + 1}</td>
+        <td><span style="cursor:pointer;color:var(--color-primary);text-decoration:underline;" onclick="openCustomerDetail(${c.id})">${c.name}</span></td>
+        <td>${c.phone}</td>
+        <td>${c.area}</td>
+        <td>${formatDate(c.created_at)}</td>
+        <td>${formatTime(c.created_at)}</td>
+        <td><button class="btn-docs" onclick="openDocsModal(${c.id}, '${c.name.replace(/'/g,"\\'")}')">View Docs</button></td>
+        <td><a href="/employee/loans.html?customer_id=${c.id}" class="btn-new-loan">Create Loan</a></td>
+      </tr>
+    `).join('');
 
     // Restore checkbox visibility when in delete mode
     if (deleteMode) {
       document.querySelectorAll('.checkbox-cell').forEach(cell => cell.style.display = 'table-cell');
       document.getElementById('checkbox-header').style.display = 'table-cell';
     }
+
+    document.getElementById('customers-pagination').innerHTML = buildCustomersPagination(total, customersPage, totalPages);
+  }
+
+  function buildCustomersPagination(total, current, totalPages) {
+    if (total <= EMP_CUSTOMERS_PER_PAGE) return '';
+    const start = (current - 1) * EMP_CUSTOMERS_PER_PAGE + 1;
+    const end = Math.min(current * EMP_CUSTOMERS_PER_PAGE, total);
+    let html = `<div class="tbl-pagination"><span class="tbl-pg-info">Showing ${start}–${end} of ${total} customers</span>`;
+    html += `<button class="tbl-pg-btn" ${current===1?'disabled':''} onclick="goCustomerPage(${current-1})">← Prev</button>`;
+    const pages = getPagPages(current, totalPages);
+    for (const p of pages) {
+      if (p === '...') html += `<span class="tbl-pg-btn" style="cursor:default;pointer-events:none;">…</span>`;
+      else html += `<button class="tbl-pg-btn${p===current?' active':''}" onclick="goCustomerPage(${p})">${p}</button>`;
+    }
+    html += `<button class="tbl-pg-btn" ${current===totalPages?'disabled':''} onclick="goCustomerPage(${current+1})">Next →</button>`;
+    html += '</div>';
+    return html;
+  }
+
+  function goCustomerPage(p) {
+    customersPage = p;
+    renderCustomersPage();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function getPagPages(current, total) {
+    if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+    const pages = [];
+    if (current <= 4) {
+      for (let i = 1; i <= 5; i++) pages.push(i);
+      pages.push('...', total);
+    } else if (current >= total - 3) {
+      pages.push(1, '...');
+      for (let i = total - 4; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1, '...', current - 1, current, current + 1, '...', total);
+    }
+    return pages;
   }
 
   // ── Helpers ──────────────────────────────────────────────────
@@ -940,6 +1211,10 @@
 
   // ── Customer Detail Modal ──────────────────────────────────
   let customerModalListenerAttached = false;
+  let activeCustomerDetailState = null;
+  let customerDetailEditMode = false;
+  let customerDetailNotice = null;
+  let customerDetailNoticeTimer = null;
 
   function openCustomerModal() {
     document.getElementById('customer-detail-modal').classList.add('show');
@@ -948,6 +1223,10 @@
 
   function closeCustomerModal() {
     document.getElementById('customer-detail-modal').classList.remove('show');
+    customerDetailEditMode = false;
+    activeCustomerDetailState = null;
+    clearCustomerDetailNotice();
+    setCustomerEditButtonVisible(false);
     attachCustomerModalListener();
   }
 
@@ -1035,8 +1314,325 @@
     document.getElementById('customer-detail-content').innerHTML = content;
   }
 
+  function customerDetailIcon(name) {
+    const icons = {
+      document: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5"></path><path d="M9 13h6"></path><path d="M9 17h4"></path></svg>',
+      save: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><path d="M17 21v-8H7v8"></path><path d="M7 3v5h8"></path></svg>',
+      cancel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>'
+    };
+    return icons[name] || '';
+  }
+
+  function setCustomerEditButtonVisible(visible) {
+    const btn = document.getElementById('customer-edit-btn');
+    if (btn) btn.style.display = visible ? 'inline-flex' : 'none';
+  }
+
+  function setCustomerDetailTitle(title) {
+    const titleEl = document.getElementById('customer-detail-title');
+    if (titleEl) titleEl.textContent = title;
+  }
+
+  function clearCustomerDetailNotice() {
+    window.clearTimeout(customerDetailNoticeTimer);
+    customerDetailNoticeTimer = null;
+    customerDetailNotice = null;
+  }
+
+  function renderCustomerNoticeMarkup() {
+    if (!customerDetailNotice) {
+      return '<div id="customer-detail-notice" class="employee-customer-notice" style="display:none;"></div>';
+    }
+    return `<div id="customer-detail-notice" class="employee-customer-notice ${escapeHtml(customerDetailNotice.type)}">${escapeHtml(customerDetailNotice.message)}</div>`;
+  }
+
+  function showCustomerDetailNotice(message, type = 'info') {
+    window.clearTimeout(customerDetailNoticeTimer);
+    customerDetailNotice = { message, type };
+    const el = document.getElementById('customer-detail-notice');
+    if (el) {
+      el.className = `employee-customer-notice ${type}`;
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+    if (type === 'success') {
+      customerDetailNoticeTimer = window.setTimeout(() => {
+        customerDetailNotice = null;
+        const current = document.getElementById('customer-detail-notice');
+        if (current) current.style.display = 'none';
+      }, 4000);
+    }
+  }
+
+  function cleanCustomerDetailText(value) {
+    return String(value || '')
+      .replace(/^\s*-{0,}\s*Additional Customer Details\s*-{0,}\s*$/gim, '')
+      .replace(/\r\n?/g, '\n')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  function splitCustomerAddressDetails(rawAddress) {
+    const normalized = String(rawAddress ?? '').replace(/\r\n?/g, '\n').trim();
+    if (!normalized) return { address: '', additionalDetails: '' };
+
+    const parts = normalized
+      .split(/^\s*-{0,}\s*Additional Customer Details\s*-{0,}\s*$/gim)
+      .map(part => part.trim());
+
+    if (parts.length === 1) {
+      return { address: cleanCustomerDetailText(parts[0]), additionalDetails: '' };
+    }
+
+    const address = cleanCustomerDetailText(parts.shift() || '');
+    const additionalDetails = cleanCustomerDetailText(parts.filter(Boolean).join('\n\n'));
+    return { address, additionalDetails };
+  }
+
+  function composeCustomerAddress(address, additionalDetails) {
+    const cleanAddress = cleanCustomerDetailText(address);
+    const cleanAdditionalDetails = cleanCustomerDetailText(additionalDetails);
+    if (!cleanAdditionalDetails) return cleanAddress;
+    return `${cleanAddress}\n\n--- Additional Customer Details ---\n${cleanAdditionalDetails}`;
+  }
+
+  function customerTextOrDash(value) {
+    const text = String(value ?? '').trim();
+    return text ? escapeHtml(text) : '&mdash;';
+  }
+
+  function customerMoneyOrDash(value) {
+    if (value === undefined || value === null || value === '') return '&mdash;';
+    const amount = Number(value);
+    return Number.isFinite(amount) ? `&#8377;${amount.toLocaleString('en-IN')}` : '&mdash;';
+  }
+
+  function customerDateOrDash(value) {
+    if (!value) return '&mdash;';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '&mdash;' : escapeHtml(formatDate(value));
+  }
+
+  function customerInitials(name) {
+    const initials = String(name || 'Customer')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part.charAt(0).toUpperCase())
+      .join('');
+    return escapeHtml(initials || 'C');
+  }
+
+  function renderCustomerDocuments(docs) {
+    if (!docs.length) {
+      return `
+        <div class="employee-customer-empty">
+          <strong>No documents uploaded</strong>
+          <span>This customer does not have files attached yet.</span>
+        </div>`;
+    }
+
+    return docs.map(d => {
+      const docMeta = [
+        d.file_name ? escapeHtml(d.file_name) : null,
+        d.document_password ? `Password: ${escapeHtml(d.document_password)}` : null
+      ].filter(Boolean).join(' | ');
+      return `
+        <div class="employee-customer-doc-item doc-row" id="detail-doc-${escapeHtml(d.id)}">
+          <div class="employee-customer-doc-main">
+            <span class="employee-customer-doc-icon">${customerDetailIcon('document')}</span>
+            <div class="employee-customer-doc-text">
+              <p>${customerTextOrDash(d.doc_type)}</p>
+              <span>${docMeta || '&mdash;'}</span>
+            </div>
+          </div>
+          <div class="employee-customer-doc-actions">
+            <a href="${escapeHtml(resolveFileUrl(d.file_path))}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">View</a>
+            <button type="button" class="btn btn-danger btn-sm" onclick='deleteUploadedDoc(${JSON.stringify(d.id)}, this)'>Delete</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderCustomerDocumentSection(docs) {
+    return `
+      <section class="employee-customer-section">
+        <div class="employee-customer-section-header">
+          <h4>Uploaded Documents</h4>
+          <span id="customer-detail-doc-count">${docs.length} file${docs.length === 1 ? '' : 's'}</span>
+        </div>
+        <div class="employee-customer-doc-list" id="customer-detail-doc-list">
+          ${renderCustomerDocuments(docs)}
+        </div>
+      </section>`;
+  }
+
+  function renderCustomerDetailView() {
+    if (!activeCustomerDetailState) return;
+    customerDetailEditMode = false;
+    setCustomerDetailTitle('Customer Details');
+    setCustomerEditButtonVisible(true);
+
+    const detailContent = document.getElementById('customer-detail-content');
+    const c = activeCustomerDetailState.customer || {};
+    const docs = Array.isArray(activeCustomerDetailState.documents) ? activeCustomerDetailState.documents : [];
+    const addressParts = splitCustomerAddressDetails(c.address);
+    const safeCustomerId = encodeURIComponent(c.id || activeCustomerDetailState.customerId || '');
+    const field = (label, value, extraClass = '') => `
+      <div class="employee-customer-field ${extraClass}">
+        <span>${label}</span>
+        <p>${value}</p>
+      </div>`;
+
+    detailContent.innerHTML = `
+      ${renderCustomerNoticeMarkup()}
+      <div class="employee-customer-shell">
+        <section class="employee-customer-hero">
+          <div class="employee-customer-avatar" aria-hidden="true">${customerInitials(c.name)}</div>
+          <div class="employee-customer-copy">
+            <span class="employee-customer-kicker">Customer profile</span>
+            <h4 class="employee-customer-name">${customerTextOrDash(c.name)}</h4>
+            <div class="employee-customer-meta">
+              <span>${customerTextOrDash(c.phone)}</span>
+              <span>${customerTextOrDash(c.email)}</span>
+              <span>${customerTextOrDash(c.area)}</span>
+            </div>
+          </div>
+          <span class="employee-customer-id">ID #${customerTextOrDash(c.id || activeCustomerDetailState.customerId)}</span>
+        </section>
+
+        <div class="employee-customer-stat-grid">
+          <div class="employee-customer-stat"><span>Net Salary</span><strong>${customerMoneyOrDash(c.net_salary)}</strong></div>
+          <div class="employee-customer-stat"><span>Total Obligation</span><strong>${customerMoneyOrDash(c.total_obligation)}</strong></div>
+          <div class="employee-customer-stat"><span>Documents</span><strong id="customer-detail-doc-total">${docs.length}</strong></div>
+          <div class="employee-customer-stat"><span>Joined</span><strong>${customerDateOrDash(c.created_at)}</strong></div>
+        </div>
+
+        <section class="employee-customer-section">
+          <div class="employee-customer-section-header">
+            <h4>Contact & Profile</h4>
+            <span>Added ${customerDateOrDash(c.created_at)}</span>
+          </div>
+          <div class="employee-customer-info-grid">
+            ${field('Name', customerTextOrDash(c.name))}
+            ${field('Phone', customerTextOrDash(c.phone))}
+            ${field('Email', customerTextOrDash(c.email))}
+            ${field('City', customerTextOrDash(c.area))}
+            ${field('Net Salary', customerMoneyOrDash(c.net_salary))}
+            ${field('Total Obligation', customerMoneyOrDash(c.total_obligation))}
+            ${field('Address', customerTextOrDash(addressParts.address), 'full')}
+          </div>
+        </section>
+
+        <section class="employee-customer-section">
+          <div class="employee-customer-section-header">
+            <h4>Additional Customer Details</h4>
+          </div>
+          <p class="employee-customer-additional-text">${customerTextOrDash(addressParts.additionalDetails)}</p>
+        </section>
+
+        ${renderCustomerDocumentSection(docs)}
+
+        <div class="employee-customer-actions">
+          <a href="/employee/loans.html?customer_id=${safeCustomerId}" class="btn btn-primary">View Loans</a>
+          <button type="button" class="btn btn-secondary" onclick="closeCustomerModal()">Close</button>
+        </div>
+      </div>`;
+  }
+
+  function renderCustomerDetailEdit() {
+    if (!activeCustomerDetailState) return;
+    customerDetailEditMode = true;
+    setCustomerDetailTitle('Edit Customer');
+    setCustomerEditButtonVisible(false);
+
+    const detailContent = document.getElementById('customer-detail-content');
+    const c = activeCustomerDetailState.customer || {};
+    const docs = Array.isArray(activeCustomerDetailState.documents) ? activeCustomerDetailState.documents : [];
+    const loans = Array.isArray(activeCustomerDetailState.loans) ? activeCustomerDetailState.loans : [];
+    const addressParts = splitCustomerAddressDetails(c.address);
+    const inputValue = (value) => escapeHtml(String(value ?? ''));
+    const editField = (label, field, value, attrs = '', extraClass = '') => `
+      <div class="employee-customer-field ${extraClass}" data-edit-field="${field}">
+        <span id="edit-customer-${field}-label">${label}</span>
+        <input id="edit-customer-${field}" class="employee-customer-edit-input" value="${inputValue(value)}" aria-labelledby="edit-customer-${field}-label" aria-describedby="edit-customer-${field}-error" oninput="clearCustomerEditError('${field}')" ${attrs} />
+        <small class="employee-customer-field-error" id="edit-customer-${field}-error"></small>
+      </div>`;
+    const editTextarea = (label, field, value, rows, extraClass = 'full') => `
+      <div class="employee-customer-field ${extraClass}" data-edit-field="${field}">
+        <span id="edit-customer-${field}-label">${label}</span>
+        <textarea id="edit-customer-${field}" class="employee-customer-edit-input" rows="${rows}" aria-labelledby="edit-customer-${field}-label" aria-describedby="edit-customer-${field}-error" oninput="clearCustomerEditError('${field}')">${inputValue(value)}</textarea>
+        <small class="employee-customer-field-error" id="edit-customer-${field}-error"></small>
+      </div>`;
+
+    detailContent.innerHTML = `
+      ${renderCustomerNoticeMarkup()}
+      <div class="employee-customer-shell">
+        <section class="employee-customer-hero">
+          <div class="employee-customer-avatar" aria-hidden="true">${customerInitials(c.name)}</div>
+          <div class="employee-customer-copy">
+            <span class="employee-customer-kicker">Customer profile</span>
+            <h4 class="employee-customer-name">${customerTextOrDash(c.name)}</h4>
+            <div class="employee-customer-meta">
+              <span>${customerTextOrDash(c.phone)}</span>
+              <span>${customerTextOrDash(c.email)}</span>
+              <span>${customerTextOrDash(c.area)}</span>
+            </div>
+          </div>
+          <span class="employee-customer-id">ID #${customerTextOrDash(c.id || activeCustomerDetailState.customerId)}</span>
+        </section>
+
+        <div class="employee-customer-stat-grid">
+          <div class="employee-customer-stat"><span>Customer ID</span><strong>${customerTextOrDash(c.id || activeCustomerDetailState.customerId)}</strong></div>
+          <div class="employee-customer-stat"><span>Documents</span><strong id="customer-detail-doc-total">${docs.length}</strong></div>
+          <div class="employee-customer-stat"><span>Joined</span><strong>${customerDateOrDash(c.created_at)}</strong></div>
+          <div class="employee-customer-stat"><span>Loans</span><strong>${loans.length}</strong></div>
+        </div>
+
+        <section class="employee-customer-section">
+          <div class="employee-customer-section-header">
+            <h4>Contact & Profile</h4>
+            <span>Added ${customerDateOrDash(c.created_at)}</span>
+          </div>
+          <div class="employee-customer-info-grid">
+            ${editField('Full Name', 'name', c.name, 'autocomplete="name"')}
+            ${editField('Phone Number', 'phone', c.phone, 'inputmode="numeric" maxlength="10" autocomplete="tel"')}
+            ${editField('Email', 'email', c.email, 'type="email" autocomplete="email"')}
+            ${editField('City', 'area', c.area, 'autocomplete="address-level2"')}
+            ${editField('Net Salary', 'net-salary', c.net_salary, 'inputmode="decimal"')}
+            ${editField('Total Obligation', 'total-obligation', c.total_obligation, 'inputmode="decimal"')}
+            ${editTextarea('Full Address', 'address', addressParts.address, 4)}
+          </div>
+        </section>
+
+        <section class="employee-customer-section">
+          <div class="employee-customer-section-header">
+            <h4>Additional Customer Details</h4>
+          </div>
+          <div class="employee-customer-info-grid">
+            ${editTextarea('Additional Customer Details', 'additional-details', addressParts.additionalDetails, 6)}
+          </div>
+        </section>
+
+        ${renderCustomerDocumentSection(docs)}
+
+        <div class="employee-customer-actions">
+          <button type="button" class="btn employee-customer-save-btn" id="customer-save-btn" onclick="saveCustomerChanges()">${customerDetailIcon('save')}<span>Save Changes</span></button>
+          <button type="button" class="btn btn-secondary" onclick="cancelCustomerEdit()">${customerDetailIcon('cancel')}<span>Cancel</span></button>
+        </div>
+      </div>`;
+  }
+
   async function openCustomerDetail(customerId) {
     openCustomerModal();
+    clearCustomerDetailNotice();
+    customerDetailEditMode = false;
+    activeCustomerDetailState = null;
+    setCustomerDetailTitle('Customer Details');
+    setCustomerEditButtonVisible(false);
+
     const detailContent = document.getElementById('customer-detail-content');
     detailContent.innerHTML = '<div class="employee-customer-loading">Loading...</div>';
 
@@ -1046,119 +1642,145 @@
       return;
     }
 
-    const c = res.data.data.customer;
-    const docs = Array.isArray(res.data.data.documents) ? res.data.data.documents : [];
-    const textOrDash = (value) => {
-      const text = String(value ?? '').trim();
-      return text ? escapeHtml(text) : '&mdash;';
+    activeCustomerDetailState = {
+      customerId,
+      customer: res.data.data.customer,
+      documents: Array.isArray(res.data.data.documents) ? res.data.data.documents : [],
+      loans: Array.isArray(res.data.data.loans) ? res.data.data.loans : []
     };
-    const moneyOrDash = (value) => {
-      if (value === undefined || value === null || value === '') return '&mdash;';
-      const amount = Number(value);
-      return Number.isFinite(amount) ? `&#8377;${amount.toLocaleString('en-IN')}` : '&mdash;';
-    };
-    const dateOrDash = (value) => {
-      if (!value) return '&mdash;';
-      const date = new Date(value);
-      return Number.isNaN(date.getTime()) ? '&mdash;' : escapeHtml(formatDate(value));
-    };
-    const customerInitials = (name) => {
-      const initials = String(name || 'Customer')
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map(part => part.charAt(0).toUpperCase())
-        .join('');
-      return escapeHtml(initials || 'C');
-    };
-    const field = (label, value, extraClass = '') => `
-      <div class="employee-customer-field ${extraClass}">
-        <span>${label}</span>
-        <p>${value}</p>
-      </div>`;
-    const documentIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5"></path><path d="M9 13h6"></path><path d="M9 17h4"></path></svg>';
-    const safeCustomerId = encodeURIComponent(c.id || customerId);
-
-    detailContent.innerHTML = `
-      <div class="employee-customer-shell">
-        <section class="employee-customer-hero">
-          <div class="employee-customer-avatar" aria-hidden="true">${customerInitials(c.name)}</div>
-          <div class="employee-customer-copy">
-            <span class="employee-customer-kicker">Customer profile</span>
-            <h4 class="employee-customer-name">${textOrDash(c.name)}</h4>
-            <div class="employee-customer-meta">
-              <span>${textOrDash(c.phone)}</span>
-              <span>${textOrDash(c.email)}</span>
-              <span>${textOrDash(c.area)}</span>
-            </div>
-          </div>
-          <span class="employee-customer-id">ID #${textOrDash(c.id || customerId)}</span>
-        </section>
-
-        <div class="employee-customer-stat-grid">
-          <div class="employee-customer-stat"><span>Net Salary</span><strong>${moneyOrDash(c.net_salary)}</strong></div>
-          <div class="employee-customer-stat"><span>Total Obligation</span><strong>${moneyOrDash(c.total_obligation)}</strong></div>
-          <div class="employee-customer-stat"><span>Documents</span><strong>${docs.length}</strong></div>
-          <div class="employee-customer-stat"><span>Joined</span><strong>${dateOrDash(c.created_at)}</strong></div>
-        </div>
-
-        <section class="employee-customer-section">
-          <div class="employee-customer-section-header">
-            <h4>Contact & Profile</h4>
-            <span>Added ${dateOrDash(c.created_at)}</span>
-          </div>
-          <div class="employee-customer-info-grid">
-            ${field('Name', textOrDash(c.name))}
-            ${field('Phone', textOrDash(c.phone))}
-            ${field('Email', textOrDash(c.email))}
-            ${field('City', textOrDash(c.area))}
-            ${field('Net Salary', moneyOrDash(c.net_salary))}
-            ${field('Total Obligation', moneyOrDash(c.total_obligation))}
-            ${field('Address', textOrDash(c.address), 'full')}
-          </div>
-        </section>
-
-        <section class="employee-customer-section">
-          <div class="employee-customer-section-header">
-            <h4>Uploaded Documents</h4>
-            <span id="customer-detail-doc-count">${docs.length} file${docs.length === 1 ? '' : 's'}</span>
-          </div>
-          <div class="employee-customer-doc-list" id="customer-detail-doc-list">
-            ${docs.length ? docs.map(d => {
-              const docMeta = [
-                d.file_name ? escapeHtml(d.file_name) : null,
-                d.document_password ? `Password: ${escapeHtml(d.document_password)}` : null
-              ].filter(Boolean).join(' | ');
-              return `
-                <div class="employee-customer-doc-item doc-row" id="detail-doc-${escapeHtml(d.id)}">
-                  <div class="employee-customer-doc-main">
-                    <span class="employee-customer-doc-icon">${documentIcon}</span>
-                    <div class="employee-customer-doc-text">
-                      <p>${textOrDash(d.doc_type)}</p>
-                      <span>${docMeta || '&mdash;'}</span>
-                    </div>
-                  </div>
-                  <div class="employee-customer-doc-actions">
-                    <a href="${escapeHtml(resolveFileUrl(d.file_path))}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">View</a>
-                    <button class="btn btn-danger btn-sm" onclick='deleteUploadedDoc(${JSON.stringify(d.id)}, this)'>Delete</button>
-                  </div>
-                </div>`;
-            }).join('') : `
-              <div class="employee-customer-empty">
-                <strong>No documents uploaded</strong>
-                <span>This customer does not have files attached yet.</span>
-              </div>`}
-          </div>
-        </section>
-
-        <div class="employee-customer-actions">
-          <a href="/employee/loans.html?customer_id=${safeCustomerId}" class="btn btn-primary">View Loans</a>
-          <button class="btn btn-secondary" onclick="closeCustomerModal()">Close</button>
-        </div>
-      </div>`;
+    renderCustomerDetailView();
   }
 
+  function enterCustomerEditMode() {
+    if (!activeCustomerDetailState) return;
+    clearCustomerDetailNotice();
+    renderCustomerDetailEdit();
+    window.setTimeout(() => document.getElementById('edit-customer-name')?.focus(), 0);
+  }
+
+  function cancelCustomerEdit() {
+    if (!activeCustomerDetailState) return;
+    clearCustomerDetailNotice();
+    renderCustomerDetailView();
+  }
+
+  function clearCustomerEditError(field) {
+    const input = document.getElementById(`edit-customer-${field}`);
+    const error = document.getElementById(`edit-customer-${field}-error`);
+    const wrapper = input ? input.closest('.employee-customer-field') : null;
+    if (wrapper) wrapper.classList.remove('has-error');
+    if (error) error.textContent = '';
+  }
+
+  function clearCustomerEditErrors() {
+    document.querySelectorAll('.employee-customer-field.has-error').forEach(field => field.classList.remove('has-error'));
+    document.querySelectorAll('.employee-customer-field-error').forEach(error => { error.textContent = ''; });
+  }
+
+  function setCustomerEditError(field, message) {
+    const input = document.getElementById(`edit-customer-${field}`);
+    const error = document.getElementById(`edit-customer-${field}-error`);
+    const wrapper = input ? input.closest('.employee-customer-field') : null;
+    if (wrapper) wrapper.classList.add('has-error');
+    if (error) error.textContent = message;
+    return input;
+  }
+
+  function getCustomerEditValue(field) {
+    return document.getElementById(`edit-customer-${field}`)?.value.trim() || '';
+  }
+
+  function validateCustomerEditForm() {
+    clearCustomerEditErrors();
+    const numericRegex = /^\d+(?:\.\d+)?$/;
+    const name = getCustomerEditValue('name');
+    const phone = getCustomerEditValue('phone').replace(/\D/g, '');
+    const email = getCustomerEditValue('email');
+    const area = getCustomerEditValue('area');
+    const netSalary = getCustomerEditValue('net-salary');
+    const totalObligation = getCustomerEditValue('total-obligation');
+    const address = getCustomerEditValue('address');
+    const additionalDetails = getCustomerEditValue('additional-details');
+    const phoneEl = document.getElementById('edit-customer-phone');
+    if (phoneEl) phoneEl.value = phone;
+
+    let firstInvalid = null;
+    const markInvalid = (field, message) => {
+      const input = setCustomerEditError(field, message);
+      if (!firstInvalid) firstInvalid = input;
+    };
+
+    if (!name) markInvalid('name', 'Full Name is required.');
+    if (!phone) markInvalid('phone', 'Phone Number is required.');
+    else if (!/^\d{10}$/.test(phone)) markInvalid('phone', 'Phone number must be 10 digits.');
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) markInvalid('email', 'Enter a valid email address.');
+    if (!area) markInvalid('area', 'City is required.');
+    if (!netSalary) markInvalid('net-salary', 'Net Salary is required.');
+    else if (!numericRegex.test(netSalary)) markInvalid('net-salary', 'Net Salary must contain numbers only.');
+    if (totalObligation && !numericRegex.test(totalObligation)) markInvalid('total-obligation', 'Total Obligation must contain numbers only.');
+    if (!address) markInvalid('address', 'Full Address is required.');
+
+    if (firstInvalid) {
+      showCustomerDetailNotice('Please fix the highlighted fields.', 'error');
+      firstInvalid.focus();
+      return null;
+    }
+
+    return {
+      name,
+      phone,
+      email,
+      area,
+      address: composeCustomerAddress(address, additionalDetails),
+      net_salary: netSalary,
+      total_obligation: totalObligation || '0'
+    };
+  }
+
+  function refreshCustomerListAfterUpdate(updatedCustomer) {
+    if (!updatedCustomer || !updatedCustomer.id) return;
+    const updatedId = String(updatedCustomer.id);
+    const index = allCustomers.findIndex(customer => String(customer.id) === updatedId);
+    if (index >= 0) {
+      allCustomers[index] = { ...allCustomers[index], ...updatedCustomer };
+    } else {
+      allCustomers.unshift(updatedCustomer);
+    }
+    filterCustomers();
+  }
+
+  async function saveCustomerChanges() {
+    if (!activeCustomerDetailState?.customer) return;
+    const payload = validateCustomerEditForm();
+    if (!payload) return;
+
+    const btn = document.getElementById('customer-save-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span>Saving...</span>';
+    }
+
+    const customerId = activeCustomerDetailState.customer.id || activeCustomerDetailState.customerId;
+    const res = await api.put(`/employee/customers/${encodeURIComponent(customerId)}`, payload);
+
+    if (!res?.ok) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `${customerDetailIcon('save')}<span>Save Changes</span>`;
+      }
+      showCustomerDetailNotice('Failed to update customer details.', 'error');
+      showAlert('page-alert', 'Failed to update customer details.', 'error');
+      return;
+    }
+
+    const updatedCustomer = res.data.customer || { ...activeCustomerDetailState.customer, ...payload, id: customerId };
+    activeCustomerDetailState.customer = updatedCustomer;
+    refreshCustomerListAfterUpdate(updatedCustomer);
+    customerDetailNotice = { message: 'Customer details updated successfully.', type: 'success' };
+    renderCustomerDetailView();
+    showCustomerDetailNotice('Customer details updated successfully.', 'success');
+    showAlert('page-alert', 'Customer details updated successfully.', 'success');
+  }
   async function deleteUploadedDoc(id, btn) {
     if (!confirm('Are you sure you want to delete this document?')) return;
     btn.disabled = true;
@@ -1170,13 +1792,18 @@
       return showAlert('page-alert', res?.data?.message || 'Failed to delete document.', 'error');
     }
     showAlert('page-alert', 'Document deleted successfully.', 'success');
+    if (activeCustomerDetailState && Array.isArray(activeCustomerDetailState.documents)) {
+      activeCustomerDetailState.documents = activeCustomerDetailState.documents.filter(doc => String(doc.id) !== String(id));
+    }
     const docRow = btn.closest('.doc-row');
     if (docRow) docRow.remove();
     const docList = document.getElementById('customer-detail-doc-list');
     const countEl = document.getElementById('customer-detail-doc-count');
+    const totalEl = document.getElementById('customer-detail-doc-total');
     if (docList && countEl) {
       const remaining = docList.querySelectorAll('.doc-row').length;
       countEl.textContent = `${remaining} file${remaining === 1 ? '' : 's'}`;
+      if (totalEl) totalEl.textContent = String(remaining);
       if (!remaining) {
         docList.innerHTML = `
           <div class="employee-customer-empty">
