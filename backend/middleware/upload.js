@@ -27,16 +27,93 @@ if (useR2) {
 }
 
 // ─── File filter (same for both storages) ─────────────────────────────────
+// Checks BOTH the file extension AND the browser-reported MIME type — a
+// quick, cheap barrier against someone simply renaming a file to .pdf.
+// (True content-based/magic-byte verification is applied separately, after
+// the file lands on disk — see verifyFileSignature below. It can't happen
+// here because multer's fileFilter runs before the file body is available
+// for streaming storage like multer-s3 or diskStorage.)
+
+const ALLOWED_MIME_BY_EXT = {
+  '.pdf':  ['application/pdf'],
+  '.jpg':  ['image/jpeg'],
+  '.jpeg': ['image/jpeg'],
+  '.png':  ['image/png'],
+  '.webp': ['image/webp'],
+};
 
 const fileFilter = (req, file, cb) => {
-  const allowed = ['.pdf', '.jpg', '.jpeg', '.png', '.webp'];
   const ext = path.extname(file.originalname).toLowerCase();
-  if (allowed.includes(ext)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only PDF, JPG, PNG, and WEBP files are allowed.'));
+  const allowedMimes = ALLOWED_MIME_BY_EXT[ext];
+
+  if (!allowedMimes) {
+    return cb(new Error('Only PDF, JPG, PNG, and WEBP files are allowed.'));
   }
+  if (!allowedMimes.includes(file.mimetype)) {
+    return cb(new Error(`File content does not match its .${ext.slice(1)} extension.`));
+  }
+  cb(null, true);
 };
+
+// ─── Magic-byte signature check (local disk storage only) ─────────────────
+// Confirms the file's actual first bytes match a real PDF/JPEG/PNG/WEBP
+// signature, not just its extension or declared MIME type. Call this after
+// a local-disk upload completes; delete the file if it returns false.
+const FILE_SIGNATURES = [
+  { ext: '.pdf',  bytes: [0x25, 0x50, 0x44, 0x46] },             // %PDF
+  { ext: '.jpg',  bytes: [0xFF, 0xD8, 0xFF] },                    // JPEG/JFIF
+  { ext: '.jpeg', bytes: [0xFF, 0xD8, 0xFF] },
+  { ext: '.png',  bytes: [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A] },
+  { ext: '.webp', bytes: [0x52, 0x49, 0x46, 0x46] },              // RIFF (WEBP container)
+];
+
+function verifyFileSignature(localPath, ext) {
+  const rule = FILE_SIGNATURES.find(r => r.ext === ext.toLowerCase());
+  if (!rule) return false;
+  try {
+    const fd = fs.openSync(localPath, 'r');
+    const buf = Buffer.alloc(rule.bytes.length);
+    fs.readSync(fd, buf, 0, rule.bytes.length, 0);
+    fs.closeSync(fd);
+    return rule.bytes.every((b, i) => buf[i] === b);
+  } catch {
+    return false;
+  }
+}
+
+// ─── Unified post-upload verification (R2 or local disk) ──────────────────
+// Call this right after a file is uploaded (R2 or disk). If it returns
+// false, the caller should reject the request and delete the file via
+// upload.deleteFile(fileUrl) — the extension/MIME check already passed by
+// this point, but this confirms the actual bytes really are what they claim.
+async function verifyUploadedFile(file, ext) {
+  const rule = FILE_SIGNATURES.find(r => r.ext === ext.toLowerCase());
+  if (!rule) return false;
+
+  if (useR2 && file.key) {
+    try {
+      const { GetObjectCommand } = require('@aws-sdk/client-s3');
+      const command = new GetObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: file.key,
+        Range: `bytes=0-${rule.bytes.length - 1}`,
+      });
+      const obj = await r2Client.send(command);
+      const chunks = [];
+      for await (const chunk of obj.Body) chunks.push(chunk);
+      const buf = Buffer.concat(chunks);
+      return rule.bytes.every((b, i) => buf[i] === b);
+    } catch (err) {
+      console.error('[Storage] verifyUploadedFile (R2) error:', err.message);
+      return false;
+    }
+  }
+
+  if (file.path) {
+    return verifyFileSignature(file.path, ext);
+  }
+  return false;
+}
 
 // ─── Storage: Cloudflare R2 ────────────────────────────────────────────────
 
@@ -187,5 +264,7 @@ upload.deleteFile = async (fileUrl) => {
 };
 
 console.log(`File storage: ${useR2 ? 'Cloudflare R2 ☁️' : 'Local disk 💾'}`);
+
+upload.verifyUploadedFile = verifyUploadedFile;
 
 module.exports = upload;

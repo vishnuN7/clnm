@@ -747,11 +747,11 @@
     tbody.innerHTML = pageItems.map((c, i) => `
     <tr>
       <td>${start + i + 1}</td>
-      <td>${c.name}</td>
-      <td>${c.phone}</td>
-      <td><span class="badge badge-employee">${c.area}</span></td>
-      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.address}">${c.address}</td>
-      <td>${c.added_by_name}</td>
+      <td>${escapeHtml(c.name)}</td>
+      <td>${escapeHtml(c.phone)}</td>
+      <td><span class="badge badge-employee">${escapeHtml(c.area)}</span></td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(c.address)}">${escapeHtml(c.address)}</td>
+      <td>${escapeHtml(c.added_by_name)}</td>
       <td>${formatDate(c.created_at)}</td>
       <td><button class="btn btn-secondary btn-sm" onclick="viewDetail(${c.id})"><span class="emoji-sm">🔎</span>View</button></td>
     </tr>`).join('');
@@ -924,7 +924,7 @@
                     <span>${meta || '&mdash;'}</span>
                   </div>
                 </div>
-                <a href="${escapeHtml(resolveFileUrl(d.file_path))}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">View</a>
+                <a href="#" onclick="openSecureDocument(${d.id}); return false;" class="btn btn-secondary btn-sm">View</a>
               </div>`;
           }).join('') : `
             <div class="customer-empty-state">

@@ -497,11 +497,11 @@
     tbody.innerHTML = res.data.data.map(r => `
       <tr>
         <td>${fmtD(r.date)}</td>
-        <td><strong>${r.break_type}</strong></td>
+        <td><strong>${escapeHtml(r.break_type)}</strong></td>
         <td>${fmtT(r.start_time)}</td>
         <td>${fmtT(r.end_time)}</td>
         <td>${r.duration}</td>
-        <td><span style="font-size:11px;color:var(--text-secondary);">${r.remarks}</span></td>
+        <td><span style="font-size:11px;color:var(--text-secondary);">${escapeHtml(r.remarks)}</span></td>
       </tr>
     `).join('');
   }

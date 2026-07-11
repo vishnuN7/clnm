@@ -1199,9 +1199,32 @@ async function doClose() {
   } catch(e) { showToast('Failed: ' + (e.message||'Error'), 'error'); }
 }
 
-function downloadFile(fileId, fmt) {
-  const token = getToken();
-  window.open(`${API_BASE}/excel/files/${fileId}/export?format=${fmt}&token=${token}`, '_blank');
+async function downloadFile(fileId, fmt) {
+  try {
+    const token = getToken();
+    const res = await fetch(`${API_BASE}/excel/files/${fileId}/export?format=${fmt}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      showToast(data.message || 'Failed to download file.', 'error');
+      return;
+    }
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    // Try to use the server-provided filename if present, otherwise a sensible default
+    const disposition = res.headers.get('Content-Disposition') || '';
+    const match = disposition.match(/filename="?([^"]+)"?/);
+    a.download = match ? match[1] : `export-${fileId}.${fmt === 'excel' ? 'xlsx' : fmt}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+  } catch (e) {
+    showToast('Failed to download file: ' + (e.message || 'Error'), 'error');
+  }
 }
 
 // ── Monitor Tab ───────────────────────────────────────────────────────────

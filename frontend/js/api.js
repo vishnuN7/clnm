@@ -1066,6 +1066,35 @@ const clearSession = () => {
   localStorage.removeItem('cln_user');
 };
 
+// ── Secure document viewer ──────────────────────────────────────
+// Documents (Aadhaar, PAN, loan files) are no longer reachable via a
+// public URL. This fetches the file with the user's auth token attached,
+// then opens it in a new tab as a local blob — the tab URL itself never
+// contains the token or any guessable/shareable path to the file.
+async function openSecureDocument(docId) {
+  if (!docId) return;
+  try {
+    const token = getToken();
+    const res = await fetch(`${API_BASE}/api/documents/${docId}/view`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert(data.message || 'Unable to open this document.');
+      return;
+    }
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl, '_blank');
+    // Release the memory a little while after opening
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+  } catch (err) {
+    console.error('[openSecureDocument] error:', err);
+    alert('Unable to open this document. Please try again.');
+  }
+}
+window.openSecureDocument = openSecureDocument;
+
 // ── Core fetch wrapper ────────────────────────────────────────
 async function apiRequest(method, path, body = null, isFormData = false) {
   const token = getToken();

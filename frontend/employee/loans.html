@@ -2264,11 +2264,11 @@
       <tr>
         <td class="checkbox-cell" style="display:none;width:40px;"><input type="checkbox" class="loan-checkbox" value="${l.id}" onchange="updateSelectedCount()" /></td>
         <td>${start + i + 1}</td>
-        <td>${l.customer_name}</td>
-        <td>${l.customer_phone}</td>
-        <td><span class="badge badge-employee">${l.area}</span></td>
+        <td>${escapeHtml(l.customer_name)}</td>
+        <td>${escapeHtml(l.customer_phone)}</td>
+        <td><span class="badge badge-employee">${escapeHtml(l.area)}</span></td>
         <td style="font-weight:600;">${formatCurrency(l.amount)}</td>
-        <td>${l.purpose || '—'}</td>
+        <td>${escapeHtml(l.purpose) || '—'}</td>
         <td>${statusBadge(l.status)}</td>
         <td style="font-size:12px;white-space:nowrap;">${l.login_date ? formatDate(l.login_date) : '<span style="color:var(--text-muted)">—</span>'}</td>
         <td style="font-size:12px;white-space:nowrap;">${l.system_upload_date ? formatDate(l.system_upload_date) : '<span style="color:var(--text-muted)">—</span>'}</td>

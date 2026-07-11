@@ -15,11 +15,12 @@ function formatTimeToAMPM(timeStr) {
  */
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  let token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
 
-  if (!token && req.query.token) {
-    token = req.query.token;
-  }
+  // NOTE: tokens are only ever accepted via the Authorization header now.
+  // A previous version also accepted ?token=... in the URL, but tokens in
+  // URLs get written into server access logs, browser history, and can
+  // leak via the Referer header — so that fallback has been removed.
 
   if (!token) {
     return res.status(401).json({ success: false, message: 'Access denied. No token provided.' });

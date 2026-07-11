@@ -1162,7 +1162,7 @@
       return `
         <tr>
           <td><strong>#${r.employee_id}</strong></td>
-          <td>${r.employee_name}</td>
+          <td>${escapeHtml(r.employee_name)}</td>
           <td>${fmtT(r.login_time)}</td>
           <td>${fmtT(r.logout_time)}</td>
           <td><span class="status-badge ${statusClass}">${r.current_status}</span></td>
@@ -1212,7 +1212,7 @@
 
     tbody.innerHTML = rows.map(r => `
       <tr>
-        <td><strong>${r.employee_name}</strong></td>
+        <td><strong>${escapeHtml(r.employee_name)}</strong></td>
         <td>${fmtD(r.work_date)}</td>
         <td>${fmtT(r.login_time)}</td>
         <td>${fmtT(r.logout_time)}</td>
@@ -1242,7 +1242,7 @@
 
     tbody.innerHTML = res.data.data.map(r => `
       <tr>
-        <td><strong>${r.employee_name}</strong></td>
+        <td><strong>${escapeHtml(r.employee_name)}</strong></td>
         <td>${fmtD(r.login_date)}</td>
         <td>${fmtT(r.login_time)}</td>
         <td>${fmtT(r.logout_time)}</td>
@@ -1269,7 +1269,7 @@
     tbody.innerHTML = res.data.data.map(r => `
       <tr>
         <td><strong>#${r.employee_id}</strong></td>
-        <td><strong>${r.employee_name}</strong></td>
+        <td><strong>${escapeHtml(r.employee_name)}</strong></td>
         <td>${r.customers_added}</td>
         <td>${r.loans_submitted}</td>
         <td>${r.loans_approved}</td>
@@ -1318,7 +1318,7 @@
       return `
         <tr>
           <td><span class="badge-rank ${r.rank <= 3 ? (r.rank === 1 ? 'badge-gold' : (r.rank === 2 ? 'badge-silver' : 'badge-bronze')) : 'badge-normal'}">${r.rank}</span></td>
-          <td><strong>${r.employee_name}</strong></td>
+          <td><strong>${escapeHtml(r.employee_name)}</strong></td>
           <td>
             <div style="display:flex;align-items:center;gap:8px;">
               <div class="score-progress-bar" style="width:80px;">
@@ -1355,13 +1355,13 @@
       return `
         <tr>
           <td><strong>#${r.employee_id}</strong></td>
-          <td>${r.employee_name}</td>
-          <td><strong>${r.break_type}</strong></td>
+          <td>${escapeHtml(r.employee_name)}</td>
+          <td><strong>${escapeHtml(r.break_type)}</strong></td>
           <td>${fmtT(r.start_time)}</td>
           <td>${fmtT(r.end_time)}</td>
           <td><span style="font-weight:${active ? 'bold' : 'normal'}; color:${active ? '#f59e0b' : 'inherit'};">${r.duration} mins ${active ? '(Active)' : ''}</span></td>
           <td><span class="status-badge ${active ? 'on-break' : 'online'}">${active ? 'On Break' : 'Completed'}</span></td>
-          <td><span style="font-size:12px;color:var(--text-secondary);">${r.remarks}</span></td>
+          <td><span style="font-size:12px;color:var(--text-secondary);">${escapeHtml(r.remarks)}</span></td>
         </tr>
       `;
     }).join('');

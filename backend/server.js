@@ -46,14 +46,11 @@ function getAllowedOrigins() {
 }
 
 function isAllowedOrigin(origin, allowedOrigins) {
-  if (allowedOrigins.includes(origin)) return true;
-
-  try {
-    const hostname = new URL(origin).hostname;
-    return hostname.endsWith('.netlify.app') || hostname.endsWith('.onrender.com');
-  } catch {
-    return false;
-  }
+  // Only exact matches against YOUR configured domains are allowed.
+  // (Previously this also trusted *any* *.netlify.app or *.onrender.com
+  // site, which would let someone else's Netlify/Render deployment make
+  // authenticated-looking cross-origin requests to this API.)
+  return allowedOrigins.includes(origin);
 }
 
 // ── Middleware ──────────────────────────────────────────────────
@@ -87,38 +84,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve uploaded documents
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Fallback to database-stored uploads if file is missing on local disk
-app.get('/uploads/*', async (req, res, next) => {
-  try {
-    const dbFilePath = decodeURIComponent(req.path);
-    const [rows] = await db.query(
-      'SELECT file_name, file_data FROM documents WHERE file_path = ? LIMIT 1',
-      [dbFilePath]
-    );
-
-    if (rows.length > 0 && rows[0].file_data) {
-      const { file_name, file_data } = rows[0];
-      const ext = path.extname(file_name).toLowerCase();
-      let contentType = 'application/octet-stream';
-      if (ext === '.pdf') contentType = 'application/pdf';
-      else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
-      else if (ext === '.png') contentType = 'image/png';
-      else if (ext === '.webp') contentType = 'image/webp';
-
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Content-Disposition', `inline; filename="${file_name}"`);
-      return res.send(file_data);
-    }
-
-    return res.status(404).send('Not Found');
-  } catch (err) {
-    console.error('Error serving fallback upload from database:', err.message);
-    next(err);
-  }
-});
+// NOTE: Customer documents (Aadhaar, PAN, loan files) are intentionally NOT
+// served as static files anymore. They are only reachable through the
+// authenticated /api/documents/:id/view route (see below), which checks
+// that the requester is either an admin or the employee who owns that
+// customer before releasing any file bytes.
 
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
@@ -135,6 +105,7 @@ app.use('/api/excel',      excelRoutes);
 app.use('/api/apr',        aprRoutes);
 app.use('/api/break-time', breakTimeRoutes);
 app.use('/api/profile', require('./routes/profile'));
+app.use('/api/documents', require('./routes/documents'));
 app.use('/uploads/profile_pics', express.static(path.join(__dirname, 'uploads', 'profile_pics')));
 app.use('/uploads/kyc_docs', express.static(path.join(__dirname, 'uploads', 'kyc_docs')));
 

@@ -1660,7 +1660,7 @@
     if (!res?.ok) return;
     const sel = document.getElementById('employee-filter');
     (res.data.data || []).forEach(e => {
-      sel.innerHTML += `<option value="${e.id}">${e.name}</option>`;
+      sel.innerHTML += `<option value="${e.id}">${escapeHtml(e.name)}</option>`;
     });
   }
 
@@ -1770,13 +1770,13 @@
       <tr>
         <td class="checkbox-cell" style="display:none;width:40px;"><input type="checkbox" class="loan-checkbox" value="${l.id}" onchange="updateSelectedCount()" /></td>
         <td class="col-index">${start + i + 1}</td>
-        <td class="customer-name-cell" title="${l.customer_name}">${l.customer_name}</td>
-        <td class="col-phone">${l.customer_phone}</td>
-        <td class="col-area"><span class="badge badge-employee">${l.area}</span></td>
+        <td class="customer-name-cell" title="${escapeHtml(l.customer_name)}">${escapeHtml(l.customer_name)}</td>
+        <td class="col-phone">${escapeHtml(l.customer_phone)}</td>
+        <td class="col-area"><span class="badge badge-employee">${escapeHtml(l.area)}</span></td>
         <td class="col-amount">${formatCurrency(l.amount)}</td>
-        <td class="col-banks">${l.purpose || '—'}</td>
+        <td class="col-banks">${escapeHtml(l.purpose) || '—'}</td>
         <td class="status-cell">${statusBadge(l.status)}</td>
-        <td class="col-applied-by">${l.applied_by_name || '—'}</td>
+        <td class="col-applied-by">${escapeHtml(l.applied_by_name) || '—'}</td>
         <td class="col-date">${l.login_date ? formatDate(l.login_date) : '<span style="color:var(--text-muted)">—</span>'}</td>
         <td class="col-date">${l.system_upload_date ? formatDate(l.system_upload_date) : '<span style="color:var(--text-muted)">—</span>'}</td>
         <td class="col-disb-date">${l.disbursement_date ? formatDate(l.disbursement_date) : '<span style="color:var(--text-muted)">—</span>'}</td>

@@ -2065,7 +2065,7 @@
           </div>
           <div class="customer-document-actions">
             ${password}
-            <a href="${resolveFileUrl(doc.file_path)}" target="_blank" class="btn btn-secondary btn-sm">View</a>
+            <a href="#" onclick="openSecureDocument(${doc.id}); return false;" class="btn btn-secondary btn-sm">View</a>
           </div>
         </div>`;
     }).join('');
@@ -3106,4 +3106,3 @@
 </script>
 </body>
 </html>
-

@@ -658,7 +658,7 @@ Net Monthly Income (Rs) -`;
             </div>
           </div>
           <div class="doc-row-actions">
-            ${doc?.file_path ? `<a href="${resolveFileUrl(doc.file_path)}" target="_blank" class="btn btn-secondary btn-sm">${iconMarkup('download')}<span>View</span></a>` : ''}
+            ${doc?.id ? `<a href="#" onclick="openSecureDocument(${doc.id}); return false;" class="btn btn-secondary btn-sm">${iconMarkup('download')}<span>View</span></a>` : ''}
             ${doc?.id ? `<button class="btn btn-danger btn-sm" onclick="deleteUploadedDoc(${doc.id}, this)">${iconMarkup('xCircle')}<span>Delete</span></button>` : ''}
           </div>
         </div>`;

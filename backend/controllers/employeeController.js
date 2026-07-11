@@ -260,8 +260,17 @@ const employeeController = {
       }
 
       const uploadedDocuments = [];
+      const rejectedFiles = [];
 
       for (const file of files) {
+       const ext = path.extname(file.originalname).toLowerCase();
+       const isGenuine = await upload.verifyUploadedFile(file, ext);
+       if (!isGenuine) {
+         await upload.deleteFile(upload.getFileUrl(req, file));
+         rejectedFiles.push(file.originalname);
+         continue;
+       }
+
        const filePath = upload.getFileUrl(req, file);
        let fileData = null;
        try {
@@ -285,12 +294,23 @@ const employeeController = {
         uploadedDocuments.push({ id, file_path: filePath, document });
       }
 
+      if (uploadedDocuments.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'All uploaded files failed content verification and were rejected.',
+          rejected: rejectedFiles
+        });
+      }
+
       return res.status(201).json({
         success: true,
-        message: 'Documents uploaded successfully.',
+        message: rejectedFiles.length
+          ? `Documents uploaded, but ${rejectedFiles.length} file(s) were rejected for failing content verification.`
+          : 'Documents uploaded successfully.',
         ids: uploadedDocuments.map((item) => item.id),
         file_paths: uploadedDocuments.map((item) => item.file_path),
-        documents: uploadedDocuments.map((item) => item.document)
+        documents: uploadedDocuments.map((item) => item.document),
+        rejected: rejectedFiles
       });
     } catch (err) {
       console.error('[Employee] Upload error:', err);
