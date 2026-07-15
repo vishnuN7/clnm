@@ -1095,6 +1095,21 @@ async function openSecureDocument(docId) {
 }
 window.openSecureDocument = openSecureDocument;
 
+// ── Shared HTML escaping helper ─────────────────────────────────
+// Prevents stored XSS: any user-supplied text (customer names, file
+// names, remarks, notes, etc.) that gets inserted via innerHTML should
+// be passed through this first. Several pages already define their own
+// local copy of this — that's harmless, but pages that don't have one
+// can now use this shared version instead of skipping escaping entirely.
+if (typeof window.escapeHtml !== 'function') {
+  window.escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // ── Core fetch wrapper ────────────────────────────────────────
 async function apiRequest(method, path, body = null, isFormData = false) {
   const token = getToken();
