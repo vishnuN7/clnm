@@ -1075,7 +1075,7 @@ async function openSecureDocument(docId) {
   if (!docId) return;
   try {
     const token = getToken();
-    const res = await fetch(`${API_BASE}/api/documents/${docId}/view`, {
+    const res = await fetch(`${API_BASE}/documents/${docId}/view`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     });
     if (!res.ok) {
