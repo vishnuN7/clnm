@@ -256,20 +256,46 @@ const LoanModel = {
     return rows;
   },
 
-  async getDashboardStats() {
+  async getDashboardStats(period = 'monthly') {
+    // period semantics:
+    //   monthly  → current calendar month, day-by-day trend
+    //   yearly   → current calendar year,  month-by-month trend
+    //   alltime  → all data,               year-by-year trend
+    let dateFilter = '';
+    let groupFormat = "'%Y-%m-%d'"; // default: day
+    let groupLabel  = 'day';
+
+    if (period === 'monthly') {
+      dateFilter  = `WHERE YEAR(created_at) = YEAR(NOW()) AND MONTH(created_at) = MONTH(NOW())`;
+      groupFormat = "'%Y-%m-%d'";
+      groupLabel  = 'day';
+    } else if (period === 'yearly') {
+      dateFilter  = `WHERE YEAR(created_at) = YEAR(NOW())`;
+      groupFormat = "'%Y-%m'";
+      groupLabel  = 'month';
+    } else {
+      // alltime – no date restriction, group by year
+      dateFilter  = '';
+      groupFormat = "'%Y'";
+      groupLabel  = 'year';
+    }
+
     const [total] = await db.query('SELECT COUNT(*) AS total FROM loans');
     const [statusBreakdown] = await db.query(
-      'SELECT status, COUNT(*) AS count FROM loans GROUP BY status'
+      `SELECT status, COUNT(*) AS count FROM loans ${dateFilter} GROUP BY status`
     );
+    const approvedFilter = dateFilter
+      ? `${dateFilter} AND status = 'Approved'`
+      : `WHERE status = 'Approved'`;
     const [totalAmount] = await db.query(
-      "SELECT SUM(amount) AS total_amount FROM loans WHERE status = 'Approved'"
+      `SELECT SUM(amount) AS total_amount FROM loans ${approvedFilter}`
     );
     const [monthlyTrend] = await db.query(`
-      SELECT DATE_FORMAT(created_at, '%Y-%m') AS month,
+      SELECT DATE_FORMAT(created_at, ${groupFormat}) AS month,
              COUNT(*) AS count,
              SUM(amount) AS total_amount
       FROM loans
-      WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+      ${dateFilter}
       GROUP BY month
       ORDER BY month ASC
     `);
@@ -286,11 +312,14 @@ const LoanModel = {
     return {
       total: total[0].total,
       statusBreakdown,
-      totalApprovedAmount: totalAmount[0].total_amount || 0,
+      totalApprovedAmount: (totalAmount[0] && totalAmount[0].total_amount) || 0,
       monthlyTrend,
-      recentLoans
+      recentLoans,
+      period,
+      groupLabel
     };
   },
+
 
   async delete(id) {
     const [result] = await db.query('DELETE FROM loans WHERE id = ?', [id]);

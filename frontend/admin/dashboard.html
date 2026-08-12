@@ -101,6 +101,52 @@
       .tbl-pagination { justify-content: center; }
       .tbl-pg-info { width: 100%; text-align: center; margin-right: 0; }
     }
+    /* ── Analytics Period Filter Buttons ── */
+    .analytics-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .analytics-period-filters {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: rgba(47,111,237,0.06);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px;
+    }
+    :root[data-theme='dark'] .analytics-period-filters {
+      background: rgba(139,180,255,0.07);
+      border-color: rgba(151,176,210,0.14);
+    }
+    .analytics-period-btn {
+      padding: 4px 11px;
+      font-size: 11px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    .analytics-period-btn:hover {
+      color: var(--accent-secondary);
+      background: rgba(47,111,237,0.08);
+    }
+    .analytics-period-btn.active {
+      background: var(--accent-secondary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(47,111,237,0.28);
+    }
+    :root[data-theme='dark'] .analytics-period-btn.active {
+      box-shadow: 0 2px 10px rgba(139,180,255,0.22);
+    }
     /* ── Premium Analytics Section ── */
     .analytics-grid {
       display: grid;
@@ -1915,7 +1961,12 @@
           <div class="analytics-card-header">
             <div class="analytics-card-title">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M4 20H20"/><path d="M8 20V7"/><path d="M12 20V4"/><path d="M16 20v-9"/></svg>
-              Monthly Loan Trend
+              Loan Trend
+            </div>
+            <div class="analytics-period-filters" id="trend-period-filters" role="group" aria-label="Trend period filter">
+              <button class="analytics-period-btn active" data-period="monthly" onclick="setAnalyticsPeriod('trend','monthly',this)">Monthly</button>
+              <button class="analytics-period-btn" data-period="yearly" onclick="setAnalyticsPeriod('trend','yearly',this)">Yearly</button>
+              <button class="analytics-period-btn" data-period="alltime" onclick="setAnalyticsPeriod('trend','alltime',this)">All Time</button>
             </div>
           </div>
           <div class="analytics-card-body">
@@ -1931,6 +1982,11 @@
             <div class="analytics-card-title">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
               Loan Status Breakdown
+            </div>
+            <div class="analytics-period-filters" id="status-period-filters" role="group" aria-label="Status period filter">
+              <button class="analytics-period-btn active" data-period="monthly" onclick="setAnalyticsPeriod('status','monthly',this)">Monthly</button>
+              <button class="analytics-period-btn" data-period="yearly" onclick="setAnalyticsPeriod('status','yearly',this)">Yearly</button>
+              <button class="analytics-period-btn" data-period="alltime" onclick="setAnalyticsPeriod('status','alltime',this)">All Time</button>
             </div>
           </div>
           <div class="analytics-card-body">
@@ -2804,12 +2860,18 @@
       return;
     }
     const trend = loans.monthlyTrend;
+    const groupLabel = loans.groupLabel || 'month'; // 'day', 'month', or 'year'
     const totalLoans = trend.reduce((s, m) => s + m.count, 0);
-    const currentMonthCount = trend[trend.length - 1]?.count || 0;
-    const highestMonth = trend.reduce((max, m) => m.count > max.count ? m : max, trend[0]);
-    const prevMonthCount = trend.length > 1 ? trend[trend.length - 2].count : 0;
-    const change = currentMonthCount - prevMonthCount;
-    const changePercent = prevMonthCount > 0 ? ((change / prevMonthCount) * 100).toFixed(1) : null;
+    const latestCount = trend[trend.length - 1]?.count || 0;
+    const highestEntry = trend.reduce((max, m) => m.count > max.count ? m : max, trend[0]);
+    const prevCount = trend.length > 1 ? trend[trend.length - 2].count : 0;
+    const change = latestCount - prevCount;
+    const changePercent = prevCount > 0 ? ((change / prevCount) * 100).toFixed(1) : null;
+
+    // Context-aware labels
+    const latestLabel  = groupLabel === 'year' ? 'Latest Year'  : groupLabel === 'day' ? 'Today' : 'Current Month';
+    const highestLabel = groupLabel === 'year' ? 'Best Year'    : groupLabel === 'day' ? 'Best Day'  : 'Highest Month';
+    const growthLabel  = groupLabel === 'year' ? 'YoY Growth'   : groupLabel === 'day' ? 'Day Growth' : 'Growth';
 
     container.innerHTML = `
       <div class="metric-item">
@@ -2817,15 +2879,15 @@
         <span class="metric-value">${totalLoans}</span>
       </div>
       <div class="metric-item">
-        <span class="metric-label">Current Month</span>
-        <span class="metric-value">${currentMonthCount}</span>
+        <span class="metric-label">${latestLabel}</span>
+        <span class="metric-value">${latestCount}</span>
       </div>
       <div class="metric-item">
-        <span class="metric-label">Highest Month</span>
-        <span class="metric-value">${highestMonth.count} <span class="metric-sub">${highestMonth.month}</span></span>
+        <span class="metric-label">${highestLabel}</span>
+        <span class="metric-value">${highestEntry.count} <span class="metric-sub">${formatTrendLabel(highestEntry.month, groupLabel)}</span></span>
       </div>
       <div class="metric-item">
-        <span class="metric-label">Growth</span>
+        <span class="metric-label">${growthLabel}</span>
         <span class="metric-value ${change > 0 ? 'metric-up' : change < 0 ? 'metric-down' : ''}">
           ${change > 0 ? '+' : ''}${change}${changePercent !== null ? ` (${changePercent}%)` : ''}
         </span>
@@ -3074,8 +3136,67 @@
 
   // ── Main Dashboard Load ──
 
+  // Track current periods for both sections (can be independently filtered)
+  const analyticsPeriod = { trend: 'monthly', status: 'monthly' };
+
+  // Helper: format trend axis labels based on groupLabel
+  function formatTrendLabel(dateStr, groupLabel) {
+    if (!dateStr) return '';
+    if (groupLabel === 'year') return dateStr; // e.g. '2024'
+    const parts = dateStr.split('-');
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    if (groupLabel === 'day') {
+      // parts: [YYYY, MM, DD] → "Aug 12"
+      return monthNames[parseInt(parts[1]) - 1] + ' ' + parseInt(parts[2]);
+    }
+    // month groupLabel → "Aug '26"
+    return monthNames[parseInt(parts[1]) - 1] + " '" + parts[0].slice(2);
+  }
+
+  // Called when user clicks a period filter button
+  async function setAnalyticsPeriod(section, period, btn) {
+    // Update active button state in that section's filter group
+    const groupId = section === 'trend' ? 'trend-period-filters' : 'status-period-filters';
+    document.querySelectorAll(`#${groupId} .analytics-period-btn`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Only re-fetch if the period actually changed
+    if (analyticsPeriod[section] === period) return;
+    analyticsPeriod[section] = period;
+
+    await reloadAnalytics(section, period);
+  }
+
+  async function reloadAnalytics(section, period) {
+    // Show subtle loading state
+    if (section === 'trend') {
+      document.getElementById('trend-metrics').innerHTML = '<div class="metric-item" style="grid-column:1/-1;justify-content:center;padding:12px;"><span style="color:var(--text-secondary);font-size:12px;">Loading…</span></div>';
+    } else {
+      document.getElementById('status-cards-grid').innerHTML = '<div style="padding:16px;color:var(--text-secondary);font-size:12px;">Loading…</div>';
+    }
+
+    const res = await api.get(`/admin/dashboard?period=${period}`);
+    if (!res?.ok) return;
+    const { loans } = res.data.data;
+
+    // Set Chart defaults for dark mode support
+    Chart.defaults.color = getCSSVar('--text-secondary') || '#526173';
+    Chart.defaults.borderColor = getCSSVar('--border') || 'rgba(151,176,210,0.14)';
+
+    if (section === 'trend') {
+      const months = (loans.monthlyTrend || []).map(m => formatTrendLabel(m.month, loans.groupLabel));
+      const counts = (loans.monthlyTrend || []).map(m => m.count);
+      renderTrendMetrics(loans);
+      renderTrendChart(months, counts);
+    } else {
+      const statusMap = {};
+      (loans.statusBreakdown || []).forEach(s => statusMap[s.status] = parseInt(s.count));
+      renderStatusChart(statusMap);
+    }
+  }
+
   async function loadDashboard() {
-    const res = await api.get('/admin/dashboard');
+    const res = await api.get('/admin/dashboard?period=monthly');
     if (!res?.ok) return;
     const { totalCustomers, totalEmployees, loans } = res.data.data;
 
@@ -3089,12 +3210,8 @@
     Chart.defaults.color = getCSSVar('--text-secondary') || '#526173';
     Chart.defaults.borderColor = getCSSVar('--border') || 'rgba(151,176,210,0.14)';
 
-    // Monthly Trend Chart
-    const months = loans.monthlyTrend.map(m => {
-      const parts = m.month.split('-');
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      return monthNames[parseInt(parts[1]) - 1] + ' ' + parts[0].slice(2);
-    });
+    // Loan Trend Chart
+    const months = loans.monthlyTrend.map(m => formatTrendLabel(m.month, loans.groupLabel));
     const counts = loans.monthlyTrend.map(m => m.count);
 
     renderTrendMetrics(loans);

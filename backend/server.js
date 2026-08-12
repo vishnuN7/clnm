@@ -172,30 +172,8 @@ async function ensurePasswordResetTable() {
 }
 
 async function ensureDocumentsTable() {
-  const allowedDocTypes = [
-    'Aadhaar Card',
-    'PAN Card',
-    'Passport Size Photograph',
-    '3 Months Bank Statement',
-    '6 Months Bank Statement',
-    '3 Months Salary Slips',
-    '6 Months Salary Slips',
-    'Form 16',
-    'Cancelled Cheque',
-    'Existing Loan Statement',
-    'Other',
-    'Aadhar',
-    'PAN',
-    'Passport',
-    'Driving License',
-    '3M Bank Statement',
-    '3M Salary Slip'
-  ];
-
-  const enumValues = allowedDocTypes.map((value) => `'${value.replace(/'/g, "''")}'`).join(', ');
-
   try {
-    await db.query(`ALTER TABLE documents MODIFY doc_type ENUM(${enumValues}) NOT NULL`);
+    await db.query('ALTER TABLE documents MODIFY doc_type VARCHAR(255) NOT NULL');
 
     const [passwordColumn] = await db.query("SHOW COLUMNS FROM documents LIKE 'document_password'");
     if (passwordColumn.length === 0) {

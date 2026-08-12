@@ -921,7 +921,7 @@
           </div>
           <div class="form-group">
             <label>Document Password (optional)</label>
-            <input type="password" id="modal-doc-password" class="form-control" placeholder="Enter document password if any" autocomplete="off" />
+            <input type="password" id="modal-doc-password" name="modal_doc_password_protection_no_autofill" class="form-control" placeholder="Enter document password if any" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" />
           </div>
           <button class="btn btn-primary" id="modal-upload-btn" onclick="uploadDocModal()">
             <span class="emoji-sm">📤</span> Upload Document
