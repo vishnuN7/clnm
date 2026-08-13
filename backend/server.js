@@ -101,11 +101,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/employee', employeeRoutes);
 
-app.use('/api/excel',      excelRoutes);
-app.use('/api/apr',        aprRoutes);
-app.use('/api/break-time', breakTimeRoutes);
-app.use('/api/profile', require('./routes/profile'));
-app.use('/api/documents', require('./routes/documents'));
+app.use('/api/excel',         excelRoutes);
+app.use('/api/apr',           aprRoutes);
+app.use('/api/break-time',    breakTimeRoutes);
+app.use('/api/profile',       require('./routes/profile'));
+app.use('/api/documents',     require('./routes/documents'));
+app.use('/api/notifications',  require('./routes/notifications'));
 app.use('/uploads/profile_pics', express.static(path.join(__dirname, 'uploads', 'profile_pics')));
 app.use('/uploads/kyc_docs', express.static(path.join(__dirname, 'uploads', 'kyc_docs')));
 
@@ -172,30 +173,8 @@ async function ensurePasswordResetTable() {
 }
 
 async function ensureDocumentsTable() {
-  const allowedDocTypes = [
-    'Aadhaar Card',
-    'PAN Card',
-    'Passport Size Photograph',
-    '3 Months Bank Statement',
-    '6 Months Bank Statement',
-    '3 Months Salary Slips',
-    '6 Months Salary Slips',
-    'Form 16',
-    'Cancelled Cheque',
-    'Existing Loan Statement',
-    'Other',
-    'Aadhar',
-    'PAN',
-    'Passport',
-    'Driving License',
-    '3M Bank Statement',
-    '3M Salary Slip'
-  ];
-
-  const enumValues = allowedDocTypes.map((value) => `'${value.replace(/'/g, "''")}'`).join(', ');
-
   try {
-    await db.query(`ALTER TABLE documents MODIFY doc_type ENUM(${enumValues}) NOT NULL`);
+    await db.query('ALTER TABLE documents MODIFY doc_type VARCHAR(255) NOT NULL');
 
     const [passwordColumn] = await db.query("SHOW COLUMNS FROM documents LIKE 'document_password'");
     if (passwordColumn.length === 0) {
@@ -684,6 +663,52 @@ async function ensureLoginHoursColumns() {
   }
 }
 
+async function ensureNotificationTables() {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS employee_notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        employee_id INT NOT NULL,
+        type VARCHAR(50) NOT NULL DEFAULT 'general',
+        title VARCHAR(200) NOT NULL,
+        body TEXT NULL,
+        link_url VARCHAR(500) NULL,
+        is_read TINYINT(1) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_emp_notif (employee_id),
+        INDEX idx_emp_notif_unread (employee_id, is_read),
+        FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS callback_reminders (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        employee_id INT NOT NULL,
+        assignment_id INT NULL,
+        record_id INT NULL,
+        phone_number VARCHAR(30) NOT NULL,
+        callback_date DATE NOT NULL,
+        callback_period VARCHAR(20) NOT NULL DEFAULT 'anytime',
+        notification_id INT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_emp_record (employee_id, record_id),
+        INDEX idx_cb_emp (employee_id),
+        INDEX idx_cb_date (callback_date),
+        FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (assignment_id) REFERENCES excel_assignments(id) ON DELETE SET NULL,
+        FOREIGN KEY (record_id) REFERENCES excel_records(id) ON DELETE SET NULL,
+        FOREIGN KEY (notification_id) REFERENCES employee_notifications(id) ON DELETE SET NULL
+      )
+    `);
+    console.log('Notification tables initialized successfully.');
+  } catch (err) {
+    console.error('Failed to initialize notification tables:', err.message);
+  }
+}
+
 async function ensureExcelModule() {
   try {
     await db.query(`
@@ -770,6 +795,7 @@ async function runMigrations() {
     await ensureSettingsTables();
     await ensureExcelModule();
     await ensureLoginHoursColumns();
+    await ensureNotificationTables();
   } catch (err) {
     console.error('Migration error:', err.message);
   }

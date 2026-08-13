@@ -9,7 +9,8 @@ const adminController = {
   // ── Dashboard ───────────────────────────────────────────────
   async getDashboard(req, res) {
     try {
-      const loanStats = await LoanModel.getDashboardStats();
+      const period = ['monthly', 'yearly', 'alltime'].includes(req.query.period) ? req.query.period : 'monthly';
+      const loanStats = await LoanModel.getDashboardStats(period);
       const [customers] = [await CustomerModel.getAll()];
       const employees = await UserModel.getAll('employee');
 

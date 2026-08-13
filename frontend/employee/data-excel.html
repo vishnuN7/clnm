@@ -405,7 +405,7 @@
       <button class="modal-close" onclick="closeModal('submit-modal')">Close</button>
     </div>
     <div style="padding:16px 0;">
-      <p style="font-size:14px;color:var(--text-primary);">Are you sure you want to submit your work? Once submitted, this sheet will be <strong>locked</strong> and you will not be able to make further changes.</p>
+      <p style="font-size:14px;color:var(--text-primary);">Are you sure you want to submit your work? Your assignment status will be updated to <strong>Completed</strong>.</p>
       <p style="font-size:13px;color:var(--text-secondary);margin-top:10px;" id="submit-summary"></p>
     </div>
     <div class="modal-actions">
@@ -471,7 +471,7 @@ let activeFloatingDropdown = null;
 let dropdownCloseListenerBound = false;
 
 let recPage = 1;
-const EMP_REC_PER_PAGE = 20;
+const EMP_REC_PER_PAGE = 100;
 let allFilteredRecords = [];
 
 // ── Init ──────────────────────────────────────────────────────────────────
@@ -530,7 +530,7 @@ function renderAssignmentList() {
       <div class="prog-row"><span>${pct}% complete</span><span style="font-size:11px;">Updated: ${fmtDate(a.file_updated_at)}</span></div>
       <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;"></div></div>
       <button class="open-btn" onclick="event.stopPropagation();openSheet(${a.id})">
-        ${isCompleted ? 'View Sheet (Read-only)' : 'Open & Edit Workbook'}
+        ${isCompleted ? 'View & Edit Sheet' : 'Open & Edit Workbook'}
       </button>
     </div>`;
   }).join('');
@@ -541,7 +541,7 @@ async function openSheet(assignmentId) {
   currentAssignment = allAssignments.find(a => a.id === assignmentId);
   if (!currentAssignment) return;
 
-  sheetLocked    = currentAssignment.status === 'Completed' || currentAssignment.file_status === 'Closed';
+  sheetLocked    = currentAssignment.status === 'Closed' || currentAssignment.file_status === 'Closed';
   pendingChanges = {};
   allRecords     = [];
 
@@ -954,10 +954,8 @@ async function doSubmit() {
   if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting...'; }
   try {
     await apiFetch(`/excel/assignments/${currentAssignment.id}/submit`, { method:'POST' });
-    showToast('Work submitted successfully. The sheet is now locked.', 'success');
+    showToast('Work submitted successfully.', 'success');
     closeModal('submit-modal');
-    sheetLocked = true;
-    document.getElementById('submit-bar').style.display = 'none';
     currentAssignment.status = 'Completed';
     document.getElementById('sheet-status-badge').innerHTML = statusBadge('Completed');
     await loadAssignments();

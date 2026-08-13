@@ -2,6 +2,7 @@ const db     = require('../config/db');
 const multer = require('multer');
 const path   = require('path');
 const XLSX   = require('xlsx');
+const notifCtrl = require('./notificationController');
 
 // ── Multer (memory storage) ────────────────────────────────────────────────
 const upload = multer({
@@ -197,7 +198,7 @@ exports.assignEmployees = async (req, res) => {
       return res.status(400).json({ success: false, message: 'employee_ids must be a non-empty array.' });
     }
 
-    const [[file]] = await db.query('SELECT id FROM excel_files WHERE id = ?', [id]);
+    const [[file]] = await db.query('SELECT id, original_name FROM excel_files WHERE id = ?', [id]);
     if (!file) return res.status(404).json({ success: false, message: 'File not found.' });
 
     // Remove old assignments first
@@ -211,6 +212,16 @@ exports.assignEmployees = async (req, res) => {
     );
 
     await db.query(`UPDATE excel_files SET status = 'Assigned', updated_at = NOW() WHERE id = ?`, [id]);
+
+    // Create a "New Work Assigned" notification for each newly assigned employee
+    const adminName = req.user.name || 'Admin';
+    for (const empId of employee_ids) {
+      await notifCtrl.createWorkAssignedNotification({
+        employeeId: empId,
+        fileName: file.original_name,
+        assignedByName: adminName
+      });
+    }
 
     res.json({ success: true, message: `File assigned to ${employee_ids.length} employee(s).` });
   } catch (err) {
@@ -554,10 +565,25 @@ exports.updateRecord = async (req, res) => {
        WHERE file_id = ? AND updated_by = ? AND status = 'Completed'`,
       [record.file_id, userId]
     );
+
+    const [[currAsgn]] = await db.query(
+      'SELECT status FROM excel_assignments WHERE file_id = ? AND employee_id = ?',
+      [record.file_id, userId]
+    );
+    const [[fileInfo]] = await db.query(
+      'SELECT total_records FROM excel_files WHERE id = ?',
+      [record.file_id]
+    );
+
+    let updatedAsgnStatus = 'In Progress';
+    if (currAsgn && currAsgn.status === 'Completed' && prog.completed >= (fileInfo ? fileInfo.total_records : 0)) {
+      updatedAsgnStatus = 'Completed';
+    }
+
     await db.query(
-      `UPDATE excel_assignments SET progress = ?, status = 'In Progress', updated_at = NOW()
+      `UPDATE excel_assignments SET progress = ?, status = ?, updated_at = NOW()
        WHERE file_id = ? AND employee_id = ?`,
-      [prog.completed, record.file_id, userId]
+      [prog.completed, updatedAsgnStatus, record.file_id, userId]
     );
 
     // Update file status to In Progress if still Assigned
@@ -566,6 +592,23 @@ exports.updateRecord = async (req, res) => {
        WHERE id = ? AND status = 'Assigned'`,
       [record.file_id]
     );
+
+    // ── Callback reminder logic ──────────────────────────────────────────────
+    // Lookup the assignment id for this employee + file
+    const [[asgnForNotif]] = await db.query(
+      'SELECT id FROM excel_assignments WHERE file_id = ? AND employee_id = ?',
+      [record.file_id, userId]
+    );
+    if (req.user.role !== 'admin' && asgnForNotif) {
+      await notifCtrl.upsertCallbackReminder({
+        employeeId:   userId,
+        assignmentId: asgnForNotif.id,
+        recordId:     parseInt(recordId, 10),
+        phoneNumber:  record.phone_number,
+        disposition:  newDisp,
+        subDisposition: newSubDisp
+      });
+    }
 
     const [[updated]] = await db.query('SELECT * FROM excel_records WHERE id = ?', [recordId]);
     res.json({ success: true, record: updated });
@@ -620,7 +663,7 @@ exports.submitAssignment = async (req, res) => {
       );
     }
 
-    res.json({ success: true, message: 'Assignment submitted successfully. Sheet is now locked.' });
+    res.json({ success: true, message: 'Assignment submitted successfully.' });
   } catch (err) {
     console.error('[Excel] submitAssignment:', err.message);
     res.status(500).json({ success: false, message: 'Submission failed.' });
