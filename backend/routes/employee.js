@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { requireEmployee } = require('../middleware/auth');
 const employeeController = require('../controllers/employeeController');
+const excelController = require('../controllers/excelController');
 const upload = require('../middleware/upload');
 
 // All routes require employee JWT
@@ -9,6 +10,9 @@ router.use(requireEmployee);
 
 // Dashboard
 router.get('/dashboard', employeeController.getDashboard);
+
+// Global Assigned Records Search
+router.get('/assigned-records/search', excelController.searchAssignedRecords);
 
 // Customers
 router.get('/customers', employeeController.getCustomers);

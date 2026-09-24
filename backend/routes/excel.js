@@ -17,6 +17,8 @@ router.get(   '/audit',                   requireAdmin,    ctrl.getAudit);
 
 // ── Employee Routes ────────────────────────────────────────────────────────
 router.get(  '/my-assignments',                          requireEmployee, ctrl.getMyAssignments);
+router.get(  '/search-records',                          requireAuth,     ctrl.searchAssignedRecords);
+router.get(  '/assigned-records/search',                 requireAuth,     ctrl.searchAssignedRecords);
 router.get(  '/assignments/:assignmentId/records',       requireEmployee, ctrl.getAssignmentRecords);
 router.post( '/assignments/:assignmentId/submit',        requireEmployee, ctrl.submitAssignment);
 

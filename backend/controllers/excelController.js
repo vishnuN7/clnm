@@ -2,6 +2,7 @@ const db     = require('../config/db');
 const multer = require('multer');
 const path   = require('path');
 const XLSX   = require('xlsx');
+const notifCtrl = require('./notificationController');
 
 // ── Multer (memory storage) ────────────────────────────────────────────────
 const upload = multer({
@@ -197,7 +198,7 @@ exports.assignEmployees = async (req, res) => {
       return res.status(400).json({ success: false, message: 'employee_ids must be a non-empty array.' });
     }
 
-    const [[file]] = await db.query('SELECT id FROM excel_files WHERE id = ?', [id]);
+    const [[file]] = await db.query('SELECT id, original_name FROM excel_files WHERE id = ?', [id]);
     if (!file) return res.status(404).json({ success: false, message: 'File not found.' });
 
     // Remove old assignments first
@@ -211,6 +212,22 @@ exports.assignEmployees = async (req, res) => {
     );
 
     await db.query(`UPDATE excel_files SET status = 'Assigned', updated_at = NOW() WHERE id = ?`, [id]);
+
+    // Create a "New Assignment" notification for each newly assigned employee
+    const adminName = req.user.name || 'Admin';
+    for (const empId of employee_ids) {
+      const [[asgnRow]] = await db.query(
+        'SELECT id FROM excel_assignments WHERE file_id = ? AND employee_id = ?',
+        [id, empId]
+      );
+      await notifCtrl.createWorkAssignedNotification({
+        employeeId: empId,
+        assignmentId: asgnRow ? asgnRow.id : null,
+        fileName: file.original_name,
+        totalRecords: file.total_records,
+        assignedByName: adminName
+      });
+    }
 
     res.json({ success: true, message: `File assigned to ${employee_ids.length} employee(s).` });
   } catch (err) {
@@ -272,6 +289,9 @@ exports.updateFileStatus = async (req, res) => {
     if (status === 'Closed') {
       await db.query("UPDATE excel_assignments SET status = 'Closed' WHERE file_id = ?", [id]);
     }
+    // Notify assigned employees about assignment update
+    await notifCtrl.createAssignmentUpdatedNotification({ fileId: id, status });
+
     res.json({ success: true, message: `Status updated to ${status}.` });
   } catch (err) {
     console.error('[Excel] updateFileStatus:', err.message);
@@ -507,7 +527,7 @@ exports.updateRecord = async (req, res) => {
   try {
     const userId   = req.user.id;
     const { recordId } = req.params;
-    const { disposition, sub_disposition } = req.body;
+    const { disposition, sub_disposition, notes } = req.body;
 
     // Fetch current record
     const [[record]] = await db.query('SELECT * FROM excel_records WHERE id = ?', [recordId]);
@@ -529,13 +549,17 @@ exports.updateRecord = async (req, res) => {
     // Determine new status
     const newDisp    = disposition    !== undefined ? disposition    : oldDisp;
     const newSubDisp = sub_disposition !== undefined ? sub_disposition : oldSubDisp;
-    const newStatus  = (newDisp && newSubDisp) ? 'Completed' : 'Pending';
+    const newNotes   = notes !== undefined ? (notes ? String(notes).trim() : null) : record.notes;
+    let newStatus    = (newDisp && newSubDisp) ? 'Completed' : 'Pending';
+    if (req.body.status !== undefined && req.body.status) {
+      newStatus = req.body.status;
+    }
 
     await db.query(
       `UPDATE excel_records
-       SET disposition = ?, sub_disposition = ?, updated_by = ?, status = ?, updated_at = NOW()
+       SET disposition = ?, sub_disposition = ?, notes = ?, updated_by = ?, status = ?, updated_at = NOW()
        WHERE id = ?`,
-      [newDisp, newSubDisp, userId, newStatus, recordId]
+      [newDisp, newSubDisp, newNotes, userId, newStatus, recordId]
     );
 
     // Audit log
@@ -554,10 +578,25 @@ exports.updateRecord = async (req, res) => {
        WHERE file_id = ? AND updated_by = ? AND status = 'Completed'`,
       [record.file_id, userId]
     );
+
+    const [[currAsgn]] = await db.query(
+      'SELECT status FROM excel_assignments WHERE file_id = ? AND employee_id = ?',
+      [record.file_id, userId]
+    );
+    const [[fileInfo]] = await db.query(
+      'SELECT total_records FROM excel_files WHERE id = ?',
+      [record.file_id]
+    );
+
+    let updatedAsgnStatus = 'In Progress';
+    if (currAsgn && currAsgn.status === 'Completed' && prog.completed >= (fileInfo ? fileInfo.total_records : 0)) {
+      updatedAsgnStatus = 'Completed';
+    }
+
     await db.query(
-      `UPDATE excel_assignments SET progress = ?, status = 'In Progress', updated_at = NOW()
+      `UPDATE excel_assignments SET progress = ?, status = ?, updated_at = NOW()
        WHERE file_id = ? AND employee_id = ?`,
-      [prog.completed, record.file_id, userId]
+      [prog.completed, updatedAsgnStatus, record.file_id, userId]
     );
 
     // Update file status to In Progress if still Assigned
@@ -566,6 +605,36 @@ exports.updateRecord = async (req, res) => {
        WHERE id = ? AND status = 'Assigned'`,
       [record.file_id]
     );
+
+    // ── Callback reminder logic ──────────────────────────────────────────────
+    // Lookup the assignment id for this employee + file
+    const [[asgnForNotif]] = await db.query(
+      'SELECT id FROM excel_assignments WHERE file_id = ? AND employee_id = ?',
+      [record.file_id, userId]
+    );
+    if (req.user.role !== 'admin' && asgnForNotif) {
+      await notifCtrl.upsertCallbackReminder({
+        employeeId:   userId,
+        assignmentId: asgnForNotif.id,
+        recordId:     parseInt(recordId, 10),
+        phoneNumber:  record.phone_number,
+        disposition:  newDisp,
+        subDisposition: newSubDisp
+      });
+    } else if (req.user.role === 'admin') {
+      // If admin modified the record, notify the assigned employee(s)
+      const [assignedEmployees] = await db.query(
+        'SELECT id, employee_id FROM excel_assignments WHERE file_id = ? AND status != ?',
+        [record.file_id, 'Closed']
+      );
+      for (const a of assignedEmployees) {
+        await notifCtrl.createRecordUpdatedNotification({
+          employeeId: a.employee_id,
+          assignmentId: a.id,
+          phoneNumber: record.phone_number
+        });
+      }
+    }
 
     const [[updated]] = await db.query('SELECT * FROM excel_records WHERE id = ?', [recordId]);
     res.json({ success: true, record: updated });
@@ -620,9 +689,128 @@ exports.submitAssignment = async (req, res) => {
       );
     }
 
-    res.json({ success: true, message: 'Assignment submitted successfully. Sheet is now locked.' });
+    res.json({ success: true, message: 'Assignment submitted successfully.' });
   } catch (err) {
     console.error('[Excel] submitAssignment:', err.message);
     res.status(500).json({ success: false, message: 'Submission failed.' });
   }
 };
+
+// ── Employee: Search across assigned records ──────────────────────────────
+exports.searchAssignedRecords = async (req, res) => {
+  try {
+    const empId = req.user.id;
+    const role  = req.user.role;
+    const {
+      phone,
+      from_date,
+      to_date,
+      date,
+      assignment_id,
+      status,
+      limit = 100
+    } = req.query;
+
+    const conditions = ["(ef.status IS NULL OR ef.status != 'Deleted')"];
+    const params = [];
+
+    // Security: Only allow employee to see their assigned files (unless admin)
+    if (role !== 'admin') {
+      conditions.push('ea.employee_id = ?');
+      params.push(empId);
+    } else if (req.query.employee_id) {
+      conditions.push('ea.employee_id = ?');
+      params.push(req.query.employee_id);
+    }
+
+    // Phone filter
+    let cleanPhone = '';
+    if (phone && phone.trim()) {
+      cleanPhone = phone.trim().replace(/[^0-9+]/g, '');
+      const rawPhone = phone.trim();
+      conditions.push('(r.phone_number = ? OR r.phone_number = ? OR r.phone_number LIKE ?)');
+      params.push(rawPhone, cleanPhone, `%${cleanPhone || rawPhone}%`);
+    }
+
+    // Assignment / File filter
+    if (assignment_id && assignment_id !== 'all') {
+      conditions.push('(ea.id = ? OR ef.id = ?)');
+      params.push(assignment_id, assignment_id);
+    }
+
+    // Status filter
+    if (status && status !== 'all') {
+      if (status.toLowerCase() === 'pending') {
+        conditions.push("(r.status = 'Pending' OR r.status IS NULL OR r.status = '')");
+      } else {
+        conditions.push('r.status = ?');
+        params.push(status);
+      }
+    }
+
+    // Date filters (on assignment assigned_at or record updated_at)
+    if (from_date) {
+      conditions.push('DATE(ea.assigned_at) >= ?');
+      params.push(from_date);
+    }
+    if (to_date) {
+      conditions.push('DATE(ea.assigned_at) <= ?');
+      params.push(to_date);
+    }
+    if (date) {
+      conditions.push('DATE(ea.assigned_at) = ?');
+      params.push(date);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const safeLimit = Math.min(Math.max(parseInt(limit, 10) || 100, 1), 300);
+
+    let orderBy = 'ea.assigned_at DESC, r.id DESC';
+    let orderParams = [];
+    if (cleanPhone) {
+      orderBy = '(CASE WHEN r.phone_number = ? THEN 1 WHEN r.phone_number LIKE ? THEN 2 ELSE 3 END), ea.assigned_at DESC, r.id DESC';
+      orderParams = [cleanPhone, `%${cleanPhone}%`];
+    }
+
+    const sql = `
+      SELECT 
+        r.id,
+        r.file_id,
+        r.row_index,
+        r.phone_number,
+        r.disposition,
+        r.sub_disposition,
+        r.notes,
+        r.status,
+        r.status AS record_status,
+        r.updated_at AS record_updated_at,
+        ef.original_name,
+        ef.file_name,
+        ef.status AS file_status,
+        ef.total_records,
+        ea.id AS assignment_id,
+        ea.employee_id,
+        ea.assigned_at,
+        ea.progress,
+        ea.status AS assignment_status
+      FROM excel_records r
+      JOIN excel_files ef ON ef.id = r.file_id
+      JOIN excel_assignments ea ON ea.file_id = r.file_id
+      ${whereClause}
+      ORDER BY ${orderBy}
+      LIMIT ${safeLimit}
+    `;
+
+    const [rows] = await db.query(sql, [...params, ...orderParams]);
+
+    res.json({
+      success: true,
+      total: rows.length,
+      records: rows
+    });
+  } catch (err) {
+    console.error('[Excel] searchAssignedRecords error:', err.message);
+    res.status(500).json({ success: false, message: 'Failed to search assigned records.' });
+  }
+};
+

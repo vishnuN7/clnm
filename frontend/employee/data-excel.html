@@ -253,11 +253,415 @@
     .toast-info    { background:linear-gradient(135deg,var(--accent),#1d4ed8); }
     @keyframes toastIn { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:none;} }
 
-    /* The global styles.css uses .modal-overlay.show — no custom override needed */
+    /* ── Global Assigned Record Search Panel ── */
+    .global-search-panel {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      position: relative;
+    }
+    .global-search-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-top-left-radius: var(--radius);
+      border-top-right-radius: var(--radius);
+      background: linear-gradient(90deg, var(--accent), #3b82f6, #06b6d4);
+    }
+    .gsearch-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .gsearch-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(59, 130, 246, 0.12);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .gsearch-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    .gsearch-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0 0 3px 0;
+    }
+    .gsearch-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    .gsearch-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .gsearch-primary-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .gsearch-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .gsearch-field-icon {
+      position: absolute;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .gsearch-input-wrap input {
+      width: 100%;
+      padding: 12px 38px 12px 42px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .gsearch-input-wrap input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .gsearch-clear-input {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+    }
+    .gsearch-clear-input:hover {
+      color: var(--text-primary);
+    }
+    .gsearch-filters-row {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1fr auto;
+      gap: 14px;
+      align-items: flex-end;
+    }
+    @media (max-width: 900px) {
+      .gsearch-filters-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 600px) {
+      .gsearch-filters-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    .gsearch-filter-col label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .gsearch-filter-col select,
+    .gsearch-filter-col input[type="date"] {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      transition: border 0.2s;
+    }
+    :root[data-theme='dark'] .gsearch-filter-col input[type="date"] {
+      color-scheme: dark;
+    }
+    :root[data-theme='light'] .gsearch-filter-col input[type="date"] {
+      color-scheme: light;
+    }
+    .gsearch-filter-col select:focus,
+    .gsearch-filter-col input[type="date"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .date-inputs-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .date-inputs-group input {
+      flex: 1;
+      min-width: 0;
+    }
+    .date-sep {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .gsearch-btn-col {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gsearch-btn {
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      height: 40px;
+    }
+    .gclear-btn {
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      height: 40px;
+    }
+
+    /* ── Global Search Results ── */
+    .gsearch-results-area {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1.5px solid var(--border);
+    }
+    .gsearch-results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .gsearch-results-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gsearch-badge-count {
+      background: rgba(59,130,246,0.12);
+      color: #2563eb;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .gsearch-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .gsearch-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .gsearch-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+    }
+    .gsearch-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .gsearch-card-phone-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .gsearch-card-phone {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+    }
+    .gsearch-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px 18px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+    }
+    .gsearch-prop-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .gsearch-prop-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+    .gsearch-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .gsearch-open-btn {
+      padding: 8px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .gsearch-open-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    }
+
+    /* ── Assigned Records Subheader & Filter Tabs ── */
+    .assigned-records-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .assigned-records-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .assigned-records-title-wrap h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .assigned-records-count {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .assigned-records-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-tab-group {
+      display: flex;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 2px;
+    }
+    .filter-tab {
+      background: none;
+      border: none;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-tab:hover {
+      color: var(--text-primary);
+    }
+    .filter-tab.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Row Focus Pulse Animation ── */
+    @keyframes rowFocusPulse {
+      0% {
+        background-color: rgba(37, 99, 235, 0.25);
+        box-shadow: inset 0 0 0 2px var(--accent);
+      }
+      50% {
+        background-color: rgba(37, 99, 235, 0.12);
+        box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.5);
+      }
+      100% {
+        background-color: rgba(37, 99, 235, 0.25);
+        box-shadow: inset 0 0 0 2px var(--accent);
+      }
+    }
+    .row-focused-highlight {
+      animation: rowFocusPulse 1.2s infinite ease-in-out !important;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* ── Notes input in table ── */
+    .notes-input {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 12px;
+      font-family: inherit;
+      transition: border 0.2s;
+    }
+    .notes-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
   </style>
 </head>
 <body>
-<div class="app-layout">
+<div class="app-layout employee-page">
 
   <!-- ═══ SIDEBAR ═══ -->
   <aside class="sidebar">
@@ -301,7 +705,27 @@
         </h2>
         <p id="page-subtitle">View and update your assigned Excel files</p>
       </div>
-      <div class="topbar-actions">
+      <div class="topbar-actions" style="display:flex;align-items:center;gap:14px;">
+        <!-- Notification Bell -->
+        <div class="notif-bell-wrap" id="notif-bell-wrap">
+          <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifDropdown()" aria-label="Notifications" title="Notifications" tabindex="0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+              <path d="M10 21h4"/>
+            </svg>
+            <span id="notif-bell-badge" class="notif-badge" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown" id="notif-dropdown" role="region" aria-label="Notifications Panel">
+            <div class="notif-dd-header">
+              <div class="notif-dd-title-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+                <h4>Notifications</h4>
+              </div>
+              <button class="notif-dd-link" onclick="markAllRead()">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
+          </div>
+        </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
           <span id="current-date" style="font-size:12px;font-weight:600;color:var(--text-primary);"></span>
           <span id="current-time" style="font-size:11px;color:var(--text-muted);"></span>
@@ -314,6 +738,98 @@
 
       <!-- ─── View: Assignment List ─────────────────────────────────────── -->
       <div id="view-list">
+
+        <!-- ═══ GLOBAL CUSTOMER RECORD / PHONE SEARCH PANEL ═══ -->
+        <section id="assignedRecordSearchPanel" class="global-search-panel">
+          <div class="gsearch-header">
+            <div class="gsearch-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="gsearch-title">Find Customer Record</h3>
+              <p class="gsearch-desc">Search your assigned records by phone number, assignment date, workbook, or record status.</p>
+            </div>
+          </div>
+
+          <div class="gsearch-form">
+            <!-- Primary Search: Phone Number -->
+            <div class="gsearch-primary-field">
+              <label for="search-phone-input">Search Phone Number</label>
+              <div class="gsearch-input-wrap">
+                <svg class="gsearch-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                <input id="search-phone-input" type="text" placeholder="Enter 10-digit phone number" autocomplete="off" oninput="handlePhoneInput(this.value)" onkeydown="handleSearchKey(event)" />
+                <button type="button" class="gsearch-clear-input" id="search-phone-clear" onclick="clearPhoneInput()" style="display:none;" title="Clear phone">&times;</button>
+              </div>
+            </div>
+
+            <!-- Secondary Filters: Date, Workbook, Status, Actions -->
+            <div class="gsearch-filters-row">
+              <div class="gsearch-filter-col date-col">
+                <label>Assigned Date (From / To)</label>
+                <div class="date-inputs-group">
+                  <input type="date" id="search-from-date" title="From Date" aria-label="From Date" />
+                  <span class="date-sep">to</span>
+                  <input type="date" id="search-to-date" title="To Date" aria-label="To Date" />
+                </div>
+              </div>
+
+              <div class="gsearch-filter-col">
+                <label for="search-assignment-select">Workbook / Assignment</label>
+                <select id="search-assignment-select">
+                  <option value="all">All Assignments</option>
+                </select>
+              </div>
+
+              <div class="gsearch-filter-col">
+                <label for="search-status-select">Record Status</label>
+                <select id="search-status-select">
+                  <option value="all">All Statuses</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Completed">Completed</option>
+                  <option value="In Progress">In Progress</option>
+                </select>
+              </div>
+
+              <div class="gsearch-btn-col">
+                <button class="btn btn-primary gsearch-btn" id="btn-search-records" onclick="executeGlobalSearch()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <span>Search Records</span>
+                </button>
+                <button class="btn btn-secondary gclear-btn" id="btn-clear-search" onclick="clearGlobalSearch()">
+                  Clear
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Container -->
+          <div id="gsearch-results-area" class="gsearch-results-area" style="display:none;"></div>
+        </section>
+
+        <!-- ═══ ASSIGNED RECORDS HEADER & FILTERS ═══ -->
+        <div class="assigned-records-header">
+          <div class="assigned-records-title-wrap">
+            <h3>Assigned Records</h3>
+            <span class="assigned-records-count" id="assigned-records-badge">All Records</span>
+          </div>
+          <div class="assigned-records-actions">
+            <div class="filter-tab-group">
+              <button class="filter-tab active" id="tab-all" onclick="filterAssignmentCards('all')">All Records</button>
+              <button class="filter-tab" id="tab-completed" onclick="filterAssignmentCards('Completed')">Completed</button>
+              <button class="filter-tab" id="tab-pending" onclick="filterAssignmentCards('In Progress')">Pending</button>
+            </div>
+            <button class="btn btn-secondary btn-sm refresh-btn" onclick="loadAssignments()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;margin-right:4px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
         <div id="list-loading">
           <div class="skeleton"></div>
           <div class="skeleton" style="height:120px;border-radius:var(--radius);"></div>
@@ -370,9 +886,10 @@
             <thead>
               <tr>
                 <th style="width:50px;">#</th>
-                <th style="min-width:140px;">Phone Number</th>
-                <th style="min-width:220px;">Disposition</th>
-                <th style="min-width:220px;">Sub Disposition</th>
+                <th style="min-width:130px;">Phone Number</th>
+                <th style="min-width:180px;">Disposition</th>
+                <th style="min-width:180px;">Sub Disposition</th>
+                <th style="min-width:180px;">Notes</th>
                 <th style="width:80px;">Status</th>
                 <th style="width:80px;">Save</th>
               </tr>
@@ -405,7 +922,7 @@
       <button class="modal-close" onclick="closeModal('submit-modal')">Close</button>
     </div>
     <div style="padding:16px 0;">
-      <p style="font-size:14px;color:var(--text-primary);">Are you sure you want to submit your work? Once submitted, this sheet will be <strong>locked</strong> and you will not be able to make further changes.</p>
+      <p style="font-size:14px;color:var(--text-primary);">Are you sure you want to submit your work? Your assignment status will be updated to <strong>Completed</strong>.</p>
       <p style="font-size:13px;color:var(--text-secondary);margin-top:10px;" id="submit-summary"></p>
     </div>
     <div class="modal-actions">
@@ -415,8 +932,27 @@
   </div>
 </div>
 
+<!-- ═══ MODAL: Delete Notification Confirmation ═══ -->
+<div class="modal-overlay" id="delete-notif-modal" onclick="closeDeleteNotifModalOnOverlay(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:380px;padding:24px;text-align:center;border-radius:16px;">
+    <div style="width:48px;height:48px;border-radius:12px;background:rgba(239,68,68,0.12);color:#ef4444;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+    </div>
+    <h4 style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Delete Notification?</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;line-height:1.4;">This notification will be permanently removed from your feed.</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary" onclick="closeDeleteNotifModal()" style="flex:1;">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete-notif-btn" style="flex:1;">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Toast -->
+<div id="notif-toast" style="position:fixed;bottom:24px;right:24px;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.2);z-index:9999;display:none;align-items:center;gap:8px;"></div>
+
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20260705d"></script>
+<script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
 // ── Bootstrap ─────────────────────────────────────────────────────────────
 const user = requireRole('employee');
@@ -471,12 +1007,29 @@ let activeFloatingDropdown = null;
 let dropdownCloseListenerBound = false;
 
 let recPage = 1;
-const EMP_REC_PER_PAGE = 20;
+const EMP_REC_PER_PAGE = 100;
 let allFilteredRecords = [];
+
+let currentCardFilter = 'all';
 
 // ── Init ──────────────────────────────────────────────────────────────────
 async function init() {
   await loadAssignments();
+
+  // Check URL query parameters for ?assignmentId=X
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetId = parseInt(urlParams.get('assignmentId'), 10);
+  const targetPhone = urlParams.get('phone');
+  const targetRecordId = parseInt(urlParams.get('recordId'), 10);
+
+  if (targetId) {
+    await openSheet(targetId);
+    if (targetRecordId || targetPhone) {
+      setTimeout(() => {
+        focusRecordInSheet(targetRecordId || null, targetPhone || null);
+      }, 250);
+    }
+  }
 }
 
 // ── Load Assignments ──────────────────────────────────────────────────────
@@ -488,6 +1041,7 @@ async function loadAssignments() {
     const res        = await apiFetch('/excel/my-assignments');
     allAssignments   = res.assignments || [];
     renderAssignmentList();
+    populateAssignmentFilterDropdown();
   } catch(e) {
     const msg = e.message || '';
     if (msg === 'Session expired') return;
@@ -501,16 +1055,46 @@ async function loadAssignments() {
   }
 }
 
-function renderAssignmentList() {
-  const grid  = document.getElementById('assign-grid');
-  const empty = document.getElementById('list-empty');
+function populateAssignmentFilterDropdown() {
+  const sel = document.getElementById('search-assignment-select');
+  if (!sel) return;
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="all">All Assignments</option>' +
+    allAssignments.map(a => `<option value="${a.id}">${escHtml(a.original_name)} (ID: ${a.id})</option>`).join('');
+  if (currentVal && Array.from(sel.options).some(o => o.value === currentVal)) {
+    sel.value = currentVal;
+  }
+}
 
-  if (allAssignments.length === 0) {
-    grid.innerHTML = ''; empty.style.display = 'block'; return;
+function filterAssignmentCards(filter) {
+  currentCardFilter = filter;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  const activeTab = document.getElementById(`tab-${filter === 'all' ? 'all' : (filter === 'Completed' ? 'completed' : 'pending')}`);
+  if (activeTab) activeTab.classList.add('active');
+
+  const grid = document.getElementById('assign-grid');
+  const empty = document.getElementById('list-empty');
+  const badge = document.getElementById('assigned-records-badge');
+
+  let list = allAssignments;
+  if (filter === 'Completed') {
+    list = allAssignments.filter(a => a.status === 'Completed');
+  } else if (filter === 'In Progress') {
+    list = allAssignments.filter(a => a.status !== 'Completed');
+  }
+
+  if (badge) {
+    badge.textContent = `${list.length} ${filter === 'all' ? 'Total' : filter} ${list.length === 1 ? 'Assignment' : 'Assignments'}`;
+  }
+
+  if (list.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);font-size:13px;">No assignments found matching this filter.</div>';
+    empty.style.display = 'none';
+    return;
   }
   empty.style.display = 'none';
 
-  grid.innerHTML = allAssignments.map(a => {
+  grid.innerHTML = list.map(a => {
     const pct    = a.completion_pct || 0;
     const isCompleted = a.status === 'Completed';
     const badgeCls = isCompleted ? 'badge-completed' : (a.status === 'In Progress' ? 'badge-inprogress' : 'badge-assigned');
@@ -530,10 +1114,228 @@ function renderAssignmentList() {
       <div class="prog-row"><span>${pct}% complete</span><span style="font-size:11px;">Updated: ${fmtDate(a.file_updated_at)}</span></div>
       <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;"></div></div>
       <button class="open-btn" onclick="event.stopPropagation();openSheet(${a.id})">
-        ${isCompleted ? 'View Sheet (Read-only)' : 'Open & Edit Workbook'}
+        ${isCompleted ? 'View & Edit Sheet' : 'Open & Edit Workbook'}
       </button>
     </div>`;
   }).join('');
+}
+
+function renderAssignmentList() {
+  filterAssignmentCards(currentCardFilter);
+}
+
+// ── Global Search Handlers ────────────────────────────────────────────────
+function handlePhoneInput(val) {
+  const clearBtn = document.getElementById('search-phone-clear');
+  if (clearBtn) clearBtn.style.display = val ? 'block' : 'none';
+}
+
+function handleSearchKey(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    executeGlobalSearch();
+  }
+}
+
+function clearPhoneInput() {
+  const inp = document.getElementById('search-phone-input');
+  if (inp) {
+    inp.value = '';
+    inp.focus();
+  }
+  const clearBtn = document.getElementById('search-phone-clear');
+  if (clearBtn) clearBtn.style.display = 'none';
+}
+
+function clearGlobalSearch() {
+  clearPhoneInput();
+  const fromDate = document.getElementById('search-from-date');
+  if (fromDate) fromDate.value = '';
+  const toDate = document.getElementById('search-to-date');
+  if (toDate) toDate.value = '';
+  const asgnSel = document.getElementById('search-assignment-select');
+  if (asgnSel) asgnSel.value = 'all';
+  const statusSel = document.getElementById('search-status-select');
+  if (statusSel) statusSel.value = 'all';
+  const resArea = document.getElementById('gsearch-results-area');
+  if (resArea) {
+    resArea.style.display = 'none';
+    resArea.innerHTML = '';
+  }
+}
+
+async function executeGlobalSearch() {
+  const phone = (document.getElementById('search-phone-input')?.value || '').trim();
+  const fromDate = document.getElementById('search-from-date')?.value || '';
+  const toDate = document.getElementById('search-to-date')?.value || '';
+  const asgnVal = document.getElementById('search-assignment-select')?.value || 'all';
+  const statusVal = document.getElementById('search-status-select')?.value || 'all';
+
+  const resArea = document.getElementById('gsearch-results-area');
+  if (!resArea) return;
+
+  if (!phone && !fromDate && !toDate && asgnVal === 'all' && statusVal === 'all') {
+    showToast('Please enter a phone number or select a filter.', 'info');
+    return;
+  }
+
+  resArea.style.display = 'block';
+  resArea.innerHTML = `
+    <div style="text-align:center;padding:26px 16px;color:var(--text-secondary);">
+      <div class="skeleton" style="height:32px;max-width:240px;margin:0 auto 12px;border-radius:8px;"></div>
+      <p style="font-size:13px;font-weight:600;margin:0;">Searching across all assigned records...</p>
+    </div>
+  `;
+
+  try {
+    const params = new URLSearchParams();
+    if (phone) params.append('phone', phone);
+    if (fromDate) params.append('from_date', fromDate);
+    if (toDate) params.append('to_date', toDate);
+    if (asgnVal !== 'all') params.append('assignment_id', asgnVal);
+    if (statusVal !== 'all') params.append('status', statusVal);
+
+    const res = await apiFetch(`/excel/search-records?${params.toString()}`);
+    renderGlobalSearchResults(res.records || [], phone);
+  } catch (err) {
+    const msg = err.message || 'Search failed. Please try again.';
+    resArea.innerHTML = `
+      <div style="text-align:center;padding:24px 16px;color:#dc2626;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:36px;height:36px;margin:0 auto 8px;display:block;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p style="font-size:13px;font-weight:600;margin:0;">${escHtml(msg)}</p>
+      </div>
+    `;
+  }
+}
+
+function renderGlobalSearchResults(records, queryPhone) {
+  const resArea = document.getElementById('gsearch-results-area');
+  if (!resArea) return;
+
+  if (records.length === 0) {
+    resArea.innerHTML = `
+      <div style="text-align:center;padding:32px 16px;color:var(--text-secondary);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:40px;height:40px;margin:0 auto 10px;display:block;opacity:0.6;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <h4 style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">No Records Found</h4>
+        <p style="font-size:13px;color:var(--text-secondary);max-width:440px;margin:0 auto;">No matching records found across your assignments. Verify the phone number or try clearing filters.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const countText = `${records.length} record${records.length === 1 ? '' : 's'} found`;
+  let html = `
+    <div class="gsearch-results-header">
+      <div class="gsearch-results-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:var(--accent);"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Customer Record${records.length === 1 ? '' : 's'} Found</span>
+        <span class="gsearch-badge-count">${countText}</span>
+      </div>
+    </div>
+    <div class="gsearch-cards-list">
+  `;
+
+  html += records.map(r => {
+    const phoneDisplay = escHtml(r.phone_number);
+    const dispVal = r.disposition ? escHtml(r.disposition) : '<span style="color:var(--text-muted);font-style:italic;">Not set</span>';
+    const subDispVal = r.sub_disposition ? escHtml(r.sub_disposition) : '<span style="color:var(--text-muted);font-style:italic;">Not set</span>';
+    const notesVal = r.notes ? escHtml(r.notes) : '<span style="color:var(--text-muted);font-style:italic;">No notes recorded</span>';
+
+    return `
+      <div class="gsearch-card">
+        <div class="gsearch-card-top">
+          <div class="gsearch-card-phone-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;color:var(--accent);"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span class="gsearch-card-phone">${phoneDisplay}</span>
+          </div>
+          <div>${statusBadge(r.status || r.record_status)}</div>
+        </div>
+
+        <div class="gsearch-card-grid">
+          <div>
+            <div class="gsearch-prop-label">Workbook</div>
+            <div class="gsearch-prop-value" title="${escHtml(r.original_name)}">${escHtml(r.original_name)}</div>
+          </div>
+          <div>
+            <div class="gsearch-prop-label">Assignment ID</div>
+            <div class="gsearch-prop-value">#${r.assignment_id}</div>
+          </div>
+          <div>
+            <div class="gsearch-prop-label">Assigned Date</div>
+            <div class="gsearch-prop-value">${fmtDate(r.assigned_at)}</div>
+          </div>
+          <div>
+            <div class="gsearch-prop-label">Disposition</div>
+            <div class="gsearch-prop-value" style="color:var(--accent);">${dispVal}</div>
+          </div>
+          <div>
+            <div class="gsearch-prop-label">Sub Disposition</div>
+            <div class="gsearch-prop-value">${subDispVal}</div>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <div class="gsearch-prop-label">Notes</div>
+            <div class="gsearch-prop-value" style="font-size:12px;background:var(--bg-secondary);padding:6px 10px;border-radius:6px;border:1px dashed var(--border);">${notesVal}</div>
+          </div>
+        </div>
+
+        <div class="gsearch-card-actions">
+          <button class="gsearch-open-btn" onclick="openFoundRecord(${r.assignment_id}, '${escHtml(r.phone_number)}', ${r.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Open Record in Assignment #${r.assignment_id}</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  html += '</div>';
+  resArea.innerHTML = html;
+}
+
+async function openFoundRecord(assignmentId, phoneNumber, recordId) {
+  try {
+    await openSheet(assignmentId);
+    setTimeout(() => {
+      focusRecordInSheet(recordId, phoneNumber);
+    }, 180);
+  } catch (err) {
+    showToast('Failed to open assignment record.', 'error');
+  }
+}
+
+function focusRecordInSheet(recordId, phoneNumber) {
+  const recSearch = document.getElementById('rec-search');
+  if (recSearch) recSearch.value = '';
+  const recFilter = document.getElementById('rec-filter');
+  if (recFilter) recFilter.value = '';
+
+  let targetIdx = -1;
+  if (recordId) {
+    targetIdx = allRecords.findIndex(r => r.id === recordId);
+  }
+  if (targetIdx === -1 && phoneNumber) {
+    targetIdx = allRecords.findIndex(r => r.phone_number === phoneNumber);
+  }
+
+  if (targetIdx !== -1) {
+    recPage = Math.floor(targetIdx / EMP_REC_PER_PAGE) + 1;
+    allFilteredRecords = allRecords;
+    renderRecordsPage();
+
+    const actualId = allRecords[targetIdx].id;
+    setTimeout(() => {
+      const row = document.getElementById(`rec-row-${actualId}`);
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.classList.remove('row-focused-highlight');
+        void row.offsetWidth;
+        row.classList.add('row-focused-highlight');
+        setTimeout(() => {
+          row.classList.remove('row-focused-highlight');
+        }, 5000);
+      }
+    }, 150);
+  }
 }
 
 // ── Open Sheet ────────────────────────────────────────────────────────────
@@ -541,7 +1343,13 @@ async function openSheet(assignmentId) {
   currentAssignment = allAssignments.find(a => a.id === assignmentId);
   if (!currentAssignment) return;
 
-  sheetLocked    = currentAssignment.status === 'Completed' || currentAssignment.file_status === 'Closed';
+  try {
+    if (window.location.search !== `?assignmentId=${assignmentId}`) {
+      history.pushState(null, '', `/employee/data-excel.html?assignmentId=${assignmentId}`);
+    }
+  } catch (err) {}
+
+  sheetLocked    = currentAssignment.status === 'Closed' || currentAssignment.file_status === 'Closed';
   pendingChanges = {};
   allRecords     = [];
 
@@ -619,7 +1427,7 @@ function renderRecordsPage() {
   const tbody = document.getElementById('rec-tbody');
 
   if (!total) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No records found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No records found.</td></tr>';
     document.getElementById('rec-pagination').innerHTML = '';
     return;
   }
@@ -673,6 +1481,7 @@ function buildRecordRow(r) {
   const pending    = pendingChanges[r.id];
   const disp       = pending ? pending.disposition    : (r.disposition    || '');
   const subDisp    = pending ? pending.sub_disposition : (r.sub_disposition || '');
+  const notes      = pending ? pending.notes          : (r.notes          || '');
   const isCompleted     = r.status === 'Completed' && !pending;
   const hasPending = !!pending;
   const rowClass   = isCompleted ? 'completed-row' : '';
@@ -702,6 +1511,8 @@ function buildRecordRow(r) {
         </div>
       </div>`;
 
+  const notesHtml = `<input class="notes-input" id="notes-input-${r.id}" type="text" value="${escHtml(notes)}" placeholder="Notes..." oninput="onNotesInput(${r.id}, this.value)" ${rowLocked ? 'readonly' : ''} />`;
+
   const saveHtml = rowLocked
     ? ''
     : `<button class="${saveBtnClass}" id="save-btn-${r.id}" onclick="saveRow(${r.id})">${saveBtnTxt}</button>`;
@@ -711,6 +1522,7 @@ function buildRecordRow(r) {
     <td style="font-weight:700;">${escHtml(r.phone_number)}</td>
     <td>${dispHtml}</td>
     <td>${subHtml}</td>
+    <td>${notesHtml}</td>
     <td>${statusBadge(r.status)}</td>
     <td>${saveHtml}</td>
   </tr>`;
@@ -884,13 +1696,18 @@ function selectSubDisp(rId, value) {
   markDirty(rId, 'sub_disposition', value);
 }
 
+function onNotesInput(rId, value) {
+  markDirty(rId, 'notes', value);
+}
+
 // ── Dirty tracking ────────────────────────────────────────────────────────
 function markDirty(rId, field, value) {
   if (!pendingChanges[rId]) {
     const rec = allRecords.find(r => r.id === rId);
     pendingChanges[rId] = {
       disposition:     rec ? (rec.disposition    || '') : '',
-      sub_disposition: rec ? (rec.sub_disposition || '') : ''
+      sub_disposition: rec ? (rec.sub_disposition || '') : '',
+      notes:           rec ? (rec.notes           || '') : ''
     };
   }
   pendingChanges[rId][field] = value;
@@ -911,7 +1728,11 @@ async function saveRow(rId) {
   try {
     const res = await apiFetch(`/excel/records/${rId}`, {
       method: 'PATCH',
-      body: JSON.stringify({ disposition: changes.disposition, sub_disposition: changes.sub_disposition })
+      body: JSON.stringify({
+        disposition:     changes.disposition,
+        sub_disposition: changes.sub_disposition,
+        notes:           changes.notes
+      })
     });
 
     // Update local record
@@ -925,9 +1746,9 @@ async function saveRow(rId) {
     // Update row class
     const row = document.getElementById(`rec-row-${rId}`);
     if (row && res.record.status === 'Completed') row.classList.add('completed-row');
-    // Update status badge in same row
+    // Update status badge in same row (cells[5] is Status column)
     const cells = row?.querySelectorAll('td');
-    if (cells && cells[4]) cells[4].innerHTML = statusBadge(res.record.status);
+    if (cells && cells[5]) cells[5].innerHTML = statusBadge(res.record.status);
 
   } catch(e) {
     savingSet.delete(rId);
@@ -954,10 +1775,8 @@ async function doSubmit() {
   if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting...'; }
   try {
     await apiFetch(`/excel/assignments/${currentAssignment.id}/submit`, { method:'POST' });
-    showToast('Work submitted successfully. The sheet is now locked.', 'success');
+    showToast('Work submitted successfully.', 'success');
     closeModal('submit-modal');
-    sheetLocked = true;
-    document.getElementById('submit-bar').style.display = 'none';
     currentAssignment.status = 'Completed';
     document.getElementById('sheet-status-badge').innerHTML = statusBadge('Completed');
     await loadAssignments();
@@ -983,6 +1802,9 @@ function goBackToList() {
   pendingChanges = {};
   document.getElementById('view-sheet').style.display = 'none';
   document.getElementById('view-list').style.display  = 'block';
+  try {
+    history.pushState(null, '', '/employee/data-excel.html');
+  } catch (err) {}
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────
@@ -1047,6 +1869,7 @@ function showToast(msg, type='info') {
   wrap.appendChild(el);
   setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 3500);
 }
+
 </script>
 </body>
 </html>
