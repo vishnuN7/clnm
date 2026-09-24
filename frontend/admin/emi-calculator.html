@@ -428,6 +428,15 @@
         flex-direction: column;
         align-items: center;
       }
+      /* Allow 3 tabs to scroll horizontally on small screens */
+      .tabs-navigation {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .tabs-navigation::-webkit-scrollbar { display: none; }
+      .tab-btn { white-space: nowrap; }
     }
   </style>
   <!-- Chart.js and Export libraries -->
@@ -483,11 +492,12 @@
     <div class="page-content">
       <!-- Tabs Navigation -->
       <div class="tabs-navigation">
-        <button type="button" class="tab-btn active" id="tab-btn-single" onclick="switchTab('single')">Single Loan Calculator</button>
+        <button type="button" class="tab-btn active" id="tab-btn-reducing" onclick="switchTab('reducing')">Reducing Rate Calculator</button>
+        <button type="button" class="tab-btn" id="tab-btn-flat" onclick="switchTab('flat')">Flat Rate Calculator</button>
         <button type="button" class="tab-btn" id="tab-btn-compare" onclick="switchTab('compare')">Compare Loans</button>
       </div>
 
-      <div id="tab-content-single">
+      <div id="tab-content-reducing">
         <div class="emi-calculator-layout">
         <!-- Input section (Left) -->
         <div class="card" style="margin-bottom:0; height:100%;">
@@ -677,6 +687,189 @@
           <div class="pagination-buttons" id="pagination-btns"></div>
         </div>
       </div>
+      </div>
+
+      <!-- ── Flat Rate Calculator Tab Content ── -->
+      <div id="tab-content-flat" style="display: none;">
+        <div class="emi-calculator-layout">
+          <!-- Input section (Left) -->
+          <div class="card" style="margin-bottom:0; height:100%;">
+            <div class="card-header">
+              <h3><span class="emoji-sm">📊</span>Loan Details</h3>
+            </div>
+            <div class="card-body">
+              <form id="flat-form" onsubmit="event.preventDefault();">
+                <div class="form-group">
+                  <label for="flat-principal">Loan Amount (Principal)</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="flat-principal" class="form-control" placeholder="10,00,000" style="padding-left:28px;" />
+                  </div>
+                  <div class="error-msg" id="flat-err-principal" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="flat-rate">Flat Interest Rate (% per annum)</label>
+                  <input type="number" id="flat-rate" step="0.01" class="form-control" placeholder="10" />
+                  <div class="error-msg" id="flat-err-rate" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="flat-tenure">Loan Tenure</label>
+                  <div class="tenure-group">
+                    <input type="number" id="flat-tenure" class="form-control" placeholder="2" />
+                    <div class="input-toggle-group">
+                      <button type="button" class="input-toggle-btn active" id="flat-btn-years" onclick="setFlatTenureUnit('years')">Years</button>
+                      <button type="button" class="input-toggle-btn" id="flat-btn-months" onclick="setFlatTenureUnit('months')">Months</button>
+                    </div>
+                  </div>
+                  <div class="error-msg" id="flat-err-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="flat-fee">Processing Fee (%) (Optional)</label>
+                  <input type="number" id="flat-fee" step="0.01" class="form-control" placeholder="1.5" />
+                  <div class="error-msg" id="flat-err-fee" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
+                  <button type="button" class="btn btn-secondary" onclick="resetFlatCalculator()">Reset</button>
+                  <button type="button" class="btn btn-primary" onclick="calculateFlatRateLoan()">Calculate</button>
+                </div>
+              </form>
+
+              <!-- Flat Rate explanation note -->
+              <div style="margin-top:20px; padding:12px 14px; background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:6px; font-size:12px; color:var(--text-secondary); line-height:1.6;">
+                <strong style="color:var(--accent); display:block; margin-bottom:4px;">ℹ️ About Flat Rate Interest</strong>
+                Interest is calculated on the <strong>original principal amount</strong> for the entire tenure, regardless of repayments made. This differs from the <em>Reducing Rate</em> method where interest decreases month-by-month as the outstanding principal is repaid.
+              </div>
+            </div>
+          </div>
+
+          <!-- Outputs & Charts (Right) -->
+          <div>
+            <!-- Summary Cards -->
+            <div class="results-stats-grid">
+              <div class="stat-card result-card-highlight">
+                <div class="stat-icon">🧮</div>
+                <div class="primary-result-value" id="flat-res-payment">₹0</div>
+                <div class="results-header-text">Monthly Payment</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="primary-result-value" id="flat-res-interest" style="color:var(--danger);">₹0</div>
+                <div class="results-header-text">Total Flat Interest</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">💼</div>
+                <div class="primary-result-value" id="flat-res-total">₹0</div>
+                <div class="results-header-text">Total Amount Payable</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">📄</div>
+                <div class="primary-result-value" id="flat-res-fee">₹0</div>
+                <div class="results-header-text">Processing Fee</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">₹</div>
+                <div class="primary-result-value" id="flat-res-cost">₹0</div>
+                <div class="results-header-text">Effective Cost of Loan</div>
+              </div>
+            </div>
+
+            <!-- Charts grid -->
+            <div class="calculator-charts-grid">
+              <!-- Pie Chart Card -->
+              <div class="card" style="margin-bottom:0;">
+                <div class="card-header">
+                  <h3>Loan Breakdown</h3>
+                </div>
+                <div class="card-body" style="display:flex; flex-direction:column; gap:20px; min-height:260px; justify-content:center; padding:20px;">
+                  <div style="display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap;">
+                    <div style="width:180px; height:180px; max-width:180px; position:relative;">
+                      <canvas id="flat-chart-pie"></canvas>
+                    </div>
+                    <div style="flex:1; min-width:220px;" id="flat-breakdown-details">
+                      <div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px 0;">
+                        Enter values above and click Calculate to view breakdown.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Payment Summary Card -->
+              <div class="card" style="margin-bottom:0;">
+                <div class="card-header">
+                  <h3>Payment Summary</h3>
+                </div>
+                <div class="card-body" style="min-height:260px; display:flex; align-items:center; justify-content:center; padding:20px;">
+                  <div id="flat-payment-summary" style="width:100%;">
+                    <div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px 0;">
+                      Enter values above and click Calculate to view payment summary.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Schedule Table -->
+        <div class="card full-table" style="margin-top:24px;">
+          <div class="table-controls-wrapper">
+            <div class="table-controls-left">
+              <span style="font-size:14px; font-weight:600; color:var(--text-primary);">📋 Flat Rate Payment Schedule</span>
+              <select id="flat-table-limit" onchange="handleFlatLimitChange()" style="width: 100px; padding:8px 12px; border-radius:6px; border:1px solid var(--border);">
+                <option value="12">12 / page</option>
+                <option value="24">24 / page</option>
+                <option value="60">60 / page</option>
+                <option value="all">All</option>
+              </select>
+            </div>
+            <div class="table-controls-right">
+              <div class="export-btn-group">
+                <button class="btn btn-secondary export-btn" onclick="exportFlatPDF()">
+                  <span class="emoji-sm">📥</span>Export PDF
+                </button>
+                <button class="btn btn-secondary export-btn" onclick="exportFlatExcel()">
+                  <span class="emoji-sm">📊</span>Export Excel
+                </button>
+                <button class="btn btn-secondary export-btn" onclick="exportFlatCSV()">
+                  <span class="emoji-sm">📄</span>Export CSV
+                </button>
+                <button class="btn btn-secondary export-btn" onclick="window.print()">
+                  <span class="emoji-sm">🖨️</span>Print
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Opening Principal</th>
+                  <th>Flat Interest</th>
+                  <th>Principal Component</th>
+                  <th>Monthly Payment</th>
+                  <th>Remaining Principal</th>
+                </tr>
+              </thead>
+              <tbody id="flat-schedule-tbody">
+                <tr>
+                  <td colspan="6" class="text-center text-muted" style="padding:40px 0;">Enter the loan details above and click Calculate to view the payment schedule.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-container" id="flat-pagination-wrapper" style="display:none;">
+            <div id="flat-pagination-info" style="font-size:13px; color:var(--text-secondary);"></div>
+            <div class="pagination-buttons" id="flat-pagination-btns"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Compare Loans Tab Content -->
@@ -1960,16 +2153,28 @@
     doc.save(`CLN_EMI_Report_${Math.round(sum.principal)}.pdf`);
   }
 
-  // ── Compare Loans Tab Javascript ───────────────────────────────────────────
-  let activeTab = 'single';
+  // ── Tab Switching ──────────────────────────────────────────────────────────
+  let activeTab = 'reducing';
   let comparedData = null;
 
   function switchTab(tab) {
+    if (tab === 'single') tab = 'reducing';
     activeTab = tab;
-    document.getElementById('tab-btn-single').classList.toggle('active', tab === 'single');
-    document.getElementById('tab-btn-compare').classList.toggle('active', tab === 'compare');
-    document.getElementById('tab-content-single').style.display = tab === 'single' ? 'block' : 'none';
-    document.getElementById('tab-content-compare').style.display = tab === 'compare' ? 'block' : 'none';
+    const btnReducing = document.getElementById('tab-btn-reducing') || document.getElementById('tab-btn-single');
+    const btnFlat = document.getElementById('tab-btn-flat');
+    const btnCompare = document.getElementById('tab-btn-compare');
+    if (btnReducing) btnReducing.classList.toggle('active', tab === 'reducing');
+    if (btnFlat) btnFlat.classList.toggle('active', tab === 'flat');
+    if (btnCompare) btnCompare.classList.toggle('active', tab === 'compare');
+
+    const contentReducing = document.getElementById('tab-content-reducing') || document.getElementById('tab-content-single');
+    const contentFlat = document.getElementById('tab-content-flat');
+    const contentCompare = document.getElementById('tab-content-compare');
+    if (contentReducing) contentReducing.style.display = tab === 'reducing' ? 'block' : 'none';
+    if (contentFlat) contentFlat.style.display = tab === 'flat' ? 'block' : 'none';
+    if (contentCompare) contentCompare.style.display = tab === 'compare' ? 'block' : 'none';
+
+    if (window.applyIconography) applyIconography();
   }
 
   const compareP1 = document.getElementById('compare-principal-1');
@@ -2308,6 +2513,582 @@
     
     doc.save(`CLN_Loan_Comparison_${Math.round(opt1.p)}.pdf`);
   }
+
+  // ── Pagination Controls Helper ─────────────────────────────────────────────
+  function renderPaginationControls(options) {
+    const {
+      wrapperId,
+      infoId,
+      btnsContainerId,
+      totalRows,
+      rowsPerPage,
+      currentPage,
+      totalPages,
+      onPageChange
+    } = options;
+
+    const wrapper = document.getElementById(wrapperId);
+    if (!wrapper) return;
+
+    if (totalRows === 0) {
+      wrapper.style.display = 'none';
+      return;
+    }
+
+    wrapper.style.display = 'flex';
+
+    const startIdx = (currentPage - 1) * rowsPerPage;
+    const endIdx = Math.min(startIdx + rowsPerPage, totalRows);
+    const startNum = totalRows === 0 ? 0 : startIdx + 1;
+
+    const infoEl = document.getElementById(infoId);
+    if (infoEl) {
+      infoEl.textContent = `Showing ${startNum} to ${endIdx} of ${totalRows} installment periods`;
+    }
+
+    const btnsContainer = document.getElementById(btnsContainerId);
+    if (!btnsContainer) return;
+    btnsContainer.innerHTML = '';
+
+    // Prev Button
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'pagination-btn';
+    prevBtn.textContent = 'Previous';
+    prevBtn.disabled = currentPage <= 1;
+    prevBtn.onclick = () => onPageChange(currentPage - 1);
+    btnsContainer.appendChild(prevBtn);
+
+    // Page numbers: display up to 7 pages directly or windowed around currentPage
+    const maxPagesToShow = 7;
+    let startPage = Math.max(1, currentPage - 3);
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+      const btn = document.createElement('button');
+      btn.className = `pagination-btn ${p === currentPage ? 'active' : ''}`;
+      btn.textContent = p;
+      btn.onclick = () => onPageChange(p);
+      btnsContainer.appendChild(btn);
+    }
+
+    // Next Button
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'pagination-btn';
+    nextBtn.textContent = 'Next';
+    nextBtn.disabled = currentPage >= totalPages || totalPages === 0;
+    nextBtn.onclick = () => onPageChange(currentPage + 1);
+    btnsContainer.appendChild(nextBtn);
+  }
+
+  // ── Flat Rate Calculator ───────────────────────────────────────────────────
+  let flatTenureUnit = 'years';
+  let flatCalculatedData = null;
+  let flatPieChartInstance = null;
+  let flatCurrentPage = 1;
+  let flatRowsPerPage = 12;
+
+  function handleFlatLimitChange() {
+    const limit = document.getElementById('flat-table-limit').value;
+    if (limit === 'all') {
+      flatRowsPerPage = 99999;
+    } else {
+      flatRowsPerPage = parseInt(limit, 10);
+    }
+    flatCurrentPage = 1;
+    renderFlatSchedule();
+  }
+
+  const flatPrincipalInput = document.getElementById('flat-principal');
+  if (flatPrincipalInput) {
+    flatPrincipalInput.addEventListener('input', () => formatInputValue(flatPrincipalInput));
+  }
+
+  function setFlatTenureUnit(unit) {
+    flatTenureUnit = unit;
+    document.getElementById('flat-btn-years').classList.toggle('active', unit === 'years');
+    document.getElementById('flat-btn-months').classList.toggle('active', unit === 'months');
+    document.getElementById('flat-tenure').placeholder = unit === 'years' ? '2' : '24';
+    if (flatCalculatedData) calculateFlatRateLoan();
+  }
+
+  function clearFlatErrors() {
+    ['flat-err-principal', 'flat-err-rate', 'flat-err-tenure', 'flat-err-fee'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) { el.textContent = ''; el.style.display = 'none'; }
+    });
+  }
+
+  function showFlatError(id, msg) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = msg; el.style.display = 'block'; }
+  }
+
+  function calculateFlatRateLoan() {
+    clearFlatErrors();
+
+    var principalStr = (flatPrincipalInput ? flatPrincipalInput.value : document.getElementById('flat-principal').value).replace(/,/g, '');
+    var rateStr = document.getElementById('flat-rate').value;
+    var tenureStr = document.getElementById('flat-tenure').value;
+    var feeStr = document.getElementById('flat-fee').value;
+
+    var principal = parseFloat(principalStr);
+    var rateVal = parseFloat(rateStr);
+    var tenureVal = parseFloat(tenureStr);
+    var feePercent = feeStr ? parseFloat(feeStr) : 0;
+
+    var hasError = false;
+    if (isNaN(principal) || principal <= 0) {
+      showFlatError('flat-err-principal', 'Please enter a valid loan amount greater than 0.');
+      hasError = true;
+    }
+    if (isNaN(rateVal) || rateVal < 0 || rateVal > 100) {
+      showFlatError('flat-err-rate', 'Flat interest rate must be between 0% and 100%.');
+      hasError = true;
+    }
+    if (isNaN(tenureVal) || tenureVal <= 0 || !Number.isInteger(tenureVal)) {
+      showFlatError('flat-err-tenure', 'Tenure must be a positive whole number.');
+      hasError = true;
+    }
+    if (feeStr && (isNaN(feePercent) || feePercent < 0 || feePercent > 100)) {
+      showFlatError('flat-err-fee', 'Processing fee must be between 0% and 100%.');
+      hasError = true;
+    }
+    if (hasError) return;
+
+    var totalMonths = flatTenureUnit === 'years' ? tenureVal * 12 : tenureVal;
+    if (totalMonths > 600) {
+      showFlatError('flat-err-tenure', 'Maximum supported tenure is 50 years (600 months).');
+      return;
+    }
+    var tenureYears = totalMonths / 12;
+
+    // Flat rate formulas: Total Interest = P × (R/100) × T (years)
+    var totalInterest = principal * (rateVal / 100) * tenureYears;
+    var totalAmount = principal + totalInterest;
+    var monthlyPayment = totalAmount / totalMonths;
+    var processingFee = principal * (feePercent / 100);
+    var effectiveCost = totalAmount + processingFee;
+
+    flatCalculatedData = {
+      principal: principal,
+      rateVal: rateVal,
+      totalMonths: totalMonths,
+      tenureYears: tenureYears,
+      totalInterest: totalInterest,
+      totalAmount: totalAmount,
+      monthlyPayment: monthlyPayment,
+      processingFee: processingFee,
+      effectiveCost: effectiveCost
+    };
+
+    var limitEl = document.getElementById('flat-table-limit');
+    if (limitEl) {
+      flatRowsPerPage = limitEl.value === 'all' ? 99999 : parseInt(limitEl.value, 10);
+    }
+    flatCurrentPage = 1;
+
+    renderFlatResults();
+    renderFlatBreakdown();
+    renderFlatSchedule();
+    if (window.applyIconography) applyIconography();
+  }
+
+  function renderFlatResults() {
+    var d = flatCalculatedData;
+    document.getElementById('flat-res-payment').textContent = formatFlatCurrency(d.monthlyPayment);
+    document.getElementById('flat-res-interest').textContent = formatFlatCurrency(d.totalInterest);
+    document.getElementById('flat-res-total').textContent = formatFlatCurrency(d.totalAmount);
+    document.getElementById('flat-res-fee').textContent = formatFlatCurrency(d.processingFee);
+    document.getElementById('flat-res-cost').textContent = formatFlatCurrency(d.effectiveCost);
+  }
+
+  // Currency formatter that preserves paise for non-whole values
+  function formatFlatCurrency(num) {
+    var rounded = Math.round(num * 100) / 100;
+    var wholePart = Math.floor(rounded);
+    var decPart = Math.round((rounded - wholePart) * 100);
+    if (decPart === 0) {
+      return '₹' + wholePart.toLocaleString('en-IN');
+    }
+    return '₹' + wholePart.toLocaleString('en-IN') + '.' + String(decPart).padStart(2, '0');
+  }
+
+  function renderFlatBreakdown() {
+    var d = flatCalculatedData;
+    var grandTotal = d.totalAmount + d.processingFee;
+    var principalPct = ((d.principal / grandTotal) * 100).toFixed(1);
+    var interestPct = ((d.totalInterest / grandTotal) * 100).toFixed(1);
+    var feePct = d.processingFee > 0 ? ((d.processingFee / grandTotal) * 100).toFixed(1) : '0.0';
+
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var textLabelColor = isDark ? '#c0ccda' : '#526173';
+
+    if (flatPieChartInstance) flatPieChartInstance.destroy();
+
+    var pieLabels = ['Principal (' + principalPct + '%)', 'Flat Interest (' + interestPct + '%)'];
+    var pieData = [d.principal, d.totalInterest];
+    var pieColors = ['#2f6fed', '#b44545'];
+    if (d.processingFee > 0) {
+      pieLabels.push('Fee (' + feePct + '%)');
+      pieData.push(d.processingFee);
+      pieColors.push('#e2a03f');
+    }
+
+    var ctx = document.getElementById('flat-chart-pie').getContext('2d');
+    flatPieChartInstance = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: pieLabels,
+        datasets: [{
+          data: pieData,
+          backgroundColor: pieColors,
+          borderColor: isDark ? '#0b1627' : '#ffffff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: textLabelColor,
+              font: { family: 'Manrope', size: 10, weight: '600' },
+              padding: 10
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return ' ' + context.label.split(' ')[0] + ': ' + formatFlatCurrency(context.raw);
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Breakdown details bar chart
+    var feeRow = d.processingFee > 0 ? '<div>' +
+      '<div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">' +
+        '<span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">' +
+          '<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#e2a03f;"></span>Processing Fee' +
+        '</span>' +
+        '<span>₹' + Math.round(d.processingFee).toLocaleString('en-IN') + ' (' + feePct + '%)</span>' +
+      '</div>' +
+      '<div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden;">' +
+        '<div style="background:#e2a03f; width:' + feePct + '%; height:100%;"></div>' +
+      '</div>' +
+    '</div>' : '';
+
+    document.getElementById('flat-breakdown-details').innerHTML =
+      '<div style="display:flex; flex-direction:column; gap:12px;">' +
+        '<div>' +
+          '<div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">' +
+            '<span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">' +
+              '<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#2f6fed;"></span>Principal Amount' +
+            '</span>' +
+            '<span>₹' + Math.round(d.principal).toLocaleString('en-IN') + ' (' + principalPct + '%)</span>' +
+          '</div>' +
+          '<div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden;">' +
+            '<div style="background:#2f6fed; width:' + principalPct + '%; height:100%;"></div>' +
+          '</div>' +
+        '</div>' +
+        '<div>' +
+          '<div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">' +
+            '<span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">' +
+              '<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#b44545;"></span>Total Flat Interest' +
+            '</span>' +
+            '<span>₹' + Math.round(d.totalInterest).toLocaleString('en-IN') + ' (' + interestPct + '%)</span>' +
+          '</div>' +
+          '<div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden;">' +
+            '<div style="background:#b44545; width:' + interestPct + '%; height:100%;"></div>' +
+          '</div>' +
+        '</div>' +
+        feeRow +
+        '<div style="border-top:1px solid var(--border); padding-top:10px; display:flex; justify-content:space-between; font-size:14px; font-weight:700;">' +
+          '<span>Total Cost of Loan</span>' +
+          '<span>₹' + Math.round(grandTotal).toLocaleString('en-IN') + '</span>' +
+        '</div>' +
+      '</div>';
+
+    // Payment Summary card
+    document.getElementById('flat-payment-summary').innerHTML =
+      '<div style="display:flex; flex-direction:column; gap:14px;">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">' +
+          '<span style="font-size:13px; color:var(--text-secondary);">Principal</span>' +
+          '<span style="font-size:14px; font-weight:700; color:#2f6fed;">₹' + Math.round(d.principal).toLocaleString('en-IN') + '</span>' +
+        '</div>' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">' +
+          '<span style="font-size:13px; color:var(--text-secondary);">Total Flat Interest<br><small style="font-size:11px;">(' + d.rateVal + '% × ' + d.tenureYears.toFixed(2) + ' yrs)</small></span>' +
+          '<span style="font-size:14px; font-weight:700; color:var(--danger);">₹' + Math.round(d.totalInterest).toLocaleString('en-IN') + '</span>' +
+        '</div>' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">' +
+          '<span style="font-size:13px; color:var(--text-secondary);">Total Repayment</span>' +
+          '<span style="font-size:14px; font-weight:700;">₹' + Math.round(d.totalAmount).toLocaleString('en-IN') + '</span>' +
+        '</div>' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0;">' +
+          '<span style="font-size:13px; font-weight:600; color:var(--text-primary);">Monthly Payment</span>' +
+          '<span style="font-size:18px; font-weight:800; color:var(--accent);">' + formatFlatCurrency(d.monthlyPayment) + '</span>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function buildFlatScheduleRows(d) {
+    var N = d.totalMonths;
+    var monthlyInterest = d.totalInterest / N;
+    var monthlyPrincipal = d.principal / N;
+    var rows = [];
+    var rem = d.principal;
+    for (var i = 1; i <= N; i++) {
+      var isLast = (i === N);
+      var open = Math.round(rem * 100) / 100;
+      var prinComp, flatInt, payment;
+      if (isLast) {
+        prinComp = open;
+        flatInt = Math.round((d.totalInterest - monthlyInterest * (N - 1)) * 100) / 100;
+        payment = Math.round((prinComp + flatInt) * 100) / 100;
+      } else {
+        prinComp = Math.round(monthlyPrincipal * 100) / 100;
+        flatInt = Math.round(monthlyInterest * 100) / 100;
+        payment = Math.round((prinComp + flatInt) * 100) / 100;
+      }
+      rem = Math.max(0, Math.round((open - prinComp) * 100) / 100);
+      rows.push({ period: i, open: open, prinComp: prinComp, flatInt: flatInt, payment: payment, rem: rem });
+    }
+    return rows;
+  }
+
+  function renderFlatSchedule() {
+    if (!flatCalculatedData) return;
+    var d = flatCalculatedData;
+    var rows = buildFlatScheduleRows(d);
+    var totalRows = rows.length;
+    var totalPages = Math.ceil(totalRows / flatRowsPerPage);
+
+    if (flatCurrentPage > totalPages && totalPages > 0) {
+      flatCurrentPage = totalPages;
+    }
+    if (flatCurrentPage < 1) {
+      flatCurrentPage = 1;
+    }
+
+    var startIdx = (flatCurrentPage - 1) * flatRowsPerPage;
+    var endIdx = Math.min(startIdx + flatRowsPerPage, totalRows);
+    var paginated = rows.slice(startIdx, endIdx);
+
+    var tbody = document.getElementById('flat-schedule-tbody');
+    tbody.innerHTML = '';
+
+    paginated.forEach(function(r) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>Month ' + r.period + '</td>' +
+        '<td>' + formatFlatCurrency(r.open) + '</td>' +
+        '<td>' + formatFlatCurrency(r.flatInt) + '</td>' +
+        '<td>' + formatFlatCurrency(r.prinComp) + '</td>' +
+        '<td>' + formatFlatCurrency(r.payment) + '</td>' +
+        '<td style="font-weight:600;">' + formatFlatCurrency(r.rem) + '</td>';
+      tbody.appendChild(tr);
+    });
+
+    renderPaginationControls({
+      wrapperId: 'flat-pagination-wrapper',
+      infoId: 'flat-pagination-info',
+      btnsContainerId: 'flat-pagination-btns',
+      totalRows: totalRows,
+      rowsPerPage: flatRowsPerPage,
+      currentPage: flatCurrentPage,
+      totalPages: totalPages,
+      onPageChange: function(newPage) {
+        flatCurrentPage = newPage;
+        renderFlatSchedule();
+      }
+    });
+  }
+
+  function resetFlatCalculator() {
+    if (flatPrincipalInput) flatPrincipalInput.value = '';
+    document.getElementById('flat-principal').value = '';
+    document.getElementById('flat-rate').value = '';
+    document.getElementById('flat-tenure').value = '';
+    document.getElementById('flat-fee').value = '';
+    clearFlatErrors();
+    flatCalculatedData = null;
+    flatCurrentPage = 1;
+    flatRowsPerPage = 12;
+    var limitEl = document.getElementById('flat-table-limit');
+    if (limitEl) limitEl.value = '12';
+
+    ['flat-res-payment', 'flat-res-interest', 'flat-res-total', 'flat-res-fee', 'flat-res-cost'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = '₹0';
+    });
+
+    if (flatPieChartInstance) { flatPieChartInstance.destroy(); flatPieChartInstance = null; }
+
+    document.getElementById('flat-breakdown-details').innerHTML =
+      '<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px 0;">Enter values above and click Calculate to view breakdown.</div>';
+    document.getElementById('flat-payment-summary').innerHTML =
+      '<div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px 0;">Enter values above and click Calculate to view payment summary.</div>';
+    document.getElementById('flat-schedule-tbody').innerHTML =
+      '<tr><td colspan="6" class="text-center text-muted" style="padding:40px 0;">Enter the loan details above and click Calculate to view the payment schedule.</td></tr>';
+    var pagWrapper = document.getElementById('flat-pagination-wrapper');
+    if (pagWrapper) pagWrapper.style.display = 'none';
+  }
+
+  // ── Flat Rate Exports ─────────────────────────────────────────────────────
+
+  function exportFlatExcel() {
+    if (!flatCalculatedData) { alert('Please perform calculations first before exporting.'); return; }
+    var d = flatCalculatedData;
+    var rows = buildFlatScheduleRows(d);
+
+    var wsData = [
+      ['CLN Lending Suite — Flat Rate Loan Schedule'],
+      [],
+      ['Principal', Math.round(d.principal)],
+      ['Flat Interest Rate', d.rateVal + '% p.a.'],
+      ['Tenure', d.totalMonths + ' Months (' + d.tenureYears.toFixed(2) + ' Years)'],
+      ['Total Flat Interest', Math.round(d.totalInterest)],
+      ['Total Amount Payable', Math.round(d.totalAmount)],
+      ['Monthly Payment', Math.round(d.monthlyPayment)],
+      ['Processing Fee', Math.round(d.processingFee)],
+      ['Effective Cost of Loan', Math.round(d.effectiveCost)],
+      [],
+      ['Period', 'Opening Principal', 'Flat Interest', 'Principal Component', 'Monthly Payment', 'Remaining Principal']
+    ];
+    rows.forEach(function(r) {
+      wsData.push(['Month ' + r.period, Math.round(r.open), Math.round(r.flatInt), Math.round(r.prinComp), Math.round(r.payment), Math.round(r.rem)]);
+    });
+
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = [{wch:10},{wch:20},{wch:16},{wch:22},{wch:18},{wch:22}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Flat Rate Schedule');
+    XLSX.writeFile(wb, 'CLN_FlatRate_Schedule_' + Math.round(d.principal) + '.xlsx');
+  }
+
+  function exportFlatCSV() {
+    if (!flatCalculatedData) { alert('Please perform calculations first.'); return; }
+    var d = flatCalculatedData;
+    var rows = buildFlatScheduleRows(d);
+
+    var csv = 'data:text/csv;charset=utf-8,';
+    csv += 'Period,Opening Principal,Flat Interest,Principal Component,Monthly Payment,Remaining Principal\n';
+    rows.forEach(function(r) {
+      csv += 'Month ' + r.period + ',' + Math.round(r.open) + ',' + Math.round(r.flatInt) + ',' + Math.round(r.prinComp) + ',' + Math.round(r.payment) + ',' + Math.round(r.rem) + '\n';
+    });
+
+    var link = document.createElement('a');
+    link.setAttribute('href', encodeURI(csv));
+    link.setAttribute('download', 'CLN_FlatRate_Schedule_' + Math.round(d.principal) + '.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function exportFlatPDF() {
+    var jsPDFLib = window.jspdf;
+    if (!jsPDFLib || !jsPDFLib.jsPDF) { alert('PDF library not loaded yet. Please wait a second.'); return; }
+    if (!flatCalculatedData) { alert('Please perform calculations first.'); return; }
+    var d = flatCalculatedData;
+    var rows = buildFlatScheduleRows(d);
+
+    var doc = new jsPDFLib.jsPDF('p', 'pt', 'a4');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(15, 39, 71);
+    doc.text('CLN Lending Suite', 40, 50);
+    doc.setFontSize(14); doc.setFont('helvetica', 'normal'); doc.setTextColor(82, 97, 115);
+    doc.text('Flat Rate Loan — Payment Schedule Report', 40, 72);
+    doc.setFontSize(10); doc.setTextColor(123, 136, 151);
+    doc.text('Generated on: ' + new Date().toLocaleDateString('en-IN'), 380, 50);
+    doc.setDrawColor(217, 227, 239); doc.line(40, 85, 550, 85);
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(16, 32, 51);
+    doc.text('Loan Details & Summary', 40, 110);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+    doc.text('Principal Amount:  ₹' + Math.round(d.principal).toLocaleString('en-IN'), 40, 135);
+    doc.text('Flat Interest Rate:  ' + d.rateVal + '% p.a.', 40, 155);
+    doc.text('Loan Tenure:  ' + d.totalMonths + ' Months (' + d.tenureYears.toFixed(2) + ' Years)', 40, 175);
+    doc.text('Processing Fee:  ₹' + Math.round(d.processingFee).toLocaleString('en-IN'), 40, 195);
+    doc.text('Total Flat Interest:  ₹' + Math.round(d.totalInterest).toLocaleString('en-IN'), 310, 135);
+    doc.text('Total Amount Payable:  ₹' + Math.round(d.totalAmount).toLocaleString('en-IN'), 310, 155);
+    doc.text('Monthly Payment:  ₹' + Math.round(d.monthlyPayment).toLocaleString('en-IN'), 310, 175);
+    doc.text('Effective Cost of Loan:  ₹' + Math.round(d.effectiveCost).toLocaleString('en-IN'), 310, 195);
+
+    var tableData = rows.map(function(r) {
+      return [
+        'Month ' + r.period,
+        '₹' + Math.round(r.open).toLocaleString('en-IN'),
+        '₹' + Math.round(r.flatInt).toLocaleString('en-IN'),
+        '₹' + Math.round(r.prinComp).toLocaleString('en-IN'),
+        '₹' + Math.round(r.payment).toLocaleString('en-IN'),
+        '₹' + Math.round(r.rem).toLocaleString('en-IN')
+      ];
+    });
+
+    doc.autoTable({
+      head: [['Period', 'Opening Principal', 'Flat Interest', 'Principal Comp.', 'Monthly Payment', 'Remaining Prin.']],
+      body: tableData,
+      startY: 220,
+      theme: 'striped',
+      headStyles: { fillColor: [15, 39, 71], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+      styles: { fontSize: 8.5, cellPadding: 5, font: 'helvetica' },
+      margin: { left: 40, right: 40 }
+    });
+
+    doc.save('CLN_FlatRate_Report_' + Math.round(d.principal) + '.pdf');
+  }
+
+  // Ensure full schedule is printed on print action
+  window.addEventListener('beforeprint', function() {
+    if (activeTab === 'flat' && flatCalculatedData) {
+      var allRows = buildFlatScheduleRows(flatCalculatedData);
+      var tbody = document.getElementById('flat-schedule-tbody');
+      tbody.innerHTML = '';
+      allRows.forEach(function(r) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>Month ' + r.period + '</td>' +
+          '<td>' + formatFlatCurrency(r.open) + '</td>' +
+          '<td>' + formatFlatCurrency(r.flatInt) + '</td>' +
+          '<td>' + formatFlatCurrency(r.prinComp) + '</td>' +
+          '<td>' + formatFlatCurrency(r.payment) + '</td>' +
+          '<td style="font-weight:600;">' + formatFlatCurrency(r.rem) + '</td>';
+        tbody.appendChild(tr);
+      });
+    } else if (activeTab === 'reducing' && typeof calculatedData !== 'undefined' && calculatedData && calculatedData.originalSchedule && calculatedData.originalSchedule.length > 0) {
+      var schedule = calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule;
+      var tbody = document.getElementById('schedule-tbody');
+      tbody.innerHTML = '';
+      schedule.forEach(function(row) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>Month ${row.emiNumber}</td>
+          <td>${row.paymentDate}</td>
+          <td>${formatValueCurrency(row.emiAmount)}</td>
+          <td>${formatValueCurrency(row.principalComponent)}</td>
+          <td>${formatValueCurrency(row.interestComponent)}</td>
+          <td>${row.prepayment > 0 ? formatValueCurrency(row.prepayment) : '—'}</td>
+          <td style="font-weight:600;">${formatValueCurrency(row.outstandingBalance)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  });
+
+  window.addEventListener('afterprint', function() {
+    if (activeTab === 'flat' && flatCalculatedData) {
+      renderFlatSchedule();
+    } else if (activeTab === 'reducing' && typeof calculatedData !== 'undefined' && calculatedData && calculatedData.originalSchedule && calculatedData.originalSchedule.length > 0) {
+      renderRepaymentTable();
+    }
+  });
 </script>
 </body>
 </html>
