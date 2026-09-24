@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const mailer = require('./mailer');
+const excelExpiry = require('./excelExpiry');
 
 function formatAuditTimestamp(date) {
   const options = {
@@ -56,6 +57,7 @@ async function cleanupOldCompletedBreakRecords() {
 async function checkAndProcessSchedules() {
   try {
     await cleanupOldCompletedBreakRecords();
+    await excelExpiry.processExpiredAssignments();
 
     // 1. Fetch current settings
     const [settings] = await db.query('SELECT * FROM system_settings');

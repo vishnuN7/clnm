@@ -3,6 +3,7 @@ const multer = require('multer');
 const path   = require('path');
 const XLSX   = require('xlsx');
 const notifCtrl = require('./notificationController');
+const excelExpiry = require('../utils/excelExpiry');
 
 // ── Multer (memory storage) ────────────────────────────────────────────────
 const upload = multer({
@@ -204,10 +205,12 @@ exports.assignEmployees = async (req, res) => {
     // Remove old assignments first
     await db.query('DELETE FROM excel_assignments WHERE file_id = ?', [id]);
 
-    // Insert new
-    const vals = employee_ids.map(eid => [id, eid, req.user.id]);
+    // Insert new with explicit expires_at (30 days from assignment) and lifecycle_status
+    const now = new Date();
+    const expiresAt = excelExpiry.calculateExpiresAt(now);
+    const vals = employee_ids.map(eid => [id, eid, req.user.id, now, expiresAt, 'Active', 'Assigned']);
     await db.query(
-      'INSERT INTO excel_assignments (file_id, employee_id, assigned_by) VALUES ?',
+      'INSERT INTO excel_assignments (file_id, employee_id, assigned_by, assigned_at, expires_at, lifecycle_status, status) VALUES ?',
       [vals]
     );
 
@@ -447,7 +450,9 @@ exports.getMyAssignments = async (req, res) => {
        FROM excel_assignments ea
        JOIN excel_files ef ON ea.file_id = ef.id
        JOIN users u        ON u.id = ea.assigned_by
-       WHERE ea.employee_id = ? AND ea.status != 'Closed'
+       WHERE ea.employee_id = ? 
+         AND ea.status != 'Closed'
+         AND ${excelExpiry.getActiveAssignmentCondition('ea')}
        ORDER BY ea.assigned_at DESC`,
       [empId, empId]
     );
@@ -480,6 +485,15 @@ exports.getAssignmentRecords = async (req, res) => {
       [assignmentId, empId]
     );
     if (!asgn) return res.status(403).json({ success: false, message: 'Assignment not found or access denied.' });
+
+    // Enforce 30-day expiration for employee
+    if (req.user.role !== 'admin' && excelExpiry.isAssignmentExpired(asgn)) {
+      return res.status(403).json({
+        success: false,
+        assignment_expired: true,
+        message: 'This assignment has expired (30-day access period ended) and is no longer accessible.'
+      });
+    }
 
     const [[file]] = await db.query('SELECT * FROM excel_files WHERE id = ?', [asgn.file_id]);
 
@@ -536,10 +550,18 @@ exports.updateRecord = async (req, res) => {
     // Verify assignment (admin can always update)
     if (req.user.role !== 'admin') {
       const [[asgn]] = await db.query(
-        'SELECT id FROM excel_assignments WHERE file_id = ? AND employee_id = ? AND status != ?',
+        'SELECT * FROM excel_assignments WHERE file_id = ? AND employee_id = ? AND status != ?',
         [record.file_id, userId, 'Closed']
       );
       if (!asgn) return res.status(403).json({ success: false, message: 'Access denied: not assigned to this file.' });
+
+      if (excelExpiry.isAssignmentExpired(asgn)) {
+        return res.status(403).json({
+          success: false,
+          assignment_expired: true,
+          message: 'This assignment has expired (30-day access period ended). Records can no longer be updated.'
+        });
+      }
     }
 
     // Save old values for audit
@@ -656,6 +678,14 @@ exports.submitAssignment = async (req, res) => {
     );
     if (!asgn) return res.status(403).json({ success: false, message: 'Assignment not found or access denied.' });
 
+    if (req.user.role !== 'admin' && excelExpiry.isAssignmentExpired(asgn)) {
+      return res.status(403).json({
+        success: false,
+        assignment_expired: true,
+        message: 'This assignment has expired (30-day access period ended) and cannot be submitted.'
+      });
+    }
+
     // Check all records are complete
     const [incomplete] = await db.query(
       `SELECT phone_number FROM excel_records
@@ -718,6 +748,8 @@ exports.searchAssignedRecords = async (req, res) => {
     if (role !== 'admin') {
       conditions.push('ea.employee_id = ?');
       params.push(empId);
+      // Strictly exclude expired assignments from employee search
+      conditions.push(excelExpiry.getActiveAssignmentCondition('ea'));
     } else if (req.query.employee_id) {
       conditions.push('ea.employee_id = ?');
       params.push(req.query.employee_id);

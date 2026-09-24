@@ -1341,7 +1341,32 @@ function focusRecordInSheet(recordId, phoneNumber) {
 // ── Open Sheet ────────────────────────────────────────────────────────────
 async function openSheet(assignmentId) {
   currentAssignment = allAssignments.find(a => a.id === assignmentId);
-  if (!currentAssignment) return;
+  if (!currentAssignment) {
+    // If not found in active assignments (e.g. expired or navigated directly via URL)
+    try {
+      const res = await apiFetch(`/excel/assignments/${assignmentId}/records?limit=1`);
+      if (res && res.assignment) {
+        currentAssignment = {
+          ...res.assignment,
+          original_name: res.file?.original_name || 'Workbook',
+          file_status: res.file?.status || 'Assigned'
+        };
+      }
+    } catch (err) {
+      const msg = err.message || 'This assignment has expired or is not accessible.';
+      showToast(msg, 'error');
+      try { history.replaceState(null, '', '/employee/data-excel.html'); } catch (e) {}
+      goBackToList();
+      return;
+    }
+  }
+
+  if (!currentAssignment) {
+    showToast('This assignment has expired (30-day access period ended) or does not exist.', 'error');
+    try { history.replaceState(null, '', '/employee/data-excel.html'); } catch (e) {}
+    goBackToList();
+    return;
+  }
 
   try {
     if (window.location.search !== `?assignmentId=${assignmentId}`) {
@@ -1374,7 +1399,16 @@ async function loadSheetRecords() {
     updateSheetKPIs();
     recPage = 1;
     renderRecordsTable();
-  } catch(e) { showToast('Failed to load records.', 'error'); }
+  } catch(e) {
+    const msg = e.message || 'Failed to load records.';
+    showToast(msg, 'error');
+    if (e.assignment_expired || msg.toLowerCase().includes('expired')) {
+      setTimeout(() => {
+        goBackToList();
+        try { history.replaceState(null, '', '/employee/data-excel.html'); } catch(err){}
+      }, 1200);
+    }
+  }
 }
 
 function updateSheetKPIs() {
@@ -1817,7 +1851,12 @@ async function apiFetch(path, opts = {}) {
   const data = await res.json().catch(() => ({ success: false, message: 'Server returned an invalid response.' }));
   if (res.status === 401 || res.status === 403) {
     const msg = data.message || '';
-    if (msg.toLowerCase().includes('expired') || msg.toLowerCase().includes('invalid') || res.status === 401) {
+    if (data.assignment_expired || msg.toLowerCase().includes('assignment has expired')) {
+      const err = new Error(msg);
+      err.assignment_expired = true;
+      throw err;
+    }
+    if (res.status === 401 || msg.toLowerCase().includes('session') || msg.toLowerCase().includes('token') || msg.toLowerCase().includes('jwt')) {
       clearSession();
       localStorage.setItem('login_error', 'Your session has expired. Please sign in again to continue.');
       window.location.href = '/index.html';

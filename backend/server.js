@@ -101,11 +101,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/employee', employeeRoutes);
 
-app.use('/api/excel',      excelRoutes);
-app.use('/api/apr',        aprRoutes);
-app.use('/api/break-time', breakTimeRoutes);
-app.use('/api/profile', require('./routes/profile'));
-app.use('/api/documents', require('./routes/documents'));
+app.use('/api/excel',         excelRoutes);
+app.use('/api/apr',           aprRoutes);
+app.use('/api/break-time',    breakTimeRoutes);
+app.use('/api/profile',       require('./routes/profile'));
+app.use('/api/documents',     require('./routes/documents'));
+app.use('/api/notifications',  require('./routes/notifications'));
+app.use('/api/employee/notifications', require('./routes/notifications'));
 app.use('/uploads/profile_pics', express.static(path.join(__dirname, 'uploads', 'profile_pics')));
 app.use('/uploads/kyc_docs', express.static(path.join(__dirname, 'uploads', 'kyc_docs')));
 
@@ -172,30 +174,8 @@ async function ensurePasswordResetTable() {
 }
 
 async function ensureDocumentsTable() {
-  const allowedDocTypes = [
-    'Aadhaar Card',
-    'PAN Card',
-    'Passport Size Photograph',
-    '3 Months Bank Statement',
-    '6 Months Bank Statement',
-    '3 Months Salary Slips',
-    '6 Months Salary Slips',
-    'Form 16',
-    'Cancelled Cheque',
-    'Existing Loan Statement',
-    'Other',
-    'Aadhar',
-    'PAN',
-    'Passport',
-    'Driving License',
-    '3M Bank Statement',
-    '3M Salary Slip'
-  ];
-
-  const enumValues = allowedDocTypes.map((value) => `'${value.replace(/'/g, "''")}'`).join(', ');
-
   try {
-    await db.query(`ALTER TABLE documents MODIFY doc_type ENUM(${enumValues}) NOT NULL`);
+    await db.query('ALTER TABLE documents MODIFY doc_type VARCHAR(255) NOT NULL');
 
     const [passwordColumn] = await db.query("SHOW COLUMNS FROM documents LIKE 'document_password'");
     if (passwordColumn.length === 0) {
@@ -684,6 +664,69 @@ async function ensureLoginHoursColumns() {
   }
 }
 
+async function ensureNotificationTables() {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS employee_notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        employee_id INT NOT NULL,
+        type VARCHAR(50) NOT NULL DEFAULT 'general',
+        title VARCHAR(200) NOT NULL,
+        body TEXT NULL,
+        link_url VARCHAR(500) NULL,
+        is_read TINYINT(1) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_emp_notif (employee_id),
+        INDEX idx_emp_notif_unread (employee_id, is_read),
+        FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS callback_reminders (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        employee_id INT NOT NULL,
+        assignment_id INT NULL,
+        record_id INT NULL,
+        phone_number VARCHAR(30) NOT NULL,
+        callback_date DATE NOT NULL,
+        callback_period VARCHAR(20) NOT NULL DEFAULT 'anytime',
+        notification_id INT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_emp_record (employee_id, record_id),
+        INDEX idx_cb_emp (employee_id),
+        INDEX idx_cb_date (callback_date),
+        FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (assignment_id) REFERENCES excel_assignments(id) ON DELETE SET NULL,
+        FOREIGN KEY (record_id) REFERENCES excel_records(id) ON DELETE SET NULL,
+        FOREIGN KEY (notification_id) REFERENCES employee_notifications(id) ON DELETE SET NULL
+      )
+    `);
+    // Ensure extra notification columns exist
+    const [notifCols] = await db.query('DESC employee_notifications');
+    const existingColNames = notifCols.map(c => c.Field);
+    if (!existingColNames.includes('message')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN message TEXT NULL AFTER title');
+      await db.query('UPDATE employee_notifications SET message = body WHERE message IS NULL');
+    }
+    if (!existingColNames.includes('reference_type')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN reference_type VARCHAR(50) NULL AFTER link_url');
+    }
+    if (!existingColNames.includes('reference_id')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN reference_id INT NULL AFTER reference_type');
+    }
+    if (!existingColNames.includes('read_at')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN read_at TIMESTAMP NULL AFTER is_read');
+    }
+
+    console.log('Notification tables initialized successfully.');
+  } catch (err) {
+    console.error('Failed to initialize notification tables:', err.message);
+  }
+}
+
 async function ensureExcelModule() {
   try {
     await db.query(`
@@ -722,10 +765,12 @@ async function ensureExcelModule() {
         file_id INT NOT NULL,
         employee_id INT NOT NULL,
         assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NULL,
         assigned_by INT NOT NULL,
         completed_at TIMESTAMP NULL,
         progress INT NOT NULL DEFAULT 0,
         status VARCHAR(50) NOT NULL DEFAULT 'Assigned',
+        lifecycle_status VARCHAR(30) NOT NULL DEFAULT 'Active',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         UNIQUE KEY unique_file_employee (file_id, employee_id),
@@ -734,6 +779,21 @@ async function ensureExcelModule() {
         FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+
+    // Ensure 30-day expiration columns exist
+    const [expCols] = await db.query("SHOW COLUMNS FROM excel_assignments LIKE 'expires_at'");
+    if (expCols.length === 0) {
+      await db.query("ALTER TABLE excel_assignments ADD COLUMN expires_at TIMESTAMP NULL AFTER assigned_at");
+    }
+    const [lifeCols] = await db.query("SHOW COLUMNS FROM excel_assignments LIKE 'lifecycle_status'");
+    if (lifeCols.length === 0) {
+      await db.query("ALTER TABLE excel_assignments ADD COLUMN lifecycle_status VARCHAR(30) NOT NULL DEFAULT 'Active' AFTER status");
+    }
+    // Backfill expires_at for legacy assignments
+    await db.query("UPDATE excel_assignments SET expires_at = DATE_ADD(assigned_at, INTERVAL 30 DAY) WHERE expires_at IS NULL");
+    // Mark expired assignments
+    await db.query("UPDATE excel_assignments SET lifecycle_status = 'Expired' WHERE expires_at <= NOW() AND lifecycle_status = 'Active'");
+
     await db.query(`
       CREATE TABLE IF NOT EXISTS excel_audit (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -770,6 +830,7 @@ async function runMigrations() {
     await ensureSettingsTables();
     await ensureExcelModule();
     await ensureLoginHoursColumns();
+    await ensureNotificationTables();
   } catch (err) {
     console.error('Migration error:', err.message);
   }
