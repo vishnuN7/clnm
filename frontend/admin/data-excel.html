@@ -32,16 +32,6 @@
     .content-body { padding: 24px; }
     .excel-topbar { gap: 14px; }
     .excel-topbar .mobile-menu-btn { flex: 0 0 auto; }
-    .excel-topbar .topbar-title {
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-    .excel-topbar .topbar-title h2,
-    .excel-topbar .topbar-title p {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
     .excel-topbar-actions {
       flex: 0 1 auto;
       justify-content: flex-end;
@@ -74,10 +64,6 @@
       white-space: nowrap;
     }
 
-    @media (max-width: 1100px) {
-      .excel-topbar .topbar-title p { display: none; }
-    }
-
     @media (max-width: 900px) {
       .excel-topbar {
         height: auto;
@@ -87,9 +73,6 @@
         row-gap: 8px;
         padding-top: 8px;
         padding-bottom: 8px;
-      }
-      .excel-topbar .topbar-title {
-        flex: 1 1 calc(100% - 54px);
       }
       .excel-topbar-actions {
         flex: 1 1 100%;
@@ -323,7 +306,7 @@
   </style>
 </head>
 <body>
-<div class="app-layout">
+<div class="app-layout admin-page">
 
   <!-- ═══ SIDEBAR ═══ -->
   <aside class="sidebar">
@@ -778,7 +761,7 @@ let monitorPollTimer  = null;
 let filesPage = 1;
 let monitorPage = 1;
 let auditPage = 1;
-const RECORDS_PER_PAGE = 20;
+const RECORDS_PER_PAGE = 100;
 
 let auditAllRecords = [];
 
