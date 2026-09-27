@@ -23,9 +23,1324 @@
     })();
   </script>
   <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* ── Stepper Component ────────────────────────────────────── */
+    .onboarding-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    }
+    :root[data-theme='dark'] .onboarding-stepper {
+      border-color: rgba(151, 176, 210, 0.14);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+    }
+    .stepper-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+    .stepper-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12.5px;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    :root[data-theme='dark'] .stepper-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(151, 176, 210, 0.15);
+    }
+    .stepper-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .stepper-step {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+    .stepper-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .stepper-item.is-active .stepper-badge {
+      background: rgba(47, 111, 237, 0.12);
+      border-color: rgba(47, 111, 237, 0.3);
+      color: var(--accent);
+    }
+    :root[data-theme='dark'] .stepper-item.is-active .stepper-badge {
+      background: rgba(139, 180, 255, 0.14);
+      border-color: rgba(139, 180, 255, 0.35);
+      color: #8bb4ff;
+    }
+    .stepper-item.is-active .stepper-title {
+      color: var(--text-primary);
+    }
+    .stepper-item.is-completed .stepper-badge {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #059669;
+    }
+    :root[data-theme='dark'] .stepper-item.is-completed .stepper-badge {
+      background: rgba(52, 211, 153, 0.14);
+      border-color: rgba(52, 211, 153, 0.35);
+      color: #34d399;
+    }
+    .stepper-item.is-completed .stepper-title {
+      color: var(--text-primary);
+    }
+    .stepper-connector {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      margin: 0 14px;
+      position: relative;
+    }
+    :root[data-theme='dark'] .stepper-connector {
+      background: rgba(151, 176, 210, 0.14);
+    }
+    .stepper-connector.is-active {
+      background: var(--accent);
+    }
+
+    /* ── Main Container & Workflow Cards ──────────────────────── */
+    .add-customer-container {
+      width: min(100%, 1400px);
+      margin-inline: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .customer-workflow-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s ease;
+    }
+    :root[data-theme='dark'] .customer-workflow-card {
+      border-color: rgba(151, 176, 210, 0.14);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+    }
+    .workflow-card-header {
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: var(--bg-card);
+    }
+    :root[data-theme='dark'] .workflow-card-header {
+      border-bottom-color: rgba(151, 176, 210, 0.12);
+    }
+    .workflow-card-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .workflow-card-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, rgba(47, 111, 237, 0.12), rgba(47, 111, 237, 0.04));
+      border: 1px solid rgba(47, 111, 237, 0.16);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    :root[data-theme='dark'] .workflow-card-icon {
+      background: linear-gradient(135deg, rgba(139, 180, 255, 0.14), rgba(139, 180, 255, 0.04));
+      border-color: rgba(139, 180, 255, 0.22);
+      color: #8bb4ff;
+    }
+    .workflow-card-icon.success-icon {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.25);
+      color: #059669;
+    }
+    :root[data-theme='dark'] .workflow-card-icon.success-icon {
+      background: rgba(52, 211, 153, 0.14);
+      border-color: rgba(52, 211, 153, 0.3);
+      color: #34d399;
+    }
+    .workflow-card-title h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: -0.2px;
+    }
+    .workflow-card-title p {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin: 2px 0 0;
+    }
+    .workflow-card-body {
+      padding: 20px 22px;
+    }
+
+    /* ── Quick Paste Details ──────────────────────────────────── */
+    .quick-paste-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .quick-paste-actions .btn {
+      width: auto !important;
+      height: 38px;
+      padding: 0 18px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .paste-helper-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── Form Grid ────────────────────────────────────────────── */
+    .customer-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 20px;
+    }
+    @media (max-width: 720px) {
+      .customer-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .form-group-full {
+      grid-column: 1 / -1;
+    }
+    .form-field-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+    .form-field-label span.req {
+      color: #dc2626;
+      font-weight: 700;
+    }
+    .customer-form-grid .form-control {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: all 0.18s ease;
+    }
+    :root[data-theme='dark'] .customer-form-grid .form-control {
+      background: rgba(9, 17, 29, 0.65);
+      border-color: rgba(151, 176, 210, 0.16);
+    }
+    .customer-form-grid .form-control:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.14);
+      outline: none;
+    }
+    .customer-form-grid textarea.form-control {
+      height: auto;
+      min-height: 72px;
+      padding: 8px 12px;
+      line-height: 1.45;
+      resize: vertical;
+    }
+    .input-with-affix {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .input-affix {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .input-with-affix .form-control {
+      padding-left: 28px !important;
+    }
+    .form-submit-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(151, 176, 210, 0.12);
+    }
+    .form-submit-row .btn {
+      height: 38px;
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    /* ── Saved Customer Summary ───────────────────────────────── */
+    .saved-customer-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+      background: rgba(47, 111, 237, 0.05);
+      border: 1px solid rgba(47, 111, 237, 0.16);
+      border-radius: 11px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    :root[data-theme='dark'] .saved-customer-hero {
+      background: rgba(139, 180, 255, 0.06);
+      border-color: rgba(139, 180, 255, 0.2);
+    }
+    .saved-hero-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+    .customer-avatar-large {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(47, 111, 237, 0.14);
+      color: var(--accent);
+      border: 1px solid rgba(47, 111, 237, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    :root[data-theme='dark'] .customer-avatar-large {
+      background: rgba(139, 180, 255, 0.16);
+      color: #8bb4ff;
+      border-color: rgba(139, 180, 255, 0.3);
+    }
+    .saved-hero-name h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .saved-hero-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 3px;
+      flex-wrap: wrap;
+    }
+    .saved-id-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--text-secondary);
+    }
+    :root[data-theme='dark'] .saved-id-pill {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+    }
+    .saved-status-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    :root[data-theme='dark'] .saved-status-pill {
+      background: rgba(52, 211, 153, 0.14);
+      color: #34d399;
+      border-color: rgba(52, 211, 153, 0.3);
+    }
+    .saved-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 860px) {
+      .saved-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 520px) {
+      .saved-summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .summary-field-box {
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.015);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+    }
+    :root[data-theme='dark'] .summary-field-box {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(151, 176, 210, 0.12);
+    }
+    .summary-field-box.full-span {
+      grid-column: 1 / -1;
+    }
+    .summary-field-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .summary-field-label i {
+      color: var(--accent);
+      font-size: 11px;
+    }
+    .summary-field-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      word-break: break-word;
+      line-height: 1.4;
+    }
+    .summary-field-val a {
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: color 0.18s;
+    }
+    .summary-field-val a:hover {
+      color: var(--accent);
+    }
+
+    /* ── Upload Documents Section ─────────────────────────────── */
+    .upload-customer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(47, 111, 237, 0.08);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    :root[data-theme='dark'] .upload-customer-badge {
+      background: rgba(139, 180, 255, 0.12);
+      color: #8bb4ff;
+    }
+    .upload-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 20px;
+    }
+    @media (max-width: 720px) {
+      .upload-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .upload-form-grid .form-control {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      box-sizing: border-box;
+    }
+    :root[data-theme='dark'] .upload-form-grid .form-control {
+      background: rgba(9, 17, 29, 0.65);
+      border-color: rgba(151, 176, 210, 0.16);
+    }
+
+    /* ── File Chooser Dark Mode ────────────────────────────────── */
+    .custom-file-input {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 40px;
+      padding: 3px 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    :root[data-theme='dark'] .custom-file-input {
+      background: rgba(14, 23, 38, 0.7);
+      border-color: rgba(151, 176, 210, 0.2);
+      color: #e2e8f0;
+    }
+    .custom-file-input:hover {
+      border-color: var(--accent);
+    }
+    .custom-file-input::-webkit-file-upload-button,
+    .custom-file-input::file-selector-button {
+      background: rgba(47, 111, 237, 0.1);
+      border: 1px solid rgba(47, 111, 237, 0.28);
+      color: var(--accent);
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 12px;
+      transition: all 0.18s ease;
+    }
+    :root[data-theme='dark'] .custom-file-input::-webkit-file-upload-button,
+    :root[data-theme='dark'] .custom-file-input::file-selector-button {
+      background: rgba(59, 130, 246, 0.18);
+      border-color: rgba(96, 165, 250, 0.35);
+      color: #93c5fd;
+    }
+    .custom-file-input::-webkit-file-upload-button:hover,
+    .custom-file-input::file-selector-button:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    /* ── Multi-File Staging Queue ────────────────────────────── */
+    .selected-files-queue {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .staged-queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .staged-queue-header h4 {
+      margin: 0;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .staged-queue-header h4 i {
+      color: var(--accent);
+    }
+    .staged-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .staged-item-card {
+      padding: 14px 16px;
+      background: rgba(47, 111, 237, 0.035);
+      border: 1px solid rgba(47, 111, 237, 0.25);
+      border-radius: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+    :root[data-theme='dark'] .staged-item-card {
+      background: rgba(139, 180, 255, 0.04);
+      border-color: rgba(139, 180, 255, 0.25);
+    }
+    .staged-item-card.has-error {
+      background: rgba(239, 68, 68, 0.04);
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+    :root[data-theme='dark'] .staged-item-card.has-error {
+      background: rgba(239, 68, 68, 0.07);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+    .staged-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .staged-item-meta-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+    .staged-item-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(47, 111, 237, 0.12);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    :root[data-theme='dark'] .staged-item-icon {
+      background: rgba(139, 180, 255, 0.15);
+      color: #8bb4ff;
+    }
+    .staged-item-card.has-error .staged-item-icon {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+    }
+    .staged-item-meta {
+      min-width: 0;
+      flex: 1;
+    }
+    .staged-item-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .staged-filename {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+    .staged-size-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--text-secondary);
+    }
+    :root[data-theme='dark'] .staged-size-badge {
+      background: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+    }
+    .staged-status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 8px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .staged-status-badge.status-ready {
+      background: rgba(47, 111, 237, 0.1);
+      color: var(--accent);
+    }
+    :root[data-theme='dark'] .staged-status-badge.status-ready {
+      background: rgba(139, 180, 255, 0.14);
+      color: #8bb4ff;
+    }
+    .staged-status-badge.status-uploading {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+    }
+    :root[data-theme='dark'] .staged-status-badge.status-uploading {
+      background: rgba(251, 191, 36, 0.14);
+      color: #fbbf24;
+    }
+    .staged-status-badge.status-uploaded {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+    }
+    :root[data-theme='dark'] .staged-status-badge.status-uploaded {
+      background: rgba(52, 211, 153, 0.14);
+      color: #34d399;
+    }
+    .staged-status-badge.status-error {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+    }
+    :root[data-theme='dark'] .staged-status-badge.status-error {
+      background: rgba(248, 113, 113, 0.15);
+      color: #f87171;
+    }
+    .staged-error-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: #dc2626;
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    :root[data-theme='dark'] .staged-error-text {
+      color: #f87171;
+    }
+    .staged-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .staged-item-actions .btn {
+      height: 32px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .staged-item-config-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 18px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(151, 176, 210, 0.12);
+    }
+    @media (max-width: 680px) {
+      .staged-item-config-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .staged-config-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .staged-config-field .form-control {
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 13px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    :root[data-theme='dark'] .staged-config-field .form-control {
+      background: rgba(9, 17, 29, 0.65);
+      border-color: rgba(151, 176, 210, 0.18);
+    }
+    .staged-batch-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      flex-wrap: wrap;
+    }
+    :root[data-theme='dark'] .staged-batch-actions {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(151, 176, 210, 0.14);
+    }
+    .staged-batch-summary {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .staged-batch-summary strong {
+      color: var(--text-primary);
+    }
+    .staged-batch-actions .btn-primary {
+      width: auto !important;
+      min-width: 180px;
+      height: 38px;
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* ── Password Input & Toggle Eye Button ───────────────────── */
+    .password-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .password-input-wrapper .form-control {
+      padding-right: 42px;
+      height: 38px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    :root[data-theme='dark'] .password-input-wrapper .form-control {
+      background: rgba(9, 17, 29, 0.65);
+      border-color: rgba(151, 176, 210, 0.18);
+    }
+    .toggle-password-btn {
+      position: absolute;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: all 0.18s ease;
+    }
+    :root[data-theme='dark'] .toggle-password-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(151, 176, 210, 0.18);
+      color: #94a3b8;
+    }
+    .toggle-password-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--accent);
+      background: rgba(47, 111, 237, 0.1);
+    }
+    :root[data-theme='dark'] .toggle-password-btn:hover {
+      color: #ffffff;
+      border-color: #8bb4ff;
+    }
+
+    /* ── Uploaded Documents List & Cards ──────────────────────── */
+    .uploaded-docs-section {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(151, 176, 210, 0.14);
+    }
+    .uploaded-docs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .uploaded-docs-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .uploaded-docs-header-left h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .uploaded-docs-header-left h4 i {
+      color: var(--accent);
+    }
+    .count-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--text-secondary);
+    }
+    :root[data-theme='dark'] .count-pill {
+      background: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+    }
+    .uploaded-docs-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .docs-empty-state {
+      padding: 24px 16px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.015);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    :root[data-theme='dark'] .docs-empty-state {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(151, 176, 210, 0.12);
+    }
+    .docs-empty-state i {
+      font-size: 22px;
+      margin-bottom: 6px;
+      display: block;
+      opacity: 0.4;
+    }
+    .uploaded-doc-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.015);
+      flex-wrap: wrap;
+      transition: all 0.18s ease;
+    }
+    :root[data-theme='dark'] .uploaded-doc-card {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(151, 176, 210, 0.14);
+    }
+    .uploaded-doc-card:hover {
+      border-color: rgba(47, 111, 237, 0.3);
+    }
+    :root[data-theme='dark'] .uploaded-doc-card:hover {
+      border-color: rgba(139, 180, 255, 0.28);
+    }
+    .uploaded-doc-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      min-width: 0;
+      flex: 1;
+    }
+    .uploaded-doc-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 9px;
+      background: rgba(47, 111, 237, 0.1);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    :root[data-theme='dark'] .uploaded-doc-icon-wrap {
+      background: rgba(139, 180, 255, 0.14);
+      color: #8bb4ff;
+    }
+    .uploaded-doc-details {
+      min-width: 0;
+      flex: 1;
+    }
+    .uploaded-doc-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .uploaded-doc-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .pwd-pill {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    :root[data-theme='dark'] .pwd-pill {
+      background: rgba(255, 255, 255, 0.05);
+      color: #94a3b8;
+    }
+    .pwd-pill.is-protected {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+    :root[data-theme='dark'] .pwd-pill.is-protected {
+      background: rgba(251, 191, 36, 0.12);
+      color: #fbbf24;
+      border-color: rgba(251, 191, 36, 0.25);
+    }
+    .uploaded-doc-name {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      display: block;
+      margin-top: 2px;
+      max-width: 520px;
+      word-break: break-word;
+    }
+    .uploaded-doc-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 3px;
+    }
+    .uploaded-doc-pwd-section {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(151, 176, 210, 0.15);
+    }
+    .uploaded-pwd-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .uploaded-pwd-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .uploaded-pwd-label i {
+      color: var(--accent);
+      font-size: 11px;
+    }
+    .uploaded-pwd-input-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 220px;
+      max-width: 100%;
+    }
+    .uploaded-pwd-input-wrap .form-control {
+      height: 30px;
+      padding: 0 34px 0 10px;
+      font-size: 12.5px;
+      font-family: inherit;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      box-sizing: border-box;
+      width: 100%;
+    }
+    :root[data-theme='dark'] .uploaded-pwd-input-wrap .form-control {
+      background: rgba(9, 17, 29, 0.7);
+      border-color: rgba(151, 176, 210, 0.18);
+    }
+    .uploaded-pwd-input-wrap .toggle-password-btn {
+      width: 24px;
+      height: 24px;
+      right: 4px;
+      font-size: 11px;
+    }
+    .uploaded-doc-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .uploaded-doc-actions .btn {
+      height: 32px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── Customer Added & Next Steps Section ──────────────────── */
+    .customer-added-card-content {
+      padding: 18px 20px;
+      background: rgba(16, 185, 129, 0.04);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    :root[data-theme='dark'] .customer-added-card-content {
+      background: rgba(52, 211, 153, 0.05);
+      border-color: rgba(52, 211, 153, 0.22);
+    }
+    .customer-added-profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+    .added-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 11px;
+      background: rgba(16, 185, 129, 0.14);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    :root[data-theme='dark'] .added-avatar {
+      background: rgba(52, 211, 153, 0.16);
+      color: #34d399;
+      border-color: rgba(52, 211, 153, 0.3);
+    }
+    .added-details h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .added-meta-line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 3px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+    .added-right-stats {
+      text-align: right;
+    }
+    .added-date-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+    .added-date-val {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+    .customer-added-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .customer-added-actions .btn {
+      width: auto !important;
+      min-width: 220px;
+      height: 42px;
+      padding: 0 24px;
+      font-size: 13.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* ── Local File Preview Lightbox/Modal ────────────────────── */
+    .local-preview-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(3, 8, 18, 0.75);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .local-preview-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .local-preview-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: min(900px, 95vw);
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+    }
+    :root[data-theme='dark'] .local-preview-box {
+      border-color: rgba(151, 176, 210, 0.2);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
+    }
+    .local-preview-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .local-preview-header h4 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .local-preview-header .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .local-preview-header .close-btn:hover {
+      color: var(--text-primary);
+    }
+    .local-preview-body {
+      padding: 18px;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 240px;
+      background: rgba(0, 0, 0, 0.03);
+    }
+    :root[data-theme='dark'] .local-preview-body {
+      background: rgba(0, 0, 0, 0.25);
+    }
+    .local-preview-body img {
+      max-width: 100%;
+      max-height: 65vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    .local-preview-body iframe {
+      width: 100%;
+      height: 65vh;
+      border: none;
+      border-radius: 8px;
+    }
+    .preview-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .preview-header-actions .btn {
+      height: 30px;
+      padding: 0 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .preview-fallback-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text-secondary);
+    }
+    .preview-fallback-container i {
+      font-size: 42px;
+      color: var(--accent);
+      opacity: 0.8;
+    }
+    .preview-error-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 32px 20px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+    .preview-error-state i {
+      font-size: 36px;
+      color: #ef4444;
+    }
+    .preview-error-state h5 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .preview-error-state p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 440px;
+    }
+  </style>
 </head>
 <body>
-<div class="app-layout add-customer-page">
+<div class="app-layout add-customer-page employee-page">
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">
@@ -33,29 +1348,29 @@
           <svg viewBox="0 0 24 24"><path d="M4 10h16"/><path d="M6 10V7l6-3 6 3v3"/><path d="M5 20h14"/><path d="M7 20v-7"/><path d="M12 20v-7"/><path d="M17 20v-7"/></svg>
         </div>
         <div>
-          <h2>CLN System</h2>
-          <span>Employee Portal</span>
+          <h2>CLN Lending Suite</h2>
+          <span>Employee Workspace</span>
         </div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-                        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span> Dashboard</a>
-        <a href="/employee/add-customer.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-user-plus"></i></span> Add Customer</a>
-        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users"></i></span> My Customers</a>
-        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase"></i></span> My Loans</a>
-        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> My Assigned Records</a>
-        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line"></i></span> APR</a>
-</div>
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+        <a href="/employee/add-customer.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Add Customer</span></a>
+        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>My Customers</span></a>
+        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>My Loans</span></a>
+        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>My Assigned Records</span></a>
+        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="sidebar-user-avatar">E</div>
         <div class="user-details"><p id="sidebar-user-name">Employee</p><span id="sidebar-user-role">employee</span></div>
       </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
     </div>
   </aside>
 
@@ -63,187 +1378,341 @@
 
   <main class="main-content">
     <div class="topbar">
-      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i> <span>Menu</span>
+      </button>
       <div class="topbar-title">
-        <h2><span class="title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span>Add Customer</h2>
-        <p>Register customer details, then upload the required documents.</p>
+        <h2><i class="fas fa-user-plus" aria-hidden="true"></i> <span>Add Customer</span></h2>
+        <p>Create a new customer record and capture their essential information.</p>
+      </div>
+      <div class="topbar-actions">
+        <!-- Notification Bell -->
+        <div class="notif-bell-wrap" id="notif-bell-wrap">
+          <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifDropdown()" aria-label="Notifications" title="Notifications" tabindex="0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+              <path d="M10 21h4"/>
+            </svg>
+            <span id="notif-bell-badge" class="notif-badge" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown" id="notif-dropdown" role="region" aria-label="Notifications Panel">
+            <div class="notif-dd-header">
+              <div class="notif-dd-title-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+                <h4>Notifications</h4>
+              </div>
+              <button class="notif-dd-link" onclick="markAllRead()">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
+          </div>
+        </div>
+        <div class="topbar-date-badge">
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+          <span id="current-date">Today</span>
+        </div>
       </div>
     </div>
 
     <div class="page-content add-customer-content">
+
       <div id="page-alert" class="alert add-customer-alert"></div>
 
-      <div class="add-customer-grid">
-        <div class="customer-column customer-left-column">
-        <section class="card customer-form-card">
-          <div class="card-header crm-card-header">
-            <div class="card-title-group">
-              <span class="section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5h6v3H9z"/><path d="M8 12h8"/><path d="M8 16h6"/></svg></span>
-              <div>
-                <h3>Customer Details</h3>
-                <p>Capture verified identity, contact, location, and income information.</p>
+      <div class="add-customer-container">
+        <!-- ── Workflow Progress Stepper ── -->
+        <div class="onboarding-stepper" aria-label="Customer Onboarding Progress">
+          <div class="stepper-item is-active" id="step-1">
+            <div class="stepper-badge" id="badge-step-1"><i class="fas fa-user-edit"></i></div>
+            <div class="stepper-info">
+              <span class="stepper-step">Step 01</span>
+              <span class="stepper-title">Customer Details</span>
+            </div>
+          </div>
+          <div class="stepper-connector" id="conn-1"></div>
+          <div class="stepper-item" id="step-2">
+            <div class="stepper-badge" id="badge-step-2"><i class="fas fa-file-upload"></i></div>
+            <div class="stepper-info">
+              <span class="stepper-step">Step 02</span>
+              <span class="stepper-title">Upload Documents</span>
+            </div>
+          </div>
+          <div class="stepper-connector" id="conn-2"></div>
+          <div class="stepper-item" id="step-3">
+            <div class="stepper-badge" id="badge-step-3"><i class="fas fa-check-circle"></i></div>
+            <div class="stepper-info">
+              <span class="stepper-step">Step 03</span>
+              <span class="stepper-title">Customer Added</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Quick Paste Details Section ── -->
+        <section class="customer-workflow-card" id="quick-paste-section">
+          <div class="workflow-card-header">
+            <div class="workflow-card-header-left">
+              <div class="workflow-card-icon"><i class="fas fa-paste"></i></div>
+              <div class="workflow-card-title">
+                <h3>Quick Paste Details</h3>
+                <p>Paste a filled customer sheet to prefill matching fields automatically.</p>
               </div>
             </div>
           </div>
-          <div class="card-body">
-            <form class="customer-details-form" onsubmit="event.preventDefault(); addCustomer();">
-              <div class="field-grid">
+          <div class="workflow-card-body">
+            <div class="form-group" style="margin-bottom:0;">
+              <label for="cust-quick-paste" class="form-field-label">Customer Sheet</label>
+              <textarea id="cust-quick-paste" class="form-control" rows="4" placeholder="Paste customer details sheet here..."></textarea>
+            </div>
+            <div class="quick-paste-actions">
+              <button type="button" class="btn btn-secondary" onclick="fillFromQuickPaste()">
+                <i class="fas fa-wand-magic-sparkles"></i> <span>Fill Fields from Paste</span>
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="insertPasteSample()">
+                <i class="fas fa-file-alt"></i> <span>Insert Sample Template</span>
+              </button>
+            </div>
+            <p class="paste-helper-text"><i class="fas fa-info-circle"></i> Full name, phone, email, city, address, and net income are detected automatically when available.</p>
+          </div>
+        </section>
+
+        <!-- ── Customer Details Section ── -->
+        <section class="customer-workflow-card" id="customer-details-card">
+          <div class="workflow-card-header">
+            <div class="workflow-card-header-left">
+              <div class="workflow-card-icon" id="cust-header-icon"><i class="fas fa-id-card"></i></div>
+              <div class="workflow-card-title">
+                <h3 id="cust-card-title">Customer Details</h3>
+                <p id="cust-card-subtitle">Capture verified identity, contact, location, and income information.</p>
+              </div>
+            </div>
+            <div id="cust-header-actions" style="display:none;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-edit-customer" onclick="enableCustomerEdit()">
+                <i class="fas fa-pen"></i> <span>Edit Customer Details</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="workflow-card-body">
+            <!-- Form View (Initial & Editable) -->
+            <form id="cust-form-wrapper" onsubmit="event.preventDefault(); submitCustomerForm();">
+              <div class="customer-form-grid">
                 <div class="form-group">
-                  <label for="cust-name">Full Name <span>*</span></label>
+                  <label for="cust-name" class="form-field-label">Full Name <span class="req">*</span></label>
                   <input type="text" id="cust-name" class="form-control" placeholder="Rahul Sharma" autocomplete="name" required />
                 </div>
                 <div class="form-group">
-                  <label for="cust-phone">Phone Number <span>*</span></label>
+                  <label for="cust-phone" class="form-field-label">Phone Number <span class="req">*</span></label>
                   <input type="tel" id="cust-phone" class="form-control" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" autocomplete="tel" required />
                 </div>
                 <div class="form-group">
-                  <label for="cust-email">Email <span>*</span></label>
+                  <label for="cust-email" class="form-field-label">Email <span class="req">*</span></label>
                   <input type="email" id="cust-email" class="form-control" placeholder="rahul.sharma@example.com" autocomplete="email" required />
                 </div>
                 <div class="form-group">
-                  <label for="cust-area">City <span>*</span></label>
+                  <label for="cust-area" class="form-field-label">City <span class="req">*</span></label>
                   <input type="text" id="cust-area" class="form-control" placeholder="Bengaluru" list="area-list" autocomplete="address-level2" required />
                   <datalist id="area-list"></datalist>
                 </div>
                 <div class="form-group">
-                  <label for="cust-net-salary">Monthly Net Salary <span>*</span></label>
+                  <label for="cust-net-salary" class="form-field-label">Monthly Net Salary <span class="req">*</span></label>
                   <div class="input-with-affix">
                     <span class="input-affix">₹</span>
                     <input type="text" id="cust-net-salary" class="form-control" placeholder="Monthly net salary" inputmode="numeric" required />
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="cust-total-obligation">Total Monthly Obligations</label>
+                  <label for="cust-total-obligation" class="form-field-label">Total Monthly Obligations</label>
                   <div class="input-with-affix">
                     <span class="input-affix">₹</span>
-                    <input type="text" id="cust-total-obligation" class="form-control" placeholder="Monthly obligations" inputmode="numeric" />
+                    <input type="text" id="cust-total-obligation" class="form-control" placeholder="Monthly obligations (optional)" inputmode="numeric" />
                   </div>
                 </div>
-                <div class="form-group form-span-2">
-                  <label for="cust-address">Full Address <span>*</span></label>
-                  <textarea id="cust-address" class="form-control" rows="4" placeholder="House/Flat No., Street, City, PIN Code" autocomplete="street-address" required></textarea>
+                <div class="form-group form-group-full">
+                  <label for="cust-address" class="form-field-label">Full Address <span class="req">*</span></label>
+                  <textarea id="cust-address" class="form-control" rows="3" placeholder="House/Flat No., Street, City, PIN Code" autocomplete="street-address" required></textarea>
                 </div>
               </div>
 
               <div class="form-submit-row">
-                <button class="btn btn-primary add-customer-submit" type="submit" id="add-cust-btn">
-                  <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span>
-                  Add Customer
+                <button type="button" class="btn btn-secondary" id="cancel-edit-btn" onclick="cancelCustomerEdit()" style="display:none;">
+                  <i class="fas fa-times"></i> <span>Cancel</span>
+                </button>
+                <button type="submit" class="btn btn-primary" id="add-cust-btn">
+                  <i class="fas fa-user-plus"></i> <span id="add-cust-btn-text">Add Customer</span>
                 </button>
               </div>
             </form>
-          </div>
-        </section>
 
-        <section id="customer-added-section" class="card customer-added-card" style="display:none;">
-          <div class="card-header crm-card-header compact">
-            <div class="card-title-group">
-              <span class="section-icon success" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.8 2.8L16 9.5"/></svg></span>
-              <div>
-                <h3>Customer Added</h3>
-                <p>Continue with the loan application.</p>
+            <!-- Saved Customer Summary View (Persistent after Add Customer) -->
+            <div id="cust-summary-wrapper" style="display:none;">
+              <div class="saved-customer-hero">
+                <div class="saved-hero-left">
+                  <div class="customer-avatar-large" id="summary-avatar">CU</div>
+                  <div class="saved-hero-name">
+                    <h4 id="summary-name">—</h4>
+                    <div class="saved-hero-badges">
+                      <span class="saved-id-pill" id="summary-id-badge">ID: —</span>
+                      <span class="saved-status-pill"><i class="fas fa-check-circle"></i> Saved in System</span>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="enableCustomerEdit()" title="Edit customer details">
+                  <i class="fas fa-pen"></i> <span>Edit Details</span>
+                </button>
               </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div id="new-customer-info" class="added-summary">
-              <div><span>Customer name</span><strong id="added-customer-name">-</strong></div>
-              <div><span>Phone</span><strong id="added-customer-phone">-</strong></div>
-              <div><span>City</span><strong id="added-customer-area">-</strong></div>
-              <div><span>Date</span><strong id="added-customer-date">-</strong></div>
-            </div>
-            <a href="/employee/loans.html" class="btn btn-primary btn-fit create-loan-button" id="create-loan-link">
-              <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 7V6a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 12h18"/><path d="M9 12v2h6v-2"/></svg></span>
-              Create Loan Application
-            </a>
-          </div>
-        </section>
-        </div>
 
-        <div class="customer-column customer-right-column">
-        <section class="card quick-paste-card">
-          <div class="card-header crm-card-header compact">
-            <div class="card-title-group">
-              <span class="section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/><rect x="5" y="3" width="14" height="18" rx="2"/></svg></span>
-              <div>
-                <h3>Quick Paste Details</h3>
-                <p>Paste a filled customer sheet to prefill matching fields.</p>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="form-group">
-              <label for="cust-quick-paste">Customer Sheet</label>
-              <textarea id="cust-quick-paste" class="form-control" rows="6" placeholder="Paste customer details here"></textarea>
-            </div>
-            <div class="quick-paste-actions">
-              <button type="button" class="btn btn-secondary btn-sm" onclick="fillFromQuickPaste()">
-                <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 12h8"/><path d="M12 8v8"/><rect x="4" y="4" width="16" height="16" rx="2"/></svg></span>
-                Fill Fields from Paste
-              </button>
-              <button type="button" class="btn btn-secondary btn-sm" onclick="insertPasteSample()">
-                <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6"/><path d="M9 17h4"/></svg></span>
-                Insert Sample Template
-              </button>
-            </div>
-            <p class="helper-text">Name, phone, email, city, address, and net income are detected automatically when available.</p>
-          </div>
-        </section>
-
-        <section id="upload-section" class="card upload-documents-card" style="display:none;">
-          <div class="card-header crm-card-header compact">
-            <div class="card-title-group">
-              <span class="section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 20h16"/></svg></span>
-              <div>
-                <h3>Upload Documents</h3>
-                <p>Attach KYC and income proof files for this customer.</p>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="upload-form-grid">
-              <div class="form-group">
-                <label for="doc-type">Document Type</label>
-                <select id="doc-type" class="form-control" onchange="handleDocTypeChange()">
-                  <option value="Aadhaar Card">Aadhaar Card</option>
-                  <option value="PAN Card">PAN Card</option>
-                  <option value="Passport Size Photograph">Passport Size Photograph</option>
-                  <option value="3 Months Bank Statement">3 Months Bank Statement</option>
-                  <option value="6 Months Bank Statement">6 Months Bank Statement</option>
-                  <option value="3 Months Salary Slips">3 Months Salary Slips</option>
-                  <option value="6 Months Salary Slips">6 Months Salary Slips</option>
-                  <option value="Form 16">Form 16</option>
-                  <option value="Cancelled Cheque">Cancelled Cheque</option>
-                  <option value="Existing Loan Statement">Existing Loan Statement</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div class="form-group" id="other-doc-type-group" style="display:none;">
-                <label for="other-doc-type">Specify Document Type <span>*</span></label>
-                <input type="text" id="other-doc-type" class="form-control" placeholder="Driving License" />
-              </div>
-              <div class="form-group">
-                <label for="doc-file">File Upload</label>
-                <input type="file" id="doc-file" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp" multiple />
-                <p class="helper-text">PDF, JPG, PNG, or WebP. Max 5MB per file.</p>
-              </div>
-              <div class="form-group">
-                <label for="doc-password">Document Password</label>
-                <div class="password-input-wrapper">
-                  <input type="password" id="doc-password" class="form-control" placeholder="Enter document password" autocomplete="off" />
-                  <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" aria-label="Show Password" title="Show Password">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg>
-                  </button>
+              <div class="saved-summary-grid">
+                <div class="summary-field-box">
+                  <div class="summary-field-label"><i class="fas fa-phone-alt"></i> Phone Number</div>
+                  <div class="summary-field-val" id="summary-phone">—</div>
+                </div>
+                <div class="summary-field-box">
+                  <div class="summary-field-label"><i class="fas fa-envelope"></i> Email</div>
+                  <div class="summary-field-val" id="summary-email">—</div>
+                </div>
+                <div class="summary-field-box">
+                  <div class="summary-field-label"><i class="fas fa-map-marker-alt"></i> City</div>
+                  <div class="summary-field-val" id="summary-area">—</div>
+                </div>
+                <div class="summary-field-box">
+                  <div class="summary-field-label"><i class="fas fa-rupee-sign"></i> Monthly Net Salary</div>
+                  <div class="summary-field-val" id="summary-salary">—</div>
+                </div>
+                <div class="summary-field-box">
+                  <div class="summary-field-label"><i class="fas fa-file-invoice-dollar"></i> Monthly Obligations</div>
+                  <div class="summary-field-val" id="summary-obligations">—</div>
+                </div>
+                <div class="summary-field-box">
+                  <div class="summary-field-label"><i class="fas fa-calendar-alt"></i> Registered Date</div>
+                  <div class="summary-field-val" id="summary-date">—</div>
+                </div>
+                <div class="summary-field-box full-span">
+                  <div class="summary-field-label"><i class="fas fa-home"></i> Full Address</div>
+                  <div class="summary-field-val" id="summary-address" style="white-space:pre-line;">—</div>
                 </div>
               </div>
             </div>
-            <button class="btn btn-secondary upload-document-button" onclick="uploadDocument()" id="upload-btn">
-              <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 20h16"/></svg></span>
-              Upload Document
-            </button>
-            <div id="uploaded-docs" class="uploaded-docs-list"></div>
           </div>
         </section>
+
+        <!-- ── Upload Documents Section ── -->
+        <section class="customer-workflow-card" id="upload-section" style="display:none;">
+          <div class="workflow-card-header">
+            <div class="workflow-card-header-left">
+              <div class="workflow-card-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+              <div class="workflow-card-title">
+                <h3>Upload Documents</h3>
+                <p>Attach KYC and income proof files for <span class="upload-customer-badge" id="upload-customer-badge"><i class="fas fa-user"></i> <strong id="upload-target-name">—</strong></span></p>
+              </div>
+            </div>
+          </div>
+          <div class="workflow-card-body">
+            <!-- File Chooser (Multi-file enabled) -->
+            <div class="upload-file-chooser-box">
+              <div class="form-group" style="margin-bottom:0;">
+                <label for="doc-files" class="form-field-label">File Upload <span class="req">*</span></label>
+                <input type="file" id="doc-files" class="custom-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" multiple onchange="handleFilesSelection(event)" />
+                <p class="paste-helper-text"><i class="fas fa-info-circle"></i> Select one or multiple documents (Ctrl/Shift supported). Allowed: PDF, JPG, PNG, WebP · Max 5MB per file.</p>
+              </div>
+            </div>
+
+            <!-- Staged Files Queue (Immediately appears upon selecting one or more files) -->
+            <div class="selected-files-queue" id="selected-files-queue" style="display:none;">
+              <div class="staged-queue-header">
+                <h4><i class="fas fa-layer-group"></i> Selected Documents (<span id="staged-count-num">0</span>)</h4>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="clearStagedQueue()" title="Clear all staged files">
+                  <i class="fas fa-trash-alt"></i> <span>Clear Queue</span>
+                </button>
+              </div>
+
+              <!-- List of individual staged file cards -->
+              <div class="staged-cards-list" id="staged-cards-list"></div>
+
+              <!-- Batch Action Bar -->
+              <div class="staged-batch-actions" id="staged-batch-actions">
+                <div class="staged-batch-summary">
+                  <span id="staged-valid-summary">Ready to upload: <strong>0 documents</strong></span>
+                </div>
+                <button type="button" class="btn btn-primary" id="btn-upload-all" onclick="uploadAllStagedDocuments()">
+                  <i class="fas fa-cloud-upload-alt"></i> <span id="btn-upload-all-text">Upload Documents</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Uploaded Documents List (Real Backend Data) -->
+            <div class="uploaded-docs-section">
+              <div class="uploaded-docs-header">
+                <div class="uploaded-docs-header-left">
+                  <h4><i class="fas fa-folder-open"></i> Uploaded Documents</h4>
+                  <span class="count-pill" id="uploaded-count-pill">0</span>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="refreshCustomerDocuments()" title="Refresh document list">
+                  <i class="fas fa-rotate"></i> <span>Refresh</span>
+                </button>
+              </div>
+              <div id="uploaded-docs" class="uploaded-docs-list">
+                <div class="docs-empty-state">
+                  <i class="fas fa-folder-open"></i>
+                  <p>No documents uploaded yet for this customer.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Customer Added & Next Steps Section ── -->
+        <section class="customer-workflow-card" id="customer-added-section" style="display:none;">
+          <div class="workflow-card-header">
+            <div class="workflow-card-header-left">
+              <div class="workflow-card-icon success-icon"><i class="fas fa-check-circle"></i></div>
+              <div class="workflow-card-title">
+                <h3>Customer Added</h3>
+                <p>Customer successfully registered. Continue with the loan origination workflow.</p>
+              </div>
+            </div>
+          </div>
+          <div class="workflow-card-body">
+            <div class="customer-added-card-content">
+              <div class="customer-added-profile">
+                <div class="added-avatar" id="added-avatar">CU</div>
+                <div class="added-details">
+                  <h4 id="added-customer-name">—</h4>
+                  <div class="added-meta-line">
+                    <span id="added-customer-phone"><i class="fas fa-phone-alt"></i> —</span>
+                    <span>·</span>
+                    <span id="added-customer-area"><i class="fas fa-map-marker-alt"></i> —</span>
+                  </div>
+                </div>
+              </div>
+              <div class="added-right-stats">
+                <span class="saved-id-pill" id="added-customer-id">Customer ID #—</span>
+                <div class="added-date-val" id="added-customer-date">—</div>
+              </div>
+            </div>
+
+            <div class="customer-added-actions">
+              <button type="button" class="btn btn-primary" onclick="goToCreateLoan()" id="btn-create-loan" title="Originate a new loan application for this customer">
+                <i class="fas fa-briefcase"></i> <span>Create Loan Application</span>
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="startNewCustomer()" title="Start onboarding another customer">
+                <i class="fas fa-user-plus"></i> <span>Add Another Customer</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ── Document Preview Modal (Universal for staged & uploaded files) ── -->
+      <div class="local-preview-overlay" id="document-preview-modal" onclick="handlePreviewOverlayClick(event)">
+        <div class="local-preview-box">
+          <div class="local-preview-header">
+            <h4 id="preview-modal-title"><i class="fas fa-file"></i> Document Preview</h4>
+            <div class="preview-header-actions">
+              <a href="#" id="preview-open-tab-btn" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="display:none;" title="Open document in new browser tab">
+                <i class="fas fa-external-link-alt"></i> <span>Open in New Tab</span>
+              </a>
+              <button type="button" class="close-btn" onclick="closeDocumentPreview()" title="Close preview">&times;</button>
+            </div>
+          </div>
+          <div class="local-preview-body" id="preview-modal-body"></div>
         </div>
       </div>
     </div>
@@ -252,10 +1721,10 @@
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20260705d"></script>
+<script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
-  let newCustomerId = null;
-  const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
-  const ALLOWED_DOCUMENT_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png', 'webp'];
+  let currentCustomer = null;
+  let isEditMode = false;
   const user = requireRole('employee');
 
   if (user) {
@@ -267,23 +1736,6 @@
   const totalObligationInput = document.getElementById('cust-total-obligation');
   const phoneInput = document.getElementById('cust-phone');
 
-  function iconMarkup(name) {
-    return typeof window.clnIcon === 'function' ? window.clnIcon(name) : '';
-  }
-
-  function refreshDynamicIcons() {
-    if (window.lucide) {
-      try { window.lucide.createIcons(); } catch (err) {}
-    }
-  }
-
-  function setButtonState(button, isBusy, label, iconName) {
-    if (!button) return;
-    button.disabled = isBusy;
-    button.innerHTML = `${iconMarkup(iconName)}<span>${isBusy ? `${label}...` : label}</span>`;
-    refreshDynamicIcons();
-  }
-
   function formatInputValue(input) {
     const rawVal = input.value.replace(/[^0-9]/g, '');
     if (!rawVal) {
@@ -293,8 +1745,39 @@
     input.value = Number(rawVal).toLocaleString('en-IN');
   }
 
+  function getCustomerInitials(name) {
+    if (!name) return 'CU';
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  function formatFileSize(bytes) {
+    if (!bytes || bytes <= 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  function getFileIconMarkup(filename) {
+    const ext = (filename || '').split('.').pop().toLowerCase();
+    if (ext === 'pdf') return '<i class="fas fa-file-pdf"></i>';
+    if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) return '<i class="fas fa-file-image"></i>';
+    return '<i class="fas fa-file-alt"></i>';
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function clearFieldErrors() {
-    document.querySelectorAll('.add-customer-page .form-control.is-invalid').forEach((el) => {
+    document.querySelectorAll('.add-customer-container .form-control.is-invalid').forEach((el) => {
       el.classList.remove('is-invalid');
       el.removeAttribute('aria-invalid');
     });
@@ -310,12 +1793,8 @@
     showAlert('page-alert', message, 'error');
   }
 
-  document.querySelectorAll('.add-customer-page .form-control').forEach((field) => {
+  document.querySelectorAll('.add-customer-container .form-control').forEach((field) => {
     field.addEventListener('input', () => {
-      field.classList.remove('is-invalid');
-      field.removeAttribute('aria-invalid');
-    });
-    field.addEventListener('change', () => {
       field.classList.remove('is-invalid');
       field.removeAttribute('aria-invalid');
     });
@@ -327,13 +1806,14 @@
     });
   }
 
-  netSalaryInput.addEventListener('input', () => formatInputValue(netSalaryInput));
-  totalObligationInput.addEventListener('input', () => formatInputValue(totalObligationInput));
+  if (netSalaryInput) netSalaryInput.addEventListener('input', () => formatInputValue(netSalaryInput));
+  if (totalObligationInput) totalObligationInput.addEventListener('input', () => formatInputValue(totalObligationInput));
 
   async function loadAreas() {
     const res = await api.get('/employee/areas');
     if (!res?.ok) return;
     const dl = document.getElementById('area-list');
+    if (!dl) return;
     dl.innerHTML = '';
     (res.data.data || []).forEach((area) => {
       const option = document.createElement('option');
@@ -367,31 +1847,42 @@
 
 Personal Details
 
-Full Name -
-Required Loan Amount -
-Loan Tenure -
-Mobile Number -
-Marital Status -
-Mother's Name -
-Spouse's Name (if applicable) -
-Aadhaar Number -
-PAN Number -
-Current Residential Address -
-City -
-Years at Current Address -
-Personal Gmail ID -
-House Type - Owned / Rented -
-Highest Education Qualification -
+Full Name - Rahul Sharma
+Required Loan Amount - 500000
+Loan Tenure - 3 Years
+Mobile Number - 9876543210
+Marital Status - Married
+Mother's Name - Sunita Sharma
+Aadhaar Number - 123456789012
+PAN Number - ABCDE1234F
+Current Residential Address - 123 MG Road, Indiranagar
+City - Bengaluru
+Years at Current Address - 4
+Personal Gmail ID - rahul.sharma@example.com
+House Type - Owned / Rented - Owned
+Highest Education Qualification - Graduate
 
 Employment Details
 
-Company Name -
-Company Address -
-Official Email ID -
-Current Work Experience -
-Total Work Experience -
-Net Monthly Income (Rs) -`;
+Company Name - Infosys
+Official Email ID - rahul@infosys.com
+Total Work Experience - 6 Years
+Net Monthly Income (Rs) - 65000`;
     document.getElementById('cust-quick-paste').value = sample;
+  }
+
+  function parseQuickPasteDetails(text) {
+    const raw = String(text || '').trim();
+    return {
+      fullName: extractValueByLabel(raw, ['Full Name', 'Name']),
+      requiredLoanAmount: extractValueByLabel(raw, ['Required Loan Amount', 'Loan Amount', 'Amount']),
+      loanTenure: extractValueByLabel(raw, ['Loan Tenure', 'Tenure']),
+      mobileNumber: sanitizePhone(extractValueByLabel(raw, ['Mobile Number', 'Phone Number', 'Mob no', 'Mobile'])),
+      currentResidentialAddress: extractValueByLabel(raw, ['Current Residential Address', 'Current address', 'Full Address', 'Address']),
+      area: extractValueByLabel(raw, ['City', 'Area', 'Location', 'Locality']),
+      personalGmailId: extractValueByLabel(raw, ['Personal Gmail ID', 'Personal gmail', 'Personal Email', 'Gmail ID', 'Gmail', 'Email']),
+      netMonthlyIncome: extractValueByLabel(raw, ['Net Monthly Income (Rs)', 'Net Monthly Income', 'Net monthly income', 'Net Salary'])
+    };
   }
 
   function applyParsedQuickPaste(parsed) {
@@ -409,64 +1900,124 @@ Net Monthly Income (Rs) -`;
   function fillFromQuickPaste() {
     clearFieldErrors();
     const raw = document.getElementById('cust-quick-paste').value.trim();
-    if (!raw) return showValidationError('Paste customer details first.', 'cust-quick-paste');
+    if (!raw) return showValidationError('Please paste customer details into the sheet area first.', 'cust-quick-paste');
 
     const parsed = parseQuickPasteDetails(raw);
     applyParsedQuickPaste(parsed);
-    sessionStorage.setItem('cln_quick_paste_details', JSON.stringify(parsed));
-    showAlert('page-alert', 'Fields filled from pasted details. Please verify before submitting.', 'success');
+    showAlert('page-alert', 'Customer fields prefilled from pasted sheet. Please verify and submit.', 'success');
   }
 
-  function autoFillFromQuickPaste() {
-    const raw = document.getElementById('cust-quick-paste').value.trim();
-    if (!raw) return;
+  // ── Stepper Progression Updater ───────────────────────────
+  function updateStepper(step) {
+    const s1 = document.getElementById('step-1');
+    const s2 = document.getElementById('step-2');
+    const s3 = document.getElementById('step-3');
+    const b1 = document.getElementById('badge-step-1');
+    const b2 = document.getElementById('badge-step-2');
+    const b3 = document.getElementById('badge-step-3');
+    const c1 = document.getElementById('conn-1');
+    const c2 = document.getElementById('conn-2');
 
-    const parsed = parseQuickPasteDetails(raw);
-    applyParsedQuickPaste(parsed);
-    sessionStorage.setItem('cln_quick_paste_details', JSON.stringify(parsed));
+    if (step === 1) {
+      s1.className = 'stepper-item is-active';
+      s2.className = 'stepper-item';
+      s3.className = 'stepper-item';
+      b1.innerHTML = '<i class="fas fa-user-edit"></i>';
+      b2.innerHTML = '<i class="fas fa-file-upload"></i>';
+      b3.innerHTML = '<i class="fas fa-check-circle"></i>';
+      if (c1) c1.classList.remove('is-active');
+      if (c2) c2.classList.remove('is-active');
+    } else if (step === 2) {
+      s1.className = 'stepper-item is-completed';
+      s2.className = 'stepper-item is-active';
+      s3.className = 'stepper-item';
+      b1.innerHTML = '<i class="fas fa-check"></i>';
+      b2.innerHTML = '<i class="fas fa-file-upload"></i>';
+      b3.innerHTML = '<i class="fas fa-check-circle"></i>';
+      if (c1) c1.classList.add('is-active');
+      if (c2) c2.classList.remove('is-active');
+    } else if (step >= 3) {
+      s1.className = 'stepper-item is-completed';
+      s2.className = 'stepper-item is-completed';
+      s3.className = 'stepper-item is-completed';
+      b1.innerHTML = '<i class="fas fa-check"></i>';
+      b2.innerHTML = '<i class="fas fa-check"></i>';
+      b3.innerHTML = '<i class="fas fa-check-circle"></i>';
+      if (c1) c1.classList.add('is-active');
+      if (c2) c2.classList.add('is-active');
+    }
   }
 
-  const quickPasteEl = document.getElementById('cust-quick-paste');
-  if (quickPasteEl) {
-    quickPasteEl.addEventListener('paste', () => setTimeout(autoFillFromQuickPaste, 0));
-    quickPasteEl.addEventListener('input', autoFillFromQuickPaste);
-  }
+  // ── Render Saved Customer Summary ─────────────────────────
+  function renderCustomerSummary(customer) {
+    if (!customer) return;
+    const name = customer.name || 'Customer';
+    const phone = customer.phone || '—';
+    const email = customer.email || '—';
+    const area = customer.area || '—';
+    const salary = customer.net_salary !== undefined ? formatCurrency(customer.net_salary) : '—';
+    const obligation = customer.total_obligation ? formatCurrency(customer.total_obligation) : '—';
+    const address = customer.address || '—';
+    const id = customer.id || '—';
+    const createdAt = customer.created_at || new Date().toISOString();
+    const initials = getCustomerInitials(name);
 
-  function parseQuickPasteDetails(text) {
-    const raw = String(text || '').trim();
-    return {
-      fullName: extractValueByLabel(raw, ['Full Name', 'Name']),
-      requiredLoanAmount: extractValueByLabel(raw, ['Required Loan Amount', 'Loan Amount', 'Amount']),
-      loanTenure: extractValueByLabel(raw, ['Loan Tenure', 'Tenure']),
-      mobileNumber: sanitizePhone(extractValueByLabel(raw, ['Mobile Number', 'Phone Number', 'Mob no', 'Mobile'])),
-      maritalStatus: extractValueByLabel(raw, ['Marital Status']),
-      motherName: extractValueByLabel(raw, ["Mother's Name", 'Mother name']),
-      spouseName: extractValueByLabel(raw, ["Spouse's Name (if applicable)", "Spouse's Name", 'Spouse name']),
-      aadhaarNumber: extractValueByLabel(raw, ['Aadhaar Number', 'Aadhar Number', 'Aadhar card', 'Aadhaar Card', 'Aadhar Card', 'Aadhar']),
-      panNumber: extractValueByLabel(raw, ['PAN Number', 'PAN card', 'Pan card']),
-      currentResidentialAddress: extractValueByLabel(raw, ['Current Residential Address', 'Current address', 'Full Address', 'Address']),
-      area: extractValueByLabel(raw, ['City', 'Area', 'Location', 'Locality']),
-      yearsAtCurrentAddress: extractValueByLabel(raw, ['Years at Current Address', 'Address years']),
-      personalGmailId: extractValueByLabel(raw, ['Personal Gmail ID', 'Personal gmail', 'Personal Email', 'Gmail ID', 'Gmail', 'Email']),
-      houseType: extractValueByLabel(raw, ['House Type', 'House - Owned/Rented', 'House']),
-      highestEducationQualification: extractValueByLabel(raw, ['Highest Education Qualification', 'Education']),
-      companyName: extractValueByLabel(raw, ['Company Name']),
-      companyAddress: extractValueByLabel(raw, ['Company Address']),
-      officialEmailId: extractValueByLabel(raw, ['Official Email ID', 'Office email id', 'Office email']),
-      currentWorkExperience: extractValueByLabel(raw, ['Current Work Experience', 'Experience']),
-      totalWorkExperience: extractValueByLabel(raw, ['Total Work Experience', 'Total experience']),
-      netMonthlyIncome: extractValueByLabel(raw, ['Net Monthly Income (Rs)', 'Net Monthly Income', 'Net monthly income', 'Net Salary'])
-    };
-  }
+    document.getElementById('summary-avatar').textContent = initials;
+    document.getElementById('summary-name').textContent = name;
+    document.getElementById('summary-id-badge').textContent = `Customer ID: #${id}`;
+    document.getElementById('summary-phone').innerHTML = phone !== '—' ? `<a href="tel:${escapeHtml(phone)}"><i class="fas fa-phone-alt" style="font-size:11px;margin-right:4px;"></i> ${escapeHtml(phone)}</a>` : '—';
+    document.getElementById('summary-email').innerHTML = email !== '—' ? `<a href="mailto:${escapeHtml(email)}"><i class="fas fa-envelope" style="font-size:11px;margin-right:4px;"></i> ${escapeHtml(email)}</a>` : '—';
+    document.getElementById('summary-area').textContent = area;
+    document.getElementById('summary-salary').textContent = salary;
+    document.getElementById('summary-obligations').textContent = obligation;
+    document.getElementById('summary-date').textContent = `${formatDate(createdAt)} ${formatTime(createdAt)}`;
+    document.getElementById('summary-address').textContent = address;
 
-  function setAddedCustomerSummary(name, phone, area, createdAt) {
+    // Populate Upload Target and Customer Added sections
+    document.getElementById('upload-target-name').textContent = `${name} · ${phone}`;
+    document.getElementById('added-avatar').textContent = initials;
     document.getElementById('added-customer-name').textContent = name;
-    document.getElementById('added-customer-phone').textContent = phone;
-    document.getElementById('added-customer-area').textContent = area;
-    document.getElementById('added-customer-date').textContent = `${formatDate(createdAt)} ${formatTime(createdAt)}`;
+    document.getElementById('added-customer-id').textContent = `Customer ID #${id}`;
+    document.getElementById('added-customer-phone').innerHTML = `<i class="fas fa-phone-alt"></i> ${escapeHtml(phone)}`;
+    document.getElementById('added-customer-area').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${escapeHtml(area)}`;
+    document.getElementById('added-customer-date').textContent = `Added: ${formatDate(createdAt)} · ${formatTime(createdAt)}`;
   }
 
-  async function addCustomer() {
+  // ── Enable & Cancel Editing ───────────────────────────────
+  function enableCustomerEdit() {
+    if (!currentCustomer) return;
+    isEditMode = true;
+
+    document.getElementById('cust-name').value = currentCustomer.name || '';
+    document.getElementById('cust-phone').value = currentCustomer.phone || '';
+    document.getElementById('cust-email').value = currentCustomer.email || '';
+    document.getElementById('cust-area').value = currentCustomer.area || '';
+    document.getElementById('cust-address').value = currentCustomer.address || '';
+    document.getElementById('cust-net-salary').value = currentCustomer.net_salary ? Number(currentCustomer.net_salary).toLocaleString('en-IN') : '';
+    document.getElementById('cust-total-obligation').value = currentCustomer.total_obligation ? Number(currentCustomer.total_obligation).toLocaleString('en-IN') : '';
+
+    document.getElementById('cust-summary-wrapper').style.display = 'none';
+    document.getElementById('cust-form-wrapper').style.display = 'block';
+    document.getElementById('cancel-edit-btn').style.display = 'inline-flex';
+    document.getElementById('add-cust-btn').className = 'btn btn-primary';
+    document.getElementById('add-cust-btn').innerHTML = '<i class="fas fa-save"></i> <span>Save Changes</span>';
+    document.getElementById('cust-card-title').textContent = 'Edit Customer Details';
+    document.getElementById('cust-card-subtitle').textContent = 'Update verified details for this registered customer.';
+    document.getElementById('cust-name').focus();
+  }
+
+  function cancelCustomerEdit() {
+    isEditMode = false;
+    document.getElementById('cust-form-wrapper').style.display = 'none';
+    document.getElementById('cust-summary-wrapper').style.display = 'block';
+    document.getElementById('cancel-edit-btn').style.display = 'none';
+    document.getElementById('add-cust-btn').innerHTML = '<i class="fas fa-user-plus"></i> <span id="add-cust-btn-text">Add Customer</span>';
+    document.getElementById('cust-card-title').textContent = 'Customer Details';
+    document.getElementById('cust-card-subtitle').textContent = 'Verified customer profile saved in CLN Lending Suite.';
+  }
+
+  // ── Add / Update Customer Submit Handler ──────────────────
+  async function submitCustomerForm() {
     clearFieldErrors();
 
     const name = document.getElementById('cust-name').value.trim();
@@ -474,7 +2025,7 @@ Net Monthly Income (Rs) -`;
     const email = document.getElementById('cust-email').value.trim();
     const area = document.getElementById('cust-area').value.trim();
     const address = document.getElementById('cust-address').value.trim();
-    const quickPaste = document.getElementById('cust-quick-paste').value.trim();
+    const quickPaste = document.getElementById('cust-quick-paste')?.value?.trim() || '';
     const netSalaryRaw = document.getElementById('cust-net-salary').value.replace(/[^0-9]/g, '');
     const totalObligationRaw = document.getElementById('cust-total-obligation').value.replace(/[^0-9]/g, '');
 
@@ -482,49 +2033,95 @@ Net Monthly Income (Rs) -`;
 
     if (!name) return showValidationError('Full Name is required.', 'cust-name');
     if (!phone) return showValidationError('Phone Number is required.', 'cust-phone');
-    if (!/^\d{10}$/.test(phone)) return showValidationError('Enter a valid 10-digit phone number.', 'cust-phone');
-    if (!email) return showValidationError('Email is required.', 'cust-email');
+    if (!/^\d{10}$/.test(phone)) return showValidationError('Enter a valid 10-digit mobile phone number.', 'cust-phone');
+    if (!email) return showValidationError('Email address is required.', 'cust-email');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showValidationError('Enter a valid email address.', 'cust-email');
     if (!area) return showValidationError('City is required.', 'cust-area');
-    if (!netSalaryRaw) return showValidationError('Net Salary is required.', 'cust-net-salary');
+    if (!netSalaryRaw) return showValidationError('Monthly Net Salary is required.', 'cust-net-salary');
     if (!address) return showValidationError('Full Address is required.', 'cust-address');
 
     const netSalary = parseFloat(netSalaryRaw);
     const totalObligation = totalObligationRaw ? parseFloat(totalObligationRaw) : 0;
 
     if (isNaN(netSalary) || netSalary <= 0) {
-      return showValidationError('Net Salary must be greater than 0.', 'cust-net-salary');
+      return showValidationError('Monthly Net Salary must be greater than 0.', 'cust-net-salary');
     }
     if (isNaN(totalObligation) || totalObligation < 0) {
-      return showValidationError('Total Obligation must be a non-negative number.', 'cust-total-obligation');
+      return showValidationError('Total Monthly Obligations must be 0 or greater.', 'cust-total-obligation');
     }
 
-    const finalAddress = quickPaste
+    const btn = document.getElementById('add-cust-btn');
+
+    // ── EDIT EXISTING CUSTOMER ──
+    if (isEditMode && currentCustomer && currentCustomer.id) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="margin-right:6px;"></span> <span>Saving Changes...</span>';
+
+      const res = await api.put(`/employee/customers/${currentCustomer.id}`, {
+        name, phone, email, area, address,
+        net_salary: netSalary,
+        total_obligation: totalObligation
+      });
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-save"></i> <span>Save Changes</span>';
+
+      if (!res?.ok) {
+        return showAlert('page-alert', res?.data?.message || 'Unable to update customer details.', 'error');
+      }
+
+      currentCustomer.name = name;
+      currentCustomer.phone = phone;
+      currentCustomer.email = email;
+      currentCustomer.area = area;
+      currentCustomer.address = address;
+      currentCustomer.net_salary = netSalary;
+      currentCustomer.total_obligation = totalObligation;
+
+      renderCustomerSummary(currentCustomer);
+      cancelCustomerEdit();
+      showAlert('page-alert', 'Customer details updated successfully.', 'success');
+      return;
+    }
+
+    // ── CREATE NEW CUSTOMER ──
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner" style="margin-right:6px;"></span> <span>Creating Customer...</span>';
+
+    const finalAddress = quickPaste && !address.includes(quickPaste)
       ? `${address}\n\n--- Additional Customer Details ---\n${quickPaste}`
       : address;
 
-    const btn = document.getElementById('add-cust-btn');
-    setButtonState(btn, true, 'Adding', 'plus');
-
     const res = await api.post('/employee/customers', {
-      name,
-      phone,
-      email,
-      area,
+      name, phone, email, area,
       address: finalAddress,
       net_salary: netSalary,
       total_obligation: totalObligation
     });
 
-    setButtonState(btn, false, 'Add Customer', 'plus');
-    if (!res?.ok) return showAlert('page-alert', res?.data?.message || 'Unable to add customer.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-user-plus"></i> <span id="add-cust-btn-text">Add Customer</span>';
 
-    newCustomerId = res.data.id || res.data.customer?.id;
+    if (!res?.ok) {
+      return showAlert('page-alert', res?.data?.message || 'Unable to create customer. Please check the entered fields.', 'error');
+    }
+
+    const createdId = res.data.id || res.data.customer?.id;
+    const createdAt = res.data.customer?.created_at || new Date().toISOString();
+
+    currentCustomer = {
+      id: createdId,
+      name, phone, email, area,
+      address: finalAddress,
+      net_salary: netSalary,
+      total_obligation: totalObligation,
+      created_at: createdAt
+    };
 
     if (quickPaste) {
       const parsedQuickPaste = parseQuickPasteDetails(quickPaste);
       sessionStorage.setItem('cln_auto_loan_data', JSON.stringify({
-        customer_id: newCustomerId,
+        customer_id: createdId,
         loan_amount: parsedQuickPaste.requiredLoanAmount ? parsedQuickPaste.requiredLoanAmount.replace(/\D/g, '') : '',
         loan_tenure: parsedQuickPaste.loanTenure || '',
         full_details: quickPaste,
@@ -532,194 +2129,644 @@ Net Monthly Income (Rs) -`;
       }));
     }
 
-    const createdAt = res.data.customer?.created_at || new Date().toISOString();
-    setAddedCustomerSummary(name, phone, area, createdAt);
-    document.getElementById('create-loan-link').href = `/employee/loans.html?customer_id=${newCustomerId}`;
-    document.getElementById('customer-added-section').style.display = 'block';
-    document.getElementById('upload-section').style.display = 'block';
-    showAlert('page-alert', `Customer "${name}" added successfully.`, 'success');
+    // 1. Transition to persistent Saved Customer Summary view
+    renderCustomerSummary(currentCustomer);
+    document.getElementById('cust-form-wrapper').style.display = 'none';
+    document.getElementById('cust-summary-wrapper').style.display = 'block';
+    document.getElementById('cust-card-title').textContent = 'Customer Details';
+    document.getElementById('cust-card-subtitle').textContent = 'Verified customer profile registered in CLN Lending Suite.';
 
-    ['cust-name','cust-phone','cust-email','cust-area','cust-address','cust-quick-paste','cust-net-salary','cust-total-obligation'].forEach((id) => {
-      document.getElementById(id).value = '';
-    });
+    // 2. Reveal Document Upload & Customer Added sections
+    document.getElementById('upload-section').style.display = 'flex';
+    document.getElementById('customer-added-section').style.display = 'flex';
 
-    if (typeof loadMyCustomers === 'function') loadMyCustomers();
+    // 3. Update Stepper to Step 2
+    updateStepper(2);
+
+    // 4. Fetch any existing documents for this customer
+    loadCustomerDocuments(createdId);
+
+    showAlert('page-alert', `Customer "${name}" registered successfully. You can now attach KYC documents or create a loan application.`, 'success');
+
+    // Smoothly scroll down to document upload section
+    document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  function handleDocTypeChange() {
-    const docType = document.getElementById('doc-type').value;
-    const otherGroup = document.getElementById('other-doc-type-group');
-    if (docType === 'Other') {
-      otherGroup.style.display = 'block';
-    } else {
-      otherGroup.style.display = 'none';
-      document.getElementById('other-doc-type').value = '';
-    }
+  // ── Multi-File Staging Queue & Session Password State ─────
+  let stagedDocuments = [];
+  const sessionDocPasswords = new Map();
+  const uploadedDocPasswordsState = new Map();
+  let currentPreviewObjectURL = null;
+
+  const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024; // 5 MB
+  const ALLOWED_DOCUMENT_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png', 'webp'];
+
+  function detectDefaultDocType(filename, index = 0) {
+    const lower = (filename || '').toLowerCase();
+    if (lower.includes('aadhaar') || lower.includes('adhar')) return 'Aadhaar Card';
+    if (lower.includes('pan')) return 'PAN Card';
+    if (lower.includes('bank')) return '3 Months Bank Statement';
+    if (lower.includes('salary') || lower.includes('slip')) return '3 Months Salary Slips';
+    if (lower.includes('form 16') || lower.includes('form16')) return 'Form 16';
+    if (lower.includes('cheque')) return 'Cancelled Cheque';
+    if (lower.includes('photo') || lower.includes('passport')) return 'Passport Size Photograph';
+    if (lower.includes('loan')) return 'Existing Loan Statement';
+
+    const sequence = [
+      'Aadhaar Card',
+      'PAN Card',
+      '3 Months Bank Statement',
+      '3 Months Salary Slips',
+      'Passport Size Photograph',
+      'Cancelled Cheque',
+      'Form 16'
+    ];
+    return sequence[index % sequence.length] || 'Other';
   }
 
-  function validateDocumentFiles(files) {
-    if (!files.length) {
-      showValidationError('Select at least one document file.', 'doc-file');
-      return false;
-    }
-
-    for (const file of files) {
-      const ext = (file.name.split('.').pop() || '').toLowerCase();
-      if (!ALLOWED_DOCUMENT_EXTENSIONS.includes(ext)) {
-        showValidationError('Only PDF, JPG, PNG, and WebP files are allowed.', 'doc-file');
-        return false;
-      }
-      if (file.size > MAX_DOCUMENT_BYTES) {
-        showValidationError(`"${file.name}" exceeds the 5MB limit.`, 'doc-file');
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  async function uploadDocument() {
+  function handleFilesSelection(event) {
     clearFieldErrors();
-    if (!newCustomerId) return showAlert('page-alert', 'Add a customer first.', 'error');
+    const files = event.target.files;
+    if (!files || !files.length) return;
 
-    const files = Array.from(document.getElementById('doc-file').files || []);
-    let docType = document.getElementById('doc-type').value;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      let error = null;
 
-    if (docType === 'Other') {
-      const otherVal = document.getElementById('other-doc-type').value.trim();
-      if (!otherVal) return showValidationError('Please specify the document type.', 'other-doc-type');
-      docType = otherVal;
-    }
-
-    if (!validateDocumentFiles(files)) return;
-
-    const documentPassword = document.getElementById('doc-password').value.trim();
-    const form = new FormData();
-    files.forEach((file) => form.append('documents', file));
-    form.append('doc_type', docType);
-    if (documentPassword) form.append('document_password', documentPassword);
-
-    const btn = document.getElementById('upload-btn');
-    setButtonState(btn, true, 'Uploading', 'upload');
-    const res = await api.upload(`/employee/documents/${newCustomerId}`, form);
-    setButtonState(btn, false, 'Upload Document', 'upload');
-
-    if (!res?.ok) return showAlert('page-alert', res?.data?.message || 'Upload failed.', 'error');
-    showAlert('page-alert', `${files.length} document${files.length > 1 ? 's' : ''} uploaded successfully.`, 'success');
-
-    document.getElementById('doc-file').value = '';
-    document.getElementById('doc-password').value = '';
-    document.getElementById('other-doc-type').value = '';
-    document.getElementById('other-doc-type-group').style.display = 'none';
-    document.getElementById('doc-type').value = 'Aadhaar Card';
-
-    const passwordInput = document.getElementById('doc-password');
-    const toggleBtn = document.querySelector('.toggle-password');
-    if (passwordInput && toggleBtn) {
-      passwordInput.type = 'password';
-      toggleBtn.classList.remove('visible');
-      toggleBtn.setAttribute('aria-label', 'Show Password');
-      toggleBtn.setAttribute('title', 'Show Password');
-      const svg = toggleBtn.querySelector('svg');
-      if (svg) {
-        svg.innerHTML = '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>';
+      if (!ALLOWED_DOCUMENT_EXTENSIONS.includes(ext)) {
+        error = `Invalid format ".${escapeHtml(ext)}". Only PDF, JPG, PNG, and WebP are allowed.`;
+      } else if (file.size > MAX_DOCUMENT_BYTES) {
+        error = `File size (${formatFileSize(file.size)}) exceeds the maximum 5 MB limit.`;
       }
+
+      const item = {
+        id: 'staged_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
+        file,
+        name: file.name,
+        size: file.size,
+        formattedSize: formatFileSize(file.size),
+        ext,
+        docType: detectDefaultDocType(file.name, stagedDocuments.length),
+        otherDocType: '',
+        password: '',
+        showPassword: false,
+        status: error ? 'error' : 'ready', // 'ready' | 'uploading' | 'uploaded' | 'error'
+        error,
+        errorMessage: ''
+      };
+
+      stagedDocuments.push(item);
     }
 
-    const uploadedDocuments = Array.isArray(res.data.documents) ? res.data.documents : [];
-    const safePassword = documentPassword || res.data?.document?.document_password || '';
-    const escapeHtml = (value) => String(value ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+    event.target.value = '';
+    renderStagedQueue();
+  }
 
-    function resolveFileUrl(path) {
-      if (!path) return '#';
-      if (path.startsWith('http://') || path.startsWith('https://')) return path;
-      const uploadsBase = (typeof api !== 'undefined' && api.uploadsBase) ? api.uploadsBase : (window.api && window.api.uploadsBase) ? window.api.uploadsBase : null;
-      return uploadsBase ? uploadsBase + path : path;
+  function renderStagedQueue() {
+    const queueContainer = document.getElementById('selected-files-queue');
+    const cardsList = document.getElementById('staged-cards-list');
+    const countNum = document.getElementById('staged-count-num');
+    const summarySpan = document.getElementById('staged-valid-summary');
+    const batchBtn = document.getElementById('btn-upload-all');
+    const batchBtnText = document.getElementById('btn-upload-all-text');
+
+    if (!stagedDocuments.length) {
+      queueContainer.style.display = 'none';
+      cardsList.innerHTML = '';
+      return;
     }
 
-    const docsToRender = uploadedDocuments.length ? uploadedDocuments : files.map((file) => ({ file_name: file.name, file_path: '' }));
-    document.getElementById('uploaded-docs').innerHTML += docsToRender.map((doc, index) => {
-      const uploadedAt = doc?.uploaded_at || doc?.updated_at || null;
-      const uploadedStamp = uploadedAt ? `${formatDate(uploadedAt)} ${formatTime(uploadedAt)}` : 'Just now';
-      const fileName = doc?.file_name || files[index]?.name || 'Document';
+    queueContainer.style.display = 'flex';
+    countNum.textContent = stagedDocuments.length;
+
+    const validItems = stagedDocuments.filter((d) => !d.error);
+    const validCount = validItems.length;
+
+    summarySpan.innerHTML = `Ready to upload: <strong>${validCount} document${validCount === 1 ? '' : 's'}</strong>`;
+    batchBtn.disabled = validCount === 0;
+    batchBtnText.textContent = validCount > 0
+      ? `Upload ${validCount} Document${validCount === 1 ? '' : 's'}`
+      : 'No Valid Documents to Upload';
+
+    cardsList.innerHTML = stagedDocuments.map((item) => {
+      const isError = Boolean(item.error);
+      let statusBadgeMarkup = '';
+
+      if (item.status === 'uploading') {
+        statusBadgeMarkup = '<span class="staged-status-badge status-uploading"><i class="fas fa-spinner fa-spin"></i> Uploading...</span>';
+      } else if (item.status === 'uploaded') {
+        statusBadgeMarkup = '<span class="staged-status-badge status-uploaded"><i class="fas fa-check-circle"></i> Uploaded</span>';
+      } else if (item.status === 'error' && !isError) {
+        statusBadgeMarkup = `<span class="staged-status-badge status-error"><i class="fas fa-times-circle"></i> ${escapeHtml(item.errorMessage || 'Failed')}</span>`;
+      } else if (isError) {
+        statusBadgeMarkup = '<span class="staged-status-badge status-error"><i class="fas fa-exclamation-triangle"></i> Invalid File</span>';
+      } else {
+        statusBadgeMarkup = '<span class="staged-status-badge status-ready"><i class="fas fa-check"></i> Ready</span>';
+      }
+
       return `
-        <div class="doc-row">
-          <div class="doc-row-main">
-            <span class="doc-row-icon">${iconMarkup('fileLines')}</span>
-            <div>
-              <strong>${escapeHtml(docType)}</strong>
-              <span>${escapeHtml(fileName)}</span>
-              <small>Password: ${escapeHtml(safePassword || 'Not set')} - ${escapeHtml(uploadedStamp)}</small>
+        <div class="staged-item-card ${isError ? 'has-error' : ''}" id="card-${item.id}">
+          <div class="staged-item-top">
+            <div class="staged-item-meta-wrap">
+              <div class="staged-item-icon">${getFileIconMarkup(item.name)}</div>
+              <div class="staged-item-meta">
+                <div class="staged-item-name-row">
+                  <strong class="staged-filename" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</strong>
+                  <span class="staged-size-badge">${item.formattedSize}</span>
+                  ${statusBadgeMarkup}
+                </div>
+                ${isError ? `<div class="staged-error-text"><i class="fas fa-exclamation-triangle"></i> ${escapeHtml(item.error)}</div>` : ''}
+              </div>
+            </div>
+            <div class="staged-item-actions">
+              ${!isError ? `
+                <button type="button" class="btn btn-secondary btn-sm" onclick="previewStagedDoc('${item.id}')" title="Preview document">
+                  <i class="fas fa-eye"></i> <span>View</span>
+                </button>
+              ` : ''}
+              <button type="button" class="btn btn-secondary btn-sm staged-remove-btn" onclick="removeStagedDoc('${item.id}')" title="Remove this file">
+                <i class="fas fa-times"></i> <span>Remove</span>
+              </button>
             </div>
           </div>
-          <div class="doc-row-actions">
-            ${doc?.id ? `<a href="#" onclick="openSecureDocument(${doc.id}); return false;" class="btn btn-secondary btn-sm">${iconMarkup('download')}<span>View</span></a>` : ''}
-            ${doc?.id ? `<button class="btn btn-danger btn-sm" onclick="deleteUploadedDoc(${doc.id}, this)">${iconMarkup('xCircle')}<span>Delete</span></button>` : ''}
+
+          ${!isError ? `
+          <div class="staged-item-config-grid">
+            <div class="staged-config-field">
+              <label class="form-field-label">Document Type <span class="req">*</span></label>
+              <select class="form-control staged-doctype-select" onchange="updateStagedDocType('${item.id}', this.value)">
+                <option value="Aadhaar Card" ${item.docType === 'Aadhaar Card' ? 'selected' : ''}>Aadhaar Card</option>
+                <option value="PAN Card" ${item.docType === 'PAN Card' ? 'selected' : ''}>PAN Card</option>
+                <option value="Passport Size Photograph" ${item.docType === 'Passport Size Photograph' ? 'selected' : ''}>Passport Size Photograph</option>
+                <option value="3 Months Bank Statement" ${item.docType === '3 Months Bank Statement' ? 'selected' : ''}>3 Months Bank Statement</option>
+                <option value="6 Months Bank Statement" ${item.docType === '6 Months Bank Statement' ? 'selected' : ''}>6 Months Bank Statement</option>
+                <option value="3 Months Salary Slips" ${item.docType === '3 Months Salary Slips' ? 'selected' : ''}>3 Months Salary Slips</option>
+                <option value="6 Months Salary Slips" ${item.docType === '6 Months Salary Slips' ? 'selected' : ''}>6 Months Salary Slips</option>
+                <option value="Form 16" ${item.docType === 'Form 16' ? 'selected' : ''}>Form 16</option>
+                <option value="Cancelled Cheque" ${item.docType === 'Cancelled Cheque' ? 'selected' : ''}>Cancelled Cheque</option>
+                <option value="Existing Loan Statement" ${item.docType === 'Existing Loan Statement' ? 'selected' : ''}>Existing Loan Statement</option>
+                <option value="Other" ${item.docType === 'Other' ? 'selected' : ''}>Other</option>
+              </select>
+              <input type="text" class="form-control staged-other-input" placeholder="Specify document type..." value="${escapeHtml(item.otherDocType || '')}" oninput="updateStagedOtherDocType('${item.id}', this.value)" style="${item.docType === 'Other' ? 'display:block;margin-top:6px;' : 'display:none;margin-top:6px;'}" />
+            </div>
+            <div class="staged-config-field">
+              <label class="form-field-label"><i class="fas fa-lock"></i> Document Password (if encrypted)</label>
+              <div class="password-input-wrapper">
+                <input type="${item.showPassword ? 'text' : 'password'}" class="form-control staged-pwd-input" placeholder="Enter password for this document..." value="${escapeHtml(item.password || '')}" oninput="updateStagedPassword('${item.id}', this.value)" autocomplete="new-password" />
+                <button type="button" class="toggle-password-btn" onclick="toggleStagedPassword('${item.id}')" title="Show or hide password" aria-label="Toggle password visibility">
+                  <i class="${item.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'}"></i>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>`;
+          ` : ''}
+        </div>
+      `;
     }).join('');
-    refreshDynamicIcons();
+  }
+
+  function updateStagedDocType(id, value) {
+    const item = stagedDocuments.find((d) => d.id === id);
+    if (!item) return;
+    item.docType = value;
+    const card = document.getElementById(`card-${id}`);
+    if (card) {
+      const otherInput = card.querySelector('.staged-other-input');
+      if (otherInput) {
+        otherInput.style.display = value === 'Other' ? 'block' : 'none';
+        if (value === 'Other') otherInput.focus();
+      }
+    }
+  }
+
+  function updateStagedOtherDocType(id, value) {
+    const item = stagedDocuments.find((d) => d.id === id);
+    if (item) item.otherDocType = value.trim();
+  }
+
+  function updateStagedPassword(id, value) {
+    const item = stagedDocuments.find((d) => d.id === id);
+    if (item) item.password = value.trim();
+  }
+
+  function toggleStagedPassword(id) {
+    const item = stagedDocuments.find((d) => d.id === id);
+    if (!item) return;
+    item.showPassword = !item.showPassword;
+    const card = document.getElementById(`card-${id}`);
+    if (card) {
+      const pwdInput = card.querySelector('.staged-pwd-input');
+      const eyeIcon = card.querySelector('.toggle-password-btn i');
+      if (pwdInput) pwdInput.type = item.showPassword ? 'text' : 'password';
+      if (eyeIcon) eyeIcon.className = item.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+    }
+  }
+
+  function removeStagedDoc(id) {
+    stagedDocuments = stagedDocuments.filter((d) => d.id !== id);
+    renderStagedQueue();
+  }
+
+  function clearStagedQueue() {
+    stagedDocuments = [];
+    renderStagedQueue();
+  }
+
+  // ── Universal Preview Modal ───────────────────────────────
+  function openDocumentPreviewModal(fileName, blobUrl, mimeOrExt) {
+    const modal = document.getElementById('document-preview-modal');
+    const title = document.getElementById('preview-modal-title');
+    const body = document.getElementById('preview-modal-body');
+    const openTabBtn = document.getElementById('preview-open-tab-btn');
+
+    title.innerHTML = `${getFileIconMarkup(fileName)} <span>Preview: ${escapeHtml(fileName)}</span>`;
+    openTabBtn.href = blobUrl;
+    openTabBtn.style.display = 'inline-flex';
+    body.innerHTML = '';
+
+    const lowerName = (fileName || '').toLowerCase();
+    const typeStr = (mimeOrExt || '').toLowerCase();
+    const isImage = typeStr.includes('image') || ['jpg', 'jpeg', 'png', 'webp'].some(ext => lowerName.endsWith('.' + ext));
+    const isPdf = typeStr.includes('pdf') || lowerName.endsWith('.pdf');
+
+    if (isImage) {
+      const img = document.createElement('img');
+      img.src = blobUrl;
+      img.alt = fileName;
+      img.style.maxWidth = '100%';
+      img.style.maxHeight = '65vh';
+      img.style.objectFit = 'contain';
+      img.style.borderRadius = '8px';
+      img.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+      body.appendChild(img);
+    } else if (isPdf) {
+      const iframe = document.createElement('iframe');
+      iframe.src = blobUrl;
+      iframe.title = 'PDF Document Preview';
+      iframe.style.width = '100%';
+      iframe.style.height = '65vh';
+      iframe.style.border = 'none';
+      iframe.style.borderRadius = '8px';
+      body.appendChild(iframe);
+    } else {
+      body.innerHTML = `
+        <div class="preview-fallback-container">
+          <i class="fas fa-file-alt"></i>
+          <div>
+            <h5 style="margin:0 0 6px;color:var(--text-primary);">Document Preview</h5>
+            <p style="margin:0;font-size:13px;color:var(--text-secondary);">Direct inline rendering is not supported for this format.</p>
+          </div>
+          <a href="${blobUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+            <i class="fas fa-external-link-alt"></i> <span>Open Document in New Tab</span>
+          </a>
+        </div>
+      `;
+    }
+
+    modal.classList.add('show');
+  }
+
+  function previewStagedDoc(id) {
+    const item = stagedDocuments.find((d) => d.id === id);
+    if (!item || !item.file) return;
+
+    if (currentPreviewObjectURL) {
+      URL.revokeObjectURL(currentPreviewObjectURL);
+      currentPreviewObjectURL = null;
+    }
+    currentPreviewObjectURL = URL.createObjectURL(item.file);
+    openDocumentPreviewModal(item.name, currentPreviewObjectURL, item.file.type || item.ext);
+  }
+
+  async function previewUploadedDoc(docId, fileName) {
+    const modal = document.getElementById('document-preview-modal');
+    const title = document.getElementById('preview-modal-title');
+    const body = document.getElementById('preview-modal-body');
+    const openTabBtn = document.getElementById('preview-open-tab-btn');
+
+    title.innerHTML = `${getFileIconMarkup(fileName)} <span>Preview: ${escapeHtml(fileName)}</span>`;
+    openTabBtn.style.display = 'none';
+    body.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;color:var(--text-secondary);">
+        <span class="spinner" style="width:28px;height:28px;"></span>
+        <span style="font-size:13px;">Loading document securely...</span>
+      </div>
+    `;
+    modal.classList.add('show');
+
+    try {
+      const token = getToken();
+      const res = await fetch(`${API_BASE}/documents/${docId}/view`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        body.innerHTML = `
+          <div class="preview-error-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h5>Unable to preview this document</h5>
+            <p>${escapeHtml(errData.message || 'You do not have permission to view this document or the file is missing.')}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const blob = await res.blob();
+      if (currentPreviewObjectURL) {
+        URL.revokeObjectURL(currentPreviewObjectURL);
+        currentPreviewObjectURL = null;
+      }
+      currentPreviewObjectURL = URL.createObjectURL(blob);
+      openDocumentPreviewModal(fileName, currentPreviewObjectURL, blob.type);
+    } catch (err) {
+      console.error('[previewUploadedDoc] error:', err);
+      body.innerHTML = `
+        <div class="preview-error-state">
+          <i class="fas fa-exclamation-circle"></i>
+          <h5>Unable to preview this document</h5>
+          <p>An unexpected network error occurred while loading the document. Please try again.</p>
+        </div>
+      `;
+    }
+  }
+
+  function closeDocumentPreview() {
+    const modal = document.getElementById('document-preview-modal');
+    if (modal) modal.classList.remove('show');
+    if (currentPreviewObjectURL) {
+      URL.revokeObjectURL(currentPreviewObjectURL);
+      currentPreviewObjectURL = null;
+    }
+  }
+
+  function handlePreviewOverlayClick(e) {
+    if (e.target && e.target.id === 'document-preview-modal') {
+      closeDocumentPreview();
+    }
+  }
+
+  // ── Batch Document Upload ─────────────────────────────────
+  async function uploadAllStagedDocuments() {
+    clearFieldErrors();
+    if (!currentCustomer || !currentCustomer.id) {
+      return showAlert('page-alert', 'Please register or select a customer before uploading documents.', 'error');
+    }
+
+    const validPending = stagedDocuments.filter((d) => !d.error && d.status !== 'uploaded');
+    if (!validPending.length) {
+      return showAlert('page-alert', 'No valid documents in queue to upload.', 'error');
+    }
+
+    const batchBtn = document.getElementById('btn-upload-all');
+    const batchBtnText = document.getElementById('btn-upload-all-text');
+    batchBtn.disabled = true;
+    batchBtnText.innerHTML = '<span class="spinner" style="margin-right:6px;"></span> <span>Uploading Documents...</span>';
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const item of validPending) {
+      item.status = 'uploading';
+      renderStagedQueue();
+
+      const effectiveDocType = item.docType === 'Other'
+        ? (item.otherDocType || 'Other')
+        : item.docType;
+
+      const form = new FormData();
+      form.append('documents', item.file);
+      form.append('doc_type', effectiveDocType);
+      if (item.password) {
+        form.append('document_password', item.password);
+      }
+
+      try {
+        const res = await api.upload(`/employee/documents/${currentCustomer.id}`, form);
+        if (res?.ok) {
+          item.status = 'uploaded';
+          item.errorMessage = '';
+          successCount++;
+          // Retain password in session map for each uploaded document
+          const docIds = res.data?.ids || (res.data?.documents ? res.data.documents.map(d => d.id) : []);
+          if (docIds.length && item.password) {
+            docIds.forEach(id => sessionDocPasswords.set(id, item.password));
+          }
+        } else {
+          item.status = 'error';
+          item.errorMessage = res?.data?.message || 'Upload failed';
+          failCount++;
+        }
+      } catch (uploadErr) {
+        console.error('Document upload error:', uploadErr);
+        item.status = 'error';
+        item.errorMessage = 'Network error during upload';
+        failCount++;
+      }
+
+      renderStagedQueue();
+    }
+
+    batchBtn.disabled = false;
+    batchBtnText.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> <span>Upload Documents</span>';
+
+    if (successCount > 0) {
+      updateStepper(3);
+      showAlert('page-alert', `Successfully uploaded ${successCount} document${successCount === 1 ? '' : 's'}.${failCount > 0 ? ` (${failCount} failed)` : ''}`, successCount && !failCount ? 'success' : 'info');
+      // Remove successfully uploaded items from queue
+      stagedDocuments = stagedDocuments.filter((d) => d.status !== 'uploaded');
+      renderStagedQueue();
+      // Refresh documents list from backend
+      loadCustomerDocuments(currentCustomer.id);
+    } else {
+      showAlert('page-alert', 'Failed to upload selected documents. Please check errors on each file and retry.', 'error');
+    }
+  }
+
+  // ── Load & Refresh Customer Documents (Backend API) ───────
+  async function loadCustomerDocuments(customerId) {
+    const listContainer = document.getElementById('uploaded-docs');
+    const countPill = document.getElementById('uploaded-count-pill');
+    if (!customerId) return;
+
+    try {
+      const res = await api.get(`/employee/customers/${customerId}`);
+      if (!res?.ok) {
+        listContainer.innerHTML = '<div class="docs-empty-state"><i class="fas fa-exclamation-triangle"></i><p>Unable to load documents. Click refresh to retry.</p></div>';
+        return;
+      }
+
+      const docs = res.data?.data?.documents || [];
+      if (countPill) countPill.textContent = docs.length;
+
+      if (!docs.length) {
+        listContainer.innerHTML = '<div class="docs-empty-state"><i class="fas fa-folder-open"></i><p>No documents uploaded yet for this customer.</p></div>';
+        return;
+      }
+
+      listContainer.innerHTML = docs.map((doc) => {
+        const docId = doc.id;
+        const fileName = doc.file_name || 'Document';
+        const docType = doc.doc_type || 'Document';
+        const uploadedStamp = doc.uploaded_at ? `${formatDate(doc.uploaded_at)} · ${formatTime(doc.uploaded_at)}` : 'Uploaded';
+
+        // Check if password exists from backend OR current session state
+        const storedPwd = doc.document_password || sessionDocPasswords.get(docId) || '';
+        const isPwdProtected = Boolean(storedPwd);
+        const isShown = Boolean(uploadedDocPasswordsState.get(docId));
+
+        const pwdBadge = isPwdProtected
+          ? '<span class="pwd-pill is-protected"><i class="fas fa-lock"></i> Password Protected</span>'
+          : '<span class="pwd-pill"><i class="fas fa-unlock"></i> No Password</span>';
+
+        return `
+          <div class="uploaded-doc-card" id="uploaded-doc-${docId}">
+            <div class="uploaded-doc-main">
+              <div class="uploaded-doc-icon-wrap">${getFileIconMarkup(fileName)}</div>
+              <div class="uploaded-doc-details">
+                <div class="uploaded-doc-title-row">
+                  <strong class="uploaded-doc-title">${escapeHtml(docType)}</strong>
+                  ${pwdBadge}
+                </div>
+                <div class="uploaded-doc-name" title="${escapeHtml(fileName)}">${escapeHtml(fileName)}</div>
+                <div class="uploaded-doc-meta">
+                  <span><i class="fas fa-clock"></i> Uploaded ${uploadedStamp}</span>
+                </div>
+
+                ${isPwdProtected ? `
+                <div class="uploaded-doc-pwd-section">
+                  <div class="uploaded-pwd-row">
+                    <span class="uploaded-pwd-label"><i class="fas fa-key"></i> Password</span>
+                    <div class="uploaded-pwd-input-wrap">
+                      <input type="${isShown ? 'text' : 'password'}" id="uploaded-pwd-${docId}" class="form-control uploaded-pwd-input" value="${escapeHtml(storedPwd)}" readonly />
+                      <button type="button" class="toggle-password-btn" id="uploaded-pwd-toggle-${docId}" onclick="toggleUploadedDocPassword(${docId})" title="Show or hide password" aria-label="Toggle password visibility">
+                        <i class="${isShown ? 'fas fa-eye-slash' : 'fas fa-eye'}" id="uploaded-pwd-icon-${docId}"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <div class="uploaded-doc-actions">
+              <button type="button" class="btn btn-secondary btn-sm uploaded-view-btn" onclick="previewUploadedDoc(${docId}, '${escapeHtml(fileName)}')" title="View document">
+                <i class="fas fa-eye"></i> <span>View</span>
+              </button>
+              <button type="button" class="btn btn-danger btn-sm uploaded-delete-btn" onclick="deleteUploadedDoc(${docId}, this)" title="Delete document">
+                <i class="fas fa-trash-alt"></i> <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      console.error('Error loading customer documents:', err);
+      listContainer.innerHTML = '<div class="docs-empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading documents.</p></div>';
+    }
+  }
+
+  function toggleUploadedDocPassword(docId) {
+    const isCurrentlyShown = Boolean(uploadedDocPasswordsState.get(docId));
+    const nextState = !isCurrentlyShown;
+    uploadedDocPasswordsState.set(docId, nextState);
+
+    const input = document.getElementById(`uploaded-pwd-${docId}`);
+    const icon = document.getElementById(`uploaded-pwd-icon-${docId}`);
+
+    if (input) input.type = nextState ? 'text' : 'password';
+    if (icon) icon.className = nextState ? 'fas fa-eye-slash' : 'fas fa-eye';
+  }
+
+  function refreshCustomerDocuments() {
+    if (!currentCustomer || !currentCustomer.id) return;
+    loadCustomerDocuments(currentCustomer.id);
   }
 
   async function deleteUploadedDoc(id, btn) {
-    if (!confirm('Are you sure you want to delete this document?')) return;
+    if (!confirm('Are you sure you want to delete this document? This action cannot be undone.')) return;
     btn.disabled = true;
-    btn.textContent = 'Deleting...';
-    const res = await api.delete(`/employee/documents/${id}`);
-    if (!res?.ok) {
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+      const res = await api.delete(`/employee/documents/${id}`);
+      if (!res?.ok) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-trash-alt"></i> <span>Delete</span>';
+        return showAlert('page-alert', res?.data?.message || 'Failed to delete document.', 'error');
+      }
+
+      sessionDocPasswords.delete(id);
+      uploadedDocPasswordsState.delete(id);
+      showAlert('page-alert', 'Document deleted successfully.', 'success');
+
+      if (currentCustomer && currentCustomer.id) {
+        loadCustomerDocuments(currentCustomer.id);
+      } else {
+        const row = btn.closest('.uploaded-doc-card');
+        if (row) row.remove();
+      }
+    } catch (err) {
+      console.error('Delete document error:', err);
       btn.disabled = false;
-      btn.innerHTML = `${iconMarkup('xCircle')}<span>Delete</span>`;
-      refreshDynamicIcons();
-      return showAlert('page-alert', res?.data?.message || 'Failed to delete document.', 'error');
+      btn.innerHTML = '<i class="fas fa-trash-alt"></i> <span>Delete</span>';
+      showAlert('page-alert', 'Failed to delete document.', 'error');
     }
-    showAlert('page-alert', 'Document deleted successfully.', 'success');
-    const docRow = btn.closest('.doc-row');
-    if (docRow) docRow.remove();
   }
 
-  const DOC_EYE_PATHS = {
-    eye: '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/>',
-    eyeOff: '<path d="M3 3l18 18"/><path d="M10.5 10.5a2.5 2.5 0 1 0 3 3"/><path d="M6.2 6.2C3.9 7.9 2 12 2 12s3.5 6 10 6c1.3 0 2.5-.2 3.6-.6"/><path d="M14.6 4.6C13.8 4.2 12.9 4 12 4c-6.5 0-10 8-10 8a20.1 20.1 0 0 0 4.8 5.7"/>'
-  };
-
-  function getOrCreateDocEyeSvg(btn) {
-    let svg = btn.querySelector('svg');
-    if (!svg) {
-      svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('viewBox', '0 0 24 24');
-      svg.setAttribute('width', '18');
-      svg.setAttribute('height', '18');
-      svg.setAttribute('fill', 'none');
-      svg.setAttribute('stroke', 'currentColor');
-      svg.setAttribute('stroke-width', '1.8');
-      svg.setAttribute('stroke-linecap', 'round');
-      svg.setAttribute('stroke-linejoin', 'round');
-      svg.setAttribute('aria-hidden', 'true');
-      btn.innerHTML = '';
-      btn.appendChild(svg);
+  // ── Loan Origination Navigation ───────────────────────────
+  function goToCreateLoan() {
+    if (!currentCustomer || !currentCustomer.id) {
+      return showAlert('page-alert', 'Please register or select a customer first.', 'error');
     }
-    return svg;
+    window.location.href = `/employee/loans.html?customer_id=${currentCustomer.id}`;
   }
 
-  function togglePasswordVisibility() {
-    const passwordInput = document.getElementById('doc-password');
-    const toggleBtn = document.querySelector('.toggle-password');
-    if (!passwordInput || !toggleBtn) return;
+  // ── Start New Customer Onboarding ─────────────────────────
+  function startNewCustomer() {
+    if (currentCustomer) {
+      if (!confirm('Start a new customer registration? Current saved customer will remain safely in the system.')) return;
+    }
 
-    const isHidden = passwordInput.type === 'password';
-    passwordInput.type = isHidden ? 'text' : 'password';
-    toggleBtn.classList.toggle('visible', isHidden);
-    toggleBtn.setAttribute('aria-label', isHidden ? 'Hide Password' : 'Show Password');
-    toggleBtn.setAttribute('title', isHidden ? 'Hide Password' : 'Show Password');
+    currentCustomer = null;
+    isEditMode = false;
+    clearStagedQueue();
+    sessionDocPasswords.clear();
+    uploadedDocPasswordsState.clear();
 
-    const svg = getOrCreateDocEyeSvg(toggleBtn);
-    svg.innerHTML = isHidden ? DOC_EYE_PATHS.eyeOff : DOC_EYE_PATHS.eye;
+    // Reset form inputs
+    ['cust-name','cust-phone','cust-email','cust-area','cust-address','cust-quick-paste','cust-net-salary','cust-total-obligation'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+
+    // Reset views
+    document.getElementById('cust-form-wrapper').style.display = 'block';
+    document.getElementById('cust-summary-wrapper').style.display = 'none';
+    document.getElementById('cancel-edit-btn').style.display = 'none';
+    document.getElementById('add-cust-btn').innerHTML = '<i class="fas fa-user-plus"></i> <span id="add-cust-btn-text">Add Customer</span>';
+    document.getElementById('cust-card-title').textContent = 'Customer Details';
+    document.getElementById('cust-card-subtitle').textContent = 'Capture verified identity, contact, location, and income information.';
+
+    // Hide subsequent sections
+    document.getElementById('upload-section').style.display = 'none';
+    document.getElementById('customer-added-section').style.display = 'none';
+    document.getElementById('uploaded-docs').innerHTML = '<div class="docs-empty-state"><i class="fas fa-folder-open"></i><p>No documents uploaded yet for this customer.</p></div>';
+    document.getElementById('uploaded-count-pill').textContent = '0';
+
+    // Reset Stepper
+    updateStepper(1);
+
+    showAlert('page-alert', 'New customer registration form ready.', 'info');
+    document.getElementById('cust-name').focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  // Global escape key handler to close preview modal
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDocumentPreview();
+  });
 </script>
 </body>
 </html>

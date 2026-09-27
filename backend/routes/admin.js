@@ -1,7 +1,33 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
+const multer = require('multer');
 const { requireAdmin } = require('../middleware/auth');
 const adminController = require('../controllers/adminController');
+
+// Multer memory storage for Excel files (max 5 MB)
+const excelUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ext === '.xlsx' || ext === '.xls') return cb(null, true);
+    cb(new Error('Only .xlsx and .xls files are allowed.'));
+  }
+});
+
+// Safe wrapper to return clean JSON errors on file limits or invalid types
+const handleExcelUpload = (req, res, next) => {
+  excelUpload.single('excelFile')(req, res, (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ success: false, message: 'The selected file exceeds the maximum allowed size of 5 MB.' });
+      }
+      return res.status(400).json({ success: false, message: err.message || 'File upload error.' });
+    }
+    next();
+  });
+};
 
 // All routes require admin JWT
 router.use(requireAdmin);
@@ -14,6 +40,10 @@ router.get('/dashboard', adminController.getDashboard);
 // Employees
 router.get('/employees', adminController.getEmployees);
 router.post('/employees', adminController.addEmployee);
+router.get('/employees/template', adminController.downloadEmployeeTemplate);
+router.post('/employees/validate-import', handleExcelUpload, adminController.validateEmployeeImport);
+router.post('/employees/confirm-import', adminController.confirmEmployeeImport);
+router.post('/employees/bulk-import', handleExcelUpload, adminController.bulkImportEmployees);
 router.delete('/employees/:id', adminController.removeEmployee);
 router.patch('/employees/:id/deactivate', adminController.deactivateEmployee);
 router.patch('/employees/:id/activate', adminController.activateEmployee);

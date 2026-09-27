@@ -15,12 +15,7 @@ function formatTimeToAMPM(timeStr) {
  */
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
-
-  // NOTE: tokens are only ever accepted via the Authorization header now.
-  // A previous version also accepted ?token=... in the URL, but tokens in
-  // URLs get written into server access logs, browser history, and can
-  // leak via the Referer header — so that fallback has been removed.
+  const token = (authHeader && authHeader.split(' ')[1]) || req.query?.token;
 
   if (!token) {
     return res.status(401).json({ success: false, message: 'Access denied. No token provided.' });
@@ -30,16 +25,48 @@ const verifyToken = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
 
-    // Check DB status and business hours if role is employee
-    if (decoded.role === 'employee') {
-      const [users] = await db.query(
-        'SELECT is_active, auto_deactivated, manual_override FROM users WHERE id = ?',
-        [decoded.id]
-      );
-      const user = users[0];
+    // Check DB status, token revocation, business hours, and temporary password status
+    const [users] = await db.query(
+      'SELECT id, role, is_active, auto_deactivated, manual_override, token_version, must_change_password FROM users WHERE id = ?',
+      [decoded.id]
+    );
+    const user = users[0];
 
-      if (!user) {
-        return res.status(401).json({ success: false, message: 'User not found.' });
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'User not found or account removed.' });
+    }
+
+    // Token revocation check: if token was invalidated by logout or password change
+    if (decoded.token_version !== undefined && user.token_version !== undefined && decoded.token_version !== user.token_version) {
+      return res.status(401).json({ success: false, message: 'Session has expired or was terminated. Please sign in again.' });
+    }
+
+    if (decoded.role === 'admin') {
+      if (!user.is_active) {
+        return res.status(403).json({ success: false, message: 'Admin account has been deactivated.' });
+      }
+      return next();
+    }
+
+    // Role is employee
+    if (decoded.role === 'employee') {
+      // Security enforcement: temporary onboarding password must be changed before accessing operational routes
+      if (user.must_change_password === 1) {
+        const fullUrl = (req.originalUrl || (req.baseUrl + req.path) || '').toLowerCase();
+        const isPasswordChangeRoute =
+          fullUrl.includes('/profile/change-password') ||
+          fullUrl.includes('/auth/me') ||
+          fullUrl.includes('/auth/logout') ||
+          fullUrl.includes('/api/profile') ||
+          fullUrl.includes('/notifications');
+
+        if (!isPasswordChangeRoute) {
+          return res.status(403).json({
+            success: false,
+            must_change_password: true,
+            message: 'Temporary onboarding password detected. You must change your password before accessing the system.'
+          });
+        }
       }
 
       // Manual override = full access regardless of business hours

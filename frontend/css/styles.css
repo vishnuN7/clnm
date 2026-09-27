@@ -2848,59 +2848,179 @@ tbody td:first-child {
   margin-bottom: 18px;
 }
 
-/* ── Centered Header (Employee & Admin Workspaces) ── */
+/* ── Unified Topbar Header System (Admin & Employee Workspaces) ── */
+.admin-page .topbar,
 .employee-page .topbar,
-.add-customer-page .topbar,
-.admin-page .topbar {
+.add-customer-page .topbar {
+  display: flex !important;
+  align-items: center !important;
   position: sticky;
-  justify-content: center;
+  top: 0;
+  z-index: 50;
+  min-height: 64px;
+  height: auto;
+  padding: 10px 24px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+:root[data-theme='dark'] .admin-page .topbar,
+:root[data-theme='dark'] .employee-page .topbar,
+:root[data-theme='dark'] .add-customer-page .topbar {
+  background: linear-gradient(90deg, rgba(9, 17, 29, 0.95) 0%, rgba(12, 24, 41, 0.92) 100%);
+  border-bottom-color: rgba(151, 176, 210, 0.12);
+}
+
+.admin-page .topbar-title,
 .employee-page .topbar-title,
-.add-customer-page .topbar-title,
-.admin-page .topbar-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  pointer-events: none;
-  max-width: min(680px, calc(100% - 240px));
+.add-customer-page .topbar-title {
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  text-align: center !important;
+  max-width: min(720px, calc(100% - 240px)) !important;
+  pointer-events: auto !important;
+  margin: 0 !important;
 }
 
+.admin-page .topbar-title h2,
 .employee-page .topbar-title h2,
-.add-customer-page .topbar-title h2,
-.admin-page .topbar-title h2 {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
+.add-customer-page .topbar-title h2 {
+  margin: 0 !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1.25 !important;
+  color: var(--text-primary) !important;
   letter-spacing: -0.2px;
 }
 
+.admin-page .topbar-title h2 i,
+.admin-page .topbar-title h2 svg,
+.employee-page .topbar-title h2 i,
+.employee-page .topbar-title h2 svg,
+.add-customer-page .topbar-title h2 i,
+.add-customer-page .topbar-title h2 svg {
+  color: var(--accent-secondary, #2f6fed) !important;
+  margin-right: 8px;
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+:root[data-theme='dark'] .admin-page .topbar-title h2 i,
+:root[data-theme='dark'] .admin-page .topbar-title h2 svg,
+:root[data-theme='dark'] .employee-page .topbar-title h2 i,
+:root[data-theme='dark'] .employee-page .topbar-title h2 svg,
+:root[data-theme='dark'] .add-customer-page .topbar-title h2 i,
+:root[data-theme='dark'] .add-customer-page .topbar-title h2 svg {
+  color: #60a5fa !important;
+}
+
+.admin-page .topbar-title p,
 .employee-page .topbar-title p,
-.add-customer-page .topbar-title p,
-.admin-page .topbar-title p {
-  text-align: center;
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-top: 1px;
+.add-customer-page .topbar-title p {
+  margin: 2px 0 0 !important;
+  font-size: 12px !important;
+  color: var(--text-secondary) !important;
+  line-height: 1.35 !important;
+  text-align: center !important;
+  white-space: normal !important;
 }
 
-.employee-page .topbar-actions,
-.employee-page .mobile-menu-btn,
-.add-customer-page .topbar-actions,
-.add-customer-page .mobile-menu-btn,
 .admin-page .topbar-actions,
-.admin-page .mobile-menu-btn {
-  position: relative;
-  z-index: 1;
+.employee-page .topbar-actions,
+.add-customer-page .topbar-actions {
+  margin-left: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px;
 }
 
-.employee-page .topbar-actions,
-.add-customer-page .topbar-actions,
-.admin-page .topbar-actions {
-  margin-left: auto;
+.admin-page .mobile-menu-btn,
+.employee-page .mobile-menu-btn,
+.add-customer-page .mobile-menu-btn {
+  position: relative;
+  z-index: 2;
+}
+
+.topbar-date-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-body);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.topbar-date-badge #current-date,
+.topbar-date-badge span {
+  display: inline !important;
+  font-size: 12px;
+  color: inherit;
+}
+
+:root[data-theme='dark'] .topbar-date-badge {
+  background: #132237;
+  border-color: rgba(151, 176, 210, 0.2);
+  color: #cbd5e1;
+}
+
+.topbar-date-badge i,
+.topbar-date-badge svg {
+  color: var(--accent-secondary, #2f6fed) !important;
+  font-size: 11px;
+}
+
+:root[data-theme='dark'] .topbar-date-badge i,
+:root[data-theme='dark'] .topbar-date-badge svg {
+  color: #60a5fa !important;
+}
+
+@media (max-width: 900px) {
+  .admin-page .topbar,
+  .employee-page .topbar,
+  .add-customer-page .topbar {
+    position: relative;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  .admin-page .topbar-title,
+  .employee-page .topbar-title,
+  .add-customer-page .topbar-title {
+    position: static !important;
+    transform: none !important;
+    max-width: 100% !important;
+    text-align: left !important;
+  }
+  .admin-page .topbar-title h2,
+  .employee-page .topbar-title h2,
+  .add-customer-page .topbar-title h2 {
+    justify-content: flex-start !important;
+  }
+  .admin-page .topbar-title p,
+  .employee-page .topbar-title p,
+  .add-customer-page .topbar-title p {
+    text-align: left !important;
+  }
+  .admin-page .topbar-actions,
+  .employee-page .topbar-actions,
+  .add-customer-page .topbar-actions {
+    margin-left: 0 !important;
+    justify-content: space-between;
+  }
 }
 
 .title-icon,
@@ -3487,8 +3607,12 @@ tbody td:first-child {
   .employee-page #current-time,
   .add-customer-page #current-date,
   .add-customer-page #current-time,
-  .admin-page #current-date,
+  .admin-page #current-date:not(.topbar-date-badge *),
   .admin-page #current-time {
+    display: none !important;
+  }
+
+  .admin-page .topbar-date-badge {
     display: none !important;
   }
 }
@@ -3496,7 +3620,7 @@ tbody td:first-child {
 @media (max-width: 1100px) {
   .employee-page #current-date,
   .employee-page #current-time,
-  .admin-page #current-date,
+  .admin-page #current-date:not(.topbar-date-badge *),
   .admin-page #current-time {
     display: none !important;
   }

@@ -108,6 +108,10 @@ const breakTimeController = {
         return res.status(400).json({ success: false, message: 'Break type is required.' });
       }
 
+      if (break_type === 'Other Break' && (!custom_reason || !custom_reason.trim())) {
+        return res.status(400).json({ success: false, message: 'Reason is mandatory for Other Break.' });
+      }
+
       // Check if already on break
       const [active] = await db.query(
         'SELECT id FROM break_records WHERE employee_id = ? AND end_time IS NULL LIMIT 1',
@@ -118,14 +122,14 @@ const breakTimeController = {
       }
 
       // Fetch employee info
-      const [emp] = await db.query('SELECT name, department FROM users WHERE id = ?', [employeeId]);
+      const [emp] = await db.query('SELECT name FROM users WHERE id = ?', [employeeId]);
       if (emp.length === 0) {
         return res.status(404).json({ success: false, message: 'Employee not found.' });
       }
 
-      // Insert record (omitting department features, save blank/default)
+      // Insert record
       await db.query(
-        'INSERT INTO break_records (employee_id, employee_name, department, break_type, custom_reason, status) VALUES (?, ?, "Operations", ?, ?, ?)',
+        'INSERT INTO break_records (employee_id, employee_name, department, break_type, custom_reason, status) VALUES (?, ?, "", ?, ?, ?)',
         [employeeId, emp[0].name, break_type, custom_reason || null, 'On Break']
       );
 
@@ -767,7 +771,7 @@ const breakTimeController = {
       const {
         page = 1, limit = 20, search = '',
         dateRange = 'today', startDate, endDate,
-        status = '', attendanceStatus = '', department = '',
+        status = '', attendanceStatus = '',
         sortBy = 'first_login', sortDir = 'asc'
       } = req.query;
 
@@ -810,11 +814,6 @@ const breakTimeController = {
         params.push(`%${search}%`, `%${search}%`, `%${search}%`);
       }
 
-      if (department) {
-        conditions.push(`u.department = ?`);
-        params.push(department);
-      }
-
       const whereClause = conditions.join(' AND ');
 
       // ── Main aggregation query ──
@@ -824,7 +823,6 @@ const breakTimeController = {
           u.name AS employee_name,
           u.username AS emp_code,
           u.designation AS role,
-          u.department,
           u.current_status,
           DATE(MIN(al.login_time)) AS work_date,
           MIN(al.login_time) AS first_login,
@@ -1066,7 +1064,7 @@ const breakTimeController = {
 
       // Employee info
       const [[emp]] = await db.query(
-        `SELECT id, name, username AS emp_code, designation, department, current_status
+        `SELECT id, name, username AS emp_code, designation, current_status
          FROM users WHERE id = ? LIMIT 1`, [id]);
       if (!emp) return res.status(404).json({ success: false, message: 'Employee not found.' });
 

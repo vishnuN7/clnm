@@ -103,11 +103,30 @@ const LoanModel = {
 
     if (status) { sql += ' AND l.status = ?'; params.push(status); }
     if (area) { sql += ' AND c.area = ?'; params.push(area); }
-    if (applied_by) { sql += ' AND l.applied_by = ?'; params.push(applied_by); }
+    if (applied_by) {
+      const strVal = String(applied_by).trim();
+      if (strVal.includes(',')) {
+        const idList = strVal.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+        if (idList.length > 0) {
+          sql += ` AND l.applied_by IN (${idList.map(() => '?').join(',')})`;
+          params.push(...idList);
+        }
+      } else {
+        sql += ' AND l.applied_by = ?';
+        params.push(applied_by);
+      }
+    }
     if (customer_id) { sql += ' AND l.customer_id = ?'; params.push(customer_id); }
     if (search) {
-      sql += ' AND (c.name LIKE ? OR c.phone LIKE ?)';
-      params.push(`%${search}%`, `%${search}%`);
+      const trimmedSearch = String(search).trim();
+      const numMatch = trimmedSearch.replace(/^LN[-_]?/i, '');
+      if (/^\d+$/.test(numMatch)) {
+        sql += ' AND (c.name LIKE ? OR c.phone LIKE ? OR l.id = ?)';
+        params.push(`%${trimmedSearch}%`, `%${trimmedSearch}%`, parseInt(numMatch, 10));
+      } else {
+        sql += ' AND (c.name LIKE ? OR c.phone LIKE ?)';
+        params.push(`%${trimmedSearch}%`, `%${trimmedSearch}%`);
+      }
     }
 
     // Determine the column to use for time period interval filters
@@ -256,23 +275,74 @@ const LoanModel = {
     return rows;
   },
 
-  async getDashboardStats() {
+  async getDashboardStats(period = 'monthly', startDate = null, endDate = null) {
+    // period semantics:
+    //   monthly  → current calendar month, day-by-day trend
+    //   yearly   → current calendar year,  month-by-month trend
+    //   alltime  → all data,               year-by-year trend
+    //   custom   → custom range,           grouped adaptively
+    let dateFilter = '';
+    let groupFormat = "'%Y-%m-%d'"; // default: day
+    let groupLabel  = 'day';
+    const params = [];
+
+    if (period === 'monthly') {
+      dateFilter  = `WHERE YEAR(created_at) = YEAR(NOW()) AND MONTH(created_at) = MONTH(NOW())`;
+      groupFormat = "'%Y-%m-%d'";
+      groupLabel  = 'day';
+    } else if (period === 'yearly') {
+      dateFilter  = `WHERE YEAR(created_at) = YEAR(NOW())`;
+      groupFormat = "'%Y-%m'";
+      groupLabel  = 'month';
+    } else if (period === 'custom' && startDate && endDate) {
+      dateFilter = `WHERE created_at >= ? AND created_at <= ?`;
+      params.push(startDate.includes(' ') ? startDate : `${startDate} 00:00:00`);
+      params.push(endDate.includes(' ') ? endDate : `${endDate} 23:59:59`);
+      const s = new Date(startDate);
+      const e = new Date(endDate);
+      const diffDays = Math.ceil((e - s) / (1000 * 60 * 60 * 24));
+      if (diffDays <= 31) {
+        groupFormat = "'%Y-%m-%d'";
+        groupLabel = 'day';
+      } else if (diffDays <= 365) {
+        groupFormat = "'%Y-%m'";
+        groupLabel = 'month';
+      } else {
+        groupFormat = "'%Y'";
+        groupLabel = 'year';
+      }
+    } else {
+      // alltime – no date restriction, group by year
+      dateFilter  = '';
+      groupFormat = "'%Y'";
+      groupLabel  = 'year';
+    }
+
     const [total] = await db.query('SELECT COUNT(*) AS total FROM loans');
-    const [statusBreakdown] = await db.query(
-      'SELECT status, COUNT(*) AS count FROM loans GROUP BY status'
+    const [periodTotalRow] = await db.query(
+      `SELECT COUNT(*) AS total FROM loans ${dateFilter}`,
+      params
     );
+    const [statusBreakdown] = await db.query(
+      `SELECT status, COUNT(*) AS count FROM loans ${dateFilter} GROUP BY status`,
+      params
+    );
+    const approvedFilter = dateFilter
+      ? `${dateFilter} AND status = 'Approved'`
+      : `WHERE status = 'Approved'`;
     const [totalAmount] = await db.query(
-      "SELECT SUM(amount) AS total_amount FROM loans WHERE status = 'Approved'"
+      `SELECT SUM(amount) AS total_amount FROM loans ${approvedFilter}`,
+      params
     );
     const [monthlyTrend] = await db.query(`
-      SELECT DATE_FORMAT(created_at, '%Y-%m') AS month,
+      SELECT DATE_FORMAT(created_at, ${groupFormat}) AS month,
              COUNT(*) AS count,
              SUM(amount) AS total_amount
       FROM loans
-      WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+      ${dateFilter}
       GROUP BY month
       ORDER BY month ASC
-    `);
+    `, params);
     const [recentLoans] = await db.query(`
       SELECT l.id, l.amount, l.status, l.created_at,
              c.id AS customer_id, c.name AS customer_name, u.name AS applied_by_name
@@ -284,13 +354,17 @@ const LoanModel = {
     `);
 
     return {
-      total: total[0].total,
+      total: Number(total[0]?.total || 0),
+      periodTotal: Number(periodTotalRow[0]?.total || 0),
       statusBreakdown,
-      totalApprovedAmount: totalAmount[0].total_amount || 0,
+      totalApprovedAmount: Number((totalAmount[0] && totalAmount[0].total_amount) || 0),
       monthlyTrend,
-      recentLoans
+      recentLoans,
+      period,
+      groupLabel
     };
   },
+
 
   async delete(id) {
     const [result] = await db.query('DELETE FROM loans WHERE id = ?', [id]);

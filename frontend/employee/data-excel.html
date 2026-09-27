@@ -23,244 +23,1190 @@
     })();
   </script>
   <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <style>
-
-    /* ── Table Pagination ─────────────────────────────────────────────── */
-    .tbl-pagination {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 6px;
-      padding: 12px 16px 10px;
-      flex-wrap: wrap;
+    /* ═══════════════════════════════════════════════════════════════════════
+       EMPLOYEE CRM WORKSPACE STYLES
+       Modern FinTech CRM aesthetic: emerald/accent tones, crisp borders,
+       high readability Manrope typography, zero emojis, full responsiveness.
+    ══════════════════════════════════════════════════════════════════════════ */
+    .content-body {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      box-sizing: border-box;
+      padding: 24px 32px;
     }
-    .tbl-pg-btn {
+
+    @media (max-width: 1024px) {
+      .content-body {
+        padding: 20px 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .content-body {
+        padding: 16px 12px;
+      }
+    }
+
+    /* ── Badges ─────────────────────────────────────────────────────────── */
+    .crm-badge {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      min-width: 34px;
-      height: 34px;
-      padding: 0 10px;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+    .crm-badge svg {
+      width: 12px;
+      height: 12px;
+      stroke-width: 2.2;
+    }
+    .crm-badge-assigned {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      color: #2563eb;
+    }
+    :root[data-theme='dark'] .crm-badge-assigned {
+      color: #60a5fa;
+      border-color: rgba(96, 165, 250, 0.3);
+    }
+    .crm-badge-inprogress {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: #d97706;
+    }
+    :root[data-theme='dark'] .crm-badge-inprogress {
+      color: #fbbf24;
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+    .crm-badge-completed {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #059669;
+    }
+    :root[data-theme='dark'] .crm-badge-completed {
+      color: #34d399;
+      border-color: rgba(52, 211, 153, 0.3);
+    }
+    .crm-badge-pending {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #dc2626;
+    }
+    :root[data-theme='dark'] .crm-badge-pending {
+      color: #f87171;
+      border-color: rgba(248, 113, 113, 0.3);
+    }
+    .crm-badge-id {
+      background: var(--bg-secondary);
       border: 1px solid var(--border);
-      border-radius: 7px;
-      background: var(--bg-card);
       color: var(--text-secondary);
+      font-weight: 700;
+    }
+    .crm-badge-time {
+      background: var(--accent-soft);
+      border: 1px solid rgba(15, 39, 71, 0.15);
+      color: var(--accent);
+    }
+    :root[data-theme='dark'] .crm-badge-time {
+      background: rgba(139, 180, 255, 0.12);
+      border-color: rgba(139, 180, 255, 0.3);
+      color: #8bb4ff;
+    }
+
+    /* ── Workspace Sheet Header ─────────────────────────────────────────── */
+    .crm-sheet-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .crm-sheet-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-top-left-radius: var(--radius);
+      border-top-right-radius: var(--radius);
+      background: linear-gradient(90deg, var(--accent), #2563eb, #10b981);
+    }
+    .crm-header-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      flex: 1;
+      min-width: 280px;
+    }
+    .crm-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .crm-back-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--bg-card);
+      transform: translateX(-2px);
+    }
+    .crm-back-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2.2;
+    }
+    .crm-title-area {
+      flex: 1;
+    }
+    .crm-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .crm-sheet-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.25;
+      letter-spacing: -0.3px;
+      word-break: break-word;
+    }
+    .crm-sheet-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 0;
+    }
+    .crm-meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .crm-meta-item svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--text-muted);
+    }
+    .crm-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ── KPI Summary Cards (4 Cards Grid) ───────────────────────────────── */
+    .crm-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 1024px) {
+      .crm-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 580px) {
+      .crm-kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .crm-kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .crm-kpi-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+    .crm-kpi-icon-wrap {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .crm-kpi-icon-wrap svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2.2;
+    }
+    .crm-kpi-icon-total {
+      background: rgba(59, 130, 246, 0.12);
+      color: #2563eb;
+    }
+    :root[data-theme='dark'] .crm-kpi-icon-total {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+    }
+    .crm-kpi-icon-completed {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+    }
+    :root[data-theme='dark'] .crm-kpi-icon-completed {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+    }
+    .crm-kpi-icon-pending {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+    }
+    :root[data-theme='dark'] .crm-kpi-icon-pending {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+    }
+    .crm-kpi-icon-progress {
+      background: rgba(99, 102, 241, 0.12);
+      color: #4f46e5;
+    }
+    :root[data-theme='dark'] .crm-kpi-icon-progress {
+      background: rgba(99, 102, 241, 0.2);
+      color: #818cf8;
+    }
+    .crm-kpi-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .crm-kpi-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+      font-family: inherit;
+    }
+    .crm-kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+    .crm-kpi-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── Progress Section ───────────────────────────────────────────────── */
+    .crm-progress-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-soft);
+    }
+    .crm-progress-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .crm-progress-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .crm-progress-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin: 0;
+    }
+    .crm-progress-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    :root[data-theme='dark'] .crm-progress-counter {
+      color: #8bb4ff;
+    }
+    .crm-progress-track {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--bg-secondary);
+      overflow: hidden;
+      position: relative;
+    }
+    .crm-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #2563eb, #10b981);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .crm-progress-tip {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .crm-progress-tip svg {
+      width: 13px;
+      height: 13px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── CRM Record Workspace Toolbar ────────────────────────────────────── */
+    .crm-toolbar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .crm-toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+      min-width: 280px;
+    }
+    .crm-search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-width: 240px;
+      max-width: 380px;
+    }
+    .crm-search-icon {
+      position: absolute;
+      left: 12px;
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .crm-search-input {
+      width: 100%;
+      padding: 9px 34px 9px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .crm-search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--bg-card);
+      box-shadow: 0 0 0 3px rgba(15, 39, 71, 0.12);
+    }
+    .crm-search-clear {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      display: none;
+    }
+    .crm-search-clear:hover {
+      color: var(--text-primary);
+    }
+    .crm-filter-select {
+      padding: 9px 32px 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23526173' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
+      background-size: 12px;
+      appearance: none;
+      -webkit-appearance: none;
+      color: var(--text-primary);
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.18s ease;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      min-width: 140px;
+    }
+    .crm-filter-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background-color: var(--bg-card);
+      box-shadow: 0 0 0 3px rgba(15, 39, 71, 0.12);
+    }
+    .crm-filter-select.is-active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background-color: var(--accent-soft);
+    }
+    :root[data-theme='dark'] .crm-filter-select.is-active {
+      background-color: rgba(139, 180, 255, 0.12);
+      color: #8bb4ff;
+    }
+    .crm-toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .crm-clear-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .crm-clear-btn:hover {
+      border-color: #dc2626;
+      color: #dc2626;
+      background: rgba(239, 68, 68, 0.06);
+    }
+    .crm-clear-btn svg {
+      width: 13px;
+      height: 13px;
+    }
+    .crm-refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .crm-refresh-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--bg-card);
+    }
+    .crm-refresh-btn svg {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.4s ease;
+    }
+    .crm-refresh-btn.spinning svg {
+      transform: rotate(360deg);
+    }
+
+    /* ── CRM Table Container & Table ────────────────────────────────────── */
+    .crm-table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .crm-table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    table.crm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    table.crm-table thead th {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      padding: 12px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1.5px solid var(--border);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    table.crm-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s ease;
+    }
+    table.crm-table tbody tr:last-child {
+      border-bottom: none;
+    }
+    table.crm-table tbody tr:hover {
+      background: var(--table-row-hover);
+    }
+    table.crm-table tbody tr.is-completed {
+      background: rgba(16, 185, 129, 0.04);
+    }
+    table.crm-table tbody tr.is-dirty {
+      background: rgba(245, 158, 11, 0.04);
+    }
+    table.crm-table tbody td {
+      padding: 10px 14px;
+      vertical-align: middle;
+      color: var(--text-primary);
+    }
+
+    /* Row index */
+    .crm-row-index {
+      font-family: monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* Phone Number Display */
+    .crm-phone-cell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .crm-phone-number {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .crm-phone-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .crm-icon-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .crm-icon-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+    .crm-icon-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke-width: 2.2;
+    }
+    .crm-icon-btn.crm-btn-call {
+      color: #2563eb;
+      background: rgba(37, 99, 235, 0.08);
+      border-color: rgba(37, 99, 235, 0.2);
+    }
+    .crm-icon-btn.crm-btn-call:hover {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+    :root[data-theme='dark'] .crm-icon-btn.crm-btn-call {
+      color: #60a5fa;
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(96, 165, 250, 0.3);
+    }
+    :root[data-theme='dark'] .crm-icon-btn.crm-btn-call:hover {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+
+    .crm-icon-btn.crm-btn-whatsapp {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+    .crm-icon-btn.crm-btn-whatsapp:hover {
+      background: #10b981;
+      color: #fff;
+      border-color: #10b981;
+    }
+    :root[data-theme='dark'] .crm-icon-btn.crm-btn-whatsapp {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(52, 211, 153, 0.3);
+    }
+    :root[data-theme='dark'] .crm-icon-btn.crm-btn-whatsapp:hover {
+      background: #059669;
+      color: #fff;
+      border-color: #059669;
+    }
+
+    /* In-table Select Dropdowns */
+    .crm-table-select {
+      width: 100%;
+      min-width: 140px;
+      padding: 8px 30px 8px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-body, #fff) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23526173' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 8px center;
+      background-size: 12px;
+      appearance: none;
+      -webkit-appearance: none;
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    :root[data-theme='dark'] .crm-table-select {
+      background-color: var(--bg-card);
+    }
+    .crm-table-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 39, 71, 0.12);
+    }
+    .crm-table-select:disabled {
+      opacity: 0.55;
+      background-color: var(--bg-secondary);
+      cursor: not-allowed;
+    }
+    .crm-table-select.is-dirty {
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+    }
+
+    /* In-table Notes Input / Textarea */
+    .crm-notes-input {
+      width: 100%;
+      min-width: 180px;
+      padding: 7px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-body, #fff);
+      color: var(--text-primary);
+      font-size: 12px;
+      line-height: 1.4;
+      resize: vertical;
+      min-height: 44px;
+      max-height: 120px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+    :root[data-theme='dark'] .crm-notes-input {
+      background-color: var(--bg-card);
+    }
+    .crm-notes-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 39, 71, 0.12);
+    }
+    .crm-notes-input.is-dirty {
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+    }
+
+    /* Row Status Column & Unsaved Indicator */
+    .crm-status-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+    }
+    .crm-row-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      line-height: 1;
+    }
+    .crm-row-tag.unsaved {
+      color: #d97706;
+    }
+    .crm-row-tag.saved {
+      color: #059669;
+    }
+
+    /* Row Save Action Button */
+    .crm-save-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      min-width: 78px;
+    }
+    .crm-save-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke-width: 2.2;
+    }
+    .crm-save-btn.is-clean {
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      cursor: default;
+    }
+    :root[data-theme='dark'] .crm-save-btn.is-clean {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(52, 211, 153, 0.3);
+    }
+    .crm-save-btn.is-dirty {
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+    }
+    .crm-save-btn.is-dirty:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    }
+    .crm-save-btn.is-saving {
+      background: var(--bg-secondary);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      border: 1px solid var(--border);
+    }
+    .crm-save-btn.is-error {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    /* ── Table Pagination Bar ───────────────────────────────────────────── */
+    .crm-pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+      flex-wrap: wrap;
+    }
+    .crm-pagination-info {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .crm-per-page-select {
+      padding: 5px 24px 5px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-secondary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23526173' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 6px center;
+      background-size: 10px;
+      appearance: none;
+      -webkit-appearance: none;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .crm-pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .crm-pg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+      padding: 0 9px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
       user-select: none;
       font-family: inherit;
     }
-    .tbl-pg-btn:hover:not(:disabled):not(.active) {
+    .crm-pg-btn:hover:not(:disabled):not(.active) {
       background: var(--accent-soft);
       border-color: var(--accent);
       color: var(--accent);
     }
-    .tbl-pg-btn.active {
-      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+    .crm-pg-btn.active {
+      background: var(--accent);
       border-color: var(--accent);
       color: #fff;
-      box-shadow: 0 4px 12px rgba(15,39,71,0.22);
     }
-    .tbl-pg-btn:disabled {
-      opacity: 0.38;
+    .crm-pg-btn:disabled {
+      opacity: 0.35;
       cursor: not-allowed;
       pointer-events: none;
     }
-    :root[data-theme='dark'] .tbl-pg-btn {
-      background: rgba(9,17,29,0.58);
-      border-color: rgba(151,176,210,0.14);
+    .crm-pg-ellipsis {
+      padding: 0 4px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* ── Sticky Submit Action Bar ───────────────────────────────────────── */
+    .crm-submit-bar {
+      position: sticky;
+      bottom: 16px;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 22px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      backdrop-filter: blur(10px);
+    }
+    .crm-submit-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .crm-submit-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .crm-submit-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.2;
+    }
+    .crm-submit-text-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .crm-submit-text-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 2px 0 0 0;
+    }
+    .crm-submit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 24px;
+      font-size: 13.5px;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .crm-submit-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+    }
+    .crm-submit-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      background: var(--text-muted);
+      transform: none;
+    }
+    .crm-submit-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.2;
+    }
+
+    /* ── Empty & Loading States ─────────────────────────────────────────── */
+    .crm-empty-state {
+      text-align: center;
+      padding: 50px 20px;
       color: var(--text-secondary);
     }
-    :root[data-theme='dark'] .tbl-pg-btn:hover:not(:disabled):not(.active) {
-      background: rgba(139,180,255,0.12);
-      border-color: rgba(139,180,255,0.4);
-      color: #8bb4ff;
+    .crm-empty-state svg {
+      width: 48px;
+      height: 48px;
+      stroke: var(--text-muted);
+      stroke-width: 1.5;
+      fill: none;
+      margin: 0 auto 14px;
+      display: block;
     }
-    :root[data-theme='dark'] .tbl-pg-btn.active {
-      background: linear-gradient(135deg, var(--accent), #1d4ed8);
-      border-color: var(--accent);
-      color: #fff;
+    .crm-empty-state h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 6px 0;
     }
-    .tbl-pg-info {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-right: auto;
+    .crm-empty-state p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      max-width: 420px;
+      margin: 0 auto 16px;
     }
-    @media (max-width: 600px) {
-      .tbl-pagination { justify-content: center; }
-      .tbl-pg-info { width: 100%; text-align: center; margin-right: 0; }
-    }
-    /* ═══ Module-scoped styles ═══════════════════════════════════════════════ */
-    .content-body { padding: 24px; }
 
-    /* ── Assignment cards ── */
+    .crm-skeleton-row {
+      height: 52px;
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-bottom: 1px solid var(--border);
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Assignment Cards (List View) ───────────────────────────────────── */
     .assign-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px; margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
     }
     .assign-card {
-      background: var(--bg-card); border: 1.5px solid var(--border);
-      border-radius: var(--radius); padding: 20px;
-      box-shadow: var(--shadow-soft); transition: all .25s ease;
-      cursor: pointer; position: relative; overflow: hidden;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-soft);
+      transition: all 0.25s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
     .assign-card::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:3px;
-      background: linear-gradient(90deg, var(--accent), #22c55e);
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #2563eb);
     }
-    .assign-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-medium); border-color: var(--accent); }
-    .assign-card.completed::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
-    .assign-card.completed { border-color: rgba(34,197,94,.3); }
-    .assign-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px; }
-    .assign-card-title { font-size:14px; font-weight:700; color:var(--text-primary); line-height:1.3; word-break:break-word; }
-    .assign-card-meta  { font-size:12px; color:var(--text-secondary); margin-top:4px; }
-    .assign-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px; }
-    .assign-stat  { text-align:center; background:var(--bg-body); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 6px; }
-    .assign-stat-val { font-size:20px; font-weight:800; color:var(--text-primary); }
-    .assign-stat-lbl { font-size:10px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
-    .prog-bar { height:6px; border-radius:999px; background:var(--bg-secondary); overflow:hidden; margin-bottom:8px; }
-    .prog-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--accent),#22c55e); transition:width .5s; }
-    .prog-row  { display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-bottom:14px; }
-    .open-btn  { width:100%; padding:10px; font-size:13px; font-weight:700; border:none; border-radius:var(--radius-sm); background:linear-gradient(135deg,var(--accent),#1d4ed8); color:#fff; cursor:pointer; transition:all .2s; }
-    .open-btn:hover { transform:scale(1.02); box-shadow:0 4px 14px rgba(15,39,71,.3); }
-
-    /* ── Badge ── */
-    .badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:700; white-space:nowrap; }
-    .badge-assigned   { background:rgba(59,130,246,.12);  color:#2563eb; }
-    .badge-inprogress { background:rgba(245,158,11,.13);  color:#b45309; }
-    .badge-completed  { background:rgba(34,197,94,.13);   color:#15803d; }
-    .badge-closed     { background:rgba(148,163,184,.15); color:#64748b; }
-    .badge-pending    { background:rgba(239,68,68,.12);   color:#dc2626; }
-    .badge-saved      { background:rgba(34,197,94,.13);   color:#15803d; }
-    .badge-editing    { background:rgba(245,158,11,.13);  color:#b45309; }
-
-    /* ── Work sheet view ── */
-    .sheet-header {
-      display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap;
+    .assign-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-medium);
+      border-color: var(--accent);
     }
-    .back-btn {
-      display:inline-flex; align-items:center; gap:6px;
-      padding:8px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm);
-      background:var(--bg-card); color:var(--text-primary); font-size:13px; font-weight:600;
-      cursor:pointer; transition:all .2s;
+    .assign-card.completed::before {
+      background: linear-gradient(90deg, #059669, #10b981);
     }
-    .back-btn:hover { border-color:var(--accent); color:var(--accent); }
-    .sheet-title { font-size:18px; font-weight:800; color:var(--text-primary); }
-    .sheet-subtitle { font-size:13px; color:var(--text-secondary); margin-top:2px; }
-
-    /* ── KPI row ── */
-    .kpi-mini-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
-    @media(max-width:640px){ .kpi-mini-row { grid-template-columns:repeat(2,1fr); } }
-    .kpi-mini { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; }
-    .kpi-mini-val { font-size:22px; font-weight:800; color:var(--text-primary); }
-    .kpi-mini-lbl { font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
-
-    /* ── Records table ── */
-    .rec-table-wrap { border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; }
-    .rec-table-wrap table { width:100%; border-collapse:collapse; font-size:13px; }
-    .rec-table-wrap thead th {
-      background:linear-gradient(90deg,var(--bg-secondary),var(--bg-card));
-      padding:11px 14px; font-size:11px; font-weight:700; text-transform:uppercase;
-      letter-spacing:.5px; color:var(--text-secondary); border-bottom:2px solid var(--border);
-      text-align:left; position:sticky; top:0; z-index:1; white-space:nowrap;
+    .assign-card.completed {
+      border-color: rgba(16, 185, 129, 0.35);
     }
-    .rec-table-wrap tbody tr { transition:background .15s; }
-    .rec-table-wrap tbody tr:hover { background:var(--bg-secondary); }
-    .rec-table-wrap tbody td { padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
-    .rec-table-wrap tbody tr:last-child td { border-bottom:none; }
-    .rec-table-wrap tbody tr.completed-row { background:rgba(34,197,94,.04); }
-
-    /* ── Disposition select (searchable) ── */
-    .disp-wrap { position:relative; }
-    .disp-input {
-      width:100%; padding:7px 10px; border:1.5px solid var(--border); border-radius:6px;
-      background:var(--bg-card); color:var(--text-primary); font-size:12px; font-family:inherit;
-      cursor:pointer; transition:border .2s;
+    .assign-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
     }
-    .disp-input:focus { outline:none; border-color:var(--accent); }
-    .disp-input.filled { border-color:rgba(34,197,94,.5); background:rgba(34,197,94,.04); }
-    .disp-dropdown {
-      position:fixed; top:0; left:0; right:auto; z-index:300; min-width:180px; max-width:calc(100vw - 24px);
-      background:var(--bg-card); border:1.5px solid var(--accent); border-radius:8px;
-      box-shadow:var(--shadow-medium); max-height:220px; overflow-y:auto; display:none; overscroll-behavior:contain;
+    .assign-card-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.3;
+      word-break: break-word;
     }
-    .disp-dropdown.open { display:block; }
-    .disp-search { padding:8px 10px; border-bottom:1px solid var(--border); }
-    .disp-search input { width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:4px; font-size:12px; background:var(--bg-body); color:var(--text-primary); }
-    .disp-option { padding:8px 12px; font-size:12px; cursor:pointer; transition:background .15s; color:var(--text-primary); }
-    .disp-option:hover, .disp-option.active { background:var(--accent-soft); color:var(--accent); }
-
-    /* ── Sub Disposition ── */
-    .subdisp-wrap { position:relative; }
-    .subdisp-input {
-      width:100%; padding:7px 10px; border:1.5px solid var(--border); border-radius:6px;
-      background:var(--bg-card); color:var(--text-primary); font-size:12px; font-family:inherit;
-      transition:border .2s;
+    .assign-card-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
-    .subdisp-input:focus { outline:none; border-color:var(--accent); }
-    .subdisp-input.filled { border-color:rgba(34,197,94,.5); background:rgba(34,197,94,.04); }
-    .subdisp-dropdown {
-      position:fixed; top:0; left:0; right:auto; z-index:300; min-width:180px; max-width:calc(100vw - 24px);
-      background:var(--bg-card); border:1.5px solid var(--accent); border-radius:8px;
-      box-shadow:var(--shadow-medium); max-height:180px; overflow-y:auto; display:none; overscroll-behavior:contain;
+    .assign-card-meta svg {
+      width: 13px;
+      height: 13px;
+      stroke: var(--text-muted);
     }
-    .subdisp-dropdown.open { display:block; }
-    .subdisp-option { padding:8px 12px; font-size:12px; cursor:pointer; transition:background .15s; color:var(--text-primary); }
-    .subdisp-option:hover { background:var(--accent-soft); color:var(--accent); }
-
-    /* ── Save button per row ── */
-    .save-btn { padding:6px 12px; font-size:11px; font-weight:700; border:none; border-radius:6px; cursor:pointer; transition:all .2s; white-space:nowrap; }
-    .save-btn.needs-save { background:linear-gradient(135deg,var(--accent),#1d4ed8); color:#fff; }
-    .save-btn.saved { background:rgba(34,197,94,.12); color:#15803d; cursor:default; }
-    .save-btn.saving { background:var(--bg-secondary); color:var(--text-muted); cursor:default; }
-
-    /* ── Submit bar ── */
-    .submit-bar {
-      position:sticky; bottom:0; left:0; right:0; z-index:10;
-      background:linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
-      border-top:1.5px solid var(--border); padding:14px 20px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
-      box-shadow:0 -4px 16px rgba(0,0,0,.1);
+    .assign-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
     }
-    .submit-info { font-size:13px; color:var(--text-secondary); }
-    .submit-btn {
-      padding:10px 24px; font-size:14px; font-weight:700; border:none; border-radius:var(--radius-sm);
-      background:linear-gradient(135deg,#15803d,#16a34a); color:#fff; cursor:pointer; transition:all .2s;
+    .assign-stat {
+      text-align: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 6px;
     }
-    .submit-btn:hover { transform:scale(1.03); box-shadow:0 4px 14px rgba(21,128,61,.35); }
-    .submit-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .assign-stat-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+    .assign-stat-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-top: 4px;
+    }
+    .prog-bar {
+      height: 6px;
+      border-radius: 999px;
+      background: var(--bg-secondary);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .prog-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), #10b981);
+      transition: width 0.5s ease;
+    }
+    .prog-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+    .open-btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: auto;
+    }
+    .open-btn:hover {
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+      transform: translateY(-1px);
+    }
+    .assign-card.completed .open-btn {
+      background: linear-gradient(135deg, #059669, #10b981);
+    }
 
-    /* ── Search bar ── */
-    .search-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
-    .search-bar input, .search-bar select { padding:8px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-primary); font-size:13px; }
-    .search-bar input { flex:1; min-width:160px; max-width:260px; }
-
-    /* ── Empty / skeleton ── */
-    .skeleton { background:linear-gradient(90deg,var(--bg-secondary) 25%,var(--bg-card) 50%,var(--bg-secondary) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:6px; height:48px; margin-bottom:10px; }
-    @keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
-    .empty-state { text-align:center; padding:60px 24px; color:var(--text-secondary); }
-    .empty-state svg { width:56px; height:56px; stroke:var(--text-muted); fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; margin:0 auto 16px; display:block; }
-    .empty-state h3 { font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:6px; }
-
-    /* ── Toast ── */
-    .toast-wrap { position:fixed; bottom:80px; right:24px; display:flex; flex-direction:column-reverse; gap:8px; z-index:9999; }
-    .toast { padding:12px 18px; border-radius:var(--radius-sm); font-size:13px; font-weight:600; box-shadow:var(--shadow-medium); color:#fff; min-width:240px; max-width:360px; animation:toastIn .3s ease; display:flex; align-items:center; gap:10px; }
-    .toast-success { background:linear-gradient(135deg,#15803d,#16a34a); }
-    .toast-error   { background:linear-gradient(135deg,#dc2626,#b91c1c); }
-    .toast-info    { background:linear-gradient(135deg,var(--accent),#1d4ed8); }
-    @keyframes toastIn { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:none;} }
-
-    /* ── Global Assigned Record Search Panel ── */
+    /* ── Global Search Panel ────────────────────────────────────────────── */
     .global-search-panel {
       background: var(--bg-card);
       border: 1.5px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 28px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      padding: 22px;
+      margin-bottom: 26px;
+      box-shadow: var(--shadow-soft);
       position: relative;
     }
     .global-search-panel::before {
@@ -270,28 +1216,29 @@
       height: 3px;
       border-top-left-radius: var(--radius);
       border-top-right-radius: var(--radius);
-      background: linear-gradient(90deg, var(--accent), #3b82f6, #06b6d4);
+      background: linear-gradient(90deg, var(--accent), #2563eb, #06b6d4);
     }
     .gsearch-header {
       display: flex;
       align-items: center;
       gap: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .gsearch-icon {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 12px;
-      background: rgba(59, 130, 246, 0.12);
-      color: var(--accent);
+      background: rgba(37, 99, 235, 0.12);
+      color: #2563eb;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
     .gsearch-icon svg {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.2;
     }
     .gsearch-title {
       font-size: 17px;
@@ -307,16 +1254,16 @@
     .gsearch-form {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
     .gsearch-primary-field label {
       display: block;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-secondary);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .gsearch-input-wrap {
       position: relative;
@@ -326,14 +1273,14 @@
     .gsearch-field-icon {
       position: absolute;
       left: 14px;
-      width: 18px;
-      height: 18px;
+      width: 17px;
+      height: 17px;
       color: var(--text-muted);
       pointer-events: none;
     }
     .gsearch-input-wrap input {
       width: 100%;
-      padding: 12px 38px 12px 42px;
+      padding: 10px 36px 10px 40px;
       border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
       background: var(--bg-secondary);
@@ -341,11 +1288,13 @@
       font-size: 14px;
       font-weight: 600;
       transition: all 0.2s ease;
+      font-family: inherit;
     }
     .gsearch-input-wrap input:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+      background: var(--bg-card);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
     .gsearch-clear-input {
       position: absolute;
@@ -358,13 +1307,10 @@
       line-height: 1;
       padding: 4px;
     }
-    .gsearch-clear-input:hover {
-      color: var(--text-primary);
-    }
     .gsearch-filters-row {
       display: grid;
       grid-template-columns: 1.3fr 1fr 1fr auto;
-      gap: 14px;
+      gap: 12px;
       align-items: flex-end;
     }
     @media (max-width: 900px) {
@@ -397,17 +1343,7 @@
       font-size: 13px;
       font-weight: 500;
       transition: border 0.2s;
-    }
-    :root[data-theme='dark'] .gsearch-filter-col input[type="date"] {
-      color-scheme: dark;
-    }
-    :root[data-theme='light'] .gsearch-filter-col input[type="date"] {
-      color-scheme: light;
-    }
-    .gsearch-filter-col select:focus,
-    .gsearch-filter-col input[type="date"]:focus {
-      outline: none;
-      border-color: var(--accent);
+      font-family: inherit;
     }
     .date-inputs-group {
       display: flex;
@@ -429,7 +1365,7 @@
       gap: 8px;
     }
     .gsearch-btn {
-      padding: 10px 18px;
+      padding: 9px 16px;
       font-size: 13px;
       font-weight: 700;
       display: inline-flex;
@@ -439,7 +1375,7 @@
       height: 40px;
     }
     .gclear-btn {
-      padding: 10px 14px;
+      padding: 9px 14px;
       font-size: 13px;
       font-weight: 600;
       white-space: nowrap;
@@ -448,15 +1384,15 @@
 
     /* ── Global Search Results ── */
     .gsearch-results-area {
-      margin-top: 22px;
-      padding-top: 20px;
+      margin-top: 20px;
+      padding-top: 18px;
       border-top: 1.5px solid var(--border);
     }
     .gsearch-results-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .gsearch-results-title {
       font-size: 14px;
@@ -466,30 +1402,21 @@
       align-items: center;
       gap: 8px;
     }
-    .gsearch-badge-count {
-      background: rgba(59,130,246,0.12);
-      color: #2563eb;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 999px;
-    }
     .gsearch-cards-list {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
     .gsearch-card {
-      background: var(--bg-card);
-      border: 1.5px solid var(--border);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 16px 20px;
+      padding: 16px;
       transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
     .gsearch-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+      background: var(--bg-card);
     }
     .gsearch-card-top {
       display: flex;
@@ -505,6 +1432,7 @@
       gap: 10px;
     }
     .gsearch-card-phone {
+      font-family: monospace;
       font-size: 16px;
       font-weight: 800;
       color: var(--text-primary);
@@ -513,11 +1441,11 @@
     .gsearch-card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px 18px;
-      background: var(--bg-secondary);
+      gap: 12px;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 12px 16px;
+      padding: 12px 14px;
       margin-bottom: 12px;
     }
     .gsearch-prop-label {
@@ -538,25 +1466,61 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 10px;
     }
-    .gsearch-open-btn {
-      padding: 8px 18px;
-      font-size: 12px;
-      font-weight: 700;
-      border: none;
+
+    /* ── Row Focus Pulse Animation ── */
+    @keyframes rowFocusPulse {
+      0% {
+        background-color: rgba(37, 99, 235, 0.22);
+        box-shadow: inset 0 0 0 2px var(--accent);
+      }
+      50% {
+        background-color: rgba(37, 99, 235, 0.08);
+        box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.4);
+      }
+      100% {
+        background-color: rgba(37, 99, 235, 0.22);
+        box-shadow: inset 0 0 0 2px var(--accent);
+      }
+    }
+    .row-focused-highlight {
+      animation: rowFocusPulse 1.2s infinite ease-in-out !important;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* ── Toast Notifications ────────────────────────────────────────────── */
+    .toast-wrap {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 8px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    .toast {
+      padding: 12px 18px;
       border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
       color: #fff;
-      cursor: pointer;
-      display: inline-flex;
+      min-width: 260px;
+      max-width: 380px;
+      animation: toastIn 0.25s ease;
+      display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
+      gap: 10px;
+      pointer-events: auto;
     }
-    .gsearch-open-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    .toast-success { background: linear-gradient(135deg, #059669, #10b981); }
+    .toast-error   { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+    .toast-info    { background: linear-gradient(135deg, var(--accent), #2563eb); }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: none; }
     }
 
     /* ── Assigned Records Subheader & Filter Tabs ── */
@@ -579,21 +1543,6 @@
       color: var(--text-primary);
       margin: 0;
     }
-    .assigned-records-count {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 3px 10px;
-      border-radius: 999px;
-    }
-    .assigned-records-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
     .filter-tab-group {
       display: flex;
       background: var(--bg-card);
@@ -607,11 +1556,12 @@
       border: none;
       padding: 6px 14px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-secondary);
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.15s ease;
+      font-family: inherit;
     }
     .filter-tab:hover {
       color: var(--text-primary);
@@ -619,44 +1569,6 @@
     .filter-tab.active {
       background: var(--accent);
       color: #fff;
-    }
-
-    /* ── Row Focus Pulse Animation ── */
-    @keyframes rowFocusPulse {
-      0% {
-        background-color: rgba(37, 99, 235, 0.25);
-        box-shadow: inset 0 0 0 2px var(--accent);
-      }
-      50% {
-        background-color: rgba(37, 99, 235, 0.12);
-        box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.5);
-      }
-      100% {
-        background-color: rgba(37, 99, 235, 0.25);
-        box-shadow: inset 0 0 0 2px var(--accent);
-      }
-    }
-    .row-focused-highlight {
-      animation: rowFocusPulse 1.2s infinite ease-in-out !important;
-      position: relative;
-      z-index: 5;
-    }
-
-    /* ── Notes input in table ── */
-    .notes-input {
-      width: 100%;
-      padding: 7px 10px;
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-size: 12px;
-      font-family: inherit;
-      transition: border 0.2s;
-    }
-    .notes-input:focus {
-      outline: none;
-      border-color: var(--accent);
     }
   </style>
 </head>
@@ -668,27 +1580,27 @@
     <div class="sidebar-header">
       <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
-        <div><h2><span class="emoji-sm">💼</span>CLN Lending Suite</h2><span>Employee Workspace</span></div>
+        <div><h2>CLN Lending Suite</h2><span>Employee Workspace</span></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-                        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span> Dashboard</a>
-        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon"><i class="fas fa-user-plus"></i></span> Add Customer</a>
-        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users"></i></span> My Customers</a>
-        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase"></i></span> My Loans</a>
-        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> My Assigned Records</a>
-        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line"></i></span> APR</a>
-</div>
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Add Customer</span></a>
+        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>My Customers</span></a>
+        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>My Loans</span></a>
+        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+        <a href="/employee/data-excel.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>My Assigned Records</span></a>
+        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="sidebar-user-avatar">E</div>
         <div class="user-details"><p id="sidebar-user-name">Employee</p><span id="sidebar-user-role">employee</span></div>
       </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
     </div>
   </aside>
 
@@ -697,15 +1609,14 @@
   <!-- ═══ MAIN ═══ -->
   <main class="main-content">
     <div class="topbar">
-      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">Menu</button>
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i> <span>Menu</span>
+      </button>
       <div class="topbar-title">
-        <h2 id="page-title">
-          <svg style="width:20px;height:20px;vertical-align:middle;margin-right:6px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
-          My Assigned Records
-        </h2>
-        <p id="page-subtitle">View and update your assigned Excel files</p>
+        <h2 id="page-title"><i class="fas fa-file-excel" aria-hidden="true"></i> <span>My Assigned Records</span></h2>
+        <p id="page-subtitle">View and update the records assigned to you.</p>
       </div>
-      <div class="topbar-actions" style="display:flex;align-items:center;gap:14px;">
+      <div class="topbar-actions">
         <!-- Notification Bell -->
         <div class="notif-bell-wrap" id="notif-bell-wrap">
           <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifDropdown()" aria-label="Notifications" title="Notifications" tabindex="0">
@@ -726,10 +1637,11 @@
             <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
-          <span id="current-date" style="font-size:12px;font-weight:600;color:var(--text-primary);"></span>
-          <span id="current-time" style="font-size:11px;color:var(--text-muted);"></span>
+        <div class="topbar-date-badge">
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+          <span id="current-date">Today</span>
         </div>
+        <span id="current-time" style="display:none;"></span>
       </div>
     </div>
 
@@ -798,7 +1710,7 @@
               <div class="gsearch-btn-col">
                 <button class="btn btn-primary gsearch-btn" id="btn-search-records" onclick="executeGlobalSearch()">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                  <span>Search Records</span>
+                  <span>Search</span>
                 </button>
                 <button class="btn btn-secondary gclear-btn" id="btn-clear-search" onclick="clearGlobalSearch()">
                   Clear
@@ -811,13 +1723,13 @@
           <div id="gsearch-results-area" class="gsearch-results-area" style="display:none;"></div>
         </section>
 
-        <!-- ═══ ASSIGNED RECORDS HEADER & FILTERS ═══ -->
+        <!-- ═══ ASSIGNED WORKBOOKS HEADER & FILTERS ═══ -->
         <div class="assigned-records-header">
           <div class="assigned-records-title-wrap">
-            <h3>Assigned Records</h3>
-            <span class="assigned-records-count" id="assigned-records-badge">All Records</span>
+            <h3>Assigned Workbooks</h3>
+            <span class="crm-badge crm-badge-assigned" id="assigned-records-badge">All Records</span>
           </div>
-          <div class="assigned-records-actions">
+          <div class="assigned-records-actions" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <div class="filter-tab-group">
               <button class="filter-tab active" id="tab-all" onclick="filterAssignmentCards('all')">All Records</button>
               <button class="filter-tab" id="tab-completed" onclick="filterAssignmentCards('Completed')">Completed</button>
@@ -831,103 +1743,295 @@
         </div>
 
         <div id="list-loading">
-          <div class="skeleton"></div>
-          <div class="skeleton" style="height:120px;border-radius:var(--radius);"></div>
-          <div class="skeleton" style="height:120px;border-radius:var(--radius);"></div>
+          <div class="crm-skeleton-row" style="border-radius:var(--radius);margin-bottom:12px;"></div>
+          <div class="crm-skeleton-row" style="height:120px;border-radius:var(--radius);margin-bottom:12px;"></div>
+          <div class="crm-skeleton-row" style="height:120px;border-radius:var(--radius);"></div>
         </div>
 
         <div id="list-empty" style="display:none;">
-          <div class="empty-state">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 3v18"/></svg>
-            <h3>No Active Assignments</h3>
-            <p>You have no active assignments. Assignments older than 30 days are automatically archived.</p>
+          <div class="crm-empty-state">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M10 9H8"/></svg>
+            <h4>No Active Assignments</h4>
+            <p>You have no active workbook assignments. Assignments older than 30 days are automatically archived.</p>
           </div>
         </div>
 
         <div class="assign-grid" id="assign-grid"></div>
       </div>
 
-      <!-- ─── View: Sheet Editor ────────────────────────────────────────── -->
+      <!-- ─── View: CRM Sheet Editor Workspace ───────────────────────────── -->
       <div id="view-sheet" style="display:none;">
-        <div class="sheet-header">
-          <button class="back-btn" onclick="goBackToList()">
-            <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><path d="M10 6 4 12l6 6"/><path d="M4 12h16"/></svg>
-            Back to List
-          </button>
-          <div>
-            <div class="sheet-title" id="sheet-title">Sheet Name</div>
-            <div class="sheet-subtitle" id="sheet-subtitle"></div>
+
+        <!-- 1. COMPACT PAGE HEADER -->
+        <div class="crm-sheet-header">
+          <div class="crm-header-main">
+            <button class="crm-back-btn" onclick="goBackToList()" title="Return to Assignments">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              <span>Back to Assignments</span>
+            </button>
+            <div class="crm-title-area">
+              <div class="crm-title-row">
+                <h3 class="crm-sheet-title" id="sheet-title">export-145.xlsx</h3>
+                <span class="crm-badge crm-badge-id" id="sheet-id-badge">Assignment #6</span>
+                <span id="sheet-status-badge"></span>
+                <span class="crm-badge crm-badge-time" id="sheet-expiry-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  Active (30-day window)
+                </span>
+              </div>
+              <div class="crm-sheet-subtitle">
+                <span class="crm-meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <span id="sheet-assigned-date">Assigned: —</span>
+                </span>
+                <span class="crm-meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  <span id="sheet-records-meta">87 total records</span>
+                </span>
+              </div>
+            </div>
           </div>
-          <span id="sheet-status-badge"></span>
+          <div class="crm-header-actions">
+            <button class="crm-refresh-btn" id="header-refresh-btn" onclick="loadSheetRecords()" title="Refresh records from database">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Refresh Records</span>
+            </button>
+          </div>
         </div>
 
-        <!-- KPI mini row -->
-        <div class="kpi-mini-row">
-          <div class="kpi-mini"><div class="kpi-mini-val" id="sh-total">—</div><div class="kpi-mini-lbl">Total</div></div>
-          <div class="kpi-mini"><div class="kpi-mini-val" id="sh-completed" style="color:#15803d;">—</div><div class="kpi-mini-lbl">Completed</div></div>
-          <div class="kpi-mini"><div class="kpi-mini-val" id="sh-pending" style="color:#dc2626;">—</div><div class="kpi-mini-lbl">Pending</div></div>
-          <div class="kpi-mini"><div class="kpi-mini-val" id="sh-pct">—</div><div class="kpi-mini-lbl">Progress</div></div>
+        <!-- 2. KPI SUMMARY CARDS (4 CARDS GRID) -->
+        <div class="crm-kpi-grid">
+          <!-- Card 1: Total Assigned -->
+          <div class="crm-kpi-card">
+            <div class="crm-kpi-icon-wrap crm-kpi-icon-total">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <div class="crm-kpi-content">
+              <div class="crm-kpi-value" id="kpi-total-val">0</div>
+              <div class="crm-kpi-label">Assigned Records</div>
+              <div class="crm-kpi-note">Total rows in workbook</div>
+            </div>
+          </div>
+
+          <!-- Card 2: Completed -->
+          <div class="crm-kpi-card">
+            <div class="crm-kpi-icon-wrap crm-kpi-icon-completed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div class="crm-kpi-content">
+              <div class="crm-kpi-value" id="kpi-completed-val" style="color:#059669;">0</div>
+              <div class="crm-kpi-label">Completed</div>
+              <div class="crm-kpi-note" id="kpi-completed-note">Both disp &amp; sub-disp set</div>
+            </div>
+          </div>
+
+          <!-- Card 3: Pending -->
+          <div class="crm-kpi-card">
+            <div class="crm-kpi-icon-wrap crm-kpi-icon-pending">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="crm-kpi-content">
+              <div class="crm-kpi-value" id="kpi-pending-val" style="color:#d97706;">0</div>
+              <div class="crm-kpi-label">Pending</div>
+              <div class="crm-kpi-note">Awaiting call outcome</div>
+            </div>
+          </div>
+
+          <!-- Card 4: Progress % -->
+          <div class="crm-kpi-card">
+            <div class="crm-kpi-icon-wrap crm-kpi-icon-progress">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                <polyline points="17 6 23 6 23 12"/>
+              </svg>
+            </div>
+            <div class="crm-kpi-content">
+              <div class="crm-kpi-value" id="kpi-progress-val" style="color:#2563eb;">0%</div>
+              <div class="crm-kpi-label">Progress</div>
+              <div class="crm-kpi-note">Completion rate</div>
+            </div>
+          </div>
         </div>
 
-        <!-- Search & filter -->
-        <div class="search-bar">
-          <input id="rec-search" type="text" placeholder="Search phone / disposition..." oninput="renderRecordsTable()" />
-          <select id="rec-filter" onchange="renderRecordsTable()">
-            <option value="">All Records</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
-          </select>
-          <button class="btn btn-secondary btn-sm" onclick="loadSheetRecords()">Refresh</button>
+        <!-- 3. DYNAMIC PROGRESS SECTION -->
+        <div class="crm-progress-card">
+          <div class="crm-progress-header">
+            <div class="crm-progress-title-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--accent);">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+              <h4 class="crm-progress-title">Workbook Completion Progress</h4>
+            </div>
+            <div class="crm-progress-counter" id="progress-bar-counter">0 of 0 records completed (0%)</div>
+          </div>
+          <div class="crm-progress-track">
+            <div class="crm-progress-fill" id="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+          <div class="crm-progress-tip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>Records mark automatically as Completed once both Disposition and Sub-disposition are recorded and saved.</span>
+          </div>
         </div>
 
-        <!-- Records table -->
-        <div class="rec-table-wrap" id="rec-table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:50px;">#</th>
-                <th style="min-width:130px;">Phone Number</th>
-                <th style="min-width:180px;">Disposition</th>
-                <th style="min-width:180px;">Sub Disposition</th>
-                <th style="min-width:180px;">Notes</th>
-                <th style="width:80px;">Status</th>
-                <th style="width:80px;">Save</th>
-              </tr>
-            </thead>
-            <tbody id="rec-tbody"></tbody>
-          </table>
-        </div>
-        <div id="rec-pagination"></div>
+        <!-- 4. CRM RECORD WORKSPACE TOOLBAR -->
+        <div class="crm-toolbar">
+          <div class="crm-toolbar-left">
+            <!-- Search Phone / Row / Disp -->
+            <div class="crm-search-wrap">
+              <svg class="crm-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input type="text" id="crm-search-input" class="crm-search-input" placeholder="Search phone, row #, disposition..." oninput="handleTableSearchInput(this.value)" autocomplete="off" />
+              <button type="button" class="crm-search-clear" id="crm-search-clear" onclick="clearTableSearch()" title="Clear search">&times;</button>
+            </div>
 
-        <!-- Submit bar -->
-        <div class="submit-bar" id="submit-bar">
-          <div class="submit-info" id="submit-info">Complete all rows before submitting.</div>
-          <button class="submit-btn" id="submit-btn" onclick="openSubmitConfirm()">
-            Submit Completed Work
+            <!-- Status Filter -->
+            <select id="crm-status-filter" class="crm-filter-select" onchange="handleStatusFilterChange(this.value)" title="Filter by status">
+              <option value="all">All Statuses</option>
+              <option value="Pending">Pending Records</option>
+              <option value="Completed">Completed Records</option>
+            </select>
+
+            <!-- Disposition Filter -->
+            <select id="crm-disp-filter" class="crm-filter-select" onchange="handleDispFilterChange(this.value)" title="Filter by disposition">
+              <option value="all">All Dispositions</option>
+            </select>
+
+            <!-- Clear Filters Button -->
+            <button type="button" class="crm-clear-btn" id="crm-clear-filters-btn" onclick="clearAllFilters()" style="display:none;" title="Clear active filters">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <span>Clear Filters</span>
+            </button>
+          </div>
+
+          <div class="crm-toolbar-right">
+            <!-- Rows per page -->
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;color:var(--text-secondary);font-weight:600;">Rows:</span>
+              <select id="crm-per-page-select" class="crm-per-page-select" onchange="handlePerPageChange(this.value)">
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100" selected>100</option>
+              </select>
+            </div>
+
+            <!-- Refresh Button -->
+            <button class="crm-refresh-btn" onclick="loadSheetRecords()" title="Refresh records table">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. CRM RECORDS TABLE -->
+        <div class="crm-table-card">
+          <div class="crm-table-container">
+            <table class="crm-table" id="crm-records-table">
+              <colgroup>
+                <col style="width: 5%;">
+                <col style="width: 15%;">
+                <col style="width: 17%;">
+                <col style="width: 17%;">
+                <col style="width: 24%;">
+                <col style="width: 11%;">
+                <col style="width: 11%;">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th style="width: 5%; text-align: center;">#</th>
+                  <th style="width: 15%; min-width: 160px;">Phone Number</th>
+                  <th style="width: 17%; min-width: 160px;">Disposition</th>
+                  <th style="width: 17%; min-width: 170px;">Sub Disposition</th>
+                  <th style="width: 24%; min-width: 200px;">Notes</th>
+                  <th style="width: 11%; min-width: 110px;">Status</th>
+                  <th style="width: 11%; min-width: 100px; text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="crm-records-tbody">
+                <!-- Dynamic rows rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty / Loading State Container inside table card -->
+          <div id="crm-table-empty" style="display:none;"></div>
+
+          <!-- 6. PAGINATION CONTROLS -->
+          <div class="crm-pagination-bar" id="crm-pagination-bar">
+            <div class="crm-pagination-info" id="crm-pagination-info">
+              Showing 0–0 of 0 records
+            </div>
+            <div class="crm-pagination-controls" id="crm-pagination-controls">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. SUBMIT COMPLETED WORK BAR -->
+        <div class="crm-submit-bar" id="crm-submit-bar">
+          <div class="crm-submit-bar-left">
+            <div class="crm-submit-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div>
+              <h5 class="crm-submit-text-title" id="submit-summary-title">Submit Completed Assignment</h5>
+              <p class="crm-submit-text-desc" id="submit-summary-desc">Complete all rows before submitting your work.</p>
+            </div>
+          </div>
+          <button class="crm-submit-btn" id="crm-submit-btn" onclick="openSubmitConfirm()" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span>Submit Completed Work</span>
           </button>
         </div>
+
       </div>
     </div>
   </main>
 </div>
 
-<!-- ═══ TOAST ═══ -->
+<!-- ═══ TOAST CONTAINER ═══ -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <!-- ═══ MODAL: Submit Confirm ═══ -->
 <div class="modal-overlay" id="submit-modal">
-  <div class="modal" style="max-width:440px;">
+  <div class="modal" style="max-width:460px;border-radius:16px;">
     <div class="modal-header">
-      <h3>Submit Work</h3>
-      <button class="modal-close" onclick="closeModal('submit-modal')">Close</button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(16, 185, 129, 0.12);color:#059669;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:18px;height:18px;"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 style="font-size:17px;font-weight:800;color:var(--text-primary);margin:0;">Confirm Work Submission</h3>
+      </div>
+      <button class="modal-close" onclick="closeModal('submit-modal')">&times;</button>
     </div>
-    <div style="padding:16px 0;">
-      <p style="font-size:14px;color:var(--text-primary);">Are you sure you want to submit your work? Your assignment status will be updated to <strong>Completed</strong>.</p>
-      <p style="font-size:13px;color:var(--text-secondary);margin-top:10px;" id="submit-summary"></p>
+    <div style="padding:18px 0;">
+      <p style="font-size:14px;color:var(--text-primary);line-height:1.5;margin:0 0 10px 0;">
+        Are you ready to submit your completed records for this workbook? Your assignment status will be updated to <strong>Completed</strong>.
+      </p>
+      <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text-secondary);" id="submit-modal-summary">
+        Loading summary...
+      </div>
     </div>
-    <div class="modal-actions">
+    <div class="modal-actions" style="display:flex;justify-content:flex-end;gap:10px;">
       <button class="btn btn-secondary" onclick="closeModal('submit-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="doSubmit()">Confirm &amp; Submit</button>
+      <button class="btn btn-primary" id="confirm-submit-btn" onclick="doSubmit()">
+        <span>Confirm &amp; Submit</span>
+      </button>
     </div>
   </div>
 </div>
@@ -954,69 +2058,160 @@
 <script src="/js/api.js?v=20260705d"></script>
 <script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
+// ── Master Disposition & Dependent Sub-Disposition Data ───────────────────
+const DISP_OPTIONS = [
+  'Connected',
+  'Not Connected',
+  'Ringing',
+  'Busy',
+  'Switched Off',
+  'Out of Coverage',
+  'Number Invalid',
+  'Wrong Number',
+  'Call Back Requested',
+  'Call Later',
+  'Voice Mail',
+  'No Response',
+  'Customer Interested',
+  'Customer Not Interested',
+  'Follow Up Required',
+  'Loan Inquiry',
+  'Existing Customer',
+  'Duplicate Lead',
+  'Do Not Call',
+  'Language Barrier',
+  'Call Disconnected',
+  'Pending Verification',
+  'Converted',
+  'Rejected',
+  'Other'
+];
+
+const SUB_DISP_MAP = {
+  'Connected':              ['Interested', 'Documents Pending', 'EMI Explained', 'Loan Eligible', 'Follow Up Tomorrow', 'Need Salary Slip', 'Need Bank Statement', 'Other'],
+  'Not Connected':          ['Number Busy', 'Switched Off', 'Out of Network', 'Try Again Later', 'Other'],
+  'Ringing':                ['No Answer', 'Hung Up', 'Left Voicemail', 'Other'],
+  'Busy':                   ['Try Later', 'Scheduled Callback', 'Other'],
+  'Switched Off':           ['Switched Off', 'Unreachable', 'Try Later', 'Other'],
+  'Out of Coverage':        ['Out of Area', 'Network Issue', 'Try Later', 'Other'],
+  'Number Invalid':         ['Wrong Number', 'Non-Existent', 'Other'],
+  'Wrong Number':           ['Person Not Known', 'Wrong Contact', 'Other'],
+  'Call Back Requested':    ['Morning', 'Afternoon', 'Evening', 'Tomorrow', 'Next Week', 'Other'],
+  'Call Later':             ['Customer Busy', 'Driving', 'In Meeting', 'Other'],
+  'Voice Mail':             ['Left Message', 'Full Mailbox', 'Other'],
+  'No Response':            ['No Answer', 'Rang Out', 'Other'],
+  'Customer Interested':    ['Loan Amount Discussed', 'Documents Requested', 'Site Visit Planned', 'Other'],
+  'Customer Not Interested':['Already Taken Loan', 'High Interest Concern', 'Financial Issue', 'Using Another Bank', 'Not Required', 'Other'],
+  'Follow Up Required':     ['After 2 Days', 'After 1 Week', 'End of Month', 'Other'],
+  'Loan Inquiry':           ['Personal Loan', 'Home Loan', 'Business Loan', 'Gold Loan', 'Vehicle Loan', 'Other'],
+  'Existing Customer':      ['Top-up Loan', 'Service Request', 'Complaint', 'Other'],
+  'Duplicate Lead':         ['Already Contacted', 'Assigned to Colleague', 'Other'],
+  'Do Not Call':            ['Requested DNC', 'Abusive', 'Not Interested Ever', 'Other'],
+  'Language Barrier':       ['Hindi Preferred', 'Tamil Preferred', 'Telugu Preferred', 'Kannada Preferred', 'Other'],
+  'Call Disconnected':      ['Immediately Disconnected', 'Disconnected During Pitch', 'Other'],
+  'Pending Verification':   ['Address Check', 'KYC Check', 'Income Check', 'Other'],
+  'Converted':              ['Loan Disbursed', 'Loan Approved', 'Application Submitted', 'Other'],
+  'Rejected':               ['Low CIBIL', 'Insufficient Income', 'Document Issues', 'Other'],
+  'Other':                  ['Custom / General', 'Callback', 'Other'],
+  'default':                ['General Follow Up', 'Not Applicable', 'Other']
+};
+
+function getSubDispOptions(disp) {
+  if (!disp) return [];
+  return SUB_DISP_MAP[disp] || SUB_DISP_MAP['default'];
+}
+
+function getWhatsAppUrl(phoneStr) {
+  if (!phoneStr) return '';
+  const digits = String(phoneStr).replace(/\D/g, '');
+  if (!digits) return '';
+  let normalized = digits;
+  if (digits.length === 10) {
+    normalized = '91' + digits;
+  } else if (digits.length === 11 && digits.startsWith('0')) {
+    normalized = '91' + digits.slice(1);
+  } else if (digits.length === 12 && digits.startsWith('91')) {
+    normalized = digits;
+  } else if (digits.length > 10) {
+    normalized = digits.endsWith(digits.slice(-10)) && !digits.startsWith('91') ? '91' + digits.slice(-10) : digits;
+  }
+  return `https://wa.me/${normalized}`;
+}
+
+// ── Application State ─────────────────────────────────────────────────────
+let allAssignments    = [];
+let currentAssignment = null;
+let allRecords        = [];
+let allFilteredRecords = [];
+let pendingChanges    = {};    // { recordId: { disposition, sub_disposition, notes } }
+let savingSet         = new Set();
+let sheetLocked       = false;
+
+// Pagination & Filtering state (default: 100 records per page)
+let recPage           = 1;
+let recPerPage        = 100;
+let searchFilterText  = '';
+let statusFilterVal   = 'all';
+let dispFilterVal     = 'all';
+let currentCardFilter = 'all';
+
 // ── Bootstrap ─────────────────────────────────────────────────────────────
 const user = requireRole('employee');
 if (user) {
   renderSidebarUser();
   applyIconography();
   applyActionButtonIcons();
-  document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-IN', {weekday:'short',year:'numeric',month:'short',day:'numeric'});
+
+  const dateEl = document.getElementById('current-date');
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }
   setInterval(() => {
     const el = document.getElementById('current-time');
-    if (el) el.textContent = new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+    if (el) {
+      el.textContent = new Date().toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+    }
   }, 1000);
+
+  populateDispositionFilter();
   init();
 }
 
-// ── Disposition / Sub-Disposition Data ────────────────────────────────────
-const DISP_OPTIONS = [
-  'Connected','Not Connected','Ringing','Busy','Switched Off','Out of Coverage',
-  'Number Invalid','Wrong Number','Call Back Requested','Call Later','Voice Mail',
-  'No Response','Customer Interested','Customer Not Interested','Follow Up Required',
-  'Loan Inquiry','Existing Customer','Duplicate Lead','Do Not Call','Language Barrier',
-  'Call Disconnected','Pending Verification','Converted','Rejected','Other'
-];
+// Expose openSheet on window for deep linking from employee notifications
+window.openSheet = openSheet;
 
-const SUB_DISP_MAP = {
-  'Connected':              ['Interested','Documents Pending','EMI Explained','Loan Eligible','Follow Up Tomorrow','Need Salary Slip','Need Bank Statement','Other'],
-  'Not Connected':          ['Number Busy','Switched Off','Out of Network','Try Again Later','Other'],
-  'Call Back Requested':    ['Morning','Afternoon','Evening','Tomorrow','Next Week','Other'],
-  'Customer Interested':    ['Loan Amount Discussed','Documents Requested','Site Visit Planned','Other'],
-  'Customer Not Interested':['Already Taken Loan','High Interest Concern','Financial Issue','Using Another Bank','Not Required','Other'],
-  'Follow Up Required':     ['After 2 Days','After 1 Week','End of Month','Other'],
-  'Ringing':                ['No Answer','Hung Up','Left Voicemail','Other'],
-  'Busy':                   ['Try Later','Scheduled Callback','Other'],
-  'Number Invalid':         ['Wrong Number','Non-Existent','Other'],
-  'Converted':              ['Loan Disbursed','Loan Approved','Application Submitted','Other'],
-  'Rejected':               ['Low CIBIL','Insufficient Income','Document Issues','Other'],
-  'default':                ['Other']
-};
-
-function getSubDispOptions(disp) {
-  return SUB_DISP_MAP[disp] || SUB_DISP_MAP['default'];
+function closeDeleteNotifModal() {
+  const modal = document.getElementById('delete-notif-modal');
+  if (modal) modal.classList.remove('show');
 }
 
-// ── State ─────────────────────────────────────────────────────────────────
-let allAssignments    = [];
-let currentAssignment = null;
-let allRecords        = [];
-let pendingChanges    = {};  // { recordId: { disposition, sub_disposition } }
-let savingSet         = new Set();
-let sheetLocked       = false;
-let activeFloatingDropdown = null;
-let dropdownCloseListenerBound = false;
+function closeDeleteNotifModalOnOverlay(e) {
+  if (e && e.target && e.target.id === 'delete-notif-modal') {
+    closeDeleteNotifModal();
+  }
+}
 
-let recPage = 1;
-const EMP_REC_PER_PAGE = 100;
-let allFilteredRecords = [];
+// ── Populate Disposition Filter in Toolbar ────────────────────────────────
+function populateDispositionFilter() {
+  const sel = document.getElementById('crm-disp-filter');
+  if (!sel) return;
+  sel.innerHTML = '<option value="all">All Dispositions</option>' +
+    DISP_OPTIONS.map(d => `<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
+}
 
-let currentCardFilter = 'all';
-
-// ── Init ──────────────────────────────────────────────────────────────────
+// ── Init & URL Query Parameter Handling ────────────────────────────────────
 async function init() {
   await loadAssignments();
 
-  // Check URL query parameters for ?assignmentId=X
   const urlParams = new URLSearchParams(window.location.search);
   const targetId = parseInt(urlParams.get('assignmentId'), 10);
   const targetPhone = urlParams.get('phone');
@@ -1027,35 +2222,40 @@ async function init() {
     if (targetRecordId || targetPhone) {
       setTimeout(() => {
         focusRecordInSheet(targetRecordId || null, targetPhone || null);
-      }, 250);
+      }, 300);
     }
   }
 }
 
-// ── Load Assignments ──────────────────────────────────────────────────────
+// ── Load Assignments (List View) ──────────────────────────────────────────
 async function loadAssignments() {
-  document.getElementById('list-loading').style.display = 'block';
-  document.getElementById('assign-grid').innerHTML = '';
-  document.getElementById('list-empty').style.display = 'none';
+  const loadingEl = document.getElementById('list-loading');
+  const gridEl = document.getElementById('assign-grid');
+  const emptyEl = document.getElementById('list-empty');
+
+  if (loadingEl) loadingEl.style.display = 'block';
+  if (gridEl) gridEl.innerHTML = '';
+  if (emptyEl) emptyEl.style.display = 'none';
+
   try {
-    const res        = await apiFetch('/excel/my-assignments');
-    allAssignments   = res.assignments || [];
+    const res = await apiFetch('/excel/my-assignments');
+    allAssignments = res.assignments || [];
     renderAssignmentList();
-    populateAssignmentFilterDropdown();
-  } catch(e) {
+    populateAssignmentSelectFilter();
+  } catch (e) {
     const msg = e.message || '';
     if (msg === 'Session expired') return;
     if (msg.toLowerCase().includes('working hours') || msg.toLowerCase().includes('deactivated')) {
       showAlert(msg, 'error');
     } else {
-      showAlert('Something went wrong while loading your assignments. ' + (msg || 'Please refresh the page.'), 'error');
+      showAlert('Could not load your assignments. ' + (msg || 'Please refresh.'), 'error');
     }
   } finally {
-    document.getElementById('list-loading').style.display = 'none';
+    if (loadingEl) loadingEl.style.display = 'none';
   }
 }
 
-function populateAssignmentFilterDropdown() {
+function populateAssignmentSelectFilter() {
   const sel = document.getElementById('search-assignment-select');
   if (!sel) return;
   const currentVal = sel.value;
@@ -1084,44 +2284,65 @@ function filterAssignmentCards(filter) {
   }
 
   if (badge) {
-    badge.textContent = `${list.length} ${filter === 'all' ? 'Total' : filter} ${list.length === 1 ? 'Assignment' : 'Assignments'}`;
+    badge.textContent = `${list.length} ${filter === 'all' ? 'Total' : filter} ${list.length === 1 ? 'Workbook' : 'Workbooks'}`;
   }
 
   if (list.length === 0) {
     if (allAssignments.length === 0) {
       grid.innerHTML = '';
-      empty.style.display = 'block';
+      if (empty) empty.style.display = 'block';
     } else {
       grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted);font-size:13px;">No assignments found matching this filter.</div>';
-      empty.style.display = 'none';
+      if (empty) empty.style.display = 'none';
     }
     return;
   }
-  empty.style.display = 'none';
+  if (empty) empty.style.display = 'none';
 
   grid.innerHTML = list.map(a => {
-    const pct    = a.completion_pct || 0;
+    const pct = a.completion_pct || 0;
     const isCompleted = a.status === 'Completed';
-    const badgeCls = isCompleted ? 'badge-completed' : (a.status === 'In Progress' ? 'badge-inprogress' : 'badge-assigned');
-    return `<div class="assign-card ${isCompleted ? 'completed' : ''}" onclick="openSheet(${a.id})">
-      <div class="assign-card-header">
-        <div>
-          <div class="assign-card-title">${escHtml(a.original_name)}</div>
-          <div class="assign-card-meta">Assigned: ${fmtDate(a.assigned_at)}</div>
+    const badgeCls = isCompleted ? 'crm-badge-completed' : (a.status === 'In Progress' ? 'crm-badge-inprogress' : 'crm-badge-assigned');
+    return `
+      <div class="assign-card ${isCompleted ? 'completed' : ''}" onclick="openSheet(${a.id})">
+        <div class="assign-card-header">
+          <div>
+            <div class="assign-card-title">${escHtml(a.original_name)}</div>
+            <div class="assign-card-meta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Assigned: ${fmtDate(a.assigned_at)}</span>
+            </div>
+          </div>
+          <span class="crm-badge ${badgeCls}">${escHtml(a.status)}</span>
         </div>
-        <span class="badge ${badgeCls}">${escHtml(a.status)}</span>
+
+        <div class="assign-stats">
+          <div class="assign-stat">
+            <div class="assign-stat-val">${a.total_records}</div>
+            <div class="assign-stat-lbl">Total</div>
+          </div>
+          <div class="assign-stat">
+            <div class="assign-stat-val" style="color:#059669;">${a.completed || 0}</div>
+            <div class="assign-stat-lbl">Completed</div>
+          </div>
+          <div class="assign-stat">
+            <div class="assign-stat-val" style="color:#d97706;">${a.pending || 0}</div>
+            <div class="assign-stat-lbl">Pending</div>
+          </div>
+        </div>
+
+        <div class="prog-row">
+          <span>${pct}% complete</span>
+          <span style="font-size:11px;color:var(--text-muted);">ID: #${a.id}</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;"></div></div>
+
+        <button class="open-btn" onclick="event.stopPropagation();openSheet(${a.id})">
+          <span>${isCompleted ? 'View Completed Sheet' : 'Open CRM Workspace'}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
       </div>
-      <div class="assign-stats">
-        <div class="assign-stat"><div class="assign-stat-val">${a.total_records}</div><div class="assign-stat-lbl">Total</div></div>
-        <div class="assign-stat"><div class="assign-stat-val" style="color:#15803d;">${a.completed||0}</div><div class="assign-stat-lbl">Completed</div></div>
-        <div class="assign-stat"><div class="assign-stat-val" style="color:#dc2626;">${a.pending||0}</div><div class="assign-stat-lbl">Pending</div></div>
-      </div>
-      <div class="prog-row"><span>${pct}% complete</span><span style="font-size:11px;">Updated: ${fmtDate(a.file_updated_at)}</span></div>
-      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;"></div></div>
-      <button class="open-btn" onclick="event.stopPropagation();openSheet(${a.id})">
-        ${isCompleted ? 'View & Edit Sheet' : 'Open & Edit Workbook'}
-      </button>
-    </div>`;
+    `;
   }).join('');
 }
 
@@ -1129,7 +2350,7 @@ function renderAssignmentList() {
   filterAssignmentCards(currentCardFilter);
 }
 
-// ── Global Search Handlers ────────────────────────────────────────────────
+// ── Global Customer Record Search ─────────────────────────────────────────
 function handlePhoneInput(val) {
   const clearBtn = document.getElementById('search-phone-clear');
   if (clearBtn) clearBtn.style.display = val ? 'block' : 'none';
@@ -1187,8 +2408,8 @@ async function executeGlobalSearch() {
   resArea.style.display = 'block';
   resArea.innerHTML = `
     <div style="text-align:center;padding:26px 16px;color:var(--text-secondary);">
-      <div class="skeleton" style="height:32px;max-width:240px;margin:0 auto 12px;border-radius:8px;"></div>
-      <p style="font-size:13px;font-weight:600;margin:0;">Searching across all assigned records...</p>
+      <div class="crm-skeleton-row" style="height:32px;max-width:240px;margin:0 auto 12px;border-radius:8px;"></div>
+      <p style="font-size:13px;font-weight:600;margin:0;">Searching across assigned workbooks...</p>
     </div>
   `;
 
@@ -1206,7 +2427,7 @@ async function executeGlobalSearch() {
     const msg = err.message || 'Search failed. Please try again.';
     resArea.innerHTML = `
       <div style="text-align:center;padding:24px 16px;color:#dc2626;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:36px;height:36px;margin:0 auto 8px;display:block;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:36px;height:36px;margin:0 auto 8px;display:block;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <p style="font-size:13px;font-weight:600;margin:0;">${escHtml(msg)}</p>
       </div>
     `;
@@ -1220,7 +2441,7 @@ function renderGlobalSearchResults(records, queryPhone) {
   if (records.length === 0) {
     resArea.innerHTML = `
       <div style="text-align:center;padding:32px 16px;color:var(--text-secondary);">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:40px;height:40px;margin:0 auto 10px;display:block;opacity:0.6;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="width:40px;height:40px;margin:0 auto 10px;display:block;opacity:0.6;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
         <h4 style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">No Records Found</h4>
         <p style="font-size:13px;color:var(--text-secondary);max-width:440px;margin:0 auto;">No matching records found across your assignments. Verify the phone number or try clearing filters.</p>
       </div>
@@ -1232,28 +2453,42 @@ function renderGlobalSearchResults(records, queryPhone) {
   let html = `
     <div class="gsearch-results-header">
       <div class="gsearch-results-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:var(--accent);"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:#2563eb;"><polyline points="20 6 9 17 4 12"/></svg>
         <span>Customer Record${records.length === 1 ? '' : 's'} Found</span>
-        <span class="gsearch-badge-count">${countText}</span>
+        <span class="crm-badge crm-badge-assigned">${countText}</span>
       </div>
     </div>
     <div class="gsearch-cards-list">
   `;
 
   html += records.map(r => {
-    const phoneDisplay = escHtml(r.phone_number);
+    const rawPhone = r.phone_number ? String(r.phone_number).trim() : '';
+    const phoneDisplay = escHtml(rawPhone);
+    const waUrl = getWhatsAppUrl(rawPhone);
     const dispVal = r.disposition ? escHtml(r.disposition) : '<span style="color:var(--text-muted);font-style:italic;">Not set</span>';
     const subDispVal = r.sub_disposition ? escHtml(r.sub_disposition) : '<span style="color:var(--text-muted);font-style:italic;">Not set</span>';
     const notesVal = r.notes ? escHtml(r.notes) : '<span style="color:var(--text-muted);font-style:italic;">No notes recorded</span>';
+
+    const phoneActionsHtml = rawPhone ? `
+      <div class="crm-phone-actions" style="margin-left: 8px;">
+        <a href="tel:${phoneDisplay}" class="crm-icon-btn crm-btn-call" title="Call ${phoneDisplay}" aria-label="Call ${phoneDisplay}" onclick="event.stopPropagation()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </a>
+        <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="crm-icon-btn crm-btn-whatsapp" title="Message customer on WhatsApp" aria-label="Message ${phoneDisplay} on WhatsApp" onclick="event.stopPropagation()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </a>
+      </div>
+    ` : '';
 
     return `
       <div class="gsearch-card">
         <div class="gsearch-card-top">
           <div class="gsearch-card-phone-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;color:var(--accent);"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:#2563eb;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             <span class="gsearch-card-phone">${phoneDisplay}</span>
+            ${phoneActionsHtml}
           </div>
-          <div>${statusBadge(r.status || r.record_status)}</div>
+          <div>${renderStatusBadge(r.status || r.record_status)}</div>
         </div>
 
         <div class="gsearch-card-grid">
@@ -1279,14 +2514,14 @@ function renderGlobalSearchResults(records, queryPhone) {
           </div>
           <div style="grid-column: 1 / -1;">
             <div class="gsearch-prop-label">Notes</div>
-            <div class="gsearch-prop-value" style="font-size:12px;background:var(--bg-secondary);padding:6px 10px;border-radius:6px;border:1px dashed var(--border);">${notesVal}</div>
+            <div class="gsearch-prop-value" style="font-size:12px;background:var(--bg-card);padding:6px 10px;border-radius:6px;border:1px dashed var(--border);">${notesVal}</div>
           </div>
         </div>
 
         <div class="gsearch-card-actions">
-          <button class="gsearch-open-btn" onclick="openFoundRecord(${r.assignment_id}, '${escHtml(r.phone_number)}', ${r.id})">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            <span>Open Record in Assignment #${r.assignment_id}</span>
+          <button class="btn btn-primary btn-sm" onclick="openFoundRecord(${r.assignment_id}, '${escHtml(r.phone_number)}', ${r.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;margin-right:5px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Open in Assignment #${r.assignment_id}</span>
           </button>
         </div>
       </div>
@@ -1302,17 +2537,14 @@ async function openFoundRecord(assignmentId, phoneNumber, recordId) {
     await openSheet(assignmentId);
     setTimeout(() => {
       focusRecordInSheet(recordId, phoneNumber);
-    }, 180);
+    }, 200);
   } catch (err) {
     showToast('Failed to open assignment record.', 'error');
   }
 }
 
 function focusRecordInSheet(recordId, phoneNumber) {
-  const recSearch = document.getElementById('rec-search');
-  if (recSearch) recSearch.value = '';
-  const recFilter = document.getElementById('rec-filter');
-  if (recFilter) recFilter.value = '';
+  clearAllFilters();
 
   let targetIdx = -1;
   if (recordId) {
@@ -1323,9 +2555,9 @@ function focusRecordInSheet(recordId, phoneNumber) {
   }
 
   if (targetIdx !== -1) {
-    recPage = Math.floor(targetIdx / EMP_REC_PER_PAGE) + 1;
+    recPage = Math.floor(targetIdx / recPerPage) + 1;
     allFilteredRecords = allRecords;
-    renderRecordsPage();
+    renderRecordsTable();
 
     const actualId = allRecords[targetIdx].id;
     setTimeout(() => {
@@ -1339,15 +2571,15 @@ function focusRecordInSheet(recordId, phoneNumber) {
           row.classList.remove('row-focused-highlight');
         }, 5000);
       }
-    }, 150);
+    }, 200);
   }
 }
 
-// ── Open Sheet ────────────────────────────────────────────────────────────
+// ── Open Sheet Workspace ──────────────────────────────────────────────────
 async function openSheet(assignmentId) {
   currentAssignment = allAssignments.find(a => a.id === assignmentId);
+
   if (!currentAssignment) {
-    // If not found in active assignments (e.g. expired or navigated directly via URL)
     try {
       const res = await apiFetch(`/excel/assignments/${assignmentId}/records?limit=1`);
       if (res && res.assignment) {
@@ -1379,389 +2611,512 @@ async function openSheet(assignmentId) {
     }
   } catch (err) {}
 
-  sheetLocked    = currentAssignment.status === 'Closed' || currentAssignment.file_status === 'Closed';
+  sheetLocked = currentAssignment.status === 'Closed' || currentAssignment.file_status === 'Closed';
   pendingChanges = {};
-  allRecords     = [];
+  allRecords = [];
 
-  document.getElementById('view-list').style.display  = 'none';
+  // Toggle views
+  document.getElementById('view-list').style.display = 'none';
   document.getElementById('view-sheet').style.display = 'block';
-  document.getElementById('sheet-title').textContent   = currentAssignment.original_name;
-  document.getElementById('sheet-subtitle').textContent = `Assignment ID: ${currentAssignment.id}`;
-  document.getElementById('sheet-status-badge').innerHTML = statusBadge(currentAssignment.status);
-  document.getElementById('submit-bar').style.display = sheetLocked ? 'none' : 'flex';
-  document.getElementById('rec-search').value = '';
-  document.getElementById('rec-filter').value = '';
+
+  // Populate header details
+  document.getElementById('sheet-title').textContent = currentAssignment.original_name || 'Workbook';
+  document.getElementById('sheet-id-badge').textContent = `Assignment #${currentAssignment.id}`;
+  document.getElementById('sheet-status-badge').innerHTML = renderStatusBadge(currentAssignment.status);
+  document.getElementById('sheet-assigned-date').textContent = `Assigned: ${fmtDate(currentAssignment.assigned_at)}`;
+
+  // Reset filters
+  searchFilterText = '';
+  statusFilterVal = 'all';
+  dispFilterVal = 'all';
   recPage = 1;
+
+  const searchInp = document.getElementById('crm-search-input');
+  if (searchInp) searchInp.value = '';
+  const statusSel = document.getElementById('crm-status-filter');
+  if (statusSel) statusSel.value = 'all';
+  const dispSel = document.getElementById('crm-disp-filter');
+  if (dispSel) dispSel.value = 'all';
+  const perPageSel = document.getElementById('crm-per-page-select');
+  if (perPageSel) perPageSel.value = String(recPerPage);
+  updateClearFiltersButtonState();
 
   await loadSheetRecords();
 }
 
+// ── Load Records for Sheet Workspace ──────────────────────────────────────
 async function loadSheetRecords() {
   if (!currentAssignment) return;
+
+  const refreshBtn = document.getElementById('header-refresh-btn');
+  if (refreshBtn) refreshBtn.classList.add('spinning');
+
+  // Render skeleton rows while loading
+  const tbody = document.getElementById('crm-records-tbody');
+  if (tbody) {
+    tbody.innerHTML = Array.from({ length: 6 }).map(() => `
+      <tr>
+        <td colspan="7"><div class="crm-skeleton-row"></div></td>
+      </tr>
+    `).join('');
+  }
+
   try {
-    const res  = await apiFetch(`/excel/assignments/${currentAssignment.id}/records?limit=1000`);
+    const res = await apiFetch(`/excel/assignments/${currentAssignment.id}/records?limit=1000`);
     allRecords = res.records || [];
+
+    // Update metadata
+    const metaEl = document.getElementById('sheet-records-meta');
+    if (metaEl) metaEl.textContent = `${allRecords.length} total records`;
+
     updateSheetKPIs();
-    recPage = 1;
-    renderRecordsTable();
-  } catch(e) {
+    applyFiltersAndRender();
+  } catch (e) {
     const msg = e.message || 'Failed to load records.';
     showToast(msg, 'error');
     if (e.assignment_expired || msg.toLowerCase().includes('expired')) {
       setTimeout(() => {
         goBackToList();
-        try { history.replaceState(null, '', '/employee/data-excel.html'); } catch(err){}
+        try { history.replaceState(null, '', '/employee/data-excel.html'); } catch (err) {}
       }, 1200);
     }
+  } finally {
+    if (refreshBtn) refreshBtn.classList.remove('spinning');
   }
 }
 
+// ── Recalculate Sheet KPIs & Progress ──────────────────────────────────────
 function updateSheetKPIs() {
-  const total     = allRecords.length;
+  const total = allRecords.length;
   const completed = allRecords.filter(r => r.status === 'Completed').length;
-  const pending   = total - completed;
-  const pct       = total > 0 ? Math.round((completed / total) * 100) : 0;
-  document.getElementById('sh-total').textContent     = total;
-  document.getElementById('sh-completed').textContent = completed;
-  document.getElementById('sh-pending').textContent   = pending;
-  document.getElementById('sh-pct').textContent       = pct + '%';
-  document.getElementById('submit-info').textContent  = `${completed} of ${total} records completed (${pct}%)`;
+  const pending = total - completed;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  // KPI card values
+  const totalValEl = document.getElementById('kpi-total-val');
+  if (totalValEl) totalValEl.textContent = total;
+
+  const compValEl = document.getElementById('kpi-completed-val');
+  if (compValEl) compValEl.textContent = completed;
+
+  const pendValEl = document.getElementById('kpi-pending-val');
+  if (pendValEl) pendValEl.textContent = pending;
+
+  const progValEl = document.getElementById('kpi-progress-val');
+  if (progValEl) progValEl.textContent = `${pct}%`;
+
+  const compNoteEl = document.getElementById('kpi-completed-note');
+  if (compNoteEl) compNoteEl.textContent = `${pct}% of total records`;
+
+  // Progress Bar
+  const progFill = document.getElementById('progress-bar-fill');
+  if (progFill) progFill.style.width = `${pct}%`;
+
+  const progCounter = document.getElementById('progress-bar-counter');
+  if (progCounter) progCounter.textContent = `${completed} of ${total} records completed (${pct}%)`;
+
+  // Submit Bar
+  const submitDesc = document.getElementById('submit-summary-desc');
+  const submitBtn = document.getElementById('crm-submit-btn');
+
+  if (submitDesc) {
+    if (completed === total && total > 0) {
+      submitDesc.textContent = `All ${total} records are completed and ready for submission.`;
+    } else {
+      submitDesc.textContent = `${completed} of ${total} records completed (${pending} pending).`;
+    }
+  }
+
+  if (submitBtn) {
+    const canSubmit = completed === total && total > 0 && !sheetLocked;
+    submitBtn.disabled = !canSubmit;
+    submitBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      <span>${canSubmit ? 'Submit Completed Work' : `Submit Completed Work (${pending} pending)`}</span>
+    `;
+  }
 }
 
-function renderRecordsTable() {
-  const search = (document.getElementById('rec-search').value || '').toLowerCase();
-  const filter = document.getElementById('rec-filter').value;
+// ── Table Filtering & Search ──────────────────────────────────────────────
+function handleTableSearchInput(val) {
+  searchFilterText = (val || '').trim().toLowerCase();
+  const clearBtn = document.getElementById('crm-search-clear');
+  if (clearBtn) clearBtn.style.display = searchFilterText ? 'block' : 'none';
+  recPage = 1;
+  updateClearFiltersButtonState();
+  applyFiltersAndRender();
+}
 
-  let records = allRecords;
-  if (search) records = records.filter(r =>
-    r.phone_number.includes(search) ||
-    (r.disposition||'').toLowerCase().includes(search) ||
-    (r.sub_disposition||'').toLowerCase().includes(search)
-  );
-  if (filter === 'completed') records = records.filter(r => r.status === 'Completed');
-  if (filter === 'pending')   records = records.filter(r => r.status === 'Pending');
-
-  // Reset page if search or filter changes
-  if (typeof renderRecordsTable.lastSearch === 'undefined') {
-    renderRecordsTable.lastSearch = '';
-    renderRecordsTable.lastFilter = '';
+function clearTableSearch() {
+  const inp = document.getElementById('crm-search-input');
+  if (inp) {
+    inp.value = '';
+    inp.focus();
   }
-  if (renderRecordsTable.lastSearch !== search || renderRecordsTable.lastFilter !== filter) {
-    recPage = 1;
-    renderRecordsTable.lastSearch = search;
-    renderRecordsTable.lastFilter = filter;
+  handleTableSearchInput('');
+}
+
+function handleStatusFilterChange(val) {
+  statusFilterVal = val;
+  const sel = document.getElementById('crm-status-filter');
+  if (sel) sel.classList.toggle('is-active', val !== 'all');
+  recPage = 1;
+  updateClearFiltersButtonState();
+  applyFiltersAndRender();
+}
+
+function handleDispFilterChange(val) {
+  dispFilterVal = val;
+  const sel = document.getElementById('crm-disp-filter');
+  if (sel) sel.classList.toggle('is-active', val !== 'all');
+  recPage = 1;
+  updateClearFiltersButtonState();
+  applyFiltersAndRender();
+}
+
+function handlePerPageChange(val) {
+  recPerPage = parseInt(val, 10) || 100;
+  recPage = 1;
+  applyFiltersAndRender();
+}
+
+function clearAllFilters() {
+  searchFilterText = '';
+  statusFilterVal = 'all';
+  dispFilterVal = 'all';
+
+  const searchInp = document.getElementById('crm-search-input');
+  if (searchInp) searchInp.value = '';
+  const clearSearchBtn = document.getElementById('crm-search-clear');
+  if (clearSearchBtn) clearSearchBtn.style.display = 'none';
+
+  const statusSel = document.getElementById('crm-status-filter');
+  if (statusSel) {
+    statusSel.value = 'all';
+    statusSel.classList.remove('is-active');
+  }
+
+  const dispSel = document.getElementById('crm-disp-filter');
+  if (dispSel) {
+    dispSel.value = 'all';
+    dispSel.classList.remove('is-active');
+  }
+
+  updateClearFiltersButtonState();
+  recPage = 1;
+  applyFiltersAndRender();
+}
+
+function updateClearFiltersButtonState() {
+  const btn = document.getElementById('crm-clear-filters-btn');
+  if (!btn) return;
+  const isFiltered = !!searchFilterText || statusFilterVal !== 'all' || dispFilterVal !== 'all';
+  btn.style.display = isFiltered ? 'inline-flex' : 'none';
+}
+
+function applyFiltersAndRender() {
+  let records = allRecords;
+
+  // Search filter
+  if (searchFilterText) {
+    records = records.filter(r => {
+      const phone = String(r.phone_number || '').toLowerCase();
+      const rowIdx = String(r.row_index || '').toLowerCase();
+      const disp = String(r.disposition || '').toLowerCase();
+      const subDisp = String(r.sub_disposition || '').toLowerCase();
+      const notes = String(r.notes || '').toLowerCase();
+      return phone.includes(searchFilterText) ||
+        rowIdx === searchFilterText ||
+        disp.includes(searchFilterText) ||
+        subDisp.includes(searchFilterText) ||
+        notes.includes(searchFilterText);
+    });
+  }
+
+  // Status filter
+  if (statusFilterVal !== 'all') {
+    records = records.filter(r => r.status === statusFilterVal);
+  }
+
+  // Disposition filter
+  if (dispFilterVal !== 'all') {
+    records = records.filter(r => r.disposition === dispFilterVal);
   }
 
   allFilteredRecords = records;
-  renderRecordsPage();
+  renderRecordsTable();
 }
 
-function renderRecordsPage() {
-  const list = allFilteredRecords;
-  const total = list.length;
-  const totalPages = Math.ceil(total / EMP_REC_PER_PAGE);
-  const start = (recPage - 1) * EMP_REC_PER_PAGE;
-  const end = Math.min(start + EMP_REC_PER_PAGE, total);
-  const pageItems = list.slice(start, end);
-  const tbody = document.getElementById('rec-tbody');
+// ── Render CRM Records Table ──────────────────────────────────────────────
+function renderRecordsTable() {
+  const total = allFilteredRecords.length;
+  const totalPages = Math.ceil(total / recPerPage) || 1;
+  if (recPage > totalPages) recPage = totalPages;
+  if (recPage < 1) recPage = 1;
 
-  if (!total) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No records found.</td></tr>';
-    document.getElementById('rec-pagination').innerHTML = '';
+  const start = (recPage - 1) * recPerPage;
+  const end = Math.min(start + recPerPage, total);
+  const pageItems = allFilteredRecords.slice(start, end);
+
+  const tbody = document.getElementById('crm-records-tbody');
+  const emptyArea = document.getElementById('crm-table-empty');
+  const pagBar = document.getElementById('crm-pagination-bar');
+
+  if (total === 0) {
+    tbody.innerHTML = '';
+    const isFiltered = !!searchFilterText || statusFilterVal !== 'all' || dispFilterVal !== 'all';
+    emptyArea.style.display = 'block';
+    emptyArea.innerHTML = `
+      <div class="crm-empty-state">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <h4>${isFiltered ? 'No Matching Records' : 'No Records in Workbook'}</h4>
+        <p>${isFiltered ? 'No records match your active search or filters. Try adjusting or clearing filters.' : 'This workbook has no records assigned.'}</p>
+        ${isFiltered ? '<button class="btn btn-secondary btn-sm" onclick="clearAllFilters()">Clear All Filters</button>' : ''}
+      </div>
+    `;
+    if (pagBar) pagBar.style.display = 'none';
     return;
   }
 
-  tbody.innerHTML = pageItems.map(r => buildRecordRow(r)).join('');
+  emptyArea.style.display = 'none';
+  if (pagBar) pagBar.style.display = 'flex';
 
-  // Attach event listeners
-  pageItems.forEach(r => attachRowListeners(r.id));
-
-  document.getElementById('rec-pagination').innerHTML = buildRecPagination(total, recPage, totalPages);
+  tbody.innerHTML = pageItems.map(r => buildCrmRecordRow(r)).join('');
+  renderPaginationControls(total, recPage, totalPages, start + 1, end);
 }
 
-function buildRecPagination(total, current, totalPages) {
-  if (total <= EMP_REC_PER_PAGE) return '';
-  const start = (current - 1) * EMP_REC_PER_PAGE + 1;
-  const end = Math.min(current * EMP_REC_PER_PAGE, total);
-  let html = `<div class="tbl-pagination"><span class="tbl-pg-info">Showing ${start}–${end} of ${total} records</span>`;
-  html += `<button class="tbl-pg-btn" ${current===1?'disabled':''} onclick="goRecPage(${current-1})">← Prev</button>`;
-  const pages = getPagPages(current, totalPages);
-  for (const p of pages) {
-    if (p === '...') html += `<span class="tbl-pg-btn" style="cursor:default;pointer-events:none;">…</span>`;
-    else html += `<button class="tbl-pg-btn${p===current?' active':''}" onclick="goRecPage(${p})">${p}</button>`;
-  }
-  html += `<button class="tbl-pg-btn" ${current===totalPages?'disabled':''} onclick="goRecPage(${current+1})">Next →</button>`;
-  html += '</div>';
-  return html;
-}
+// ── Build Single Record Row ───────────────────────────────────────────────
+function buildCrmRecordRow(r) {
+  const pending = pendingChanges[r.id];
+  const disp = pending ? pending.disposition : (r.disposition || '');
+  const subDisp = pending ? pending.sub_disposition : (r.sub_disposition || '');
+  const notes = pending ? pending.notes : (r.notes || '');
 
-function goRecPage(p) {
-  recPage = p;
-  renderRecordsPage();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function getPagPages(current, total) {
-  if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
-  const pages = [];
-  if (current <= 4) {
-    for (let i = 1; i <= 5; i++) pages.push(i);
-    pages.push('...', total);
-  } else if (current >= total - 3) {
-    pages.push(1, '...');
-    for (let i = total - 4; i <= total; i++) pages.push(i);
-  } else {
-    pages.push(1, '...', current - 1, current, current + 1, '...', total);
-  }
-  return pages;
-}
-
-function buildRecordRow(r) {
-  const pending    = pendingChanges[r.id];
-  const disp       = pending ? pending.disposition    : (r.disposition    || '');
-  const subDisp    = pending ? pending.sub_disposition : (r.sub_disposition || '');
-  const notes      = pending ? pending.notes          : (r.notes          || '');
-  const isCompleted     = r.status === 'Completed' && !pending;
   const hasPending = !!pending;
-  const rowClass   = isCompleted ? 'completed-row' : '';
-  const rowLocked  = sheetLocked;
+  const isCompleted = r.status === 'Completed';
+  const isSaving = savingSet.has(r.id);
+  const rowLocked = sheetLocked;
 
-  const saveBtnClass = hasPending ? 'save-btn needs-save' : 'save-btn saved';
-  const saveBtnTxt   = hasPending ? 'Save' : 'Saved';
+  // Sub-disposition options
+  const subOptions = getSubDispOptions(disp);
+  // Ensure existing sub_disposition is included if not in standard list
+  const allSubOptions = (subDisp && !subOptions.includes(subDisp))
+    ? [subDisp, ...subOptions]
+    : subOptions;
 
-  const subOpts = getSubDispOptions(disp);
+  // Row Classes
+  let rowClasses = [];
+  if (isCompleted) rowClasses.push('is-completed');
+  if (hasPending) rowClasses.push('is-dirty');
 
-  const dispHtml = rowLocked
-    ? `<span style="font-size:12px;color:var(--text-primary);">${escHtml(disp||'—')}</span>`
-    : `<div class="disp-wrap" id="disp-wrap-${r.id}">
-        <input class="disp-input${disp?'  filled':''}" id="disp-input-${r.id}" type="text" value="${escHtml(disp)}" placeholder="Select disposition..." readonly onclick="toggleDispDropdown(${r.id})" />
-        <div class="disp-dropdown" id="disp-dd-${r.id}">
-          <div class="disp-search"><input type="text" placeholder="Search..." oninput="filterDispDropdown(${r.id}, this.value)" /></div>
-          ${DISP_OPTIONS.map(o => `<div class="disp-option${disp===o?' active':''}" onclick="selectDisp(${r.id},'${escHtml(o)}')">${escHtml(o)}</div>`).join('')}
+  // Phone actions
+  const rawPhone = r.phone_number ? String(r.phone_number).trim() : '';
+  const phoneClean = escHtml(rawPhone);
+  const waUrl = getWhatsAppUrl(rawPhone);
+
+  // Disposition Select
+  const dispSelectHtml = rowLocked
+    ? `<span style="font-weight:600;font-size:12.5px;">${escHtml(disp || '—')}</span>`
+    : `
+      <select class="crm-table-select ${hasPending && pending.disposition !== r.disposition ? 'is-dirty' : ''}"
+        id="disp-sel-${r.id}"
+        onchange="handleRowDispChange(${r.id}, this.value)">
+        <option value="">Select disposition...</option>
+        ${DISP_OPTIONS.map(opt => `<option value="${escHtml(opt)}" ${disp === opt ? 'selected' : ''}>${escHtml(opt)}</option>`).join('')}
+      </select>
+    `;
+
+  // Sub-disposition Select
+  const isSubDisabled = rowLocked || !disp;
+  const subSelectHtml = rowLocked
+    ? `<span style="font-weight:600;font-size:12.5px;">${escHtml(subDisp || '—')}</span>`
+    : `
+      <select class="crm-table-select ${hasPending && pending.sub_disposition !== r.sub_disposition ? 'is-dirty' : ''}"
+        id="subdisp-sel-${r.id}"
+        onchange="handleRowSubDispChange(${r.id}, this.value)"
+        ${isSubDisabled ? 'disabled' : ''}>
+        <option value="">${disp ? 'Select sub disposition...' : 'Select disposition first'}</option>
+        ${allSubOptions.map(opt => `<option value="${escHtml(opt)}" ${subDisp === opt ? 'selected' : ''}>${escHtml(opt)}</option>`).join('')}
+      </select>
+    `;
+
+  // Notes Textarea
+  const notesHtml = `
+    <textarea class="crm-notes-input ${hasPending && pending.notes !== (r.notes || '') ? 'is-dirty' : ''}"
+      id="notes-inp-${r.id}"
+      rows="2"
+      placeholder="Add call notes..."
+      oninput="handleRowNotesChange(${r.id}, this.value)"
+      ${rowLocked ? 'readonly' : ''}>${escHtml(notes)}</textarea>
+  `;
+
+  // Row status badge & tag
+  const statusBadgeHtml = renderStatusBadge(r.status);
+  const tagHtml = hasPending
+    ? `<span class="crm-row-tag unsaved" id="tag-${r.id}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+        Unsaved
+       </span>`
+    : `<span class="crm-row-tag saved" id="tag-${r.id}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><polyline points="20 6 9 17 4 12"/></svg>
+        Saved
+       </span>`;
+
+  // Action Button
+  let btnClass = 'crm-save-btn is-clean';
+  let btnText = 'Saved';
+  let btnDisabled = true;
+  let btnIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+  if (isSaving) {
+    btnClass = 'crm-save-btn is-saving';
+    btnText = 'Saving...';
+    btnDisabled = true;
+    btnIcon = `<span class="spinner" style="width:12px;height:12px;border:2px solid rgba(0,0,0,0.2);border-top-color:currentColor;border-radius:50%;display:inline-block;animation:spin 0.6s linear infinite;"></span>`;
+  } else if (hasPending) {
+    btnClass = 'crm-save-btn is-dirty';
+    btnText = 'Save';
+    btnDisabled = false;
+    btnIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>`;
+  }
+
+  const saveActionHtml = rowLocked
+    ? `<span style="font-size:11px;color:var(--text-muted);font-weight:600;">Locked</span>`
+    : `<button class="${btnClass}" id="save-btn-${r.id}" onclick="saveRow(${r.id})" ${btnDisabled ? 'disabled' : ''} title="${hasPending ? 'Save record updates' : 'No unsaved changes'}">
+        ${btnIcon}
+        <span>${btnText}</span>
+       </button>`;
+
+  return `
+    <tr class="${rowClasses.join(' ')}" id="rec-row-${r.id}">
+      <td style="text-align: center;"><span class="crm-row-index">${r.row_index}</span></td>
+      <td>
+        <div class="crm-phone-cell">
+          <span class="crm-phone-number">${phoneClean || '—'}</span>
+          ${rawPhone ? `
+          <div class="crm-phone-actions">
+            <a href="tel:${phoneClean}" class="crm-icon-btn crm-btn-call" title="Call ${phoneClean}" aria-label="Call ${phoneClean}" onclick="event.stopPropagation()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </a>
+            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="crm-icon-btn crm-btn-whatsapp" title="Message customer on WhatsApp" aria-label="Message ${phoneClean} on WhatsApp" onclick="event.stopPropagation()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </a>
+            <button type="button" class="crm-icon-btn" onclick="event.stopPropagation(); copyPhone('${phoneClean}')" title="Copy Phone Number" aria-label="Copy phone number">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          ` : ''}
         </div>
-      </div>`;
-
-  const subHtml = rowLocked
-    ? `<span style="font-size:12px;color:var(--text-primary);">${escHtml(subDisp||'—')}</span>`
-    : `<div class="subdisp-wrap" id="subdisp-wrap-${r.id}">
-        <input class="subdisp-input${subDisp?' filled':''}" id="subdisp-input-${r.id}" type="text" value="${escHtml(subDisp)}" placeholder="Sub disposition or type custom..." oninput="onSubDispInput(${r.id},this.value)" onfocus="showSubDispDD(${r.id})" />
-        <div class="subdisp-dropdown" id="subdisp-dd-${r.id}">
-          ${subOpts.map(o => `<div class="subdisp-option" onclick="selectSubDisp(${r.id},'${escHtml(o)}')">${escHtml(o)}</div>`).join('')}
+      </td>
+      <td>${dispSelectHtml}</td>
+      <td>${subSelectHtml}</td>
+      <td>${notesHtml}</td>
+      <td>
+        <div class="crm-status-wrap">
+          <div id="status-badge-${r.id}">${statusBadgeHtml}</div>
+          ${tagHtml}
         </div>
-      </div>`;
-
-  const notesHtml = `<input class="notes-input" id="notes-input-${r.id}" type="text" value="${escHtml(notes)}" placeholder="Notes..." oninput="onNotesInput(${r.id}, this.value)" ${rowLocked ? 'readonly' : ''} />`;
-
-  const saveHtml = rowLocked
-    ? ''
-    : `<button class="${saveBtnClass}" id="save-btn-${r.id}" onclick="saveRow(${r.id})">${saveBtnTxt}</button>`;
-
-  return `<tr class="${rowClass}" id="rec-row-${r.id}">
-    <td style="color:var(--text-muted);font-size:11px;">${r.row_index}</td>
-    <td style="font-weight:700;">${escHtml(r.phone_number)}</td>
-    <td>${dispHtml}</td>
-    <td>${subHtml}</td>
-    <td>${notesHtml}</td>
-    <td>${statusBadge(r.status)}</td>
-    <td>${saveHtml}</td>
-  </tr>`;
+      </td>
+      <td style="text-align: center;">${saveActionHtml}</td>
+    </tr>
+  `;
 }
 
-function attachRowListeners(rId) {
-  if (dropdownCloseListenerBound) return;
-  dropdownCloseListenerBound = true;
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('.disp-wrap, .subdisp-wrap')) return;
-    closeAllFloatingDropdowns();
-  });
-}
+// ── In-Row Change Handlers ────────────────────────────────────────────────
+function handleRowDispChange(rId, newDisp) {
+  initPendingForRecord(rId);
+  pendingChanges[rId].disposition = newDisp;
 
-function closeFloatingDropdown(dd) {
-  if (!dd) return;
-  dd.classList.remove('open');
-  dd.style.left = '';
-  dd.style.top = '';
-  dd.style.width = '';
-  dd.style.maxHeight = '';
-  dd.style.visibility = '';
-  if (activeFloatingDropdown === dd) activeFloatingDropdown = null;
-}
-
-function closeAllFloatingDropdowns(except = null) {
-  document.querySelectorAll('.disp-dropdown.open, .subdisp-dropdown.open').forEach(dd => {
-    if (dd !== except) closeFloatingDropdown(dd);
-  });
-}
-
-function positionFloatingDropdown(anchor, dd, preferredMaxHeight) {
-  if (!anchor || !dd) return;
-
-  const margin = 12;
-  const gap = 4;
-  const anchorRect = anchor.getBoundingClientRect();
-  const width = Math.min(Math.max(anchorRect.width, 180), window.innerWidth - (margin * 2));
-  const left = Math.min(Math.max(anchorRect.left, margin), window.innerWidth - width - margin);
-
-  let bottomLimit = window.innerHeight - margin;
-  const submitBar = document.getElementById('submit-bar');
-  if (submitBar && getComputedStyle(submitBar).display !== 'none') {
-    const submitRect = submitBar.getBoundingClientRect();
-    if (submitRect.top < window.innerHeight && submitRect.bottom > 0) {
-      bottomLimit = Math.min(bottomLimit, submitRect.top - margin);
-    }
-  }
-
-  dd.style.visibility = 'hidden';
-  dd.style.width = `${width}px`;
-  dd.style.left = `${left}px`;
-  dd.style.top = '0px';
-  dd.style.maxHeight = `${preferredMaxHeight}px`;
-
-  const desiredHeight = Math.min(dd.scrollHeight, preferredMaxHeight);
-  const spaceBelow = bottomLimit - anchorRect.bottom - gap;
-  const spaceAbove = anchorRect.top - margin - gap;
-  const shouldOpenAbove = spaceBelow < Math.min(desiredHeight, 140) && spaceAbove > spaceBelow;
-  const availableSpace = Math.max(80, shouldOpenAbove ? spaceAbove : spaceBelow);
-  const dropdownHeight = Math.min(desiredHeight, availableSpace);
-  const top = shouldOpenAbove
-    ? Math.max(margin, anchorRect.top - dropdownHeight - gap)
-    : Math.min(anchorRect.bottom + gap, bottomLimit - dropdownHeight);
-
-  dd.style.maxHeight = `${dropdownHeight}px`;
-  dd.style.top = `${Math.max(margin, top)}px`;
-  dd.style.visibility = '';
-  activeFloatingDropdown = dd;
-}
-
-function repositionActiveDropdown() {
-  const dd = activeFloatingDropdown;
-  if (!dd || !dd.classList.contains('open')) return;
-
-  const isDisposition = dd.classList.contains('disp-dropdown');
-  const rId = dd.id.replace(isDisposition ? 'disp-dd-' : 'subdisp-dd-', '');
-  const anchor = document.getElementById(`${isDisposition ? 'disp' : 'subdisp'}-input-${rId}`);
-  positionFloatingDropdown(anchor, dd, isDisposition ? 220 : 180);
-}
-
-window.addEventListener('resize', repositionActiveDropdown);
-window.addEventListener('scroll', repositionActiveDropdown, { passive: true });
-
-// ── Disposition Dropdown ──────────────────────────────────────────────────
-function toggleDispDropdown(rId) {
-  const dd = document.getElementById(`disp-dd-${rId}`);
-  const inp = document.getElementById(`disp-input-${rId}`);
-  if (!dd || !inp) return;
-
-  const shouldOpen = !dd.classList.contains('open');
-  closeAllFloatingDropdowns(dd);
-  if (!shouldOpen) {
-    closeFloatingDropdown(dd);
-    return;
-  }
-
-  dd.classList.add('open');
-  positionFloatingDropdown(inp, dd, 220);
-}
-
-function filterDispDropdown(rId, search) {
-  const dd = document.getElementById(`disp-dd-${rId}`);
-  if (!dd) return;
-  dd.querySelectorAll('.disp-option').forEach(opt => {
-    opt.style.display = opt.textContent.toLowerCase().includes(search.toLowerCase()) ? '' : 'none';
-  });
-  positionFloatingDropdown(document.getElementById(`disp-input-${rId}`), dd, 220);
-}
-
-function selectDisp(rId, value) {
-  const inp = document.getElementById(`disp-input-${rId}`);
-  if (!inp) return;
-  inp.value = value;
-  inp.classList.toggle('filled', !!value);
-  closeFloatingDropdown(document.getElementById(`disp-dd-${rId}`));
-
-  // Update sub-disp dropdown options
-  const subDD = document.getElementById(`subdisp-dd-${rId}`);
-  if (subDD) {
-    const opts = getSubDispOptions(value);
-    subDD.innerHTML = opts.map(o => `<div class="subdisp-option" onclick="selectSubDisp(${rId},'${escHtml(o)}')">${escHtml(o)}</div>`).join('');
-    // Clear sub-disp if disposition changed
-    const subInp = document.getElementById(`subdisp-input-${rId}`);
-    if (subInp) { subInp.value = ''; subInp.classList.remove('filled'); }
-  }
-
-  markDirty(rId, 'disposition', value);
-}
-
-// ── Sub Disposition ───────────────────────────────────────────────────────
-function showSubDispDD(rId) {
-  const dd   = document.getElementById(`subdisp-dd-${rId}`);
-  const inp  = document.getElementById(`subdisp-input-${rId}`);
-  const disp = document.getElementById(`disp-input-${rId}`)?.value || '';
-  if (!dd || !inp) return;
-  const opts = getSubDispOptions(disp);
-  dd.innerHTML = opts.map(o => `<div class="subdisp-option" onclick="selectSubDisp(${rId},'${escHtml(o)}')">${escHtml(o)}</div>`).join('');
-  closeAllFloatingDropdowns(dd);
-  dd.classList.add('open');
-  positionFloatingDropdown(inp, dd, 180);
-}
-
-function onSubDispInput(rId, value) {
-  const inp = document.getElementById(`subdisp-input-${rId}`);
-  if (inp) inp.classList.toggle('filled', !!value);
-  // Filter sub-disp dropdown
-  const dd = document.getElementById(`subdisp-dd-${rId}`);
-  if (dd) {
-    const disp = document.getElementById(`disp-input-${rId}`)?.value || '';
-    const opts = getSubDispOptions(disp);
-    const filtered = opts.filter(o => o.toLowerCase().includes(value.toLowerCase()));
-    dd.innerHTML = filtered.map(o => `<div class="subdisp-option" onclick="selectSubDisp(${rId},'${escHtml(o)}')">${escHtml(o)}</div>`).join('');
-    const shouldOpen = value.length > 0 && filtered.length > 0;
-    dd.classList.toggle('open', shouldOpen);
-    if (shouldOpen) {
-      closeAllFloatingDropdowns(dd);
-      positionFloatingDropdown(inp, dd, 180);
+  // Dynamically update sub-disposition select options
+  const subSel = document.getElementById(`subdisp-sel-${rId}`);
+  if (subSel) {
+    if (!newDisp) {
+      subSel.disabled = true;
+      subSel.innerHTML = '<option value="">Select disposition first</option>';
+      pendingChanges[rId].sub_disposition = '';
     } else {
-      closeFloatingDropdown(dd);
+      subSel.disabled = false;
+      const opts = getSubDispOptions(newDisp);
+      subSel.innerHTML = '<option value="">Select sub disposition...</option>' +
+        opts.map(o => `<option value="${escHtml(o)}">${escHtml(o)}</option>`).join('');
+
+      // If current sub_disposition is not in the new options, clear it
+      const currentSub = pendingChanges[rId].sub_disposition;
+      if (currentSub && opts.includes(currentSub)) {
+        subSel.value = currentSub;
+      } else {
+        subSel.value = '';
+        pendingChanges[rId].sub_disposition = '';
+      }
     }
   }
-  markDirty(rId, 'sub_disposition', value);
+
+  markRowDirty(rId);
 }
 
-function selectSubDisp(rId, value) {
-  const inp = document.getElementById(`subdisp-input-${rId}`);
-  if (inp) { inp.value = value; inp.classList.toggle('filled', !!value); }
-  const dd = document.getElementById(`subdisp-dd-${rId}`);
-  closeFloatingDropdown(dd);
-  markDirty(rId, 'sub_disposition', value);
+function handleRowSubDispChange(rId, newSubDisp) {
+  initPendingForRecord(rId);
+  pendingChanges[rId].sub_disposition = newSubDisp;
+  markRowDirty(rId);
 }
 
-function onNotesInput(rId, value) {
-  markDirty(rId, 'notes', value);
+function handleRowNotesChange(rId, newNotes) {
+  initPendingForRecord(rId);
+  pendingChanges[rId].notes = newNotes;
+  markRowDirty(rId);
 }
 
-// ── Dirty tracking ────────────────────────────────────────────────────────
-function markDirty(rId, field, value) {
+function initPendingForRecord(rId) {
   if (!pendingChanges[rId]) {
     const rec = allRecords.find(r => r.id === rId);
     pendingChanges[rId] = {
-      disposition:     rec ? (rec.disposition    || '') : '',
+      disposition:     rec ? (rec.disposition || '') : '',
       sub_disposition: rec ? (rec.sub_disposition || '') : '',
-      notes:           rec ? (rec.notes           || '') : ''
+      notes:           rec ? (rec.notes || '') : ''
     };
   }
-  pendingChanges[rId][field] = value;
-  const btn = document.getElementById(`save-btn-${rId}`);
-  if (btn) { btn.className = 'save-btn needs-save'; btn.textContent = 'Save'; }
 }
 
-// ── Save Row ──────────────────────────────────────────────────────────────
+function markRowDirty(rId) {
+  const row = document.getElementById(`rec-row-${rId}`);
+  if (row) row.classList.add('is-dirty');
+
+  const tag = document.getElementById(`tag-${rId}`);
+  if (tag) {
+    tag.className = 'crm-row-tag unsaved';
+    tag.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+      Unsaved changes
+    `;
+  }
+
+  const btn = document.getElementById(`save-btn-${rId}`);
+  if (btn) {
+    btn.className = 'crm-save-btn is-dirty';
+    btn.disabled = false;
+    btn.title = 'Save record updates';
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      <span>Save</span>
+    `;
+  }
+}
+
+// ── Save Row (Single API Call with Instant KPI Update) ─────────────────────
 async function saveRow(rId) {
   if (savingSet.has(rId)) return;
   const changes = pendingChanges[rId];
   if (!changes) return;
 
   const btn = document.getElementById(`save-btn-${rId}`);
-  if (btn) { btn.className = 'save-btn saving'; btn.textContent = 'Saving...'; btn.disabled = true; }
+  if (btn) {
+    btn.className = 'crm-save-btn is-saving';
+    btn.disabled = true;
+    btn.innerHTML = `
+      <span class="spinner" style="width:12px;height:12px;border:2px solid rgba(0,0,0,0.2);border-top-color:currentColor;border-radius:50%;display:inline-block;animation:spin 0.6s linear infinite;"></span>
+      <span>Saving...</span>
+    `;
+  }
   savingSet.add(rId);
 
   try {
@@ -1774,86 +3129,213 @@ async function saveRow(rId) {
       })
     });
 
-    // Update local record
+    // Update memory record
     const idx = allRecords.findIndex(r => r.id === rId);
-    if (idx !== -1) allRecords[idx] = { ...allRecords[idx], ...res.record };
+    if (idx !== -1) {
+      allRecords[idx] = { ...allRecords[idx], ...res.record };
+    }
     delete pendingChanges[rId];
     savingSet.delete(rId);
 
-    if (btn) { btn.className = 'save-btn saved'; btn.textContent = 'Saved'; btn.disabled = false; }
-    updateSheetKPIs();
-    // Update row class
+    // Dynamic UI updates for this row
     const row = document.getElementById(`rec-row-${rId}`);
-    if (row && res.record.status === 'Completed') row.classList.add('completed-row');
-    // Update status badge in same row (cells[5] is Status column)
-    const cells = row?.querySelectorAll('td');
-    if (cells && cells[5]) cells[5].innerHTML = statusBadge(res.record.status);
+    if (row) {
+      row.classList.remove('is-dirty');
+      if (res.record.status === 'Completed') {
+        row.classList.add('is-completed');
+      } else {
+        row.classList.remove('is-completed');
+      }
+    }
 
-  } catch(e) {
+    const badgeContainer = document.getElementById(`status-badge-${rId}`);
+    if (badgeContainer) {
+      badgeContainer.innerHTML = renderStatusBadge(res.record.status);
+    }
+
+    const tag = document.getElementById(`tag-${rId}`);
+    if (tag) {
+      tag.className = 'crm-row-tag saved';
+      tag.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><polyline points="20 6 9 17 4 12"/></svg>
+        Saved just now
+      `;
+    }
+
+    if (btn) {
+      btn.className = 'crm-save-btn is-clean';
+      btn.disabled = true;
+      btn.title = 'No unsaved changes';
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Saved</span>
+      `;
+    }
+
+    // Instantly update KPI cards and Progress bar without full re-render
+    updateSheetKPIs();
+    showToast(`Record #${res.record.row_index || rId} saved successfully.`, 'success');
+
+  } catch (e) {
     savingSet.delete(rId);
-    if (btn) { btn.className = 'save-btn needs-save'; btn.textContent = 'Save'; btn.disabled = false; }
+    if (btn) {
+      btn.className = 'crm-save-btn is-error';
+      btn.disabled = false;
+      btn.title = 'Click to retry saving';
+      btn.innerHTML = `<span>Retry</span>`;
+    }
     const msg = e.message || '';
     if (msg === 'Session expired') return;
-    showToast('Changes could not be saved. ' + (msg || 'Please try again.'), 'error');
+    showToast('Failed to save record updates. ' + (msg || 'Please retry.'), 'error');
   }
 }
 
-// ── Submit ────────────────────────────────────────────────────────────────
+// ── Copy Phone Helper ─────────────────────────────────────────────────────
+function copyPhone(phone) {
+  if (!phone) return;
+  navigator.clipboard.writeText(phone).then(() => {
+    showToast(`Copied phone number ${phone} to clipboard`, 'success');
+  }).catch(() => {
+    showToast(`Phone: ${phone}`, 'info');
+  });
+}
+
+// ── Render Pagination Controls ────────────────────────────────────────────
+function renderPaginationControls(total, current, totalPages, start, end) {
+  const infoEl = document.getElementById('crm-pagination-info');
+  if (infoEl) {
+    const isFiltered = total !== allRecords.length;
+    infoEl.innerHTML = `Showing <strong>${start}–${end}</strong> of <strong>${total}</strong> ${isFiltered ? `matching records (${allRecords.length} total)` : 'records'}`;
+  }
+
+  const ctrlEl = document.getElementById('crm-pagination-controls');
+  if (!ctrlEl) return;
+
+  if (totalPages <= 1) {
+    ctrlEl.innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  // Prev button
+  html += `<button class="crm-pg-btn" ${current === 1 ? 'disabled' : ''} onclick="goRecPage(${current - 1})" title="Previous Page">← Prev</button>`;
+
+  // Page Numbers
+  const pages = getPaginationPageList(current, totalPages);
+  for (const p of pages) {
+    if (p === '...') {
+      html += `<span class="crm-pg-ellipsis">…</span>`;
+    } else {
+      html += `<button class="crm-pg-btn ${p === current ? 'active' : ''}" onclick="goRecPage(${p})">${p}</button>`;
+    }
+  }
+
+  // Next button
+  html += `<button class="crm-pg-btn" ${current === totalPages ? 'disabled' : ''} onclick="goRecPage(${current + 1})" title="Next Page">Next →</button>`;
+
+  ctrlEl.innerHTML = html;
+}
+
+function getPaginationPageList(current, total) {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages = [];
+  if (current <= 3) {
+    for (let i = 1; i <= 4; i++) pages.push(i);
+    pages.push('...', total);
+  } else if (current >= total - 2) {
+    pages.push(1, '...');
+    for (let i = total - 3; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1, '...', current - 1, current, current + 1, '...', total);
+  }
+  return pages;
+}
+
+function goRecPage(p) {
+  recPage = p;
+  renderRecordsTable();
+  const tableCard = document.querySelector('.crm-table-card');
+  if (tableCard) {
+    tableCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// ── Submit Completed Work ─────────────────────────────────────────────────
 function openSubmitConfirm() {
   if (Object.keys(pendingChanges).length > 0) {
-    showToast('Please save all pending changes before submitting.', 'error'); return;
+    showToast('Please save your pending row changes before submitting.', 'error');
+    return;
   }
   const completed = allRecords.filter(r => r.status === 'Completed').length;
-  const total     = allRecords.length;
-  document.getElementById('submit-summary').textContent = `${completed} of ${total} records are completed.`;
+  const total = allRecords.length;
+
+  const summaryEl = document.getElementById('submit-modal-summary');
+  if (summaryEl) {
+    summaryEl.innerHTML = `
+      <strong>${completed} of ${total} records completed</strong> (100%).
+      <br/><span style="font-size:12px;color:var(--text-muted);">Workbook: ${escHtml(currentAssignment.original_name)} • Assignment #${currentAssignment.id}</span>
+    `;
+  }
   openModal('submit-modal');
 }
 
 async function doSubmit() {
-  const submitBtn = document.getElementById('submit-btn');
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting...'; }
+  const btn = document.getElementById('confirm-submit-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+  }
+
   try {
-    await apiFetch(`/excel/assignments/${currentAssignment.id}/submit`, { method:'POST' });
-    showToast('Work submitted successfully.', 'success');
+    await apiFetch(`/excel/assignments/${currentAssignment.id}/submit`, { method: 'POST' });
+    showToast('Work submitted successfully! Great job.', 'success');
     closeModal('submit-modal');
+
     currentAssignment.status = 'Completed';
-    document.getElementById('sheet-status-badge').innerHTML = statusBadge('Completed');
+    document.getElementById('sheet-status-badge').innerHTML = renderStatusBadge('Completed');
+
     await loadAssignments();
     await loadSheetRecords();
-  } catch(e) {
+  } catch (e) {
     closeModal('submit-modal');
     const msg = e.message || '';
     if (msg === 'Session expired') return;
-    if (msg.includes('incomplete') || msg.includes('Disposition')) {
-      showToast(msg, 'error');
-    } else {
-      showToast('Submission could not be completed. ' + (msg || 'Please try again.'), 'error');
-    }
+    showToast('Submission could not be completed. ' + (msg || 'Please retry.'), 'error');
   } finally {
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit Completed Work'; }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Confirm & Submit';
+    }
   }
 }
 
+// ── Navigation Back to Assignments List ───────────────────────────────────
 function goBackToList() {
   if (Object.keys(pendingChanges).length > 0) {
-    if (!confirm('You have unsaved changes. Are you sure you want to go back?')) return;
+    if (!confirm('You have unsaved changes in this sheet. Are you sure you want to exit without saving?')) return;
   }
   pendingChanges = {};
   document.getElementById('view-sheet').style.display = 'none';
-  document.getElementById('view-list').style.display  = 'block';
+  document.getElementById('view-list').style.display = 'block';
   try {
     history.pushState(null, '', '/employee/data-excel.html');
   } catch (err) {}
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
+// ── Helper & UI Rendering Utilities ───────────────────────────────────────
 async function apiFetch(path, opts = {}) {
   const token = getToken();
-  const res   = await fetch(`${API_BASE}${path}`, {
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers||{}) },
+  const res = await fetch(`${API_BASE}${path}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      ...(opts.headers || {})
+    },
     ...opts
   });
+
   const data = await res.json().catch(() => ({ success: false, message: 'Server returned an invalid response.' }));
+
   if (res.status === 401 || res.status === 403) {
     const msg = data.message || '';
     if (data.assignment_expired || msg.toLowerCase().includes('assignment has expired')) {
@@ -1872,48 +3354,107 @@ async function apiFetch(path, opts = {}) {
     }
     throw new Error(data.message || 'Access denied.');
   }
-  if (!data.success) throw new Error(data.message || 'Something went wrong while processing your request. Please try again.');
+
+  if (!data.success) {
+    throw new Error(data.message || 'Something went wrong while processing your request. Please try again.');
+  }
   return data;
 }
 
-function openModal(id)  { closeAllFloatingDropdowns(); document.getElementById(id).classList.add('show'); document.body.style.overflow='hidden'; }
-function closeModal(id) { document.getElementById(id).classList.remove('show'); document.body.style.overflow=''; }
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+}
 
-function statusBadge(s) {
-  const map = { 'Assigned':'badge-assigned','In Progress':'badge-inprogress','Completed':'badge-completed','Closed':'badge-closed','Pending':'badge-pending' };
-  return `<span class="badge ${map[s]||'badge-assigned'}">${escHtml(s||'Unknown')}</span>`;
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+}
+
+function renderStatusBadge(status) {
+  const s = status || 'Pending';
+  if (s === 'Completed') {
+    return `
+      <span class="crm-badge crm-badge-completed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+        Completed
+      </span>
+    `;
+  }
+  if (s === 'In Progress') {
+    return `
+      <span class="crm-badge crm-badge-inprogress">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        In Progress
+      </span>
+    `;
+  }
+  if (s === 'Assigned') {
+    return `
+      <span class="crm-badge crm-badge-assigned">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Assigned
+      </span>
+    `;
+  }
+  return `
+    <span class="crm-badge crm-badge-pending">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Pending
+    </span>
+  `;
 }
 
 function escHtml(v) {
   if (v === null || v === undefined) return '';
-  return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function fmtDate(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function showAlert(msg, type) {
   const el = document.getElementById('page-alert');
-  el.className = `alert alert-${type === 'error' ? 'danger':'success'}`;
-  el.textContent = msg; el.style.display = 'block';
+  if (!el) return;
+  el.className = `alert alert-${type === 'error' ? 'danger' : 'success'}`;
+  el.textContent = msg;
+  el.style.display = 'block';
   setTimeout(() => { el.style.display = 'none'; }, 5000);
 }
 
-let toastN = 0;
-function showToast(msg, type='info') {
+let toastCounter = 0;
+function showToast(msg, type = 'info') {
   const wrap = document.getElementById('toast-wrap');
-  const id   = 't-' + (++toastN);
-  const cls  = type==='success'?'toast-success':type==='error'?'toast-error':'toast-info';
-  const icons= {success:'✓',error:'✗',info:'ℹ'};
-  const el   = document.createElement('div');
-  el.id = id; el.className = `toast ${cls}`;
-  el.innerHTML = `<span>${icons[type]||'ℹ'}</span><span>${escHtml(msg)}</span>`;
-  wrap.appendChild(el);
-  setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 3500);
-}
+  if (!wrap) return;
+  const id = 'toast-' + (++toastCounter);
+  const cls = type === 'success' ? 'toast-success' : (type === 'error' ? 'toast-error' : 'toast-info');
 
+  const icons = {
+    success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:16px;height:16px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>`,
+    error:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:16px;height:16px;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+    info:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:16px;height:16px;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+  };
+
+  const el = document.createElement('div');
+  el.id = id;
+  el.className = `toast ${cls}`;
+  el.innerHTML = `<span>${icons[type] || icons.info}</span><span>${escHtml(msg)}</span>`;
+  wrap.appendChild(el);
+
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => el.remove(), 300);
+  }, 3500);
+}
 </script>
 </body>
 </html>

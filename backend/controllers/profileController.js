@@ -1,8 +1,10 @@
 const upload = require('../middleware/upload');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
 const db = require('../config/db');
+const cryptoUtil = require('../utils/cryptoUtil');
 
 // ── Helper: log user activity ──────────────────────────────────────────────
 async function logActivity(userId, activity, req, status = 'Success') {
@@ -25,6 +27,10 @@ const profileController = {
 
       const user = { ...userRows[0] };
       delete user.password; // Never expose password hash
+      user.aadhaar_password_configured = Boolean(user.aadhaar_document_password);
+      user.pan_password_configured = Boolean(user.pan_document_password);
+      delete user.aadhaar_document_password;
+      delete user.pan_document_password;
 
       const [[bank]] = await db.query('SELECT * FROM bank_details WHERE user_id = ?', [userId]);
       const [[emergency]] = await db.query('SELECT * FROM emergency_contacts WHERE user_id = ?', [userId]);
@@ -83,45 +89,63 @@ const profileController = {
   async updateAccountSettings(req, res) {
     try {
       const userId = req.user.id;
-      const { name, username, email, phone } = req.body;
+      const { name, username, email, phone, role, authorizationRole, designation } = req.body;
 
       if (req.user.role === 'employee') {
         return res.status(403).json({
           success: false,
-          message: 'Employees cannot update name, email, or phone from their profile.'
+          message: 'Employees cannot update account settings from their profile.'
         });
       }
 
-      if (!name || !email) {
-        return res.status(400).json({ success: false, message: 'Name and email are required.' });
+      if (!name || !name.trim()) {
+        return res.status(400).json({ success: false, message: 'Name is required.' });
       }
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ success: false, message: 'Invalid email format.' });
+      // Fetch existing user to enforce protected system fields
+      const [userRows] = await db.query('SELECT email, role, designation FROM users WHERE id = ?', [userId]);
+      if (!userRows.length) {
+        return res.status(404).json({ success: false, message: 'User not found.' });
+      }
+      const existingUser = userRows[0];
+
+      // Reject unauthorized attempts to modify protected fields
+      if (email !== undefined && email !== null && email.trim().toLowerCase() !== (existingUser.email || '').toLowerCase()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email address is system-managed and cannot be modified.'
+        });
       }
 
-      // Check for duplicate email
-      const [emailCheck] = await db.query(
-        'SELECT id FROM users WHERE email = ? AND id != ?', [email, userId]
-      );
-      if (emailCheck.length) {
-        return res.status(400).json({ success: false, message: 'Email is already used by another account.' });
+      const requestedRole = role || authorizationRole;
+      if (requestedRole !== undefined && requestedRole !== null && requestedRole !== existingUser.role) {
+        return res.status(400).json({
+          success: false,
+          message: 'Authorization role is system-managed and cannot be modified.'
+        });
       }
 
-      // Check for duplicate username (if provided)
-      if (username) {
+      if (designation !== undefined && designation !== null && designation !== existingUser.designation) {
+        return res.status(400).json({
+          success: false,
+          message: 'Designation is system-managed and cannot be modified.'
+        });
+      }
+
+      // Check for duplicate username (if provided and changed)
+      if (username && username.trim()) {
         const [usernameCheck] = await db.query(
-          'SELECT id FROM users WHERE username = ? AND id != ?', [username, userId]
+          'SELECT id FROM users WHERE username = ? AND id != ?', [username.trim(), userId]
         );
         if (usernameCheck.length) {
           return res.status(400).json({ success: false, message: 'Username is already taken.' });
         }
       }
 
+      // Update ONLY permitted fields: name, username, phone (protected fields are untouched)
       await db.query(
-        'UPDATE users SET name=?, username=?, email=?, phone=? WHERE id=?',
-        [name.trim(), username?.trim() || null, email.trim().toLowerCase(), phone?.trim() || null, userId]
+        'UPDATE users SET name=?, username=?, phone=? WHERE id=?',
+        [name.trim(), username?.trim() || null, phone?.trim() || null, userId]
       );
 
       await logActivity(userId, 'Updated account settings', req);
@@ -157,10 +181,29 @@ const profileController = {
       }
 
       const hashed = await bcrypt.hash(newPassword, 10);
-      await db.query('UPDATE users SET password=? WHERE id=?', [hashed, userId]);
+      await db.query('UPDATE users SET password = ?, token_version = token_version + 1, must_change_password = 0 WHERE id = ?', [hashed, userId]);
+
+      const [updatedRows] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+      const updatedUser = updatedRows[0];
+      const token = jwt.sign(
+        {
+          id: updatedUser.id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          role: updatedUser.role,
+          token_version: updatedUser.token_version || 1
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '8h' }
+      );
 
       await logActivity(userId, 'Changed password', req);
-      return res.json({ success: true, message: 'Password changed successfully.' });
+      return res.json({
+        success: true,
+        message: 'Password changed successfully.',
+        token,
+        must_change_password: false
+      });
     } catch (err) {
       console.error('[Profile] changePassword error:', err);
       return res.status(500).json({ success: false, message: 'Failed to change password.' });
@@ -197,31 +240,59 @@ const profileController = {
   async uploadKYCDoc(req, res) {
     try {
       const userId = req.user.id;
-      const { doc_type, aadhaar_number, pan_number } = req.body;
+      const { doc_type, aadhaar_number, pan_number, aadhaar_document_password, pan_document_password } = req.body;
+
+      // Lock enforcement: Block employee mutations if KYC is already approved
+      const [uStatus] = await db.query('SELECT verification_status FROM users WHERE id=?', [userId]);
+      if (uStatus[0]?.verification_status === 'Approved') {
+        return res.status(403).json({
+          success: false,
+          message: 'KYC documents are locked after approval. Contact an administrator if changes are required.'
+        });
+      }
 
       if (!req.file) {
         return res.status(400).json({ success: false, message: 'No file uploaded.' });
       }
 
       const relativePath = upload.getFileUrl(req, req.file);
-
-      let updateField = null;
       let activity = '';
 
       if (doc_type === 'aadhaar_front') {
         const [old] = await db.query('SELECT aadhaar_front FROM users WHERE id=?', [userId]);
-        if (old[0]?.aadhaar_front && old[0].aadhaar_front.startsWith('/uploads/')) { const op = path.join(__dirname, '..', old[0].aadhaar_front); if (fs.existsSync(op)) fs.unlinkSync(op); }
+        if (old[0]?.aadhaar_front && old[0].aadhaar_front.startsWith('/uploads/')) {
+          const op = path.join(__dirname, '..', old[0].aadhaar_front);
+          if (fs.existsSync(op)) fs.unlinkSync(op);
+        }
         await db.query('UPDATE users SET aadhaar_front=?, aadhaar_number=COALESCE(?, aadhaar_number) WHERE id=?', [relativePath, aadhaar_number || null, userId]);
+        if (aadhaar_document_password && aadhaar_document_password.trim() !== '') {
+          const enc = cryptoUtil.encrypt(aadhaar_document_password.trim());
+          await db.query('UPDATE users SET aadhaar_document_password=? WHERE id=?', [enc, userId]);
+        }
         activity = 'Uploaded Aadhaar Front';
       } else if (doc_type === 'aadhaar_back') {
         const [old] = await db.query('SELECT aadhaar_back FROM users WHERE id=?', [userId]);
-        if (old[0]?.aadhaar_back && old[0].aadhaar_back.startsWith('/uploads/')) { const op = path.join(__dirname, '..', old[0].aadhaar_back); if (fs.existsSync(op)) fs.unlinkSync(op); }
+        if (old[0]?.aadhaar_back && old[0].aadhaar_back.startsWith('/uploads/')) {
+          const op = path.join(__dirname, '..', old[0].aadhaar_back);
+          if (fs.existsSync(op)) fs.unlinkSync(op);
+        }
         await db.query('UPDATE users SET aadhaar_back=?, aadhaar_number=COALESCE(?, aadhaar_number) WHERE id=?', [relativePath, aadhaar_number || null, userId]);
+        if (aadhaar_document_password && aadhaar_document_password.trim() !== '') {
+          const enc = cryptoUtil.encrypt(aadhaar_document_password.trim());
+          await db.query('UPDATE users SET aadhaar_document_password=? WHERE id=?', [enc, userId]);
+        }
         activity = 'Uploaded Aadhaar Back';
       } else if (doc_type === 'pan_card') {
         const [old] = await db.query('SELECT pan_card FROM users WHERE id=?', [userId]);
-        if (old[0]?.pan_card && old[0].pan_card.startsWith('/uploads/')) { const op = path.join(__dirname, '..', old[0].pan_card); if (fs.existsSync(op)) fs.unlinkSync(op); }
+        if (old[0]?.pan_card && old[0].pan_card.startsWith('/uploads/')) {
+          const op = path.join(__dirname, '..', old[0].pan_card);
+          if (fs.existsSync(op)) fs.unlinkSync(op);
+        }
         await db.query('UPDATE users SET pan_card=?, pan_number=COALESCE(?, pan_number) WHERE id=?', [relativePath, pan_number || null, userId]);
+        if (pan_document_password && pan_document_password.trim() !== '') {
+          const enc = cryptoUtil.encrypt(pan_document_password.trim());
+          await db.query('UPDATE users SET pan_document_password=? WHERE id=?', [enc, userId]);
+        }
         activity = 'Uploaded PAN Card';
       } else {
         return res.status(400).json({ success: false, message: 'Invalid document type. Use aadhaar_front, aadhaar_back, or pan_card.' });
@@ -235,6 +306,77 @@ const profileController = {
     } catch (err) {
       console.error('[Profile] uploadKYCDoc error:', err);
       return res.status(500).json({ success: false, message: 'Failed to upload document.' });
+    }
+  },
+
+  // ── PUT /api/profile/kyc-details ──────────────────────────────────────────
+  async updateKYCDetails(req, res) {
+    try {
+      const userId = req.user.id;
+      const {
+        aadhaar_number,
+        pan_number,
+        aadhaar_document_password,
+        pan_document_password,
+        clear_aadhaar_password,
+        clear_pan_password
+      } = req.body;
+
+      const [userRows] = await db.query('SELECT verification_status, aadhaar_number, pan_number FROM users WHERE id=?', [userId]);
+      if (!userRows.length) return res.status(404).json({ success: false, message: 'User not found.' });
+
+      // Lock enforcement: Block modifications if approved
+      if (userRows[0].verification_status === 'Approved') {
+        return res.status(403).json({
+          success: false,
+          message: 'KYC documents are locked after approval. Contact an administrator if changes are required.'
+        });
+      }
+
+      const updates = [];
+      const values = [];
+
+      if (aadhaar_number !== undefined) {
+        updates.push('aadhaar_number = ?');
+        values.push(aadhaar_number ? String(aadhaar_number).trim() : null);
+      }
+
+      if (pan_number !== undefined) {
+        updates.push('pan_number = ?');
+        values.push(pan_number ? String(pan_number).trim().toUpperCase() : null);
+      }
+
+      if (clear_aadhaar_password === true) {
+        updates.push('aadhaar_document_password = NULL');
+      } else if (aadhaar_document_password !== undefined && aadhaar_document_password !== null && String(aadhaar_document_password).trim() !== '') {
+        const encrypted = cryptoUtil.encrypt(String(aadhaar_document_password).trim());
+        updates.push('aadhaar_document_password = ?');
+        values.push(encrypted);
+      }
+
+      if (clear_pan_password === true) {
+        updates.push('pan_document_password = NULL');
+      } else if (pan_document_password !== undefined && pan_document_password !== null && String(pan_document_password).trim() !== '') {
+        const encrypted = cryptoUtil.encrypt(String(pan_document_password).trim());
+        updates.push('pan_document_password = ?');
+        values.push(encrypted);
+      }
+
+      // If status was Rejected, update to Pending upon correction
+      if (userRows[0].verification_status === 'Rejected') {
+        updates.push("verification_status = 'Pending'");
+      }
+
+      if (updates.length > 0) {
+        values.push(userId);
+        await db.query(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, values);
+        await logActivity(userId, 'Updated KYC document details and passwords', req);
+      }
+
+      return res.json({ success: true, message: 'KYC document details updated successfully.' });
+    } catch (err) {
+      console.error('[Profile] updateKYCDetails error:', err);
+      return res.status(500).json({ success: false, message: 'Failed to update KYC document details.' });
     }
   },
 
@@ -336,6 +478,10 @@ const profileController = {
 
       const user = { ...userRows[0] };
       delete user.password;
+      user.aadhaar_password_configured = Boolean(user.aadhaar_document_password);
+      user.pan_password_configured = Boolean(user.pan_document_password);
+      delete user.aadhaar_document_password;
+      delete user.pan_document_password;
 
       const [[bank]] = await db.query('SELECT * FROM bank_details WHERE user_id = ?', [employeeId]);
       const [[emergency]] = await db.query('SELECT * FROM emergency_contacts WHERE user_id = ?', [employeeId]);
@@ -355,6 +501,61 @@ const profileController = {
     } catch (err) {
       console.error('[Profile] adminGetEmployeeProfile error:', err);
       return res.status(500).json({ success: false, message: 'Failed to load employee profile.' });
+    }
+  },
+
+  // ── GET /api/profile/admin/employees/:id/kyc-password/:docType ───────────
+  async adminGetEmployeeKYCPassword(req, res) {
+    try {
+      const adminId = req.user.id;
+      const employeeId = parseInt(req.params.id, 10);
+      const docType = req.params.docType?.toLowerCase();
+
+      if (!employeeId) return res.status(400).json({ success: false, message: 'Invalid employee ID.' });
+      if (!['aadhaar', 'pan'].includes(docType)) {
+        return res.status(400).json({ success: false, message: "Invalid document type. Must be 'aadhaar' or 'pan'." });
+      }
+
+      const colName = docType === 'aadhaar' ? 'aadhaar_document_password' : 'pan_document_password';
+      const [userRows] = await db.query(
+        `SELECT id, name, ${colName} AS enc_password FROM users WHERE id = ? AND role = 'employee'`,
+        [employeeId]
+      );
+
+      if (!userRows.length) return res.status(404).json({ success: false, message: 'Employee not found.' });
+
+      const encPassword = userRows[0].enc_password;
+      if (!encPassword) {
+        return res.json({
+          success: true,
+          has_password: false,
+          password: ''
+        });
+      }
+
+      let decrypted = '';
+      try {
+        decrypted = cryptoUtil.decrypt(encPassword);
+      } catch (decErr) {
+        console.error('[Profile] adminGetEmployeeKYCPassword decryption failed:', decErr.message);
+        return res.status(500).json({ success: false, message: 'Failed to decrypt document password.' });
+      }
+
+      // Audit log: record that admin viewed password without saving plaintext in log
+      await logActivity(
+        adminId,
+        `Viewed ${docType.toUpperCase()} document password for employee ${userRows[0].name} (ID: ${employeeId})`,
+        req
+      );
+
+      return res.json({
+        success: true,
+        has_password: true,
+        password: decrypted
+      });
+    } catch (err) {
+      console.error('[Profile] adminGetEmployeeKYCPassword error:', err);
+      return res.status(500).json({ success: false, message: 'Failed to retrieve document password.' });
     }
   },
 

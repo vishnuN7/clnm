@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — APR Module</title>
+  <title>CLN Lending Suite — APR & Workforce Analytics</title>
   <meta name="description" content="APR — Attendance, Performance & Reports Management Dashboard." />
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -23,6 +23,7 @@
     })();
   </script>
   <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- CDNs for charts and exporting -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -34,177 +35,205 @@
     .apr-container {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
       min-width: 0;
       max-width: 100%;
-      overflow: hidden;
     }
 
     .main-content {
       min-width: 0;
-      max-width: calc(100vw - var(--sidebar-width));
+      max-width: calc(100vw - var(--sidebar-width, 260px));
       overflow-x: hidden;
     }
-    .topbar {
-      min-width: 0;
-      gap: 16px;
+
+    /* ── Topbar with Centered Title & Brand Consistency ── */
+    .admin-page .topbar {
+      display: flex !important;
+      align-items: center !important;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      min-height: 64px;
+      height: auto;
+      padding: 10px 24px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
-    .topbar-actions {
-      flex-shrink: 0;
-      min-width: 0;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+    :root[data-theme='dark'] .admin-page .topbar {
+      background: linear-gradient(90deg, rgba(9, 17, 29, 0.95) 0%, rgba(12, 24, 41, 0.92) 100%);
+      border-bottom-color: rgba(151, 176, 210, 0.12);
+    }
+    .admin-page .topbar-title {
+      position: absolute !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      text-align: center !important;
+      max-width: min(720px, calc(100% - 240px)) !important;
+      pointer-events: auto !important;
+      margin: 0 !important;
+    }
+    .admin-page .topbar-title h2 {
+      margin: 0 !important;
+      font-size: 18px !important;
+      font-weight: 800 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1.25 !important;
+      color: var(--text-primary) !important;
+      letter-spacing: -0.2px;
+    }
+    .admin-page .topbar-title h2 i {
+      color: var(--accent);
+      margin-right: 8px;
+      font-size: 17px;
+    }
+    .admin-page .topbar-title p {
+      margin: 2px 0 0 !important;
+      font-size: 12px !important;
+      color: var(--text-secondary) !important;
+      line-height: 1.35 !important;
+      text-align: center !important;
+      white-space: normal !important;
+    }
+    .admin-page .topbar-actions {
+      margin-left: auto !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      flex-shrink: 0 !important;
+      position: relative;
+      z-index: 2;
+    }
+    .topbar-date-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-body);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .topbar-date-badge i {
+      color: var(--accent);
+      font-size: 11px;
+    }
+    .btn-topbar-action {
+      height: 34px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-body);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm, 6px);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-topbar-action:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
     }
     .page-content {
       min-width: 0;
       max-width: 100%;
-      overflow-x: hidden;
+      padding: 24px;
     }
 
-    /* Tabs System */
-    .apr-tabs {
-      display: flex;
-      gap: 8px;
-      padding: 4px;
+    /* ── Tabs System ── */
+    .apr-tabs-wrapper {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      width: fit-content;
+      border-radius: var(--radius, 10px);
+      padding: 6px;
       box-shadow: var(--shadow-soft);
       overflow-x: auto;
       max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+    .apr-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: max-content;
+      min-width: 100%;
+      list-style: none;
+      margin: 0;
+      padding: 0;
     }
     .apr-tab-btn {
-      padding: 10px 20px;
-      border: none;
+      padding: 9px 16px;
+      border: 1px solid transparent;
       background: transparent;
-      border-radius: calc(var(--radius) - 4px);
+      border-radius: calc(var(--radius, 10px) - 4px);
       font-size: 13px;
       font-weight: 600;
       font-family: inherit;
       color: var(--text-secondary);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       white-space: nowrap;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
+      flex-shrink: 0;
+      user-select: none;
     }
-    .apr-tab-btn.active {
-      background: linear-gradient(135deg, var(--accent) 0%, #173b6b 100%);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(15, 39, 71, 0.22);
+    .apr-tab-btn i {
+      font-size: 14px;
+      line-height: 1;
+      opacity: 0.9;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
     }
     .apr-tab-btn:hover:not(.active) {
       background: var(--accent-soft);
       color: var(--accent);
+      border-color: rgba(47, 111, 237, 0.15);
+    }
+    .apr-tab-btn:hover:not(.active) i {
+      transform: scale(1.08);
+    }
+    .apr-tab-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .apr-tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 3px 10px rgba(15, 39, 71, 0.25);
+    }
+    :root[data-theme='dark'] .apr-tab-btn.active {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
     }
     .apr-tab-panel {
       display: none;
     }
     .apr-tab-panel.active {
       display: block;
-      animation: aprFadeUp 0.3s ease;
+      animation: aprFadeUp 0.25s ease;
     }
     @keyframes aprFadeUp {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: none; }
     }
 
-    /* Stats Grid & Grouping */
-    .apr-section-group {
-      margin-bottom: 32px;
-    }
-    .apr-section-title {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-    .apr-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .apr-stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 18px;
-      box-shadow: var(--shadow-soft);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .apr-stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-medium);
-    }
-    .apr-stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--accent);
-    }
-    .apr-stat-blue::before { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
-    .apr-stat-green::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
-    .apr-stat-amber::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
-    .apr-stat-rose::before { background: linear-gradient(90deg, #f43f5e, #e11d48); }
-    .apr-stat-purple::before { background: linear-gradient(90deg, #a855f7, #7c3aed); }
-
-    .apr-stat-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: var(--text-secondary);
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .apr-stat-icon {
-      font-size: 20px;
-      color: var(--accent);
-    }
-    .apr-stat-val {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text-primary);
-      line-height: 1.1;
-      margin-top: 4px;
-    }
-    .apr-stat-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .apr-trend {
-      display: inline-flex;
-      align-items: center;
-      font-weight: 700;
-    }
-    .apr-trend.up { color: #22c55e; }
-    .apr-trend.down { color: #f43f5e; }
-
-    /* Filters Panel */
+    /* ── Global Filters Panel ── */
     .apr-filters {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius, 10px);
       padding: 16px 20px;
       display: flex;
       flex-wrap: wrap;
@@ -222,31 +251,514 @@
       font-weight: 700;
       text-transform: uppercase;
       color: var(--text-muted);
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
     .apr-filter-select, .apr-filter-input {
-      padding: 8px 12px;
+      height: 38px;
+      padding: 6px 12px;
       border: 1px solid var(--border);
       background: var(--bg-body);
       color: var(--text-primary);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-sm, 6px);
       font-size: 13px;
       font-family: inherit;
       outline: none;
       min-width: 140px;
-      transition: border-color 0.2s;
+      transition: all 0.2s ease;
     }
     .apr-filter-select:focus, .apr-filter-input:focus {
       border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+    .apr-timeline-segmented {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--bg-body);
+      padding: 3px;
+      border-radius: var(--radius-sm, 8px);
+      border: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .apr-segmented-btn {
+      padding: 7px 13px;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: calc(var(--radius-sm, 8px) - 2px);
+      font-size: 12.5px;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .apr-segmented-btn:hover:not(.active) {
+      color: var(--text-primary);
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .apr-segmented-btn.active {
+      background: var(--accent);
+      color: #ffffff !important;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(15, 39, 71, 0.25);
+    }
+    :root[data-theme='dark'] .apr-timeline-segmented {
+      background: #0f172a;
+      border-color: #334155;
+    }
+    :root[data-theme='dark'] .apr-segmented-btn {
+      color: #94a3b8;
+    }
+    :root[data-theme='dark'] .apr-segmented-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+    }
+    :root[data-theme='dark'] .apr-segmented-btn.active {
+      background: #2563eb;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+    }
+    .apr-tab-text {
+      display: inline-block;
+      line-height: 1.2;
+    }
+    .apr-search-wrapper {
+      position: relative;
+      min-width: 240px;
+    }
+    .apr-search-wrapper i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .apr-search-wrapper .apr-filter-input {
+      padding-left: 34px;
+      width: 100%;
+    }
+    .apr-btn-reset {
+      height: 38px;
+      padding: 0 16px;
+      border: 1px solid var(--border);
+      background: var(--bg-body);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm, 6px);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s ease;
+    }
+    .apr-btn-reset:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-color: var(--border-strong, var(--border));
+    }
+    :root[data-theme='dark'] .apr-btn-reset {
+      background: #0f172a;
+      border-color: #334155;
+      color: #cbd5e1;
+    }
+    :root[data-theme='dark'] .apr-btn-reset:hover {
+      background: #1e293b;
+      color: #ffffff;
+      border-color: #475569;
+    }
+    :root[data-theme='dark'] .apr-filter-select,
+    :root[data-theme='dark'] .apr-filter-input {
+      background: #0f172a;
+      border-color: #334155;
+      color: #f8fafc;
+    }
+    :root[data-theme='dark'] .apr-search-wrapper i {
+      color: #64748b;
     }
 
-    /* Leaderboard Badge Colors */
+    /* ── Section Titles & Groupings ── */
+    .apr-section-group {
+      margin-bottom: 24px;
+    }
+    .apr-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .apr-section-title i {
+      color: var(--accent);
+      font-size: 14px;
+    }
+
+    /* ── KPI Stat Cards ── */
+    .apr-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .apr-stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius, 10px);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .apr-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+    .apr-stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3.5px;
+      background: var(--accent);
+    }
+    .apr-stat-blue::before { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+    .apr-stat-green::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
+    .apr-stat-amber::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
+    .apr-stat-rose::before { background: linear-gradient(90deg, #f43f5e, #e11d48); }
+    .apr-stat-purple::before { background: linear-gradient(90deg, #a855f7, #7c3aed); }
+    .apr-stat-slate::before { background: linear-gradient(90deg, #94a3b8, #64748b); }
+
+    .apr-stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+    .apr-stat-icon-wrapper {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+    }
+    .apr-stat-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.15;
+      margin-top: 2px;
+      letter-spacing: -0.5px;
+    }
+    .apr-stat-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    /* ── Split Layouts ── */
+    .apr-dashboard-split {
+      display: grid;
+      grid-template-columns: 2.2fr 1.8fr;
+      gap: 16px;
+      align-items: stretch;
+      margin-bottom: 24px;
+    }
+    .apr-grid-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 1100px) {
+      .apr-dashboard-split {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 900px) {
+      .apr-grid-split {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Chart & Summary Boxes ── */
+    .chart-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius, 10px);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-box-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-box-title i {
+      color: var(--accent);
+      font-size: 13px;
+    }
+    .scoreboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .score-card {
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm, 6px);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .score-card .score-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .score-card .score-title i {
+      font-size: 12px;
+      line-height: 1;
+      opacity: 0.85;
+      flex-shrink: 0;
+    }
+    .score-card .score-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+    .score-progress-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .score-progress-val {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    /* ── Action Bar for Tables & Export Buttons ── */
+    .apr-actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+      min-width: 0;
+    }
+    .apr-actions-bar-title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .apr-actions-bar h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .apr-actions-bar h3 i {
+      color: var(--accent);
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .apr-badge-count {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .apr-btn-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .apr-export-btn {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm, 6px);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1.2;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .apr-export-btn i {
+      font-size: 12.5px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .apr-export-btn:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+    .apr-export-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+    :root[data-theme='dark'] .apr-export-btn {
+      background: rgba(15, 23, 42, 0.6);
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+    :root[data-theme='dark'] .apr-export-btn:hover {
+      background: rgba(37, 99, 235, 0.15);
+      border-color: #3b82f6;
+      color: #93c5fd;
+    }
+
+    /* ── Data Tables ── */
+    .full-table {
+      max-width: 100%;
+      min-width: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius, 10px);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+    }
+    .full-table .table-wrapper {
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+    .full-table table {
+      width: 100%;
+      min-width: 800px;
+      border-collapse: collapse;
+    }
+    .full-table thead th {
+      background: var(--bg-secondary);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      user-select: none;
+    }
+    .full-table thead th.sortable {
+      cursor: pointer;
+    }
+    .full-table thead th.sortable:hover {
+      color: var(--text-primary);
+    }
+    .full-table tbody td {
+      padding: 12px 14px;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .full-table tbody tr:hover {
+      background: rgba(0, 0, 0, 0.015);
+    }
+    :root[data-theme='dark'] .full-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* ── Status Badges ── */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .status-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .status-badge.online { background: rgba(34, 197, 94, 0.12); color: #16a34a; }
+    .status-badge.offline { background: rgba(148, 163, 184, 0.15); color: #64748b; }
+    .status-badge.on-break { background: rgba(245, 158, 11, 0.12); color: #d97706; }
+    .status-badge.logged-out { background: rgba(244, 63, 94, 0.12); color: #e11d48; }
+    .status-badge.auto-deactivated { background: rgba(168, 85, 247, 0.12); color: #7c3aed; }
+    .status-badge.manual-override { background: rgba(6, 182, 212, 0.12); color: #0891b2; }
+    :root[data-theme='dark'] .status-badge.online { color: #22c55e; }
+    :root[data-theme='dark'] .status-badge.offline { color: #94a3b8; }
+    :root[data-theme='dark'] .status-badge.on-break { color: #f59e0b; }
+    :root[data-theme='dark'] .status-badge.logged-out { color: #f43f5e; }
+    :root[data-theme='dark'] .status-badge.auto-deactivated { color: #a855f7; }
+    :root[data-theme='dark'] .status-badge.manual-override { color: #06b6d4; }
+
+    /* ── Leaderboard Rank Medals ── */
     .badge-rank {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       font-size: 12px;
       font-weight: 800;
@@ -256,232 +768,113 @@
     .badge-bronze { background: #ffedd5; color: #9a3412; border: 1.5px solid #ea580c; }
     .badge-normal { background: var(--bg-body); color: var(--text-secondary); border: 1px solid var(--border); }
 
-    /* Badges */
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-    .status-badge.online { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
-    .status-badge.offline { background: rgba(148, 163, 184, 0.12); color: #94a3b8; }
-    .status-badge.on-break { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
-    .status-badge.logged-out { background: rgba(244, 63, 94, 0.12); color: #f43f5e; }
-    .status-badge.auto-deactivated { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
-    .status-badge.manual-override { background: rgba(6, 182, 212, 0.12); color: #06b6d4; }
-
-    /* Exports Bar */
-    .apr-actions-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 16px;
-      min-width: 0;
-    }
-    .apr-actions-bar h3 {
-      min-width: 0;
-      margin: 0;
-      line-height: 1.25;
-    }
-    .apr-btn-group {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-    .apr-export-btn {
-      padding: 8px 14px;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text-secondary);
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-    .apr-export-btn:hover {
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-color: var(--accent);
-    }
-
-    /* Grid for analytics/details split */
-    .apr-grid-split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    @media (max-width: 1024px) {
-      .apr-grid-split {
-        grid-template-columns: 1fr;
-      }
-    }
-    .chart-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow-soft);
-    }
-    .chart-box-title {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Scoreboard cards */
-    .scoreboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-    }
-    .score-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow-soft);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .score-progress-bar {
-      height: 6px;
-      border-radius: 3px;
-      background: var(--border);
-      overflow: hidden;
-    }
-    .score-progress-val {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 3px;
-    }
-    .full-table {
-      max-width: 100%;
-      min-width: 0;
-    }
-    .full-table .table-wrapper {
-      max-width: 100%;
-      overflow-x: auto;
-      overflow-y: hidden;
-      border-radius: inherit;
-      -webkit-overflow-scrolling: touch;
-    }
-    .full-table .table-wrapper::-webkit-scrollbar {
-      height: 8px;
-    }
-    .full-table .table-wrapper::-webkit-scrollbar-thumb {
-      background: var(--border-strong);
-      border-radius: 999px;
-    }
-    .full-table table {
-      min-width: max-content;
-    }
-    .full-table thead th,
-    .full-table tbody td {
-      padding-left: 10px;
-      padding-right: 10px;
-      white-space: nowrap;
-    }
-    .full-table tbody td {
-      font-size: 12px;
-    }
-    #performance-table {
-      min-width: 1040px;
-    }
-    #performance-table th,
-    #performance-table td {
-      text-align: center;
-    }
-    #performance-table th:nth-child(2),
-    #performance-table td:nth-child(2) {
-      text-align: left;
-      min-width: 140px;
-    }
-    #performance-table th:nth-child(10),
-    #performance-table td:nth-child(10),
-    #performance-table th:nth-child(11),
-    #performance-table td:nth-child(11) {
-      min-width: 132px;
-    }
+    /* ── Performance Score Progress Cells ── */
     .apr-score-cell {
       display: grid;
-      grid-template-columns: minmax(46px, 1fr) auto;
+      grid-template-columns: minmax(50px, 1fr) auto;
       align-items: center;
       gap: 8px;
-      min-width: 112px;
+      min-width: 120px;
     }
     .apr-score-cell .score-progress-bar {
       width: 100%;
-      min-width: 46px;
+      min-width: 50px;
+      margin: 0;
     }
     .apr-score-cell span {
       font-size: 12px;
+      font-weight: 700;
       color: var(--text-secondary);
     }
-    .apr-dashboard-split {
-      display: grid;
-      grid-template-columns: 2.2fr 1.8fr;
-      gap: 20px;
-      align-items: stretch;
-      margin-bottom: 32px;
+
+    /* ── Unified 20-Record Pagination System ── */
+    .tbl-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 18px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
     }
-    @media (max-width: 1200px) {
-      .apr-dashboard-split {
-        grid-template-columns: 1fr;
-      }
+    .tbl-pg-info {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
     }
+    .tbl-pg-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .tbl-pg-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      background: var(--bg-body);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm, 6px);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tbl-pg-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .tbl-pg-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff !important;
+    }
+    .tbl-pg-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    :root[data-theme='dark'] .tbl-pg-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    :root[data-theme='dark'] .tbl-pg-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #ffffff !important;
+    }
+
+    /* ── Responsive adjustments ── */
     @media (max-width: 900px) {
-      .topbar {
-        height: auto;
-        min-height: var(--header-height);
-        align-items: flex-start;
-        padding-top: 12px;
-        padding-bottom: 12px;
+      .admin-page .topbar {
+        position: relative;
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 12px;
+        padding: 12px 16px;
       }
-      .topbar-title h2,
-      .topbar-title p {
-        white-space: normal;
+      .admin-page .topbar-title {
+        position: static !important;
+        transform: none !important;
+        max-width: 100% !important;
+        text-align: left !important;
       }
-      .apr-actions-bar,
-      .apr-btn-group {
-        align-items: stretch;
+      .admin-page .topbar-actions {
+        margin-left: 0 !important;
+        justify-content: space-between;
       }
-      .apr-btn-group {
-        width: 100%;
-      }
-      .apr-export-btn {
-        flex: 1 1 72px;
-        justify-content: center;
-      }
-    }
-    @media (max-width: 640px) {
       .page-content {
         padding: 16px;
       }
       .apr-filters {
-        padding: 14px;
+        flex-direction: column;
+        align-items: stretch;
       }
-      .apr-filter-group,
-      .apr-filter-select,
-      .apr-filter-input {
-        width: 100%;
-      }
-      #custom-date-container {
+      .apr-search-wrapper, .apr-filter-select, .apr-filter-input, .apr-btn-reset {
         width: 100%;
       }
     }
@@ -492,7 +885,7 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo">
+      <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
         <div><h2>CLN Lending Suite</h2><span>Admin Console</span></div>
       </div>
@@ -500,21 +893,21 @@
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-                <a href="/admin/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span> Dashboard</a>
-        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users"></i></span> Employees</a>
-        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book"></i></span> Customers</a>
-        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase"></i></span> Loan Applications</a>
-        <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span> EMI Calculator</a>
-        <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> Data Excel Document</a>
-        <a href="/admin/apr.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-chart-line"></i></span> APR</a>
-</div>
+        <a href="/admin/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users" aria-hidden="true"></i></span> <span>Employees</span></a>
+        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Customers</span></a>
+        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>Loan Applications</span></a>
+        <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+        <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>Data Excel Document</span></a>
+        <a href="/admin/apr.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="sidebar-user-avatar">A</div>
         <div class="user-details"><p id="sidebar-user-name">Admin</p><span id="sidebar-user-role">admin</span></div>
       </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
     </div>
   </aside>
 
@@ -523,108 +916,127 @@
 
   <!-- Main Content -->
   <main class="main-content">
+    <!-- Centered Header & Topbar -->
     <div class="topbar">
-      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+        <span>Menu</span>
+      </button>
       <div class="topbar-title">
-        <h2>APR Dashboard</h2>
-        <p>Real-time employee monitoring, performance scorecards, and reports</p>
+        <h2><i class="fas fa-chart-line" aria-hidden="true"></i> <span>APR Analytics & Workforce Management</span></h2>
+        <p>Real-time employee monitoring, attendance tracking, performance scorecards, and audit logs.</p>
       </div>
       <div class="topbar-actions">
-        <span id="current-date" style="font-size:13px;color:var(--text-secondary);"></span>
+        <div class="topbar-date-badge">
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+          <span id="current-date">Today</span>
+        </div>
+        <button class="btn-topbar-action" onclick="refreshAll()" title="Refresh Dashboard">
+          <i class="fas fa-sync-alt" id="refresh-icon" aria-hidden="true"></i>
+          <span>Refresh</span>
+        </button>
       </div>
     </div>
 
     <div class="page-content">
       <div class="apr-container">
         
-        <!-- Filters panel -->
+        <!-- Global Filters Panel -->
         <div class="apr-filters">
           <div class="apr-filter-group">
-            <label class="apr-filter-label">Timeline</label>
-            <select id="filter-range" class="apr-filter-select" onchange="toggleCustomDate(this.value); refreshAll();">
-              <option value="today">Today</option>
-              <option value="yesterday">Yesterday</option>
-              <option value="last7">Last 7 Days</option>
-              <option value="last30" selected>Last 30 Days</option>
-              <option value="thisMonth">This Month</option>
-              <option value="custom">Custom Date Range</option>
-            </select>
+            <label class="apr-filter-label"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Timeline</label>
+            <div class="apr-timeline-segmented" role="group" aria-label="Timeline Filter">
+              <button type="button" class="apr-segmented-btn" data-range="today" onclick="selectTimelineRange('today')">Today</button>
+              <button type="button" class="apr-segmented-btn" data-range="yesterday" onclick="selectTimelineRange('yesterday')">Yesterday</button>
+              <button type="button" class="apr-segmented-btn" data-range="last7" onclick="selectTimelineRange('last7')">Last 7 Days</button>
+              <button type="button" class="apr-segmented-btn active" data-range="last30" onclick="selectTimelineRange('last30')">Last 30 Days</button>
+              <button type="button" class="apr-segmented-btn" data-range="thisMonth" onclick="selectTimelineRange('thisMonth')">This Month</button>
+              <button type="button" class="apr-segmented-btn" data-range="custom" onclick="selectTimelineRange('custom')">Custom Date Range</button>
+            </div>
+            <input type="hidden" id="filter-range" value="last30" />
           </div>
           
           <div class="apr-filter-group" id="custom-date-container" style="display:none; flex-direction:row; gap:10px;">
             <div class="apr-filter-group">
               <label class="apr-filter-label">From</label>
-              <input type="date" id="filter-start" class="apr-filter-input" onchange="refreshAll();" />
+              <input type="date" id="filter-start" class="apr-filter-input" onchange="handleFilterChange();" />
             </div>
             <div class="apr-filter-group">
               <label class="apr-filter-label">To</label>
-              <input type="date" id="filter-end" class="apr-filter-input" onchange="refreshAll();" />
+              <input type="date" id="filter-end" class="apr-filter-input" onchange="handleFilterChange();" />
             </div>
           </div>
 
-          <input type="hidden" id="filter-dept" value="" />
-
-          <div class="apr-filter-group">
-            <label class="apr-filter-label">Employee ID or Name</label>
-            <input type="text" id="filter-search" class="apr-filter-input" placeholder="Search..." oninput="debounce(refreshAll, 400)();" />
+          <div class="apr-filter-group" style="flex: 1 1 240px;">
+            <label class="apr-filter-label"><i class="fas fa-search" aria-hidden="true"></i> Employee ID or Name</label>
+            <div class="apr-search-wrapper">
+              <i class="fas fa-search" aria-hidden="true"></i>
+              <input type="text" id="filter-search" class="apr-filter-input" placeholder="Search by name or employee ID..." oninput="debounce(handleFilterChange, 350)();" />
+            </div>
           </div>
-        </div>
 
-        <!-- Tabs bar -->
-        <div class="apr-tabs">
-          <button class="apr-tab-btn active" onclick="switchTab('tab-dashboard')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> Main Dashboard
-          </button>
-          <button class="apr-tab-btn" onclick="switchTab('tab-attendance')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Live Attendance
-          </button>
-          <button class="apr-tab-btn" onclick="switchTab('tab-daily')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Daily Logins
-          </button>
-          <button class="apr-tab-btn" onclick="switchTab('tab-history')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Login History
-          </button>
-          <button class="apr-tab-btn" onclick="switchTab('tab-analytics')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Analytics
-          </button>
-          <button class="apr-tab-btn" onclick="switchTab('tab-performance')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Performance Scorecard
-          </button>
-          <button class="apr-tab-btn" onclick="switchTab('tab-leaderboard')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Leaderboard
-          </button>
-          <button class="apr-tab-btn" onclick="switchTab('tab-breaks')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Live Break Monitor
+          <button type="button" class="apr-btn-reset" onclick="resetFilters()" title="Reset All Filters" aria-label="Reset All Filters">
+            <i class="fas fa-rotate-left" aria-hidden="true"></i> <span>Reset</span>
           </button>
         </div>
 
-        <!-- 1. MAIN DASHBOARD TAB -->
-        <div id="tab-dashboard" class="apr-tab-panel active">
+        <!-- Navigation Tabs Bar -->
+        <nav class="apr-tabs-wrapper" aria-label="APR Dashboard Navigation">
+          <div class="apr-tabs" role="tablist" aria-orientation="horizontal">
+            <button type="button" class="apr-tab-btn active" data-tab="tab-dashboard" role="tab" id="tab-btn-dashboard" aria-controls="tab-dashboard" aria-selected="true" tabindex="0" onclick="switchTab('tab-dashboard')">
+              <i class="fas fa-chart-pie" aria-hidden="true"></i> <span class="apr-tab-text">Overview</span>
+            </button>
+            <button type="button" class="apr-tab-btn" data-tab="tab-attendance" role="tab" id="tab-btn-attendance" aria-controls="tab-attendance" aria-selected="false" tabindex="-1" onclick="switchTab('tab-attendance')">
+              <i class="fas fa-users" aria-hidden="true"></i> <span class="apr-tab-text">Live Roster</span>
+            </button>
+            <button type="button" class="apr-tab-btn" data-tab="tab-daily" role="tab" id="tab-btn-daily" aria-controls="tab-daily" aria-selected="false" tabindex="-1" onclick="switchTab('tab-daily')">
+              <i class="fas fa-calendar-check" aria-hidden="true"></i> <span class="apr-tab-text">Daily Logins</span>
+            </button>
+            <button type="button" class="apr-tab-btn" data-tab="tab-history" role="tab" id="tab-btn-history" aria-controls="tab-history" aria-selected="false" tabindex="-1" onclick="switchTab('tab-history')">
+              <i class="fas fa-clock-rotate-left" aria-hidden="true"></i> <span class="apr-tab-text">Login History</span>
+            </button>
+            <button type="button" class="apr-tab-btn" data-tab="tab-analytics" role="tab" id="tab-btn-analytics" aria-controls="tab-analytics" aria-selected="false" tabindex="-1" onclick="switchTab('tab-analytics')">
+              <i class="fas fa-chart-line" aria-hidden="true"></i> <span class="apr-tab-text">Visual Analytics</span>
+            </button>
+            <button type="button" class="apr-tab-btn" data-tab="tab-performance" role="tab" id="tab-btn-performance" aria-controls="tab-performance" aria-selected="false" tabindex="-1" onclick="switchTab('tab-performance')">
+              <i class="fas fa-award" aria-hidden="true"></i> <span class="apr-tab-text">Performance Matrix</span>
+            </button>
+            <button type="button" class="apr-tab-btn" data-tab="tab-leaderboard" role="tab" id="tab-btn-leaderboard" aria-controls="tab-leaderboard" aria-selected="false" tabindex="-1" onclick="switchTab('tab-leaderboard')">
+              <i class="fas fa-trophy" aria-hidden="true"></i> <span class="apr-tab-text">Monthly Leaderboard</span>
+            </button>
+            <button type="button" class="apr-tab-btn" data-tab="tab-breaks" role="tab" id="tab-btn-breaks" aria-controls="tab-breaks" aria-selected="false" tabindex="-1" onclick="switchTab('tab-breaks')">
+              <i class="fas fa-mug-hot" aria-hidden="true"></i> <span class="apr-tab-text">Live Break Monitor</span>
+            </button>
+          </div>
+        </nav>
+
+        <!-- 1. MAIN DASHBOARD OVERVIEW TAB -->
+        <div id="tab-dashboard" class="apr-tab-panel active" role="tabpanel" aria-labelledby="tab-btn-dashboard">
           
           <!-- Group 1: Roster & Attendance Overview -->
           <div class="apr-section-group">
             <h3 class="apr-section-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-              Roster & Attendance Overview
+              <i class="fas fa-user-check" aria-hidden="true"></i>
+              <span>Roster & Attendance Overview</span>
             </h3>
             <div class="apr-stats-grid" id="grid-attendance">
               <!-- Populated via JS -->
             </div>
           </div>
 
-          <!-- Group 2: Real-time Status & Break Activity -->
+          <!-- Group 2: Real-time Connectivity & Activity -->
           <div class="apr-section-group">
             <h3 class="apr-section-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              Real-time Connectivity & Activity
+              <i class="fas fa-tower-broadcast" aria-hidden="true"></i>
+              <span>Real-time Connectivity & Break Summary</span>
             </h3>
             <div class="apr-dashboard-split">
               <div class="apr-stats-grid" id="grid-realtime" style="margin-bottom:0;">
                 <!-- Populated via JS -->
               </div>
               <div class="chart-box" style="margin-top:0;">
-                <div class="chart-box-title" style="font-size:13px; color:var(--text-secondary); border-bottom:1px dashed var(--border); padding-bottom:6px; margin-bottom:12px;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Break Counts & Durations
+                <div class="chart-box-title">
+                  <i class="fas fa-mug-hot" aria-hidden="true"></i> <span>Break Counts & Duration Analysis</span>
                 </div>
                 <div class="scoreboard-grid" id="breaks-kpi-grid">
                   <!-- Breaks summary populated via JS -->
@@ -636,16 +1048,16 @@
           <!-- Group 3: Time & Performance Metrics -->
           <div class="apr-section-group">
             <h3 class="apr-section-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-              Time & Performance Metrics
+              <i class="fas fa-stopwatch" aria-hidden="true"></i>
+              <span>Working Hours & Performance Indicators</span>
             </h3>
             <div class="apr-dashboard-split">
               <div class="apr-stats-grid" id="grid-performance" style="margin-bottom:0;">
                 <!-- Populated via JS -->
               </div>
               <div class="chart-box" style="margin-top:0;">
-                <div class="chart-box-title" style="font-size:13px; color:var(--text-secondary); border-bottom:1px dashed var(--border); padding-bottom:6px; margin-bottom:12px;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Working Hours Breakdowns
+                <div class="chart-box-title">
+                  <i class="fas fa-clock" aria-hidden="true"></i> <span>Working Hours Utilization</span>
                 </div>
                 <div class="scoreboard-grid" id="hours-kpi-grid">
                   <!-- Working hours summary populated via JS -->
@@ -657,98 +1069,111 @@
         </div>
 
         <!-- 2. LIVE ATTENDANCE TAB -->
-        <div id="tab-attendance" class="apr-tab-panel">
+        <div id="tab-attendance" class="apr-tab-panel" role="tabpanel" aria-labelledby="tab-btn-attendance">
           <div class="apr-actions-bar">
-            <h3>Live Employee Roster</h3>
+            <div class="apr-actions-bar-title">
+              <h3><i class="fas fa-users" aria-hidden="true"></i> <span>Live Employee Roster</span></h3>
+              <span class="apr-badge-count" id="attendance-count-badge">0 employees</span>
+            </div>
             <div class="apr-btn-group">
-              <button class="apr-export-btn" onclick="exportTable('attendance-table', 'Excel')">Excel</button>
-              <button class="apr-export-btn" onclick="exportTable('attendance-table', 'CSV')">CSV</button>
-              <button class="apr-export-btn" onclick="exportTable('attendance-table', 'PDF')">PDF</button>
-              <button class="apr-export-btn" onclick="window.print()">Print</button>
+              <button type="button" class="apr-export-btn" onclick="exportData('attendance', 'Excel')" title="Export to Excel" aria-label="Export to Excel"><i class="fas fa-file-excel" aria-hidden="true"></i> <span>Excel</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('attendance', 'CSV')" title="Export to CSV" aria-label="Export to CSV"><i class="fas fa-file-csv" aria-hidden="true"></i> <span>CSV</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('attendance', 'PDF')" title="Export to PDF" aria-label="Export to PDF"><i class="fas fa-file-pdf" aria-hidden="true"></i> <span>PDF</span></button>
+              <button type="button" class="apr-export-btn" onclick="printTableData('attendance')" title="Print Records" aria-label="Print Records"><i class="fas fa-print" aria-hidden="true"></i> <span>Print</span></button>
             </div>
           </div>
-          <div class="card full-table">
+          <div class="full-table">
             <div class="table-wrapper">
               <table id="attendance-table">
                 <thead>
                   <tr>
-                    <th onclick="sortRoster('employee_id')">Emp ID</th>
-                    <th onclick="sortRoster('employee_name')">Employee Name</th>
-                    <th onclick="sortRoster('login_time')">Login Time</th>
-                    <th onclick="sortRoster('logout_time')">Logout Time</th>
-                    <th onclick="sortRoster('current_status')">Current Status</th>
-                    <th onclick="sortRoster('working_hours')">Today's Hours</th>
-                    <th onclick="sortRoster('break_time')">Today's Break</th>
-                    <th onclick="sortRoster('active_session')">Active Session</th>
-                    <th onclick="sortRoster('last_activity')">Last Activity</th>
-                    <th onclick="sortRoster('attendance_status')">Attendance Status</th>
+                    <th class="sortable" onclick="sortRoster('employee_id')">Emp ID <i class="fas fa-sort" aria-hidden="true"></i></th>
+                    <th class="sortable" onclick="sortRoster('employee_name')">Employee Name <i class="fas fa-sort" aria-hidden="true"></i></th>
+                    <th class="sortable" onclick="sortRoster('login_time')">Login Time <i class="fas fa-sort" aria-hidden="true"></i></th>
+                    <th class="sortable" onclick="sortRoster('logout_time')">Logout Time <i class="fas fa-sort" aria-hidden="true"></i></th>
+                    <th class="sortable" onclick="sortRoster('current_status')">Current Status <i class="fas fa-sort" aria-hidden="true"></i></th>
+                    <th class="sortable" onclick="sortRoster('working_hours')">Today's Hours <i class="fas fa-sort" aria-hidden="true"></i></th>
+                    <th class="sortable" onclick="sortRoster('break_time')">Today's Break <i class="fas fa-sort" aria-hidden="true"></i></th>
+                    <th class="sortable" onclick="sortRoster('active_session')">Active Session <i class="fas fa-sort" aria-hidden="true"></i></th>
+                    <th class="sortable" onclick="sortRoster('last_activity')">Last Activity <i class="fas fa-sort" aria-hidden="true"></i></th>
+                    <th class="sortable" onclick="sortRoster('attendance_status')">Attendance Status <i class="fas fa-sort" aria-hidden="true"></i></th>
                   </tr>
                 </thead>
                 <tbody id="attendance-tbody">
-                  <tr><td colspan="10" style="text-align:center;color:var(--text-muted);">Loading live roster...</td></tr>
+                  <tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:24px;">Loading live roster...</td></tr>
                 </tbody>
               </table>
             </div>
+            <div id="attendance-pagination"></div>
           </div>
         </div>
 
         <!-- 3. DAILY LOGINS TAB -->
-        <div id="tab-daily" class="apr-tab-panel">
+        <div id="tab-daily" class="apr-tab-panel" role="tabpanel" aria-labelledby="tab-btn-daily">
           <div class="apr-actions-bar">
-            <h3>Daily Login Summary</h3>
+            <div class="apr-actions-bar-title">
+              <h3><i class="fas fa-calendar-check" aria-hidden="true"></i> <span>Daily Login Summary</span></h3>
+              <span class="apr-badge-count" id="daily-count-badge">0 records</span>
+            </div>
             <div class="apr-btn-group">
-              <button class="apr-export-btn" onclick="exportTable('daily-table', 'Excel')">Excel</button>
-              <button class="apr-export-btn" onclick="exportTable('daily-table', 'CSV')">CSV</button>
-              <button class="apr-export-btn" onclick="exportTable('daily-table', 'PDF')">PDF</button>
-              <button class="apr-export-btn" onclick="window.print()">Print</button>
+              <button type="button" class="apr-export-btn" onclick="exportData('daily', 'Excel')" title="Export to Excel" aria-label="Export to Excel"><i class="fas fa-file-excel" aria-hidden="true"></i> <span>Excel</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('daily', 'CSV')" title="Export to CSV" aria-label="Export to CSV"><i class="fas fa-file-csv" aria-hidden="true"></i> <span>CSV</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('daily', 'PDF')" title="Export to PDF" aria-label="Export to PDF"><i class="fas fa-file-pdf" aria-hidden="true"></i> <span>PDF</span></button>
+              <button type="button" class="apr-export-btn" onclick="printTableData('daily')" title="Print Records" aria-label="Print Records"><i class="fas fa-print" aria-hidden="true"></i> <span>Print</span></button>
             </div>
           </div>
-          <div class="card full-table">
+          <div class="full-table">
             <div class="table-wrapper">
               <table id="daily-table">
                 <thead>
                   <tr>
+                    <th>Emp ID</th>
                     <th>Employee Name</th>
-                    <th>Date</th>
+                    <th>Work Date</th>
                     <th>First Login</th>
                     <th>Last Logout</th>
                     <th>Sessions</th>
                     <th>Total Working Hours</th>
                     <th>Overtime</th>
-                    <th>Break Duration (mins)</th>
-                    <th>Late Login</th>
-                    <th>Early Logout</th>
+                    <th>Break Duration</th>
+                    <th>Arrival</th>
+                    <th>Departure</th>
                   </tr>
                 </thead>
                 <tbody id="daily-tbody">
-                  <tr><td colspan="10" style="text-align:center;color:var(--text-muted);">Loading logs...</td></tr>
+                  <tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:24px;">Loading daily logs...</td></tr>
                 </tbody>
               </table>
             </div>
+            <div id="daily-pagination"></div>
           </div>
         </div>
 
         <!-- 4. LOGIN HISTORY TAB -->
-        <div id="tab-history" class="apr-tab-panel">
+        <div id="tab-history" class="apr-tab-panel" role="tabpanel" aria-labelledby="tab-btn-history">
           <div class="apr-actions-bar">
-            <h3>Session Login History Logs</h3>
+            <div class="apr-actions-bar-title">
+              <h3><i class="fas fa-history" aria-hidden="true"></i> <span>Session Login History Logs</span></h3>
+              <span class="apr-badge-count" id="history-count-badge">0 sessions</span>
+            </div>
             <div class="apr-btn-group">
-              <button class="apr-export-btn" onclick="exportTable('history-table', 'Excel')">Excel</button>
-              <button class="apr-export-btn" onclick="exportTable('history-table', 'CSV')">CSV</button>
-              <button class="apr-export-btn" onclick="exportTable('history-table', 'PDF')">PDF</button>
-              <button class="apr-export-btn" onclick="window.print()">Print</button>
+              <button type="button" class="apr-export-btn" onclick="exportData('history', 'Excel')" title="Export to Excel" aria-label="Export to Excel"><i class="fas fa-file-excel" aria-hidden="true"></i> <span>Excel</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('history', 'CSV')" title="Export to CSV" aria-label="Export to CSV"><i class="fas fa-file-csv" aria-hidden="true"></i> <span>CSV</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('history', 'PDF')" title="Export to PDF" aria-label="Export to PDF"><i class="fas fa-file-pdf" aria-hidden="true"></i> <span>PDF</span></button>
+              <button type="button" class="apr-export-btn" onclick="printTableData('history')" title="Print Records" aria-label="Print Records"><i class="fas fa-print" aria-hidden="true"></i> <span>Print</span></button>
             </div>
           </div>
-          <div class="card full-table">
+          <div class="full-table">
             <div class="table-wrapper">
               <table id="history-table">
                 <thead>
                   <tr>
+                    <th>Emp ID</th>
                     <th>Employee</th>
                     <th>Login Date</th>
                     <th>Login Time</th>
                     <th>Logout Time</th>
-                    <th>Session Duration (hrs)</th>
+                    <th>Duration</th>
                     <th>IP Address</th>
                     <th>Browser</th>
                     <th>OS / Device</th>
@@ -756,136 +1181,148 @@
                   </tr>
                 </thead>
                 <tbody id="history-tbody">
-                  <tr><td colspan="9" style="text-align:center;color:var(--text-muted);">Loading complete login logs...</td></tr>
+                  <tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:24px;">Loading session history logs...</td></tr>
                 </tbody>
               </table>
             </div>
+            <div id="history-pagination"></div>
           </div>
         </div>
 
-        <!-- 5. ANALYTICS TAB -->
-        <div id="tab-analytics" class="apr-tab-panel">
+        <!-- 5. VISUAL ANALYTICS TAB -->
+        <div id="tab-analytics" class="apr-tab-panel" role="tabpanel" aria-labelledby="tab-btn-analytics">
           <div class="apr-grid-split">
             <div class="chart-box">
-              <div class="chart-box-title">Daily Attendance Trends</div>
-              <div class="chart-container" style="position:relative;height:240px;"><canvas id="chart-attendance-trend"></canvas></div>
+              <div class="chart-box-title"><i class="fas fa-chart-line" aria-hidden="true"></i> <span>Daily Attendance Trends</span></div>
+              <div class="chart-container" style="position:relative;height:260px;"><canvas id="chart-attendance-trend"></canvas></div>
             </div>
             <div class="chart-box">
-              <div class="chart-box-title">Online vs Offline Ratios</div>
-              <div class="chart-container" style="position:relative;height:240px;width:240px;margin:auto;"><canvas id="chart-online-ratio"></canvas></div>
+              <div class="chart-box-title"><i class="fas fa-chart-pie" aria-hidden="true"></i> <span>Online vs Offline Ratio</span></div>
+              <div class="chart-container" style="position:relative;height:260px;max-width:280px;margin:auto;"><canvas id="chart-online-ratio"></canvas></div>
             </div>
           </div>
-          <div class="apr-grid-split" style="margin-top:20px;">
+          <div class="apr-grid-split" style="margin-top:16px;">
             <div class="chart-box" style="grid-column: span 2;">
-              <div class="chart-box-title">Working Hours Trends</div>
-              <div class="chart-container" style="position:relative;height:240px;"><canvas id="chart-working-trend"></canvas></div>
+              <div class="chart-box-title"><i class="fas fa-chart-column" aria-hidden="true"></i> <span>Average Working Hours Trend</span></div>
+              <div class="chart-container" style="position:relative;height:260px;"><canvas id="chart-working-trend"></canvas></div>
             </div>
-            <div style="display:none;"><canvas id="chart-department-presence"></canvas></div>
           </div>
         </div>
 
         <!-- 6. PERFORMANCE SCORECARD TAB -->
-        <div id="tab-performance" class="apr-tab-panel">
+        <div id="tab-performance" class="apr-tab-panel" role="tabpanel" aria-labelledby="tab-btn-performance">
           <div class="apr-actions-bar">
-            <h3>Employee Performance Matrix</h3>
+            <div class="apr-actions-bar-title">
+              <h3><i class="fas fa-award" aria-hidden="true"></i> <span>Employee Performance Matrix</span></h3>
+              <span class="apr-badge-count" id="performance-count-badge">0 employees</span>
+            </div>
             <div class="apr-btn-group">
-              <button class="apr-export-btn" onclick="exportTable('performance-table', 'Excel')">Excel</button>
-              <button class="apr-export-btn" onclick="exportTable('performance-table', 'CSV')">CSV</button>
-              <button class="apr-export-btn" onclick="exportTable('performance-table', 'PDF')">PDF</button>
-              <button class="apr-export-btn" onclick="window.print()">Print</button>
+              <button type="button" class="apr-export-btn" onclick="exportData('performance', 'Excel')" title="Export to Excel" aria-label="Export to Excel"><i class="fas fa-file-excel" aria-hidden="true"></i> <span>Excel</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('performance', 'CSV')" title="Export to CSV" aria-label="Export to CSV"><i class="fas fa-file-csv" aria-hidden="true"></i> <span>CSV</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('performance', 'PDF')" title="Export to PDF" aria-label="Export to PDF"><i class="fas fa-file-pdf" aria-hidden="true"></i> <span>PDF</span></button>
+              <button type="button" class="apr-export-btn" onclick="printTableData('performance')" title="Print Records" aria-label="Print Records"><i class="fas fa-print" aria-hidden="true"></i> <span>Print</span></button>
             </div>
           </div>
-          <div class="card full-table">
+          <div class="full-table">
             <div class="table-wrapper">
               <table id="performance-table">
                 <thead>
                   <tr>
-                    <th>Employee ID</th>
+                    <th>Emp ID</th>
                     <th>Employee Name</th>
                     <th>Customers Added</th>
                     <th>Loans Submitted</th>
-                    <th>Approved Loans</th>
-                    <th>Rejected Loans</th>
-                    <th>Disbursed Loans</th>
+                    <th>Approved</th>
+                    <th>Rejected</th>
+                    <th>Disbursed</th>
                     <th>Conversion Rate</th>
-                    <th>Avg Processing (hrs)</th>
+                    <th>Avg Processing</th>
                     <th>Productivity Score</th>
                     <th>Attendance Score</th>
                   </tr>
                 </thead>
                 <tbody id="performance-tbody">
-                  <tr><td colspan="11" style="text-align:center;color:var(--text-muted);">Loading scorecard...</td></tr>
+                  <tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:24px;">Loading performance matrix...</td></tr>
                 </tbody>
               </table>
             </div>
+            <div id="performance-pagination"></div>
           </div>
         </div>
 
         <!-- 7. LEADERBOARD TAB -->
-        <div id="tab-leaderboard" class="apr-tab-panel">
+        <div id="tab-leaderboard" class="apr-tab-panel" role="tabpanel" aria-labelledby="tab-btn-leaderboard">
           <div class="apr-actions-bar">
-            <h3>Monthly Performance Leaderboard</h3>
+            <div class="apr-actions-bar-title">
+              <h3><i class="fas fa-trophy" aria-hidden="true"></i> <span>Monthly Performance Leaderboard</span></h3>
+              <span class="apr-badge-count" id="leaderboard-count-badge">0 ranked</span>
+            </div>
             <div class="apr-btn-group">
-              <button class="apr-export-btn" onclick="exportTable('leaderboard-table', 'Excel')">Excel</button>
-              <button class="apr-export-btn" onclick="exportTable('leaderboard-table', 'CSV')">CSV</button>
-              <button class="apr-export-btn" onclick="exportTable('leaderboard-table', 'PDF')">PDF</button>
-              <button class="apr-export-btn" onclick="window.print()">Print</button>
+              <button type="button" class="apr-export-btn" onclick="exportData('leaderboard', 'Excel')" title="Export to Excel" aria-label="Export to Excel"><i class="fas fa-file-excel" aria-hidden="true"></i> <span>Excel</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('leaderboard', 'CSV')" title="Export to CSV" aria-label="Export to CSV"><i class="fas fa-file-csv" aria-hidden="true"></i> <span>CSV</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('leaderboard', 'PDF')" title="Export to PDF" aria-label="Export to PDF"><i class="fas fa-file-pdf" aria-hidden="true"></i> <span>PDF</span></button>
+              <button type="button" class="apr-export-btn" onclick="printTableData('leaderboard')" title="Print Records" aria-label="Print Records"><i class="fas fa-print" aria-hidden="true"></i> <span>Print</span></button>
             </div>
           </div>
-          <div class="card full-table">
+          <div class="full-table">
             <div class="table-wrapper">
               <table id="leaderboard-table">
                 <thead>
                   <tr>
-                    <th>Rank</th>
+                    <th>Global Rank</th>
                     <th>Employee Name</th>
                     <th>Performance Score</th>
                     <th>Attendance Score</th>
                     <th>Productivity</th>
                     <th>Working Hours</th>
-                    <th>Loans Processed</th>
-                    <th>Badge</th>
+                    <th>Applications Processed</th>
+                    <th>Medal & Tier</th>
                   </tr>
                 </thead>
                 <tbody id="leaderboard-tbody">
-                  <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Loading leaderboard...</td></tr>
+                  <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">Loading monthly rankings...</td></tr>
                 </tbody>
               </table>
             </div>
+            <div id="leaderboard-pagination"></div>
           </div>
         </div>
 
         <!-- 8. BREAK MONITOR TAB -->
-        <div id="tab-breaks" class="apr-tab-panel">
+        <div id="tab-breaks" class="apr-tab-panel" role="tabpanel" aria-labelledby="tab-btn-breaks">
           <div class="apr-actions-bar">
-            <h3>Live Break Logs</h3>
+            <div class="apr-actions-bar-title">
+              <h3><i class="fas fa-mug-hot" aria-hidden="true"></i> <span>Live Break Logs</span></h3>
+              <span class="apr-badge-count" id="breaks-count-badge">0 breaks today</span>
+            </div>
             <div class="apr-btn-group">
-              <button class="apr-export-btn" onclick="exportTable('breaks-table', 'Excel')">Excel</button>
-              <button class="apr-export-btn" onclick="exportTable('breaks-table', 'CSV')">CSV</button>
-              <button class="apr-export-btn" onclick="exportTable('breaks-table', 'PDF')">PDF</button>
-              <button class="apr-export-btn" onclick="window.print()">Print</button>
+              <button type="button" class="apr-export-btn" onclick="exportData('breaks', 'Excel')" title="Export to Excel" aria-label="Export to Excel"><i class="fas fa-file-excel" aria-hidden="true"></i> <span>Excel</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('breaks', 'CSV')" title="Export to CSV" aria-label="Export to CSV"><i class="fas fa-file-csv" aria-hidden="true"></i> <span>CSV</span></button>
+              <button type="button" class="apr-export-btn" onclick="exportData('breaks', 'PDF')" title="Export to PDF" aria-label="Export to PDF"><i class="fas fa-file-pdf" aria-hidden="true"></i> <span>PDF</span></button>
+              <button type="button" class="apr-export-btn" onclick="printTableData('breaks')" title="Print Records" aria-label="Print Records"><i class="fas fa-print" aria-hidden="true"></i> <span>Print</span></button>
             </div>
           </div>
-          <div class="card full-table">
+          <div class="full-table">
             <div class="table-wrapper">
               <table id="breaks-table">
                 <thead>
                   <tr>
-                    <th>Employee ID</th>
+                    <th>Emp ID</th>
                     <th>Employee Name</th>
                     <th>Break Type</th>
                     <th>Start Time</th>
                     <th>End Time</th>
-                    <th>Duration (mins)</th>
+                    <th>Duration</th>
                     <th>Status</th>
                     <th>Remarks</th>
                   </tr>
                 </thead>
                 <tbody id="breaks-tbody">
-                  <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Loading break logs...</td></tr>
+                  <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">Loading break logs...</td></tr>
                 </tbody>
               </table>
             </div>
+            <div id="breaks-pagination"></div>
           </div>
         </div>
 
@@ -897,47 +1334,135 @@
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20260705c"></script>
 <script>
-  // Require Admin access role validation
-  const user = requireRole('admin');
-  if (user) {
-    renderSidebarUser();
-    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
-    initDashboard();
-  }
+  // ── Pagination & State Management ──
+  const PAGE_SIZE = 20;
 
+  let currentTab = 'tab-dashboard';
   let rosterSortBy = 'employee_name';
   let rosterSortDir = 'asc';
   let charts = {};
 
+  // Complete in-memory datasets for 20-record pagination & full export
+  let allAttendanceData = [];
+  let attendancePage = 1;
+
+  let allDailyData = [];
+  let dailyPage = 1;
+
+  let allHistoryData = [];
+  let historyPage = 1;
+
+  let allPerformanceData = [];
+  let performancePage = 1;
+
+  let allLeaderboardData = [];
+  let leaderboardPage = 1;
+
+  let allBreaksData = [];
+  let breaksPage = 1;
+
+  // Require Admin access role validation
+  const user = requireRole('admin');
+  if (user) {
+    renderSidebarUser();
+    const dateEl = document.getElementById('current-date');
+    if (dateEl) {
+      dateEl.textContent = new Date().toLocaleDateString('en-IN', {
+        weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'
+      });
+    }
+    initDashboard();
+  }
+
   function initDashboard() {
     refreshAll();
-    // Refresh live dashboards every 30 seconds
+    setupTabKeyboardNavigation();
+    // Silent auto-refresh for live monitoring tabs every 30 seconds
     setInterval(() => {
-      const activeTab = document.querySelector('.apr-tab-btn.active').getAttribute('onclick').match(/'([^']+)'/)[1];
-      if (activeTab === 'tab-dashboard' || activeTab === 'tab-attendance' || activeTab === 'tab-breaks') {
-        refreshAll(true); // silent update
+      if (currentTab === 'tab-dashboard' || currentTab === 'tab-attendance' || currentTab === 'tab-breaks') {
+        refreshAll(true);
       }
     }, 30000);
   }
 
+  function setupTabKeyboardNavigation() {
+    const tablist = document.querySelector('.apr-tabs');
+    if (!tablist) return;
+    tablist.addEventListener('keydown', (e) => {
+      const tabs = Array.from(tablist.querySelectorAll('.apr-tab-btn'));
+      const activeIdx = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
+      if (activeIdx === -1) return;
+
+      let nextIdx = -1;
+      if (e.key === 'ArrowRight') {
+        nextIdx = (activeIdx + 1) % tabs.length;
+      } else if (e.key === 'ArrowLeft') {
+        nextIdx = (activeIdx - 1 + tabs.length) % tabs.length;
+      } else if (e.key === 'Home') {
+        nextIdx = 0;
+      } else if (e.key === 'End') {
+        nextIdx = tabs.length - 1;
+      }
+
+      if (nextIdx !== -1) {
+        e.preventDefault();
+        tabs[nextIdx].focus();
+        tabs[nextIdx].click();
+      }
+    });
+  }
+
   function toggleCustomDate(val) {
-    document.getElementById('custom-date-container').style.display = val === 'custom' ? 'flex' : 'none';
+    const customContainer = document.getElementById('custom-date-container');
+    if (customContainer) {
+      customContainer.style.display = val === 'custom' ? 'flex' : 'none';
+    }
+  }
+
+  function handleFilterChange() {
+    // Reset all pagination to page 1 on filter/search change
+    attendancePage = 1;
+    dailyPage = 1;
+    historyPage = 1;
+    performancePage = 1;
+    leaderboardPage = 1;
+    breaksPage = 1;
+    refreshAll();
+  }
+
+  function selectTimelineRange(range) {
+    const input = document.getElementById('filter-range');
+    if (input) input.value = range;
+    document.querySelectorAll('.apr-segmented-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-range') === range);
+    });
+    toggleCustomDate(range);
+    handleFilterChange();
+  }
+
+  function resetFilters() {
+    selectTimelineRange('last30');
+    const startInput = document.getElementById('filter-start');
+    const endInput = document.getElementById('filter-end');
+    if (startInput) startInput.value = '';
+    if (endInput) endInput.value = '';
+    const searchInput = document.getElementById('filter-search');
+    if (searchInput) searchInput.value = '';
+    handleFilterChange();
   }
 
   function getQueryString() {
-    const range = document.getElementById('filter-range').value;
-    const dept = document.getElementById('filter-dept').value;
-    const search = document.getElementById('filter-search').value;
+    const range = document.getElementById('filter-range')?.value || 'last30';
+    const search = document.getElementById('filter-search')?.value.trim() || '';
     
-    let query = `?dateRange=${range}`;
-    if (dept) query += `&department=${encodeURIComponent(dept)}`;
+    let query = `?dateRange=${encodeURIComponent(range)}`;
     if (search) query += `&search=${encodeURIComponent(search)}`;
     
     if (range === 'custom') {
-      const start = document.getElementById('filter-start').value;
-      const end = document.getElementById('filter-end').value;
+      const start = document.getElementById('filter-start')?.value;
+      const end = document.getElementById('filter-end')?.value;
       if (start && end) {
-        query += `&startDate=${start}&endDate=${end}`;
+        query += `&startDate=${encodeURIComponent(start)}&endDate=${encodeURIComponent(end)}`;
       }
     }
     return query;
@@ -952,36 +1477,52 @@
     };
   }
 
+  function switchTab(tabId) {
+    currentTab = tabId;
+    document.querySelectorAll('.apr-tab-btn').forEach(btn => {
+      const isActive = btn.getAttribute('data-tab') === tabId;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      btn.setAttribute('tabindex', isActive ? '0' : '-1');
+    });
+    document.querySelectorAll('.apr-tab-panel').forEach(p => {
+      const isActive = p.id === tabId;
+      p.classList.toggle('active', isActive);
+    });
+    refreshAll();
+  }
+
   async function refreshAll(silent = false) {
     const query = getQueryString();
-    
-    // Check which tab is currently active to refresh only relevant API sets
-    const activeTab = document.querySelector('.apr-tab-btn.active').getAttribute('onclick').match(/'([^']+)'/)[1];
-    
+    const refreshIcon = document.getElementById('refresh-icon');
+    if (!silent && refreshIcon) refreshIcon.classList.add('fa-spin');
+
     if (!silent) {
-      showLoadingIndicators(activeTab);
+      showLoadingIndicators(currentTab);
     }
 
     try {
-      if (activeTab === 'tab-dashboard') {
+      if (currentTab === 'tab-dashboard') {
         await Promise.all([loadStats(query), loadWorkingHours(query), loadBreakStats(query)]);
-      } else if (activeTab === 'tab-attendance') {
+      } else if (currentTab === 'tab-attendance') {
         await loadLiveAttendance();
-      } else if (activeTab === 'tab-daily') {
+      } else if (currentTab === 'tab-daily') {
         await loadDailyLogins(query);
-      } else if (activeTab === 'tab-history') {
+      } else if (currentTab === 'tab-history') {
         await loadLoginHistory(query);
-      } else if (activeTab === 'tab-analytics') {
+      } else if (currentTab === 'tab-analytics') {
         await loadAnalytics();
-      } else if (activeTab === 'tab-performance') {
+      } else if (currentTab === 'tab-performance') {
         await loadPerformanceScorecard(query);
-      } else if (activeTab === 'tab-leaderboard') {
+      } else if (currentTab === 'tab-leaderboard') {
         await loadLeaderboard();
-      } else if (activeTab === 'tab-breaks') {
+      } else if (currentTab === 'tab-breaks') {
         await loadLiveBreaks();
       }
     } catch (e) {
-      console.error('Refresh error: ', e);
+      console.error('[APR Refresh Error]:', e);
+    } finally {
+      if (refreshIcon) refreshIcon.classList.remove('fa-spin');
     }
   }
 
@@ -1002,61 +1543,123 @@
         const el = document.getElementById(elementId);
         if (el) {
           if (el.tagName === 'TBODY') {
-            el.innerHTML = `<tr><td colspan="15" style="text-align:center;color:var(--text-muted);">Fetching records...</td></tr>`;
+            el.innerHTML = `<tr><td colspan="15" style="text-align:center;color:var(--text-muted);padding:24px;"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> <span>Loading records...</span></td></tr>`;
           } else {
-            el.innerHTML = `<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:12px;">Loading...</div>`;
+            el.innerHTML = `<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:12px;"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> <span>Loading data...</span></div>`;
           }
         }
       });
     }
   }
 
-  function switchTab(tabId) {
-    document.querySelectorAll('.apr-tab-btn').forEach(btn => {
-      const onclickAttr = btn.getAttribute('onclick') || '';
-      btn.classList.toggle('active', onclickAttr.includes(tabId));
-    });
-    document.querySelectorAll('.apr-tab-panel').forEach(p => {
-      p.classList.toggle('active', p.id === tabId);
-    });
-    refreshAll();
+  // ── Reusable 20-Record Pagination Builder ──
+  function getPagPages(current, total) {
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    if (current <= 4) {
+      return [1, 2, 3, 4, 5, '...', total];
+    }
+    if (current >= total - 3) {
+      return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+    }
+    return [1, '...', current - 1, current, current + 1, '...', total];
   }
 
-  // ── Stats Loader ──
+  function renderPagination(containerId, currentPage, totalRecords, pageSize, onPageChangeFnName, unitName = 'employees') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!totalRecords || totalRecords <= 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    const totalPages = Math.ceil(totalRecords / pageSize);
+    const start = (currentPage - 1) * pageSize + 1;
+    const end = Math.min(currentPage * pageSize, totalRecords);
+
+    // Requirement: "Showing 1–20 of 23 employees" with en-dash (–)
+    const infoHtml = `<span class="tbl-pg-info">Showing ${start}–${end} of ${totalRecords} ${unitName}</span>`;
+
+    // If only 1 page, show info without pagination buttons
+    if (totalPages <= 1) {
+      container.innerHTML = `<div class="tbl-pagination">${infoHtml}</div>`;
+      return;
+    }
+
+    const pages = getPagPages(currentPage, totalPages);
+    let btnsHtml = `
+      <button class="tbl-pg-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="${onPageChangeFnName}(${currentPage - 1})" title="Previous Page" aria-label="Previous Page">
+        <i class="fas fa-chevron-left" aria-hidden="true"></i>
+      </button>
+    `;
+
+    pages.forEach(p => {
+      if (p === '...') {
+        btnsHtml += `<span class="tbl-pg-btn" style="cursor:default;border:none;background:transparent;">…</span>`;
+      } else {
+        const isActive = p === currentPage;
+        btnsHtml += `
+          <button class="tbl-pg-btn ${isActive ? 'active' : ''}" onclick="${onPageChangeFnName}(${p})">
+            ${p}
+          </button>
+        `;
+      }
+    });
+
+    btnsHtml += `
+      <button class="tbl-pg-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="${onPageChangeFnName}(${currentPage + 1})" title="Next Page" aria-label="Next Page">
+        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+      </button>
+    `;
+
+    container.innerHTML = `
+      <div class="tbl-pagination">
+        ${infoHtml}
+        <div class="tbl-pg-controls">${btnsHtml}</div>
+      </div>
+    `;
+  }
+
+  // ── 1. Main Dashboard Stats Loader ──
   async function loadStats(query) {
     const res = await api.get(`/apr/admin/dashboard${query}`);
     if (!res?.ok) return;
     const d = res.data.data;
-    
+
+    // Attendance Rate is capped at 100% by backend and verified here
+    const attRate = Math.min(100, Math.max(0, Number(d.attendancePercentage) || 0));
+
     const attendanceKPIs = [
-      { title: 'Total Employees', val: d.totalEmployees, sub: 'Active staff list', color: 'blue', icon: '👥' },
-      { title: 'Present Today', val: d.presentToday, sub: 'At least 1 active session', color: 'green', icon: '✅' },
-      { title: 'Absent Today', val: d.absentToday, sub: 'Not logged in yet', color: 'rose', icon: '❌' },
-      { title: 'Attendance Rate', val: `${d.attendancePercentage}%`, sub: 'Present vs Total staff', color: 'green', icon: '📈' }
+      { title: 'Total Employees', val: d.totalEmployees, sub: 'Active staff members', color: 'blue', icon: 'fas fa-users' },
+      { title: 'Present in Period', val: d.presentToday, sub: 'At least 1 verified session', color: 'green', icon: 'fas fa-user-check' },
+      { title: 'Absent / Inactive', val: d.absentToday, sub: 'No logins recorded', color: 'rose', icon: 'fas fa-user-xmark' },
+      { title: 'Attendance Rate', val: `${attRate}%`, sub: 'Present vs Total staff', color: 'green', icon: 'fas fa-chart-line' }
     ];
 
     const realtimeKPIs = [
-      { title: 'Employees Online', val: d.employeesOnline, sub: 'Active right now', color: 'green', icon: '🟢' },
-      { title: 'Employees Offline', val: d.employeesOffline, sub: 'Disconnected', color: 'slate', icon: '⚪' },
-      { title: 'Active Sessions', val: d.activeSessions, sub: 'Open connections', color: 'blue', icon: '⚡' },
-      { title: 'Employees on Break', val: d.employeesOnBreak, sub: 'Away from desk', color: 'amber', icon: '☕' },
-      { title: 'Logged In Today', val: d.loggedInToday, sub: 'Total login actions', color: 'blue', icon: '📥' },
-      { title: 'Logged Out Today', val: d.loggedOutToday, sub: 'Total logout actions', color: 'rose', icon: '📤' }
+      { title: 'Employees Online', val: d.employeesOnline, sub: 'Active right now', color: 'green', icon: 'fas fa-circle-dot' },
+      { title: 'Employees Offline', val: d.employeesOffline, sub: 'Not connected', color: 'slate', icon: 'fas fa-power-off' },
+      { title: 'Active Sessions', val: d.activeSessions, sub: 'Open live sessions', color: 'blue', icon: 'fas fa-bolt' },
+      { title: 'Employees on Break', val: d.employeesOnBreak, sub: 'Currently away', color: 'amber', icon: 'fas fa-mug-hot' },
+      { title: 'Logged In Today', val: d.loggedInToday, sub: 'Total login actions', color: 'blue', icon: 'fas fa-arrow-right-to-bracket' },
+      { title: 'Logged Out Today', val: d.loggedOutToday, sub: 'Total logout actions', color: 'rose', icon: 'fas fa-arrow-right-from-bracket' }
     ];
 
     const performanceKPIs = [
-      { title: 'Average Login Time', val: d.averageLoginTime, sub: 'First login avg', color: 'blue', icon: '🕒' },
-      { title: 'Average Logout Time', val: d.averageLogoutTime, sub: 'Last logout avg', color: 'rose', icon: '🕒' },
-      { title: 'Average Working Hours', val: `${d.averageWorkingHours}h`, sub: 'Per present employee', color: 'green', icon: '⏱️' },
-      { title: 'Total Working Hours Today', val: `${d.totalWorkingHoursToday}h`, sub: 'Today cumulative', color: 'green', icon: '📊' },
-      { title: 'Productivity Score', val: `${d.productivityScore}/100`, sub: 'Score cumulative', color: 'purple', icon: '🎯' }
+      { title: 'Avg First Login', val: d.averageLoginTime || '—', sub: 'Average start time', color: 'blue', icon: 'fas fa-clock' },
+      { title: 'Avg Last Logout', val: d.averageLogoutTime || '—', sub: 'Average end time', color: 'rose', icon: 'fas fa-business-time' },
+      { title: 'Avg Working Hours', val: `${d.averageWorkingHours}h`, sub: 'Per present employee', color: 'green', icon: 'fas fa-hourglass-half' },
+      { title: 'Total Hours Worked', val: `${d.totalWorkingHoursToday}h`, sub: 'Cumulative in period', color: 'purple', icon: 'fas fa-calculator' },
+      { title: 'Productivity Score', val: `${d.productivityScore}/100`, sub: 'Enterprise benchmark', color: 'purple', icon: 'fas fa-bullseye' }
     ];
 
     const makeCardHtml = k => `
       <div class="apr-stat-card apr-stat-${k.color}">
         <div class="apr-stat-header">
           <span>${k.title}</span>
-          <span class="apr-stat-icon">${k.icon}</span>
+          <span class="apr-stat-icon-wrapper"><i class="${k.icon}" aria-hidden="true"></i></span>
         </div>
         <div class="apr-stat-val">${k.val}</div>
         <div class="apr-stat-sub">${k.sub}</div>
@@ -1068,7 +1671,7 @@
     document.getElementById('grid-performance').innerHTML = performanceKPIs.map(makeCardHtml).join('');
   }
 
-  // ── Hours Loader ──
+  // ── Working Hours Loader ──
   async function loadWorkingHours(query) {
     const res = await api.get(`/apr/admin/working-hours${query}`);
     if (!res?.ok) return;
@@ -1076,20 +1679,20 @@
     
     document.getElementById('hours-kpi-grid').innerHTML = `
       <div class="score-card">
-        <span class="apr-filter-label">Total Login Hours</span>
-        <div class="apr-stat-val" style="font-size:22px;">${d.loginHours} hrs</div>
+        <span class="score-title"><i class="fas fa-clock" aria-hidden="true"></i> Total Login</span>
+        <div class="score-val">${d.loginHours} <span style="font-size:12px;font-weight:600;">hrs</span></div>
       </div>
       <div class="score-card">
-        <span class="apr-filter-label">Productive Hours</span>
-        <div class="apr-stat-val" style="font-size:22px;color:#22c55e;">${d.productiveHours} hrs</div>
+        <span class="score-title" style="color:#16a34a;"><i class="fas fa-check-circle" aria-hidden="true"></i> Productive</span>
+        <div class="score-val" style="color:#16a34a;">${d.productiveHours} <span style="font-size:12px;font-weight:600;">hrs</span></div>
       </div>
       <div class="score-card">
-        <span class="apr-filter-label">Idle Hours</span>
-        <div class="apr-stat-val" style="font-size:22px;color:var(--text-secondary);">${d.idleHours} hrs</div>
+        <span class="score-title"><i class="fas fa-pause-circle" aria-hidden="true"></i> Idle / Break</span>
+        <div class="score-val" style="color:var(--text-secondary);">${d.idleHours} <span style="font-size:12px;font-weight:600;">hrs</span></div>
       </div>
       <div class="score-card">
-        <span class="apr-filter-label">Overtime Hours</span>
-        <div class="apr-stat-val" style="font-size:22px;color:#3b82f6;">${d.overtime} hrs</div>
+        <span class="score-title" style="color:#2563eb;"><i class="fas fa-fire" aria-hidden="true"></i> Overtime</span>
+        <div class="score-val" style="color:#2563eb;">${d.overtime} <span style="font-size:12px;font-weight:600;">hrs</span></div>
       </div>
     `;
   }
@@ -1102,45 +1705,64 @@
     
     document.getElementById('breaks-kpi-grid').innerHTML = `
       <div class="score-card">
-        <span class="apr-filter-label">Tea / Lunch Breaks</span>
-        <div class="apr-stat-val" style="font-size:20px;">☕ ${d.teaCount} | 🍴 ${d.lunchCount}</div>
+        <span class="score-title"><i class="fas fa-mug-hot" aria-hidden="true"></i> Tea / Lunch</span>
+        <div class="score-val"><i class="fas fa-mug-hot" style="font-size:14px;color:#d97706;" aria-hidden="true"></i> ${d.teaCount} &nbsp;|&nbsp; <i class="fas fa-utensils" style="font-size:14px;color:#2563eb;" aria-hidden="true"></i> ${d.lunchCount}</div>
       </div>
       <div class="score-card">
-        <span class="apr-filter-label">Personal / Meetings</span>
-        <div class="apr-stat-val" style="font-size:20px;">👤 ${d.personalCount} | 👥 ${d.meetingCount}</div>
+        <span class="score-title"><i class="fas fa-user-clock" aria-hidden="true"></i> Personal / Meetings</span>
+        <div class="score-val"><i class="fas fa-user" style="font-size:14px;color:#7c3aed;" aria-hidden="true"></i> ${d.personalCount} &nbsp;|&nbsp; <i class="fas fa-users" style="font-size:14px;color:#0891b2;" aria-hidden="true"></i> ${d.meetingCount}</div>
       </div>
       <div class="score-card">
-        <span class="apr-filter-label">Avg / Total Duration</span>
-        <div class="apr-stat-val" style="font-size:20px;color:#f59e0b;">${d.averageBreakTime}m | ${d.totalBreakTime}m</div>
+        <span class="score-title"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Avg / Total</span>
+        <div class="score-val" style="color:#d97706;">${d.averageBreakTime}m &nbsp;|&nbsp; ${d.totalBreakTime}m</div>
       </div>
       <div class="score-card">
-        <span class="apr-filter-label">Longest / Shortest</span>
-        <div class="apr-stat-val" style="font-size:20px;">Max ${d.longestBreak}m | Min ${d.shortestBreak}m</div>
+        <span class="score-title"><i class="fas fa-arrows-up-down" aria-hidden="true"></i> Max / Min</span>
+        <div class="score-val">Max ${d.longestBreak}m &nbsp;|&nbsp; Min ${d.shortestBreak}m</div>
       </div>
     `;
   }
 
-  // ── Live Attendance Loader ──
+  // ── 2. Live Attendance Loader & 20-Record Pagination ──
   async function loadLiveAttendance() {
-    const dept = document.getElementById('filter-dept').value;
-    const search = document.getElementById('filter-search').value;
+    const search = document.getElementById('filter-search')?.value.trim() || '';
     let query = `?sortBy=${rosterSortBy}&sortDir=${rosterSortDir}`;
-    if (dept) query += `&department=${encodeURIComponent(dept)}`;
     if (search) query += `&search=${encodeURIComponent(search)}`;
 
     const res = await api.get(`/apr/admin/live-attendance${query}`);
     if (!res?.ok) return;
     
+    allAttendanceData = Array.isArray(res.data?.data) ? res.data.data : [];
+    document.getElementById('attendance-count-badge').textContent = `${allAttendanceData.length} employee${allAttendanceData.length === 1 ? '' : 's'}`;
+
+    renderAttendancePage();
+  }
+
+  function goAttendancePage(p) {
+    attendancePage = p;
+    renderAttendancePage();
+  }
+
+  function renderAttendancePage() {
     const tbody = document.getElementById('attendance-tbody');
-    if (res.data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text-muted);">No employees found matching filter settings.</td></tr>`;
+    if (!allAttendanceData || allAttendanceData.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>No employees found matching filter settings.</span>
+        </div>
+      </td></tr>`;
+      renderPagination('attendance-pagination', 1, 0, PAGE_SIZE, 'goAttendancePage', 'employees');
       return;
     }
+
+    const startIdx = (attendancePage - 1) * PAGE_SIZE;
+    const pageRows = allAttendanceData.slice(startIdx, startIdx + PAGE_SIZE);
 
     const fmtT = t => t ? new Date(t).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : '—';
     const fmtA = t => t ? new Date(t).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : '—';
 
-    tbody.innerHTML = res.data.data.map(r => {
+    tbody.innerHTML = pageRows.map(r => {
       let statusClass = 'offline';
       if (r.current_status === 'Available' || r.current_status === 'Idle') statusClass = 'online';
       else if (r.current_status === 'On Break') statusClass = 'on-break';
@@ -1152,19 +1774,21 @@
 
       return `
         <tr>
-          <td><strong>#${r.employee_id}</strong></td>
-          <td>${escapeHtml(r.employee_name)}</td>
+          <td><strong style="color:var(--text-secondary);">#${r.employee_id}</strong></td>
+          <td><strong>${escapeHtml(r.employee_name)}</strong></td>
           <td>${fmtT(r.login_time)}</td>
           <td>${fmtT(r.logout_time)}</td>
           <td><span class="status-badge ${statusClass}">${r.current_status}</span></td>
-          <td>${r.working_hours} hrs</td>
+          <td><strong>${r.working_hours}</strong> hrs</td>
           <td>${r.break_time} mins</td>
-          <td>${r.active_session}</td>
-          <td>${fmtA(r.last_activity)}</td>
+          <td><span class="status-badge ${r.active_session === 'Yes' ? 'online' : 'offline'}">${r.active_session}</span></td>
+          <td><span style="font-size:11.5px;color:var(--text-muted);">${fmtA(r.last_activity)}</span></td>
           <td><span class="status-badge ${attClass}">${r.attendance_status}</span></td>
         </tr>
       `;
     }).join('');
+
+    renderPagination('attendance-pagination', attendancePage, allAttendanceData.length, PAGE_SIZE, 'goAttendancePage', 'employees');
   }
 
   function sortRoster(field) {
@@ -1174,311 +1798,702 @@
       rosterSortBy = field;
       rosterSortDir = 'asc';
     }
+    attendancePage = 1;
     loadLiveAttendance();
   }
 
-  // ── Daily Logins Loader ──
+  // ── 3. Daily Logins Loader & 20-Record Pagination ──
   async function loadDailyLogins(query) {
     const res = await api.get(`/apr/admin/daily-report${query}`);
     const tbody = document.getElementById('daily-tbody');
 
-    const showDailyMessage = (message) => {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text-muted);"></td></tr>`;
-      tbody.querySelector('td').textContent = message;
-    };
-
     if (!res?.ok) {
-      showDailyMessage(res?.data?.message || 'Unable to load daily login records.');
+      tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>Unable to load daily login records.</span>
+        </div>
+      </td></tr>`;
+      allDailyData = [];
+      document.getElementById('daily-count-badge').textContent = '0 records';
+      renderPagination('daily-pagination', 1, 0, PAGE_SIZE, 'goDailyPage', 'records');
       return;
     }
 
-    const rows = Array.isArray(res.data?.data) ? res.data.data : [];
-    if (rows.length === 0) {
-      showDailyMessage('No records found.');
+    allDailyData = Array.isArray(res.data?.data) ? res.data.data : [];
+    document.getElementById('daily-count-badge').textContent = `${allDailyData.length} record${allDailyData.length === 1 ? '' : 's'}`;
+    renderDailyPage();
+  }
+
+  function goDailyPage(p) {
+    dailyPage = p;
+    renderDailyPage();
+  }
+
+  function renderDailyPage() {
+    const tbody = document.getElementById('daily-tbody');
+    if (!allDailyData || allDailyData.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>No daily login records found for the selected period.</span>
+        </div>
+      </td></tr>`;
+      renderPagination('daily-pagination', 1, 0, PAGE_SIZE, 'goDailyPage', 'records');
       return;
     }
+
+    const startIdx = (dailyPage - 1) * PAGE_SIZE;
+    const pageRows = allDailyData.slice(startIdx, startIdx + PAGE_SIZE);
 
     const fmtT = t => t ? new Date(t).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : '—';
     const fmtD = d => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
-    tbody.innerHTML = rows.map(r => `
+    tbody.innerHTML = pageRows.map(r => `
       <tr>
+        <td><strong style="color:var(--text-secondary);">#${r.employee_id || '—'}</strong></td>
         <td><strong>${escapeHtml(r.employee_name)}</strong></td>
         <td>${fmtD(r.work_date)}</td>
         <td>${fmtT(r.login_time)}</td>
         <td>${fmtT(r.logout_time)}</td>
-        <td>${r.total_sessions}</td>
-        <td>${r.total_working_hours} hrs</td>
-        <td>${r.overtime} hrs</td>
+        <td><span class="status-badge online" style="padding:2px 6px;">${r.total_sessions}</span></td>
+        <td><strong>${r.total_working_hours}</strong> hrs</td>
+        <td>${r.overtime > 0 ? `<span style="color:#2563eb;font-weight:700;">+${r.overtime}h</span>` : '0.00'}</td>
         <td>${r.break_duration} mins</td>
         <td><span class="status-badge ${r.late_login === 'Yes' ? 'logged-out' : 'online'}">${r.late_login === 'Yes' ? 'Late' : 'On Time'}</span></td>
         <td><span class="status-badge ${r.early_logout === 'Yes' ? 'on-break' : 'online'}">${r.early_logout === 'Yes' ? 'Early' : 'Regular'}</span></td>
       </tr>
     `).join('');
+
+    renderPagination('daily-pagination', dailyPage, allDailyData.length, PAGE_SIZE, 'goDailyPage', 'records');
   }
 
-  // ── Login History Loader ──
+  // ── 4. Login History Loader & 20-Record Pagination ──
   async function loadLoginHistory(query) {
     const res = await api.get(`/apr/admin/login-history${query}`);
-    if (!res?.ok) return;
-
     const tbody = document.getElementById('history-tbody');
-    if (res.data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--text-muted);">No session records.</td></tr>`;
+
+    if (!res?.ok) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>Unable to load login history logs.</span>
+        </div>
+      </td></tr>`;
+      allHistoryData = [];
+      document.getElementById('history-count-badge').textContent = '0 sessions';
+      renderPagination('history-pagination', 1, 0, PAGE_SIZE, 'goHistoryPage', 'sessions');
       return;
     }
+
+    allHistoryData = Array.isArray(res.data?.data) ? res.data.data : [];
+    document.getElementById('history-count-badge').textContent = `${allHistoryData.length} session${allHistoryData.length === 1 ? '' : 's'}`;
+    renderHistoryPage();
+  }
+
+  function goHistoryPage(p) {
+    historyPage = p;
+    renderHistoryPage();
+  }
+
+  function renderHistoryPage() {
+    const tbody = document.getElementById('history-tbody');
+    if (!allHistoryData || allHistoryData.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>No session history logs recorded in this period.</span>
+        </div>
+      </td></tr>`;
+      renderPagination('history-pagination', 1, 0, PAGE_SIZE, 'goHistoryPage', 'sessions');
+      return;
+    }
+
+    const startIdx = (historyPage - 1) * PAGE_SIZE;
+    const pageRows = allHistoryData.slice(startIdx, startIdx + PAGE_SIZE);
 
     const fmtD = d => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
     const fmtT = t => t ? new Date(t).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : '—';
 
-    tbody.innerHTML = res.data.data.map(r => `
+    tbody.innerHTML = pageRows.map(r => `
       <tr>
+        <td><strong style="color:var(--text-secondary);">#${r.employee_id || r.id}</strong></td>
         <td><strong>${escapeHtml(r.employee_name)}</strong></td>
         <td>${fmtD(r.login_date)}</td>
         <td>${fmtT(r.login_time)}</td>
         <td>${fmtT(r.logout_time)}</td>
-        <td>${r.session_duration} hrs</td>
-        <td><code style="font-size:11px;">${r.ip_address || '—'}</code></td>
-        <td>${r.browser || '—'}</td>
-        <td>${r.os || '—'} (${r.device || 'Desktop'})</td>
-        <td>${r.location}</td>
+        <td><strong>${r.session_duration}</strong> hrs</td>
+        <td><code style="font-size:11px;background:var(--bg-secondary);padding:2px 6px;border-radius:4px;">${r.ip_address || '—'}</code></td>
+        <td>${escapeHtml(r.browser || '—')}</td>
+        <td>${escapeHtml(r.os || '—')} (${escapeHtml(r.device || 'Desktop')})</td>
+        <td><span style="color:var(--text-muted);">${r.location || 'Local / Office'}</span></td>
       </tr>
     `).join('');
+
+    renderPagination('history-pagination', historyPage, allHistoryData.length, PAGE_SIZE, 'goHistoryPage', 'sessions');
   }
 
-  // ── Performance scorecard ──
+  // ── 5. Visual Analytics Charts Loader ──
+  async function loadAnalytics() {
+    const res = await api.get('/apr/admin/analytics');
+    if (!res?.ok) return;
+    const d = res.data.data;
+
+    // Destroy existing chart instances cleanly to prevent canvas memory leaks
+    Object.keys(charts).forEach(key => {
+      if (charts[key]) {
+        charts[key].destroy();
+        charts[key] = null;
+      }
+    });
+
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)';
+
+    const optionsCommon = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: textColor, font: { family: 'inherit', size: 12 } } }
+      },
+      scales: {
+        x: {
+          ticks: { color: textColor },
+          grid: { display: false }
+        },
+        y: {
+          ticks: { color: textColor },
+          grid: { color: gridColor }
+        }
+      }
+    };
+
+    // 1. Attendance Trend Chart
+    const ctxTrendEl = document.getElementById('chart-attendance-trend');
+    if (ctxTrendEl) {
+      const ctxTrend = ctxTrendEl.getContext('2d');
+      charts.trend = new Chart(ctxTrend, {
+        type: 'line',
+        data: {
+          labels: d.labels.map(l => new Date(l).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })),
+          datasets: [
+            {
+              label: 'Present',
+              data: d.presentTrend,
+              borderColor: '#16a34a',
+              backgroundColor: 'rgba(22, 163, 74, 0.1)',
+              tension: 0.35,
+              fill: true,
+              pointBackgroundColor: '#16a34a'
+            },
+            {
+              label: 'Absent',
+              data: d.absentTrend,
+              borderColor: '#e11d48',
+              backgroundColor: 'rgba(225, 29, 72, 0.05)',
+              tension: 0.35,
+              pointBackgroundColor: '#e11d48'
+            }
+          ]
+        },
+        options: optionsCommon
+      });
+    }
+
+    // 2. Online Ratios Doughnut Chart
+    const ctxOnlineEl = document.getElementById('chart-online-ratio');
+    if (ctxOnlineEl) {
+      const ctxOnline = ctxOnlineEl.getContext('2d');
+      charts.online = new Chart(ctxOnline, {
+        type: 'doughnut',
+        data: {
+          labels: ['Online / Active', 'Offline'],
+          datasets: [{
+            data: [d.ratios.online, d.ratios.offline],
+            backgroundColor: ['#16a34a', '#94a3b8'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: { color: textColor, font: { family: 'inherit', size: 12 } }
+            }
+          }
+        }
+      });
+    }
+
+    // 3. Working Hours Trend Chart
+    const ctxHrsEl = document.getElementById('chart-working-trend');
+    if (ctxHrsEl) {
+      const ctxHrs = ctxHrsEl.getContext('2d');
+      charts.hrs = new Chart(ctxHrs, {
+        type: 'bar',
+        data: {
+          labels: d.labels.map(l => new Date(l).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })),
+          datasets: [{
+            label: 'Avg Working Hours',
+            data: d.avgWorkHoursTrend,
+            backgroundColor: '#2563eb',
+            borderRadius: 6
+          }]
+        },
+        options: optionsCommon
+      });
+    }
+  }
+
+  // ── 6. Performance Scorecard Loader & 20-Record Pagination ──
   async function loadPerformanceScorecard(query) {
     const res = await api.get(`/apr/admin/performance${query}`);
-    if (!res?.ok) return;
-
     const tbody = document.getElementById('performance-tbody');
-    if (res.data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--text-muted);">No performance metrics calculated.</td></tr>`;
+
+    if (!res?.ok) {
+      tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>Unable to load performance matrix.</span>
+        </div>
+      </td></tr>`;
+      allPerformanceData = [];
+      document.getElementById('performance-count-badge').textContent = '0 employees';
+      renderPagination('performance-pagination', 1, 0, PAGE_SIZE, 'goPerformancePage', 'employees');
       return;
     }
 
-    tbody.innerHTML = res.data.data.map(r => `
+    allPerformanceData = Array.isArray(res.data?.data) ? res.data.data : [];
+    document.getElementById('performance-count-badge').textContent = `${allPerformanceData.length} employee${allPerformanceData.length === 1 ? '' : 's'}`;
+    renderPerformancePage();
+  }
+
+  function goPerformancePage(p) {
+    performancePage = p;
+    renderPerformancePage();
+  }
+
+  function renderPerformancePage() {
+    const tbody = document.getElementById('performance-tbody');
+    if (!allPerformanceData || allPerformanceData.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>No performance metrics calculated for this period.</span>
+        </div>
+      </td></tr>`;
+      renderPagination('performance-pagination', 1, 0, PAGE_SIZE, 'goPerformancePage', 'employees');
+      return;
+    }
+
+    const startIdx = (performancePage - 1) * PAGE_SIZE;
+    const pageRows = allPerformanceData.slice(startIdx, startIdx + PAGE_SIZE);
+
+    tbody.innerHTML = pageRows.map(r => `
       <tr>
-        <td><strong>#${r.employee_id}</strong></td>
+        <td><strong style="color:var(--text-secondary);">#${r.employee_id}</strong></td>
         <td><strong>${escapeHtml(r.employee_name)}</strong></td>
         <td>${r.customers_added}</td>
-        <td>${r.loans_submitted}</td>
-        <td>${r.loans_approved}</td>
-        <td>${r.loans_rejected}</td>
-        <td>${r.loans_disbursed}</td>
-        <td>${r.conversion_rate}%</td>
+        <td><strong>${r.loans_submitted}</strong></td>
+        <td><span style="color:#16a34a;font-weight:700;">${r.loans_approved}</span></td>
+        <td><span style="color:#e11d48;font-weight:700;">${r.loans_rejected}</span></td>
+        <td><span style="color:#2563eb;font-weight:700;">${r.loans_disbursed}</span></td>
+        <td><strong>${r.conversion_rate}%</strong></td>
         <td>${r.avg_processing_time} hrs</td>
         <td>
           <div class="apr-score-cell">
             <div class="score-progress-bar">
-              <div class="score-progress-val" style="width:${r.productivity_score}%; background:#3b82f6;"></div>
+              <div class="score-progress-val" style="width:${r.productivity_score}%; background:#2563eb;"></div>
             </div>
-            <span><strong>${r.productivity_score}</strong>/100</span>
+            <span>${r.productivity_score}</span>
           </div>
         </td>
         <td>
           <div class="apr-score-cell">
             <div class="score-progress-bar">
-              <div class="score-progress-val" style="width:${r.attendance_score}%; background:#22c55e;"></div>
+              <div class="score-progress-val" style="width:${r.attendance_score}%; background:#16a34a;"></div>
             </div>
-            <span><strong>${r.attendance_score}</strong>/100</span>
+            <span>${r.attendance_score}</span>
           </div>
         </td>
       </tr>
     `).join('');
+
+    renderPagination('performance-pagination', performancePage, allPerformanceData.length, PAGE_SIZE, 'goPerformancePage', 'employees');
   }
 
-  // ── Leaderboard Loader ──
+  // ── 7. Monthly Leaderboard Loader & 20-Record Pagination (Global Rank Never Restarts) ──
   async function loadLeaderboard() {
     const res = await api.get('/apr/admin/leaderboard');
-    if (!res?.ok) return;
-
     const tbody = document.getElementById('leaderboard-tbody');
-    if (res.data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No rankings today.</td></tr>`;
+
+    if (!res?.ok) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>Unable to load leaderboard.</span>
+        </div>
+      </td></tr>`;
+      allLeaderboardData = [];
+      document.getElementById('leaderboard-count-badge').textContent = '0 ranked';
+      renderPagination('leaderboard-pagination', 1, 0, PAGE_SIZE, 'goLeaderboardPage', 'employees');
       return;
     }
 
-    tbody.innerHTML = res.data.data.map(r => {
+    allLeaderboardData = Array.isArray(res.data?.data) ? res.data.data : [];
+    document.getElementById('leaderboard-count-badge').textContent = `${allLeaderboardData.length} employee${allLeaderboardData.length === 1 ? '' : 's'}`;
+    renderLeaderboardPage();
+  }
+
+  function goLeaderboardPage(p) {
+    leaderboardPage = p;
+    renderLeaderboardPage();
+  }
+
+  function renderLeaderboardPage() {
+    const tbody = document.getElementById('leaderboard-tbody');
+    if (!allLeaderboardData || allLeaderboardData.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>No leaderboard rankings available for current month.</span>
+        </div>
+      </td></tr>`;
+      renderPagination('leaderboard-pagination', 1, 0, PAGE_SIZE, 'goLeaderboardPage', 'employees');
+      return;
+    }
+
+    const startIdx = (leaderboardPage - 1) * PAGE_SIZE;
+    const pageRows = allLeaderboardData.slice(startIdx, startIdx + PAGE_SIZE);
+
+    tbody.innerHTML = pageRows.map((r, idx) => {
+      // Global ranking: MUST NEVER restart on page 2!
+      const globalRank = startIdx + idx + 1;
+
       let badgeClass = 'badge-normal';
-      let badgeText = '—';
-      if (r.badge === 'Gold') { badgeClass = 'badge-gold'; badgeText = '🥇 Gold'; }
-      else if (r.badge === 'Silver') { badgeClass = 'badge-silver'; badgeText = '🥈 Silver'; }
-      else if (r.badge === 'Bronze') { badgeClass = 'badge-bronze'; badgeText = '🥉 Bronze'; }
+      let badgeHtml = `<span>Top #${globalRank}</span>`;
+      if (globalRank === 1) {
+        badgeClass = 'badge-gold';
+        badgeHtml = `<i class="fas fa-award" style="color:#eab308;margin-right:4px;" aria-hidden="true"></i> <span>Gold Tier</span>`;
+      } else if (globalRank === 2) {
+        badgeClass = 'badge-silver';
+        badgeHtml = `<i class="fas fa-award" style="color:#94a3b8;margin-right:4px;" aria-hidden="true"></i> <span>Silver Tier</span>`;
+      } else if (globalRank === 3) {
+        badgeClass = 'badge-bronze';
+        badgeHtml = `<i class="fas fa-award" style="color:#d97706;margin-right:4px;" aria-hidden="true"></i> <span>Bronze Tier</span>`;
+      }
 
       return `
         <tr>
-          <td><span class="badge-rank ${r.rank <= 3 ? (r.rank === 1 ? 'badge-gold' : (r.rank === 2 ? 'badge-silver' : 'badge-bronze')) : 'badge-normal'}">${r.rank}</span></td>
+          <td><span class="badge-rank ${badgeClass}">#${globalRank}</span></td>
           <td><strong>${escapeHtml(r.employee_name)}</strong></td>
           <td>
             <div style="display:flex;align-items:center;gap:8px;">
-              <div class="score-progress-bar" style="width:80px;">
-                <div class="score-progress-val" style="width:${r.performance_score}%; background:linear-gradient(90deg, #8b5cf6, #3b82f6);"></div>
+              <div class="score-progress-bar" style="width:75px;margin:0;">
+                <div class="score-progress-val" style="width:${r.performance_score}%; background:linear-gradient(90deg, #7c3aed, #2563eb);"></div>
               </div>
               <span><strong>${r.performance_score}</strong>/100</span>
             </div>
           </td>
           <td>${r.attendance_score}%</td>
           <td>${r.productivity}%</td>
-          <td>${r.working_hours} hrs</td>
-          <td>${r.loans_processed} applications</td>
-          <td><span class="status-badge ${r.badge ? r.badge.toLowerCase() : 'offline'}">${badgeText}</span></td>
+          <td><strong>${r.working_hours}</strong> hrs</td>
+          <td>${r.loans_processed} loans</td>
+          <td><span class="status-badge ${globalRank <= 3 ? 'online' : 'offline'}" style="display:inline-flex;align-items:center;">${badgeHtml}</span></td>
         </tr>
       `;
     }).join('');
+
+    renderPagination('leaderboard-pagination', leaderboardPage, allLeaderboardData.length, PAGE_SIZE, 'goLeaderboardPage', 'employees');
   }
 
-  // ── Live Break Monitor ──
+  // ── 8. Live Break Monitor Loader & 20-Record Pagination ──
   async function loadLiveBreaks() {
     const res = await api.get('/apr/admin/live-breaks');
-    if (!res?.ok) return;
-
     const tbody = document.getElementById('breaks-tbody');
-    if (res.data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No breaks recorded today.</td></tr>`;
+
+    if (!res?.ok) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>Unable to load live breaks.</span>
+        </div>
+      </td></tr>`;
+      allBreaksData = [];
+      document.getElementById('breaks-count-badge').textContent = '0 breaks today';
+      renderPagination('breaks-pagination', 1, 0, PAGE_SIZE, 'goBreaksPage', 'breaks');
       return;
     }
 
+    allBreaksData = Array.isArray(res.data?.data) ? res.data.data : [];
+    document.getElementById('breaks-count-badge').textContent = `${allBreaksData.length} break${allBreaksData.length === 1 ? '' : 's'} today`;
+    renderBreaksPage();
+  }
+
+  function goBreaksPage(p) {
+    breaksPage = p;
+    renderBreaksPage();
+  }
+
+  function renderBreaksPage() {
+    const tbody = document.getElementById('breaks-tbody');
+    if (!allBreaksData || allBreaksData.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:36px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <i class="fas fa-inbox" style="font-size:28px;opacity:0.5;" aria-hidden="true"></i>
+          <span>No breaks recorded today yet.</span>
+        </div>
+      </td></tr>`;
+      renderPagination('breaks-pagination', 1, 0, PAGE_SIZE, 'goBreaksPage', 'breaks');
+      return;
+    }
+
+    const startIdx = (breaksPage - 1) * PAGE_SIZE;
+    const pageRows = allBreaksData.slice(startIdx, startIdx + PAGE_SIZE);
+
     const fmtT = t => t ? new Date(t).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : '—';
 
-    tbody.innerHTML = res.data.data.map(r => {
+    tbody.innerHTML = pageRows.map(r => {
       const active = r.status === 'On Break';
       return `
         <tr>
-          <td><strong>#${r.employee_id}</strong></td>
-          <td>${escapeHtml(r.employee_name)}</td>
+          <td><strong style="color:var(--text-secondary);">#${r.employee_id}</strong></td>
+          <td><strong>${escapeHtml(r.employee_name)}</strong></td>
           <td><strong>${escapeHtml(r.break_type)}</strong></td>
           <td>${fmtT(r.start_time)}</td>
           <td>${fmtT(r.end_time)}</td>
-          <td><span style="font-weight:${active ? 'bold' : 'normal'}; color:${active ? '#f59e0b' : 'inherit'};">${r.duration} mins ${active ? '(Active)' : ''}</span></td>
+          <td><span style="font-weight:${active ? '700' : '600'}; color:${active ? '#d97706' : 'inherit'};">${r.duration} mins ${active ? '(In Progress)' : ''}</span></td>
           <td><span class="status-badge ${active ? 'on-break' : 'online'}">${active ? 'On Break' : 'Completed'}</span></td>
-          <td><span style="font-size:12px;color:var(--text-secondary);">${escapeHtml(r.remarks)}</span></td>
+          <td><span style="font-size:12px;color:var(--text-secondary);">${escapeHtml(r.remarks || '—')}</span></td>
         </tr>
       `;
     }).join('');
+
+    renderPagination('breaks-pagination', breaksPage, allBreaksData.length, PAGE_SIZE, 'goBreaksPage', 'breaks');
   }
 
-  // ── Analytics Charts ──
-  async function loadAnalytics() {
-    const res = await api.get('/apr/admin/analytics');
-    if (!res?.ok) return;
-    const d = res.data.data;
-
-    // Destory existing charts to prevent memory leaks
-    Object.keys(charts).forEach(key => {
-      if (charts[key]) {
-        charts[key].destroy();
-      }
-    });
-
-    const optionsCommon = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        x: { grid: { display: false } },
-        y: { grid: { color: 'rgba(0,0,0,0.05)' } }
-      }
-    };
-
-    // 1. Attendance Trend Chart
-    const ctxTrend = document.getElementById('chart-attendance-trend').getContext('2d');
-    charts.trend = new Chart(ctxTrend, {
-      type: 'line',
-      data: {
-        labels: d.labels.map(l => new Date(l).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })),
-        datasets: [
-          { label: 'Present', data: d.presentTrend, borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)', tension: 0.3, fill: true },
-          { label: 'Absent', data: d.absentTrend, borderColor: '#f43f5e', backgroundColor: 'rgba(244, 63, 94, 0.05)', tension: 0.3 }
-        ]
-      },
-      options: {
-        ...optionsCommon,
-        plugins: { legend: { display: true } }
-      }
-    });
-
-    // 2. Online Ratios Doughnut Chart
-    const ctxOnline = document.getElementById('chart-online-ratio').getContext('2d');
-    charts.online = new Chart(ctxOnline, {
-      type: 'doughnut',
-      data: {
-        labels: ['Online', 'Offline'],
-        datasets: [{
-          data: [d.ratios.online, d.ratios.offline],
-          backgroundColor: ['#22c55e', '#94a3b8'],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: true, position: 'bottom' }
-        }
-      }
-    });
-
-    // 3. Working Hours Trend Chart
-    const ctxHrs = document.getElementById('chart-working-trend').getContext('2d');
-    charts.hrs = new Chart(ctxHrs, {
-      type: 'bar',
-      data: {
-        labels: d.labels.map(l => new Date(l).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })),
-        datasets: [{
-          label: 'Avg Hours',
-          data: d.avgWorkHoursTrend,
-          backgroundColor: '#3b82f6',
-          borderRadius: 4
-        }]
-      },
-      options: optionsCommon
-    });
-
-    // 4. Department-wise Presence Chart
-    const ctxDept = document.getElementById('chart-department-presence').getContext('2d');
-    charts.dept = new Chart(ctxDept, {
-      type: 'bar',
-      data: {
-        labels: d.departmentAttendance.map(a => a.department),
-        datasets: [{
-          label: 'Staff Count',
-          data: d.departmentAttendance.map(a => a.count),
-          backgroundColor: '#a855f7',
-          borderRadius: 4
-        }]
-      },
-      options: optionsCommon
-    });
+  // ── Complete Data Exporter: Exports ALL Filtered Records, NOT Just Current Page ──
+  function getDatasetForExport(type) {
+    switch (type) {
+      case 'attendance':
+        return {
+          title: 'Live Employee Attendance Roster',
+          filename: 'apr_live_attendance_roster',
+          columns: ['Emp ID', 'Employee Name', 'Login Time', 'Logout Time', 'Status', 'Today Hours', 'Break Time', 'Active Session', 'Attendance Status'],
+          data: allAttendanceData.map(r => [
+            r.employee_id,
+            r.employee_name,
+            r.login_time ? new Date(r.login_time).toLocaleString('en-IN') : '—',
+            r.logout_time ? new Date(r.logout_time).toLocaleString('en-IN') : '—',
+            r.current_status,
+            `${r.working_hours} hrs`,
+            `${r.break_time} mins`,
+            r.active_session,
+            r.attendance_status
+          ])
+        };
+      case 'daily':
+        return {
+          title: 'Daily Login Summary Report',
+          filename: 'apr_daily_login_summary',
+          columns: ['Emp ID', 'Employee Name', 'Work Date', 'First Login', 'Last Logout', 'Sessions', 'Working Hours', 'Overtime', 'Break Mins', 'Late Login', 'Early Logout'],
+          data: allDailyData.map(r => [
+            r.employee_id || '—',
+            r.employee_name,
+            r.work_date ? new Date(r.work_date).toLocaleDateString('en-IN') : '—',
+            r.login_time ? new Date(r.login_time).toLocaleTimeString('en-IN') : '—',
+            r.logout_time ? new Date(r.logout_time).toLocaleTimeString('en-IN') : '—',
+            r.total_sessions,
+            `${r.total_working_hours} hrs`,
+            `${r.overtime} hrs`,
+            `${r.break_duration} mins`,
+            r.late_login,
+            r.early_logout
+          ])
+        };
+      case 'history':
+        return {
+          title: 'Session Login History Audit Logs',
+          filename: 'apr_session_login_history',
+          columns: ['Emp ID', 'Employee Name', 'Login Date', 'Login Time', 'Logout Time', 'Duration', 'IP Address', 'Browser', 'OS / Device', 'Location'],
+          data: allHistoryData.map(r => [
+            r.employee_id || r.id,
+            r.employee_name,
+            r.login_date ? new Date(r.login_date).toLocaleDateString('en-IN') : '—',
+            r.login_time ? new Date(r.login_time).toLocaleTimeString('en-IN') : '—',
+            r.logout_time ? new Date(r.logout_time).toLocaleTimeString('en-IN') : '—',
+            `${r.session_duration} hrs`,
+            r.ip_address || '—',
+            r.browser || '—',
+            `${r.os || '—'} (${r.device || 'Desktop'})`,
+            r.location || 'Local / Office'
+          ])
+        };
+      case 'performance':
+        return {
+          title: 'Employee Performance Matrix',
+          filename: 'apr_employee_performance_matrix',
+          columns: ['Emp ID', 'Employee Name', 'Customers Added', 'Loans Submitted', 'Approved', 'Rejected', 'Disbursed', 'Conversion Rate', 'Avg Processing', 'Productivity Score', 'Attendance Score'],
+          data: allPerformanceData.map(r => [
+            r.employee_id,
+            r.employee_name,
+            r.customers_added,
+            r.loans_submitted,
+            r.loans_approved,
+            r.loans_rejected,
+            r.loans_disbursed,
+            `${r.conversion_rate}%`,
+            `${r.avg_processing_time} hrs`,
+            r.productivity_score,
+            r.attendance_score
+          ])
+        };
+      case 'leaderboard':
+        return {
+          title: 'Monthly Performance Leaderboard',
+          filename: 'apr_monthly_leaderboard',
+          columns: ['Rank', 'Employee Name', 'Performance Score', 'Attendance Score', 'Productivity Score', 'Working Hours', 'Loans Processed', 'Tier'],
+          data: allLeaderboardData.map((r, idx) => {
+            const rank = idx + 1;
+            let tier = `Rank #${rank}`;
+            if (rank === 1) tier = 'Gold Tier';
+            else if (rank === 2) tier = 'Silver Tier';
+            else if (rank === 3) tier = 'Bronze Tier';
+            return [
+              rank,
+              r.employee_name,
+              r.performance_score,
+              `${r.attendance_score}%`,
+              `${r.productivity}%`,
+              `${r.working_hours} hrs`,
+              r.loans_processed,
+              r.badge || tier
+            ];
+          })
+        };
+      case 'breaks':
+        return {
+          title: 'Live Break Monitoring Logs',
+          filename: 'apr_live_break_logs',
+          columns: ['Emp ID', 'Employee Name', 'Break Type', 'Start Time', 'End Time', 'Duration Mins', 'Status', 'Remarks'],
+          data: allBreaksData.map(r => [
+            r.employee_id,
+            r.employee_name,
+            r.break_type,
+            r.start_time ? new Date(r.start_time).toLocaleTimeString('en-IN') : '—',
+            r.end_time ? new Date(r.end_time).toLocaleTimeString('en-IN') : '—',
+            `${r.duration} mins`,
+            r.status,
+            r.remarks || '—'
+          ])
+        };
+      default:
+        return null;
+    }
   }
 
-  // ── Export functionality ──
-  function exportTable(tableId, format) {
-    const table = document.getElementById(tableId);
-    if (!table) return;
+  function exportData(type, format) {
+    const meta = getDatasetForExport(type);
+    if (!meta || !meta.data || meta.data.length === 0) {
+      alert('No records available to export.');
+      return;
+    }
 
-    if (format === 'CSV' || format === 'Excel') {
-      const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet JS" });
+    const stamp = new Date().toISOString().slice(0, 10);
+    const fileName = `${meta.filename}_${stamp}`;
+
+    if (format === 'Excel' || format === 'CSV') {
+      const sheetData = [meta.columns, ...meta.data];
+      const ws = XLSX.utils.aoa_to_sheet(sheetData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Records');
+
       if (format === 'CSV') {
-        const csvContent = XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
+        const csvContent = XLSX.utils.sheet_to_csv(ws);
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", `${tableId}_export_${Date.now()}.csv`);
+        link.setAttribute('download', `${fileName}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } else {
-        XLSX.writeFile(wb, `${tableId}_export_${Date.now()}.xlsx`);
+        XLSX.writeFile(wb, `${fileName}.xlsx`);
       }
     } else if (format === 'PDF') {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('l', 'pt', 'a4');
-      doc.autoTable({ html: `#${tableId}` });
-      doc.save(`${tableId}_export_${Date.now()}.pdf`);
+      doc.setFontSize(14);
+      doc.text(meta.title, 40, 35);
+      doc.setFontSize(10);
+      doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Total Records: ${meta.data.length}`, 40, 50);
+
+      doc.autoTable({
+        head: [meta.columns],
+        body: meta.data,
+        startY: 65,
+        styles: { fontSize: 8, cellPadding: 4 },
+        headStyles: { fillColor: [15, 39, 71], textColor: [255, 255, 255] }
+      });
+      doc.save(`${fileName}.pdf`);
     }
+  }
+
+  function printTableData(type) {
+    const meta = getDatasetForExport(type);
+    if (!meta || !meta.data || meta.data.length === 0) {
+      alert('No records available to print.');
+      return;
+    }
+
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+      window.print();
+      return;
+    }
+
+    const tableRows = meta.data.map(row => `
+      <tr>${row.map(cell => `<td>${escapeHtml(String(cell ?? ''))}</td>`).join('')}</tr>
+    `).join('');
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${escapeHtml(meta.title)}</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; color: #1e293b; }
+          h2 { margin: 0 0 4px 0; color: #0f2747; font-size: 18px; }
+          p { margin: 0 0 16px 0; font-size: 12px; color: #64748b; }
+          table { width: 100%; border-collapse: collapse; font-size: 11px; }
+          th { background: #0f2747; color: #fff; text-align: left; padding: 8px 10px; border: 1px solid #cbd5e1; }
+          td { padding: 6px 10px; border: 1px solid #cbd5e1; }
+          tr:nth-child(even) { background: #f8fafc; }
+        </style>
+      </head>
+      <body>
+        <h2>${escapeHtml(meta.title)}</h2>
+        <p>Total Records: ${meta.data.length} | Generated: ${new Date().toLocaleString('en-IN')}</p>
+        <table>
+          <thead>
+            <tr>${meta.columns.map(c => `<th>${escapeHtml(c)}</th>`).join('')}</tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+        <script>
+          window.onload = function() { window.print(); }
+        <\/script>
+      </body>
+      </html>
+    `;
+
+    printWin.document.open();
+    printWin.document.write(html);
+    printWin.document.close();
   }
 </script>
 </body>

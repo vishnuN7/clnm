@@ -53,6 +53,7 @@ yarn.lock
 tmp/
 temp/
 *.tmp
+scratch/
 
 # Deployment secrets and certificates
 deploy/ssl/

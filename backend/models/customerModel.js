@@ -22,7 +22,8 @@ const CustomerModel = {
 
   async getAll({ area, search, added_by, period, startDate, endDate } = {}) {
     let sql = `
-      SELECT c.*, u.name AS added_by_name
+      SELECT c.*, u.name AS added_by_name,
+             (SELECT COUNT(*) FROM documents d WHERE d.customer_id = c.id) AS document_count
       FROM customers c
       LEFT JOIN users u ON c.added_by = u.id
       WHERE 1=1
@@ -30,13 +31,19 @@ const CustomerModel = {
     const params = [];
 
     if (area) { sql += ' AND c.area = ?'; params.push(area); }
-    if (search) { sql += ' AND (c.name LIKE ? OR c.phone LIKE ?)'; params.push(`%${search}%`, `%${search}%`); }
+    if (search) { sql += ' AND (c.name LIKE ? OR c.phone LIKE ? OR c.area LIKE ?)'; params.push(`%${search}%`, `%${search}%`, `%${search}%`); }
     if (added_by) { sql += ' AND c.added_by = ?'; params.push(added_by); }
 
-    if (period === 'week') {
+    if (period === 'today') {
+      sql += ' AND DATE(c.created_at) = CURDATE()';
+    } else if (period === 'yesterday') {
+      sql += ' AND DATE(c.created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)';
+    } else if (period === 'week') {
       sql += ' AND c.created_at >= DATE_SUB(NOW(), INTERVAL 1 WEEK)';
     } else if (period === 'month') {
       sql += ' AND c.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+    } else if (period === 'this_month') {
+      sql += ' AND YEAR(c.created_at) = YEAR(CURDATE()) AND MONTH(c.created_at) = MONTH(CURDATE())';
     } else if (period === 'year') {
       sql += ' AND c.created_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)';
     }

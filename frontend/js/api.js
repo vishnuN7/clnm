@@ -190,7 +190,37 @@ const ICON_SVG = {
   calendarCheck: svgIcon('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M3 10h18"/><path d="m8 16 2.5 2.5L16 13"/>'),
   uploadCloud: svgIcon('<path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20 16.6A5 5 0 0 0 18 7h-1.3A7 7 0 0 0 3.8 10.1A4.5 4.5 0 0 0 5 19h2"/><path d="M16 19h3"/>'),
   indianRupee: svgIcon('<path d="M6 4h12"/><path d="M6 8h12"/><path d="M7 4h4a4 4 0 0 1 0 8H7l6 8"/>'),
-  message: svgIcon('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>')
+  message: svgIcon('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'),
+  ellipsisVertical: svgIcon('<circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>'),
+  bolt: svgIcon('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
+  userSlash: svgIcon('<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="18" y1="8" x2="23" y2="13"/><line x1="23" y1="8" x2="18" y2="13"/>'),
+  award: svgIcon('<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>'),
+  trophy: svgIcon('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>'),
+  fileCsv: svgIcon('<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M8 15h.01"/><path d="M12 15h.01"/><path d="M16 15h.01"/>'),
+  filePdf: svgIcon('<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 12h2a1 1 0 0 1 0 2H9v3"/><path d="M9 14h2"/>'),
+  fileExcel: svgIcon('<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="m9 12 6 6"/><path d="m15 12-6 6"/>'),
+  print: svgIcon('<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>'),
+  calendarAlt: svgIcon('<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'),
+  circleDot: svgIcon('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>'),
+  powerOff: svgIcon('<path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>'),
+  businessTime: svgIcon('<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="3"/><polyline points="12 11.5 12 13 13 13"/>'),
+  stopwatch: svgIcon('<circle cx="12" cy="14" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="10" x2="12" y2="14"/><line x1="12" y1="14" x2="15" y2="17"/>'),
+  bullseye: svgIcon('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'),
+  fire: svgIcon('<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>'),
+  towerBroadcast: svgIcon('<path d="M4.9 19.1A10 10 0 0 1 4.9 4.9"/><path d="M7.8 16.2A6 6 0 0 1 7.8 7.8"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/>'),
+  medal: svgIcon('<circle cx="12" cy="15" r="5"/><path d="m8.5 8.5 3.5-6 3.5 6"/><path d="M12 2.5V8"/><path d="m14 10 3-7"/><path d="m10 10-3-7"/>'),
+  sort: svgIcon('<path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>'),
+  sortUp: svgIcon('<path d="m7 14 5-5 5 5"/>'),
+  sortDown: svgIcon('<path d="m7 10 5 5 5-5"/>'),
+  rotateRight: svgIcon('<path d="M20 4v6h-6"/><path d="M4 20a8.5 8.5 0 1 1 0-12"/>'),
+  arrowsUpDown: svgIcon('<polyline points="7 15 12 20 17 15"/><line x1="12" y1="4" x2="12" y2="20"/><polyline points="7 9 12 4 17 9"/>'),
+  chevronLeft: svgIcon('<path d="m15 18-6-6 6-6"/>'),
+  chevronRight: svgIcon('<path d="m9 18 6-6-6-6"/>'),
+  chevronDown: svgIcon('<path d="m6 9 6 6 6-6"/>'),
+  chevronUp: svgIcon('<path d="m18 15-6-6-6 6"/>'),
+  userCircle: svgIcon('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>'),
+  infinity: svgIcon('<path d="M18.178 8c5.096 0 5.096 8 0 8-2.612 0-3.52-1.996-5.178-4-1.658 2.004-2.566 4-5.178 4-5.096 0-5.096-8 0-8 2.612 0 3.52 1.996 5.178 4 1.658-2.004 2.566-4 5.178-4z"/>'),
+  inbox: svgIcon('<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>')
 };
 
 const LUCIDE_MAP = {
@@ -241,9 +271,12 @@ const FONT_AWESOME_ICON_MAP = new Map([
   ['fa-address-book', 'addressBook'],
   ['fa-briefcase', 'briefcase'],
   ['fa-calculator', 'calculator'],
-  ['fa-file-excel', 'fileLines'],
+  ['fa-file-excel', 'fileExcel'],
   ['fa-chart-line', 'chartLine'],
   ['fa-right-from-bracket', 'logout'],
+  ['fa-arrow-right-from-bracket', 'logout'],
+  ['fa-arrow-right-to-bracket', 'logout'],
+  ['fa-right-to-bracket', 'logout'],
   ['fa-bars', 'bars'],
   ['fa-user-gear', 'userShield'],
   ['fa-camera', 'camera'],
@@ -251,8 +284,13 @@ const FONT_AWESOME_ICON_MAP = new Map([
   ['fa-phone', 'phone'],
   ['fa-at', 'at'],
   ['fa-calendar-days', 'calendarDays'],
+  ['fa-calendar-check', 'calendarCheck'],
+  ['fa-calendar-alt', 'calendarAlt'],
+  ['fa-calendar', 'calendarDays'],
   ['fa-clock', 'clock'],
   ['fa-trash-can', 'trash'],
+  ['fa-trash', 'trash'],
+  ['fa-trash-alt', 'trash'],
   ['fa-user', 'user'],
   ['fa-user-plus', 'userPlus'],
   ['fa-id-card', 'idCard'],
@@ -265,7 +303,9 @@ const FONT_AWESOME_ICON_MAP = new Map([
   ['fa-file-invoice', 'fileLines'],
   ['fa-clock-rotate-left', 'rotateLeft'],
   ['fa-circle-xmark', 'xCircle'],
-  ['fa-file-pdf', 'fileLines'],
+  ['fa-file-pdf', 'filePdf'],
+  ['fa-file-csv', 'fileCsv'],
+  ['fa-print', 'print'],
   ['fa-phone-volume', 'phone'],
   ['fa-circle', 'circle'],
   ['fa-spinner', 'rotateLeft'],
@@ -294,7 +334,59 @@ const FONT_AWESOME_ICON_MAP = new Map([
   ['fa-chrome', 'desktop'],
   ['fa-firefox-browser', 'desktop'],
   ['fa-safari', 'desktop'],
-  ['fa-edge', 'desktop']
+  ['fa-edge', 'desktop'],
+  ['fa-ellipsis-vertical', 'ellipsisVertical'],
+  ['fa-ellipsis-v', 'ellipsisVertical'],
+  ['fa-bolt', 'bolt'],
+  ['fa-user-slash', 'userSlash'],
+  ['fa-user-check', 'checkCircle'],
+  ['fa-user-xmark', 'xCircle'],
+  ['fa-search', 'search'],
+  ['fa-magnifying-glass', 'search'],
+  ['fa-undo', 'rotateLeft'],
+  ['fa-rotate', 'rotateRight'],
+  ['fa-rotate-right', 'rotateRight'],
+  ['fa-award', 'award'],
+  ['fa-trophy', 'trophy'],
+  ['fa-chart-column', 'chartColumn'],
+  ['fa-circle-dot', 'circleDot'],
+  ['fa-power-off', 'powerOff'],
+  ['fa-business-time', 'businessTime'],
+  ['fa-hourglass-half', 'hourglass'],
+  ['fa-stopwatch', 'stopwatch'],
+  ['fa-bullseye', 'bullseye'],
+  ['fa-fire', 'fire'],
+  ['fa-check-circle', 'checkCircle'],
+  ['fa-pause-circle', 'pauseCircle'],
+  ['fa-tower-broadcast', 'towerBroadcast'],
+  ['fa-medal', 'medal'],
+  ['fa-sort', 'sort'],
+  ['fa-sort-up', 'sortUp'],
+  ['fa-sort-down', 'sortDown'],
+  ['fa-arrows-up-down', 'arrowsUpDown'],
+  ['fa-sign-out-alt', 'logout'],
+  ['fa-sync-alt', 'rotateRight'],
+  ['fa-sync', 'rotateRight'],
+  ['fa-chevron-left', 'chevronLeft'],
+  ['fa-chevron-right', 'chevronRight'],
+  ['fa-chevron-down', 'chevronDown'],
+  ['fa-chevron-up', 'chevronUp'],
+  ['fa-location-dot', 'mapPin'],
+  ['fa-map-marker-alt', 'mapPin'],
+  ['fa-user-circle', 'userCircle'],
+  ['fa-phone-alt', 'phone'],
+  ['fa-infinity', 'infinity'],
+  ['fa-calendar-day', 'calendarDays'],
+  ['fa-calendar-minus', 'calendarDays'],
+  ['fa-calendar-week', 'calendarDays'],
+  ['fa-calendar-range', 'calendarDays'],
+  ['fa-rotate-left', 'rotateLeft'],
+  ['fa-inbox', 'inbox'],
+  ['fa-folder-open', 'folder'],
+  ['fa-folder-closed', 'folder'],
+  ['fa-filter', 'sliders'],
+  ['fa-user-tie', 'user'],
+  ['fa-pen-to-square', 'fileLines']
 ]);
 
 function resolveFontAwesomeIconName(el) {
@@ -1018,9 +1110,24 @@ function mountThemeToggle() {
   updateThemeToggleButtons();
 }
 
+function initTopbarDate() {
+  const dateEls = document.querySelectorAll('#current-date, #topbar-date-text, .topbar-date-badge span');
+  if (!dateEls.length) return;
+  try {
+    const formatted = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    dateEls.forEach((el) => {
+      const text = el.textContent ? el.textContent.trim() : '';
+      if (!text || text === 'Today' || text === '—' || text === '') {
+        el.textContent = formatted;
+      }
+    });
+  } catch (e) {}
+}
+
 function initTheme() {
   applyTheme(getResolvedTheme());
   mountThemeToggle();
+  initTopbarDate();
   applyIconography();
   applyFontAwesomeFallbackIcons();
   applyLucideFallbackIcons();
@@ -1053,17 +1160,54 @@ if (document.readyState === 'loading') {
 registerServiceWorker();
 
 // ── Token helpers ─────────────────────────────────────────────
-const getToken = () => localStorage.getItem('cln_token');
-const getUser  = () => JSON.parse(localStorage.getItem('cln_user') || 'null');
+const getToken = () => {
+  try {
+    return sessionStorage.getItem('cln_token') || localStorage.getItem('cln_token') || null;
+  } catch (e) {
+    return null;
+  }
+};
 
-const setSession = (token, user) => {
-  localStorage.setItem('cln_token', token);
-  localStorage.setItem('cln_user', JSON.stringify(user));
+const getUser = () => {
+  try {
+    const raw = sessionStorage.getItem('cln_user') || localStorage.getItem('cln_user');
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+const setSession = (token, user, keepSignedIn = false) => {
+  try {
+    if (keepSignedIn) {
+      localStorage.setItem('cln_token', token);
+      localStorage.setItem('cln_user', JSON.stringify(user));
+      sessionStorage.removeItem('cln_token');
+      sessionStorage.removeItem('cln_user');
+    } else {
+      sessionStorage.setItem('cln_token', token);
+      sessionStorage.setItem('cln_user', JSON.stringify(user));
+      localStorage.removeItem('cln_token');
+      localStorage.removeItem('cln_user');
+    }
+  } catch (err) {}
 };
 
 const clearSession = () => {
-  localStorage.removeItem('cln_token');
-  localStorage.removeItem('cln_user');
+  try {
+    localStorage.removeItem('cln_token');
+    localStorage.removeItem('cln_user');
+    localStorage.removeItem('login_error');
+    sessionStorage.removeItem('cln_token');
+    sessionStorage.removeItem('cln_user');
+    sessionStorage.removeItem('cln_quick_paste_details');
+    sessionStorage.removeItem('cln_auto_loan_data');
+    sessionStorage.removeItem('login_error');
+    ['password', 'userPassword', 'employeePassword', 'savedPassword', 'loginPassword', 'credentials', 'savedCredentials'].forEach(k => {
+      localStorage.removeItem(k);
+      sessionStorage.removeItem(k);
+    });
+  } catch (err) {}
 };
 
 // ── Secure document viewer ──────────────────────────────────────
@@ -1158,6 +1302,17 @@ const api = {
   uploadsBase: UPLOADS_BASE,
 };
 
+// Export to global window so all modules and pages can access window.api
+window.api = api;
+window.getToken = getToken;
+window.getUser = getUser;
+window.setSession = setSession;
+window.clearSession = clearSession;
+window.API_BASE = API_BASE;
+window.formatDate = formatDate;
+window.formatDateTime = formatDateTime;
+window.formatCurrency = formatCurrency;
+
 // ── Auth guard ────────────────────────────────────────────────
 function requireRole(role) {
   const user = getUser();
@@ -1168,6 +1323,14 @@ function requireRole(role) {
   if (role && user.role !== role) {
     window.location.href = '/index.html';
     return null;
+  }
+  // Enforce mandatory password change for employees with temporary credentials
+  if (user.role === 'employee' && user.must_change_password) {
+    const currentPath = window.location.pathname.toLowerCase();
+    if (!currentPath.includes('profile.html')) {
+      window.location.href = '/employee/profile.html?force_password_change=1';
+      return null;
+    }
   }
   return user;
 }
@@ -1211,7 +1374,7 @@ function renderSidebarUser() {
   // Call refreshSidebarAvatar() from profile pages after uploading a new avatar.
 }
 
-// ── Refresh sidebar avatar from localStorage cache ────────────
+// ── Refresh sidebar avatar from session cache ─────────────────
 function refreshSidebarAvatar(profilePicUrl) {
   const avatarEl = document.getElementById('sidebar-user-avatar');
   if (!avatarEl) return;
@@ -1225,11 +1388,17 @@ function refreshSidebarAvatar(profilePicUrl) {
     const user = getUser();
     avatarEl.textContent = user ? user.name.charAt(0).toUpperCase() : '?';
   }
-  // Persist to localStorage cln_user
+  // Persist to user session
   const user = getUser();
   if (user) {
     user.profile_picture = profilePicUrl || null;
-    localStorage.setItem('cln_user', JSON.stringify(user));
+    const str = JSON.stringify(user);
+    if (sessionStorage.getItem('cln_token')) {
+      sessionStorage.setItem('cln_user', str);
+    }
+    if (localStorage.getItem('cln_token')) {
+      localStorage.setItem('cln_user', str);
+    }
   }
 }
 
@@ -1263,8 +1432,21 @@ async function logout() {
     await api.post('/auth/logout');
   } catch (err) {}
   clearSession();
-  window.location.href = '/index.html';
+  window.location.replace('/index.html');
 }
+
+// ── Back-Forward Cache (BFCache) Guard ────────────────────────
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    const path = window.location.pathname;
+    if (path.includes('/employee/') || path.includes('/admin/')) {
+      if (!getToken() || !getUser()) {
+        clearSession();
+        window.location.replace('/index.html');
+      }
+    }
+  }
+});
 
 // ── Mobile Sidebar Toggle ─────────────────────────────────────
 function toggleMobileSidebar() {
@@ -1341,6 +1523,21 @@ function formatDate(date) {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
+    timeZone: 'Asia/Kolkata'
+  });
+}
+
+function formatDateTime(date) {
+  const parsedDate = parseDisplayDate(date);
+  if (!parsedDate) return '—';
+
+  return parsedDate.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
     timeZone: 'Asia/Kolkata'
   });
 }

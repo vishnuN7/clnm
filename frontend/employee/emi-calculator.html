@@ -23,6 +23,8 @@
     })();
   </script>
   <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/calculator-hub.css?v=20260925" />
   <style>
     /* Tabs Navigation */
     .tabs-navigation {
@@ -428,6 +430,15 @@
         flex-direction: column;
         align-items: center;
       }
+      /* Allow 3 tabs to scroll horizontally on small screens */
+      .tabs-navigation {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .tabs-navigation::-webkit-scrollbar { display: none; }
+      .tab-btn { white-space: nowrap; }
     }
   </style>
   <!-- Chart.js and Export libraries -->
@@ -437,33 +448,33 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
-<div class="app-layout">
+<div class="app-layout employee-page">
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
-        <div><h2><span class="emoji-sm">💼</span>CLN Lending Suite</h2><span>Employee Workspace</span></div>
+        <div><h2>CLN Lending Suite</h2><span>Employee Workspace</span></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-                        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span> Dashboard</a>
-        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon"><i class="fas fa-user-plus"></i></span> Add Customer</a>
-        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users"></i></span> My Customers</a>
-        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase"></i></span> My Loans</a>
-        <a href="/employee/emi-calculator.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-calculator"></i></span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> My Assigned Records</a>
-        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line"></i></span> APR</a>
-</div>
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Add Customer</span></a>
+        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>My Customers</span></a>
+        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>My Loans</span></a>
+        <a href="/employee/emi-calculator.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>My Assigned Records</span></a>
+        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="sidebar-user-avatar">E</div>
         <div class="user-details"><p id="sidebar-user-name">Employee</p><span id="sidebar-user-role">employee</span></div>
       </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
     </div>
   </aside>
 
@@ -473,29 +484,102 @@
   <!-- Main -->
   <main class="main-content">
     <div class="topbar">
-      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2><span class="emoji">🧮</span>EMI Calculator</h2><p>Calculate loan EMIs, view amortization schedules, and simulate prepayments</p></div>
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i> <span>Menu</span>
+      </button>
+      <div class="topbar-title">
+        <h2><i class="fas fa-calculator" aria-hidden="true"></i> <span>EMI Calculator</span></h2>
+        <p>Calculate loan repayments, compare options, and review amortization schedules.</p>
+      </div>
       <div class="topbar-actions">
-        <span id="current-date" style="font-size:13px;color:var(--text-secondary);"></span>
+        <!-- Notification Bell -->
+        <div class="notif-bell-wrap" id="notif-bell-wrap">
+          <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifDropdown()" aria-label="Notifications" title="Notifications" tabindex="0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+              <path d="M10 21h4"/>
+            </svg>
+            <span id="notif-bell-badge" class="notif-badge" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown" id="notif-dropdown" role="region" aria-label="Notifications Panel">
+            <div class="notif-dd-header">
+              <div class="notif-dd-title-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+                <h4>Notifications</h4>
+              </div>
+              <button class="notif-dd-link" onclick="markAllRead()">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
+          </div>
+        </div>
+        <div class="topbar-date-badge">
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+          <span id="current-date">Today</span>
+        </div>
       </div>
     </div>
 
     <div class="page-content">
-      <!-- Tabs Navigation -->
-      <div class="tabs-navigation">
-        <button type="button" class="tab-btn active" id="tab-btn-single" onclick="switchTab('single')">Single Loan Calculator</button>
-        <button type="button" class="tab-btn" id="tab-btn-compare" onclick="switchTab('compare')">Compare Loans</button>
+      <!-- Loan Calculator Hub Header & Navigation -->
+      <div class="loan-hub-nav-card">
+        <div class="loan-hub-header">
+          <div class="loan-hub-title-wrap">
+            <div class="loan-hub-icon">
+              <i class="fas fa-calculator"></i>
+            </div>
+            <div>
+              <h2 class="loan-hub-title">Loan Calculator Hub</h2>
+              <p class="loan-hub-subtitle">Complete borrowing assessment suite — EMI, eligibility, affordability, part-prepayment, and balance transfer</p>
+            </div>
+          </div>
+          <div class="hub-compliance-pill">
+            <i class="fas fa-shield-halved"></i> Standard Banking Formulas
+          </div>
+        </div>
+
+        <nav class="loan-hub-segmented-tabs" role="tablist" aria-label="Loan Calculators">
+          <button type="button" class="hub-tab-btn active" id="hub-tab-emi" role="tab" aria-selected="true" onclick="switchHubTab('emi')">
+            <i class="fas fa-chart-pie"></i>
+            <span>EMI Calculator</span>
+          </button>
+          <button type="button" class="hub-tab-btn" id="hub-tab-eligibility" role="tab" aria-selected="false" onclick="switchHubTab('eligibility')">
+            <i class="fas fa-user-check"></i>
+            <span>Eligibility</span>
+          </button>
+          <button type="button" class="hub-tab-btn" id="hub-tab-affordability" role="tab" aria-selected="false" onclick="switchHubTab('affordability')">
+            <i class="fas fa-wallet"></i>
+            <span>Affordability</span>
+          </button>
+          <button type="button" class="hub-tab-btn" id="hub-tab-prepayment" role="tab" aria-selected="false" onclick="switchHubTab('prepayment')">
+            <i class="fas fa-coins"></i>
+            <span>Prepayment</span>
+          </button>
+          <button type="button" class="hub-tab-btn" id="hub-tab-transfer" role="tab" aria-selected="false" onclick="switchHubTab('transfer')">
+            <i class="fas fa-right-left"></i>
+            <span>Balance Transfer</span>
+          </button>
+        </nav>
       </div>
 
-      <div id="tab-content-single">
+      <!-- 1. EMI Calculator Hub Panel (Wraps existing Reducing, Flat, Compare tabs) -->
+      <div id="hub-content-emi" class="hub-tab-content active" style="display:block;">
+        <!-- Tabs Navigation -->
+        <div class="tabs-navigation">
+          <button type="button" class="tab-btn active" id="tab-btn-reducing" onclick="switchTab('reducing')">Reducing Rate Calculator</button>
+          <button type="button" class="tab-btn" id="tab-btn-flat" onclick="switchTab('flat')">Flat Rate Calculator</button>
+          <button type="button" class="tab-btn" id="tab-btn-compare" onclick="switchTab('compare')">Compare Loans</button>
+        </div>
+
+      <div id="tab-content-reducing">
         <div class="emi-calculator-layout">
         <!-- Input section (Left) -->
         <div class="card" style="margin-bottom:0; height:100%;">
           <div class="card-header">
-            <h3><span class="emoji-sm">🧮</span>Loan Details</h3>
+            <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-primary);"><i class="fas fa-sliders" style="margin-right:8px; color:var(--accent);"></i>Loan Details</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin:4px 0 0;">Calculate estimated monthly repayments, interest, and total borrowing cost.</p>
           </div>
           <div class="card-body">
-            <form id="emi-form" onsubmit="event.preventDefault();">
+            <form id="emi-form" onsubmit="event.preventDefault(); calculateEMI();">
               <div class="form-group">
                 <label for="input-principal">Loan Amount (Principal)</label>
                 <div style="position:relative;">
@@ -539,8 +623,8 @@
               </div>
 
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
-                <button type="button" class="btn btn-secondary" onclick="resetCalculator()">Reset</button>
-                <button type="button" class="btn btn-primary" onclick="calculateEMI()">Calculate</button>
+                <button type="button" id="btn-reset-calculator" class="btn btn-secondary" onclick="resetCalculator()"><i class="fas fa-rotate-left" style="margin-right:6px;"></i>Reset</button>
+                <button type="button" id="btn-calculate-emi" class="btn btn-primary" onclick="calculateEMI()"><i class="fas fa-calculator" style="margin-right:6px;"></i>Calculate EMI</button>
               </div>
             </form>
           </div>
@@ -551,29 +635,44 @@
           <!-- Summary Cards -->
           <div class="results-stats-grid">
             <div class="stat-card result-card-highlight">
-              <div class="stat-icon">🧮</div>
+              <div class="stat-card-top">
+                <span class="results-header-text">Monthly EMI</span>
+                <span class="stat-card-icon-wrap"><i class="fas fa-calendar-check"></i></span>
+              </div>
               <div class="primary-result-value" id="res-emi">₹0</div>
-              <div class="results-header-text">Monthly EMI</div>
+              <div class="stat-card-desc">Estimated monthly repayment</div>
             </div>
             <div class="stat-card">
-              <div class="stat-icon">📈</div>
+              <div class="stat-card-top">
+                <span class="results-header-text">Total Interest</span>
+                <span class="stat-card-icon-wrap" style="color:var(--danger); background:rgba(224,82,82,0.12);"><i class="fas fa-chart-pie"></i></span>
+              </div>
               <div class="primary-result-value" id="res-interest" style="color:var(--danger);">₹0</div>
-              <div class="results-header-text">Total Interest Payable</div>
+              <div class="stat-card-desc">Interest payable over tenure</div>
             </div>
             <div class="stat-card">
-              <div class="stat-icon">💼</div>
+              <div class="stat-card-top">
+                <span class="results-header-text">Total Repayment</span>
+                <span class="stat-card-icon-wrap" style="color:var(--accent); background:var(--accent-soft);"><i class="fas fa-wallet"></i></span>
+              </div>
               <div class="primary-result-value" id="res-total">₹0</div>
-              <div class="results-header-text">Total Amount Payable</div>
+              <div class="stat-card-desc">Principal + interest</div>
             </div>
             <div class="stat-card">
-              <div class="stat-icon">📄</div>
+              <div class="stat-card-top">
+                <span class="results-header-text">Processing Fee</span>
+                <span class="stat-card-icon-wrap" style="color:#d97706; background:rgba(217,119,6,0.12);"><i class="fas fa-file-invoice-dollar"></i></span>
+              </div>
               <div class="primary-result-value" id="res-fee">₹0</div>
-              <div class="results-header-text">Processing Fee</div>
+              <div class="stat-card-desc">Upfront lender fee</div>
             </div>
             <div class="stat-card" id="card-cost-savings">
-              <div class="stat-icon">₹</div>
+              <div class="stat-card-top">
+                <span class="results-header-text" id="res-cost-label">Effective Cost</span>
+                <span class="stat-card-icon-wrap" style="color:var(--success); background:rgba(15,139,113,0.12);"><i class="fas fa-coins"></i></span>
+              </div>
               <div class="primary-result-value" id="res-cost">₹0</div>
-              <div class="results-header-text" id="res-cost-label">Effective Cost of Loan</div>
+              <div class="stat-card-desc" id="res-cost-desc">Estimated total outflow (inc. fee)</div>
               <div id="savings-badge-container"></div>
             </div>
           </div>
@@ -583,18 +682,22 @@
             <!-- Pie Chart Card -->
             <div class="card" style="margin-bottom:0;">
               <div class="card-header">
-                <h3>Loan Breakdown</h3>
+                <div>
+                  <h3 style="margin:0; font-size:15px; font-weight:800;"><i class="fas fa-chart-pie" style="margin-right:8px; color:var(--accent);"></i>Loan Cost Breakdown</h3>
+                  <p style="margin:2px 0 0; font-size:12px; color:var(--text-muted);">Visual proportion of principal, interest, and charges.</p>
+                </div>
               </div>
-              <div class="card-body" style="display:flex; flex-direction:column; gap:20px; min-height:260px; justify-content:center; padding: 20px;">
-                <div style="display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap;">
-                  <div style="width: 20px; height: 20px; max-width:180px; position:relative;">
+              <div class="card-body" style="display:flex; flex-direction:column; justify-content:center; min-height:260px; padding:20px;">
+                <div id="breakdown-placeholder" class="calculator-empty-state">
+                  <div class="calculator-empty-icon"><i class="fas fa-chart-pie"></i></div>
+                  <div class="calculator-empty-title">No calculation yet</div>
+                  <div class="calculator-empty-desc">Enter loan details and select Calculate to view the principal, interest, and total cost breakdown.</div>
+                </div>
+                <div id="breakdown-content" style="display:none; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap;">
+                  <div style="width:160px; height:160px; position:relative; flex-shrink:0;">
                     <canvas id="chart-pie"></canvas>
                   </div>
-                  <div style="flex:1; min-width:220px;" id="breakdown-details-container">
-                    <div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px 0;">
-                      Enter values above and click Calculate to view breakdown.
-                    </div>
-                  </div>
+                  <div style="flex:1; min-width:210px;" id="breakdown-details-container"></div>
                 </div>
               </div>
             </div>
@@ -602,16 +705,26 @@
             <!-- Amortization Chart Card -->
             <div class="card" style="margin-bottom:0;">
               <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-                <h3>Amortization Schedule</h3>
+                <div>
+                  <h3 style="margin:0; font-size:15px; font-weight:800;"><i class="fas fa-chart-line" style="margin-right:8px; color:var(--accent);"></i>Repayment Trend</h3>
+                  <p style="margin:2px 0 0; font-size:12px; color:var(--text-muted);">Outstanding balance &amp; cumulative paid over tenure.</p>
+                </div>
                 <div class="chart-header-actions">
-                  <div class="input-toggle-group">
-                    <button type="button" class="input-toggle-btn active" id="btn-chart-monthly" onclick="setChartGrouping('monthly')">Monthly</button>
-                    <button type="button" class="input-toggle-btn" id="btn-chart-yearly" onclick="setChartGrouping('yearly')">Yearly</button>
+                  <div class="segmented-pills-group">
+                    <button type="button" class="segmented-pill-btn active" id="btn-chart-monthly" onclick="setChartGrouping('monthly')">Monthly</button>
+                    <button type="button" class="segmented-pill-btn" id="btn-chart-yearly" onclick="setChartGrouping('yearly')">Yearly</button>
                   </div>
                 </div>
               </div>
-              <div class="card-body" style="position:relative; min-height:260px; max-height: 260px;">
-                <canvas id="chart-amortization"></canvas>
+              <div class="card-body" style="position:relative; min-height:260px; max-height:260px; display:flex; flex-direction:column; justify-content:center; padding:16px;">
+                <div id="amort-chart-placeholder" class="calculator-empty-state">
+                  <div class="calculator-empty-icon"><i class="fas fa-chart-line"></i></div>
+                  <div class="calculator-empty-title">Trend chart inactive</div>
+                  <div class="calculator-empty-desc">Run a calculation to plot principal reduction and cumulative interest progression.</div>
+                </div>
+                <div id="amort-chart-canvas-wrap" style="display:none; width:100%; height:100%;">
+                  <canvas id="chart-amortization"></canvas>
+                </div>
               </div>
             </div>
           </div>
@@ -620,53 +733,96 @@
 
       <!-- Schedule Table Section -->
       <div class="card full-table" style="margin-top:24px;">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 20px; border-bottom:1px solid var(--border);">
+          <div>
+            <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-primary);"><i class="fas fa-calendar-days" style="margin-right:8px; color:var(--accent);"></i>Amortization Schedule</h3>
+            <p style="margin:3px 0 0; font-size:12px; color:var(--text-muted);">View your estimated repayment schedule, including principal, interest, and outstanding balance.</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="segmented-pills-group">
+              <button type="button" class="segmented-pill-btn active" id="btn-schedule-monthly" onclick="setScheduleViewMode('monthly')">
+                <i class="fas fa-calendar"></i> Monthly
+              </button>
+              <button type="button" class="segmented-pill-btn" id="btn-schedule-yearly" onclick="setScheduleViewMode('yearly')">
+                <i class="fas fa-calendar-alt"></i> Yearly
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Amortization Metric Summary Bar -->
+        <div class="amort-summary-bar" id="amort-summary-bar" style="display:none;">
+          <div class="amort-summary-item">
+            <div class="amort-summary-label">Installments</div>
+            <div class="amort-summary-val" id="sum-installments">—</div>
+          </div>
+          <div class="amort-summary-item">
+            <div class="amort-summary-label">Monthly EMI</div>
+            <div class="amort-summary-val" id="sum-emi">—</div>
+          </div>
+          <div class="amort-summary-item">
+            <div class="amort-summary-label">Total Interest</div>
+            <div class="amort-summary-val" id="sum-interest" style="color:var(--danger);">—</div>
+          </div>
+          <div class="amort-summary-item">
+            <div class="amort-summary-label">Total Repayment</div>
+            <div class="amort-summary-val" id="sum-repayment">—</div>
+          </div>
+        </div>
+
         <div class="table-controls-wrapper">
           <div class="table-controls-left">
             <div class="table-search-box">
-              <input type="text" id="table-search" class="form-control" placeholder="Search schedule (e.g. Month 12)" oninput="handleSearch()" />
+              <input type="text" id="table-search" class="form-control" placeholder="Search schedule (e.g. Month 12, Oct 2026)" oninput="handleSearch()" />
             </div>
-            <select id="table-limit" onchange="handleLimitChange()" style="width: 100px; padding:8px 12px; border-radius:6px; border:1px solid var(--border);">
-              <option value="12">12 / page</option>
-              <option value="24">24 / page</option>
-              <option value="60">60 / page</option>
-              <option value="all">All</option>
-            </select>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:12px; font-weight:700; color:var(--text-secondary); white-space:nowrap;">Rows:</span>
+              <div class="segmented-pills-group" id="limit-pills-group">
+                <button type="button" class="segmented-pill-btn active" data-limit="12" onclick="setRowsLimit(12)">12</button>
+                <button type="button" class="segmented-pill-btn" data-limit="24" onclick="setRowsLimit(24)">24</button>
+                <button type="button" class="segmented-pill-btn" data-limit="60" onclick="setRowsLimit(60)">60</button>
+                <button type="button" class="segmented-pill-btn" data-limit="all" onclick="setRowsLimit('all')">All</button>
+              </div>
+            </div>
           </div>
 
           <div class="table-controls-right">
             <div class="export-btn-group">
-              <button class="btn btn-secondary export-btn" onclick="exportPDF()">
-                <span class="emoji-sm">📥</span>Export PDF
+              <button type="button" class="btn btn-secondary export-btn" onclick="exportPDF()">
+                <i class="fas fa-file-pdf" style="margin-right:6px; color:#e05252;"></i>Export PDF
               </button>
-              <button class="btn btn-secondary export-btn" onclick="exportExcel()">
-                <span class="emoji-sm">📊</span>Export Excel
+              <button type="button" class="btn btn-secondary export-btn" onclick="exportExcel()">
+                <i class="fas fa-file-excel" style="margin-right:6px; color:#107c41;"></i>Export Excel
               </button>
-              <button class="btn btn-secondary export-btn" onclick="exportCSV()">
-                <span class="emoji-sm">📄</span>Export CSV
+              <button type="button" class="btn btn-secondary export-btn" onclick="exportCSV()">
+                <i class="fas fa-file-csv" style="margin-right:6px; color:#2563eb;"></i>Export CSV
               </button>
-              <button class="btn btn-secondary export-btn" onclick="window.print()">
-                <span class="emoji-sm">🖨️</span>Print
+              <button type="button" class="btn btn-secondary export-btn" onclick="triggerPrint()">
+                <i class="fas fa-print" style="margin-right:6px;"></i>Print
               </button>
             </div>
           </div>
         </div>
 
         <div class="table-wrapper">
-          <table>
+          <table id="amortization-table">
             <thead>
-              <tr>
-                <th class="sortable asc" onclick="handleSort('emiNumber')">EMI #</th>
-                <th class="sortable" onclick="handleSort('paymentDate')">Payment Date</th>
-                <th class="sortable" onclick="handleSort('emiAmount')">EMI Amount</th>
-                <th class="sortable" onclick="handleSort('principalComponent')">Principal Component</th>
-                <th class="sortable" onclick="handleSort('interestComponent')">Interest Component</th>
-                <th class="sortable" onclick="handleSort('prepayment')">Prepayment</th>
-                <th class="sortable" onclick="handleSort('outstandingBalance')">Outstanding Balance</th>
+              <tr id="schedule-thead-tr">
+                <th class="th-center sortable asc" onclick="handleSort('emiNumber')">#</th>
+                <th class="th-left sortable" onclick="handleSort('paymentDate')">Payment Date</th>
+                <th class="th-right sortable" onclick="handleSort('emiAmount')">EMI</th>
+                <th class="th-right sortable" onclick="handleSort('principalComponent')">Principal</th>
+                <th class="th-right sortable" onclick="handleSort('interestComponent')">Interest</th>
+                <th class="th-right sortable" onclick="handleSort('prepayment')">Prepayment</th>
+                <th class="th-right sortable" onclick="handleSort('outstandingBalance')">Outstanding Balance</th>
               </tr>
             </thead>
             <tbody id="schedule-tbody">
               <tr>
-                <td colspan="7" class="text-center text-muted" style="padding:40px 0;">Enter the loan details above and click Calculate to view the amortization schedule.</td>
+                <td colspan="7" class="text-center text-muted" style="padding:40px 0;">
+                  <i class="fas fa-table" style="font-size:32px; opacity:0.35; display:block; margin-bottom:10px;"></i>
+                  Enter the loan details above and click Calculate to view the amortization schedule.
+                </td>
               </tr>
             </tbody>
           </table>
@@ -679,16 +835,232 @@
       </div>
       </div>
 
+
+      <!-- ── Flat Rate Calculator Tab Content ── -->
+      <div id="tab-content-flat" style="display: none;">
+        <div class="emi-calculator-layout">
+          <!-- Input section (Left) -->
+          <div class="card" style="margin-bottom:0; height:100%;">
+            <div class="card-header">
+              <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-primary);"><i class="fas fa-file-invoice" style="margin-right:8px; color:var(--accent);"></i>Loan Details</h3>
+              <p style="font-size:12px; color:var(--text-muted); margin:4px 0 0;">Calculate flat rate loan repayments, total flat interest, and effective borrowing cost.</p>
+            </div>
+            <div class="card-body">
+              <form id="flat-form" onsubmit="event.preventDefault();">
+                <div class="form-group">
+                  <label for="flat-principal">Loan Amount (Principal)</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="flat-principal" class="form-control" placeholder="10,00,000" style="padding-left:28px;" />
+                  </div>
+                  <div class="error-msg" id="flat-err-principal" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="flat-rate">Flat Interest Rate (% per annum)</label>
+                  <input type="number" id="flat-rate" step="0.01" class="form-control" placeholder="10" />
+                  <div class="error-msg" id="flat-err-rate" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="flat-tenure">Loan Tenure</label>
+                  <div class="tenure-group">
+                    <input type="number" id="flat-tenure" class="form-control" placeholder="2" />
+                    <div class="input-toggle-group">
+                      <button type="button" class="input-toggle-btn active" id="flat-btn-years" onclick="setFlatTenureUnit('years')">Years</button>
+                      <button type="button" class="input-toggle-btn" id="flat-btn-months" onclick="setFlatTenureUnit('months')">Months</button>
+                    </div>
+                  </div>
+                  <div class="error-msg" id="flat-err-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="flat-fee">Processing Fee (%) (Optional)</label>
+                  <input type="number" id="flat-fee" step="0.01" class="form-control" placeholder="1.5" />
+                  <div class="error-msg" id="flat-err-fee" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
+                  <button type="button" class="btn btn-secondary" onclick="resetFlatCalculator()"><i class="fas fa-rotate-left" style="margin-right:6px;"></i>Reset</button>
+                  <button type="button" class="btn btn-primary" onclick="calculateFlatRateLoan()"><i class="fas fa-calculator" style="margin-right:6px;"></i>Calculate</button>
+                </div>
+              </form>
+
+              <!-- Flat Rate explanation note -->
+              <div style="margin-top:20px; padding:12px 14px; background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:6px; font-size:12px; color:var(--text-secondary); line-height:1.6;">
+                <strong style="color:var(--accent); display:block; margin-bottom:4px;"><i class="fas fa-circle-info" style="margin-right:5px;"></i> About Flat Rate Interest</strong>
+                Interest is calculated on the <strong>original principal amount</strong> for the entire tenure, regardless of repayments made. This differs from the <em>Reducing Rate</em> method where interest decreases month-by-month as the outstanding principal is repaid.
+              </div>
+            </div>
+          </div>
+
+          <!-- Outputs & Charts (Right) -->
+          <div>
+            <!-- Summary Cards -->
+            <div class="results-stats-grid">
+              <div class="stat-card result-card-highlight">
+                <div class="stat-card-top">
+                  <span class="results-header-text">Monthly Payment</span>
+                  <span class="stat-card-icon-wrap"><i class="fas fa-calendar-check"></i></span>
+                </div>
+                <div class="primary-result-value" id="flat-res-payment">₹0</div>
+                <div class="stat-card-desc">Fixed monthly installment</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-top">
+                  <span class="results-header-text">Total Flat Interest</span>
+                  <span class="stat-card-icon-wrap" style="color:var(--danger); background:rgba(224,82,82,0.12);"><i class="fas fa-chart-pie"></i></span>
+                </div>
+                <div class="primary-result-value" id="flat-res-interest" style="color:var(--danger);">₹0</div>
+                <div class="stat-card-desc">Total interest over tenure</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-top">
+                  <span class="results-header-text">Total Repayment</span>
+                  <span class="stat-card-icon-wrap" style="color:var(--accent); background:var(--accent-soft);"><i class="fas fa-wallet"></i></span>
+                </div>
+                <div class="primary-result-value" id="flat-res-total">₹0</div>
+                <div class="stat-card-desc">Principal + total interest</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-top">
+                  <span class="results-header-text">Processing Fee</span>
+                  <span class="stat-card-icon-wrap" style="color:#d97706; background:rgba(217,119,6,0.12);"><i class="fas fa-file-invoice-dollar"></i></span>
+                </div>
+                <div class="primary-result-value" id="flat-res-fee">₹0</div>
+                <div class="stat-card-desc">Upfront lender fee</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-top">
+                  <span class="results-header-text">Effective Cost</span>
+                  <span class="stat-card-icon-wrap" style="color:var(--success); background:rgba(15,139,113,0.12);"><i class="fas fa-coins"></i></span>
+                </div>
+                <div class="primary-result-value" id="flat-res-cost">₹0</div>
+                <div class="stat-card-desc">Estimated total outflow (inc. fee)</div>
+              </div>
+            </div>
+
+            <!-- Charts grid -->
+            <div class="calculator-charts-grid">
+              <!-- Pie Chart Card -->
+              <div class="card" style="margin-bottom:0;">
+                <div class="card-header">
+                  <h3 style="margin:0; font-size:15px; font-weight:800;"><i class="fas fa-chart-pie" style="margin-right:8px; color:var(--accent);"></i>Loan Cost Breakdown</h3>
+                  <p style="margin:2px 0 0; font-size:12px; color:var(--text-muted);">Visual proportion of principal, interest, and charges.</p>
+                </div>
+                <div class="card-body" style="display:flex; flex-direction:column; justify-content:center; min-height:260px; padding:20px;">
+                  <div id="flat-breakdown-placeholder" class="calculator-empty-state">
+                    <div class="calculator-empty-icon"><i class="fas fa-chart-pie"></i></div>
+                    <div class="calculator-empty-title">No calculation yet</div>
+                    <div class="calculator-empty-desc">Enter loan details and select Calculate to view the cost breakdown.</div>
+                  </div>
+                  <div id="flat-breakdown-content" style="display:none; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap;">
+                    <div style="width:160px; height:160px; position:relative; flex-shrink:0;">
+                      <canvas id="flat-chart-pie"></canvas>
+                    </div>
+                    <div style="flex:1; min-width:210px;" id="flat-breakdown-details"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Payment Summary Card -->
+              <div class="card" style="margin-bottom:0;">
+                <div class="card-header">
+                  <h3 style="margin:0; font-size:15px; font-weight:800;"><i class="fas fa-receipt" style="margin-right:8px; color:var(--accent);"></i>Payment Summary</h3>
+                  <p style="margin:2px 0 0; font-size:12px; color:var(--text-muted);">Detailed financial summary of borrowing terms.</p>
+                </div>
+                <div class="card-body" style="min-height:260px; display:flex; align-items:center; justify-content:center; padding:20px;">
+                  <div id="flat-payment-summary" style="width:100%;">
+                    <div class="calculator-empty-state">
+                      <div class="calculator-empty-icon"><i class="fas fa-receipt"></i></div>
+                      <div class="calculator-empty-title">Summary inactive</div>
+                      <div class="calculator-empty-desc">Enter loan parameters and calculate to generate borrowing overview.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Schedule Table -->
+        <div class="card full-table" style="margin-top:24px;">
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 20px; border-bottom:1px solid var(--border);">
+            <div>
+              <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-primary);"><i class="fas fa-table-list" style="margin-right:8px; color:var(--accent);"></i>Flat Rate Payment Schedule</h3>
+              <p style="margin:3px 0 0; font-size:12px; color:var(--text-muted);">Equalized principal and flat interest repayment timeline.</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:12px; font-weight:700; color:var(--text-secondary); white-space:nowrap;">Rows:</span>
+              <div class="segmented-pills-group" id="flat-limit-pills-group">
+                <button type="button" class="segmented-pill-btn active" data-limit="12" onclick="setFlatRowsLimit(12)">12</button>
+                <button type="button" class="segmented-pill-btn" data-limit="24" onclick="setFlatRowsLimit(24)">24</button>
+                <button type="button" class="segmented-pill-btn" data-limit="60" onclick="setFlatRowsLimit(60)">60</button>
+                <button type="button" class="segmented-pill-btn" data-limit="all" onclick="setFlatRowsLimit('all')">All</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-controls-wrapper">
+            <div class="table-controls-left">
+              <span style="font-size:13px; font-weight:600; color:var(--text-muted);"><i class="fas fa-circle-info" style="margin-right:4px;"></i> Fixed monthly payment schedule</span>
+            </div>
+            <div class="table-controls-right">
+              <div class="export-btn-group">
+                <button type="button" class="btn btn-secondary export-btn" onclick="exportFlatPDF()">
+                  <i class="fas fa-file-pdf" style="margin-right:6px; color:#e05252;"></i>Export PDF
+                </button>
+                <button type="button" class="btn btn-secondary export-btn" onclick="exportFlatExcel()">
+                  <i class="fas fa-file-excel" style="margin-right:6px; color:#107c41;"></i>Export Excel
+                </button>
+                <button type="button" class="btn btn-secondary export-btn" onclick="exportFlatCSV()">
+                  <i class="fas fa-file-csv" style="margin-right:6px; color:#2563eb;"></i>Export CSV
+                </button>
+                <button type="button" class="btn btn-secondary export-btn" onclick="triggerPrint()">
+                  <i class="fas fa-print" style="margin-right:6px;"></i>Print
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="th-center">Period</th>
+                  <th class="th-right">Opening Principal</th>
+                  <th class="th-right">Flat Interest</th>
+                  <th class="th-right">Principal Component</th>
+                  <th class="th-right">Monthly Payment</th>
+                  <th class="th-right">Remaining Principal</th>
+                </tr>
+              </thead>
+              <tbody id="flat-schedule-tbody">
+                <tr>
+                  <td colspan="6" class="text-center text-muted" style="padding:40px 0;">
+                    <i class="fas fa-table" style="font-size:32px; opacity:0.35; display:block; margin-bottom:10px;"></i>
+                    Enter the loan details above and click Calculate to view the payment schedule.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-container" id="flat-pagination-wrapper" style="display:none;">
+            <div id="flat-pagination-info" style="font-size:13px; color:var(--text-secondary);"></div>
+            <div class="pagination-buttons" id="flat-pagination-btns"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- ── Compare Loans Tab Content ── -->
       <div id="tab-content-compare" style="display: none;">
         <div class="card" style="margin-bottom: 24px;">
           <div class="card-header">
-            <h3><span class="emoji-sm">⚖️</span> Compare Two Loan Options</h3>
+            <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-primary);"><i class="fas fa-code-compare" style="margin-right:8px; color:var(--accent);"></i> Compare Two Loan Options</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin:4px 0 0;">Compare EMIs, total interest payable, and total repayment amounts side-by-side.</p>
           </div>
           <div class="card-body">
-            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">
-              Enter the details for two loan options to compare EMIs, total interest payable, and total repayment amounts. Select the better option and submit it directly as a client loan application.
-            </p>
             <form id="compare-form" onsubmit="event.preventDefault();">
               <div class="compare-columns-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
 
@@ -810,8 +1182,8 @@
 
               <!-- Action Buttons -->
               <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;border-top:1px solid var(--border);padding-top:20px;flex-wrap:wrap;">
-                <button type="button" class="btn btn-secondary" onclick="resetCompare()">Reset</button>
-                <button type="button" class="btn btn-primary" onclick="calculateCompare()">Calculate</button>
+                <button type="button" class="btn btn-secondary" onclick="resetCompare()"><i class="fas fa-rotate-left" style="margin-right:6px;"></i>Reset</button>
+                <button type="button" class="btn btn-primary" onclick="calculateCompare()"><i class="fas fa-calculator" style="margin-right:6px;"></i>Calculate</button>
               </div>
             </form>
           </div>
@@ -827,38 +1199,50 @@
           <!-- Potential Savings Stat Grid -->
           <div class="results-stats-grid">
             <div class="stat-card" style="border-left:5px solid var(--success);">
-              <div class="stat-icon" style="color:var(--success);">₹</div>
+              <div class="stat-card-top">
+                <span class="results-header-text">Potential Savings</span>
+                <span class="stat-card-icon-wrap" style="color:var(--success); background:rgba(15,139,113,0.12);"><i class="fas fa-piggy-bank"></i></span>
+              </div>
               <div class="primary-result-value" id="comp-savings-val" style="color:var(--success);">₹0</div>
-              <div class="results-header-text">Potential Savings</div>
+              <div class="stat-card-desc">Total financial advantage</div>
             </div>
             <div class="stat-card" style="border-left:5px solid var(--accent);">
-              <div class="stat-icon" style="color:var(--accent);">📊</div>
+              <div class="stat-card-top">
+                <span class="results-header-text">Monthly EMI Difference</span>
+                <span class="stat-card-icon-wrap"><i class="fas fa-calendar-check"></i></span>
+              </div>
               <div class="primary-result-value" id="comp-emi-diff-val">₹0</div>
-              <div class="results-header-text">Monthly EMI Difference</div>
+              <div class="stat-card-desc">Difference in monthly repayment</div>
             </div>
             <div class="stat-card" style="border-left:5px solid var(--warning);">
-              <div class="stat-icon" style="color:var(--warning);">📈</div>
+              <div class="stat-card-top">
+                <span class="results-header-text">Interest Payable Difference</span>
+                <span class="stat-card-icon-wrap" style="color:var(--warning); background:rgba(217,119,6,0.12);"><i class="fas fa-chart-pie"></i></span>
+              </div>
               <div class="primary-result-value" id="comp-interest-diff-val" style="color:var(--warning);">₹0</div>
-              <div class="results-header-text">Interest Payable Difference</div>
+              <div class="stat-card-desc">Difference in total borrowing cost</div>
             </div>
           </div>
 
           <!-- Comparison Table Card -->
           <div class="card full-table" style="margin-bottom:24px;">
-            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-              <h3><span class="emoji-sm">📊</span> Comparison Details</h3>
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);">
+              <div>
+                <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-primary);"><i class="fas fa-table-columns" style="margin-right:8px; color:var(--accent);"></i>Comparison Details</h3>
+                <p style="margin:3px 0 0; font-size:12px; color:var(--text-muted);">Side-by-side metric comparison between both loan options.</p>
+              </div>
               <div class="export-btn-group" style="margin:0;">
-                <button class="btn btn-secondary export-btn" onclick="exportComparePDF()">
-                  <span class="emoji-sm">📥</span>Export PDF
+                <button type="button" class="btn btn-secondary export-btn" onclick="exportComparePDF()">
+                  <i class="fas fa-file-pdf" style="margin-right:6px; color:#e05252;"></i>Export PDF
                 </button>
-                <button class="btn btn-secondary export-btn" onclick="exportCompareExcel()">
-                  <span class="emoji-sm">📊</span>Export Excel
+                <button type="button" class="btn btn-secondary export-btn" onclick="exportCompareExcel()">
+                  <i class="fas fa-file-excel" style="margin-right:6px; color:#107c41;"></i>Export Excel
                 </button>
-                <button class="btn btn-secondary export-btn" onclick="window.print()">
-                  <span class="emoji-sm">🖨️</span>Print
+                <button type="button" class="btn btn-secondary export-btn" onclick="triggerPrint()">
+                  <i class="fas fa-print" style="margin-right:6px;"></i>Print
                 </button>
-                <button class="btn btn-secondary export-btn" onclick="shareCompare()">
-                  <span class="emoji-sm">🔗</span>Share
+                <button type="button" class="btn btn-secondary export-btn" onclick="shareCompare()">
+                  <i class="fas fa-share-nodes" style="margin-right:6px;"></i>Share
                 </button>
               </div>
             </div>
@@ -867,10 +1251,10 @@
               <table style="text-align:left;width:100%;border-collapse:collapse;">
                 <thead>
                   <tr style="background:var(--bg-secondary);">
-                    <th style="padding:12px;font-weight:600;">Details</th>
-                    <th style="padding:12px;font-weight:600;" id="table-header-opt1">Loan Option 1</th>
-                    <th style="padding:12px;font-weight:600;" id="table-header-opt2">Loan Option 2</th>
-                    <th style="padding:12px;font-weight:600;">Difference</th>
+                    <th style="padding:12px 14px;font-weight:700;">Details</th>
+                    <th style="padding:12px 14px;font-weight:700;" id="table-header-opt1">Loan Option 1</th>
+                    <th style="padding:12px 14px;font-weight:700;" id="table-header-opt2">Loan Option 2</th>
+                    <th style="padding:12px 14px;font-weight:700;">Difference</th>
                   </tr>
                 </thead>
                 <tbody id="compare-table-tbody"></tbody>
@@ -880,22 +1264,694 @@
 
         </div>
       </div>
+      </div> <!-- /#hub-content-emi -->
+
+
+      <!-- 2. Eligibility Calculator Hub Panel -->
+      <div id="hub-content-eligibility" class="hub-tab-content">
+        <div class="emi-calculator-layout">
+          <!-- Input Form (Left) -->
+          <div class="card" style="margin-bottom:0; height:100%;">
+            <div class="card-header">
+              <h3><i class="fas fa-user-check" style="margin-right:8px; color:var(--accent-secondary);"></i>Borrower Income &amp; Eligibility</h3>
+            </div>
+            <div class="card-body">
+              <form id="elig-form" onsubmit="event.preventDefault(); calculateEligibility();">
+                <div class="form-group">
+                  <label for="input-elig-income">Net Monthly Take-Home Income</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="input-elig-income" class="form-control" placeholder="e.g. 60,000" value="" style="padding-left:28px;" required />
+                  </div>
+                  <div class="error-msg" id="err-elig-income" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-elig-existing-emi">Existing Monthly EMIs / Obligations</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="input-elig-existing-emi" class="form-control" placeholder="e.g. 10,000" value="" style="padding-left:28px;" />
+                  </div>
+                  <small style="color:var(--text-muted); font-size:11px;">Total existing loan commitments (credit cards, personal loans, car loans, etc.)</small>
+                </div>
+
+                <div class="form-group">
+                  <label>FOIR Benchmark (Fixed Obligation to Income Ratio)</label>
+                  <div class="preset-pills-row" id="elig-foir-pills">
+                    <button type="button" class="preset-pill" data-foir="40" onclick="setEligibilityFoir(40)">40% (Conservative)</button>
+                    <button type="button" class="preset-pill" data-foir="50" onclick="setEligibilityFoir(50)">50% (Standard Banking)</button>
+                    <button type="button" class="preset-pill" data-foir="60" onclick="setEligibilityFoir(60)">60% (High Income)</button>
+                    <button type="button" class="preset-pill" data-foir="65" onclick="setEligibilityFoir(65)">65% (Co-Applicant / Maximum)</button>
+                  </div>
+                  <div class="error-msg" id="err-elig-foir" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-elig-rate">Expected Interest Rate (% p.a.)</label>
+                  <input type="number" id="input-elig-rate" step="0.05" class="form-control" placeholder="e.g. 10.5" value="" required />
+                  <div class="error-msg" id="err-elig-rate" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-elig-tenure">Desired Loan Tenure</label>
+                  <div class="tenure-input-group">
+                    <input type="number" id="input-elig-tenure" step="1" class="form-control" placeholder="e.g. 5" value="" required />
+                    <div class="toggle-group">
+                      <button type="button" class="toggle-btn active" id="btn-elig-years" onclick="setEligibilityTenureUnit('years')">Yr</button>
+                      <button type="button" class="toggle-btn" id="btn-elig-months" onclick="setEligibilityTenureUnit('months')">Mo</button>
+                    </div>
+                  </div>
+                  <div class="error-msg" id="err-elig-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                  <button type="submit" class="btn btn-primary" style="flex:1;">
+                    <i class="fas fa-calculator" style="margin-right:6px;"></i> Calculate Eligibility
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="resetEligibility()">
+                    <i class="fas fa-rotate-left"></i> Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Results Section (Right) -->
+          <div class="card" style="margin-bottom:0; height:100%;">
+            <div class="card-header">
+              <h3><i class="fas fa-chart-line" style="margin-right:8px; color:var(--accent-secondary);"></i>Eligibility Assessment</h3>
+            </div>
+            <div class="card-body">
+              <div id="elig-banner" class="hub-banner positive" style="display:none;"></div>
+
+              <div id="elig-results-wrapper" style="display:none;">
+                <div class="stat-cards-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:20px;">
+                  <div class="stat-card result-card-emerald">
+                    <div class="stat-label">Eligible Loan Amount</div>
+                    <div class="stat-value" id="res-elig-amount" style="color:var(--success, #0f8b71);">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Estimated sanction capacity</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Affordable Monthly EMI</div>
+                    <div class="stat-value" id="res-elig-emi">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Permissible new commitment</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Total Interest Payable</div>
+                    <div class="stat-value" id="res-elig-interest">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Over full tenure</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Total Debt FOIR</div>
+                    <div class="stat-value" id="res-elig-foir">0.0%</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Total obligations / income</small>
+                  </div>
+                </div>
+
+                <div class="card" style="padding:16px; margin-bottom:20px; border:1px solid var(--border); background:var(--bg-card);">
+                  <h4 style="font-size:14px; font-weight:700; margin:0 0 12px; color:var(--text-primary);">Underwriting Assessment Breakdown</h4>
+                  <div style="overflow-x:auto;">
+                    <table class="hub-comparison-table">
+                      <thead>
+                        <tr>
+                          <th>Parameter</th>
+                          <th style="text-align:right;">Value (₹)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="elig-breakdown-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end;">
+                  <button type="button" class="btn btn-primary" onclick="prefillEmiFromEligibility()">
+                    <i class="fas fa-arrow-right" style="margin-right:6px;"></i> Send to EMI &amp; Amortization Schedule
+                  </button>
+                </div>
+              </div>
+
+              <div id="elig-placeholder" style="padding:40px 20px; text-align:center; color:var(--text-muted);">
+                <i class="fas fa-user-shield" style="font-size:42px; opacity:0.35; margin-bottom:12px; display:block;"></i>
+                <div style="font-size:15px; font-weight:600; margin-bottom:6px;">Enter Borrower Income &amp; Obligations</div>
+                <div style="font-size:12.5px; max-width:420px; margin:0 auto;">Enter your monthly income and financial obligations to evaluate your maximum loan eligibility and permissible debt ratio.</div>
+              </div>
+
+              <div class="hub-disclaimer-note">
+                <i class="fas fa-circle-info"></i>
+                <div>
+                  <strong>Indicative Assessment Disclaimer:</strong> Eligibility figures are estimates based on standard bank FOIR underwriting norms and assume standard credit profile criteria. Final sanctions depend on credit score (CIBIL), employer category, title clearance, and internal bank policies.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Affordability Calculator Hub Panel -->
+      <div id="hub-content-affordability" class="hub-tab-content">
+        <div class="emi-calculator-layout">
+          <!-- Input Form (Left) -->
+          <div class="card" style="margin-bottom:0; height:100%;">
+            <div class="card-header">
+              <h3><i class="fas fa-wallet" style="margin-right:8px; color:var(--accent-secondary);"></i>Monthly Cash Flow &amp; Budget</h3>
+            </div>
+            <div class="card-body">
+              <form id="afford-form" onsubmit="event.preventDefault(); calculateAffordability();">
+                <div class="form-group">
+                  <label for="input-afford-income">Monthly Household Net Income</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="input-afford-income" class="form-control" placeholder="e.g. 70,000" value="" style="padding-left:28px;" required />
+                  </div>
+                  <div class="error-msg" id="err-afford-income" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-afford-expenses">Living &amp; Household Expenses</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="input-afford-expenses" class="form-control" placeholder="e.g. 25,000" value="" style="padding-left:28px;" />
+                  </div>
+                  <small style="color:var(--text-muted); font-size:11px;">Rent, groceries, utilities, school fees, insurance, etc.</small>
+                  <div class="error-msg" id="err-afford-expenses" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-afford-debts">Existing Loan EMIs &amp; Debt Commitments</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="input-afford-debts" class="form-control" placeholder="e.g. 10,000" value="" style="padding-left:28px;" />
+                  </div>
+                  <small style="color:var(--text-muted); font-size:11px;">Existing car/personal loan EMIs or credit card minimums</small>
+                </div>
+
+                <div class="form-group">
+                  <label>Emergency Buffer on Disposable Surplus</label>
+                  <div class="preset-pills-row" id="afford-buffer-pills">
+                    <button type="button" class="preset-pill" data-buffer="20" onclick="setAffordabilityBuffer(20)">20% (Aggressive)</button>
+                    <button type="button" class="preset-pill" data-buffer="30" onclick="setAffordabilityBuffer(30)">30% (Recommended)</button>
+                    <button type="button" class="preset-pill" data-buffer="40" onclick="setAffordabilityBuffer(40)">40% (Conservative)</button>
+                    <button type="button" class="preset-pill" data-buffer="50" onclick="setAffordabilityBuffer(50)">50% (High Safety)</button>
+                  </div>
+                  <div class="error-msg" id="err-afford-buffer" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                  <small style="color:var(--text-muted); font-size:11px; margin-top:4px; display:block;">Percent of monthly cash surplus preserved for savings and unexpected events.</small>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-afford-rate">Interest Rate (% p.a.)</label>
+                  <input type="number" id="input-afford-rate" step="0.05" class="form-control" placeholder="e.g. 10.5" value="" required />
+                  <div class="error-msg" id="err-afford-rate" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-afford-tenure">Planned Loan Tenure</label>
+                  <div class="tenure-input-group">
+                    <input type="number" id="input-afford-tenure" step="1" class="form-control" placeholder="e.g. 5" value="" required />
+                    <div class="toggle-group">
+                      <button type="button" class="toggle-btn active" id="btn-afford-years" onclick="setAffordabilityTenureUnit('years')">Yr</button>
+                      <button type="button" class="toggle-btn" id="btn-afford-months" onclick="setAffordabilityTenureUnit('months')">Mo</button>
+                    </div>
+                  </div>
+                  <div class="error-msg" id="err-afford-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                  <button type="submit" class="btn btn-primary" style="flex:1;">
+                    <i class="fas fa-calculator" style="margin-right:6px;"></i> Evaluate Affordability
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="resetAffordability()">
+                    <i class="fas fa-rotate-left"></i> Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Results Section (Right) -->
+          <div class="card" style="margin-bottom:0; height:100%;">
+            <div class="card-header">
+              <h3><i class="fas fa-piggy-bank" style="margin-right:8px; color:var(--accent-secondary);"></i>Affordability &amp; Cash Flow Analysis</h3>
+            </div>
+            <div class="card-body">
+              <div id="afford-banner" class="hub-banner positive" style="display:none;"></div>
+
+              <div id="afford-results-wrapper" style="display:none;">
+                <div class="stat-cards-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:20px;">
+                  <div class="stat-card result-card-purple">
+                    <div class="stat-label">Comfortably Affordable Loan</div>
+                    <div class="stat-value" id="res-afford-amount" style="color:#8b5cf6;">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Sustainable borrowing limit</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Comfortable New EMI</div>
+                    <div class="stat-value" id="res-afford-emi">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Within monthly cash surplus</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Total Monthly Surplus</div>
+                    <div class="stat-value" id="res-afford-surplus">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Income - Expenses - Debts</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Preserved Emergency Buffer</div>
+                    <div class="stat-value" id="res-afford-buffer">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Protected safety margin</small>
+                  </div>
+                </div>
+
+                <!-- Cashflow breakdown progress bar -->
+                <div class="card" style="padding:16px; margin-bottom:20px; border:1px solid var(--border); background:var(--bg-card);">
+                  <h4 style="font-size:14px; font-weight:700; margin:0 0 4px; color:var(--text-primary);">Monthly Income Distribution</h4>
+                  <p style="font-size:12px; color:var(--text-muted); margin:0 0 12px;">Visual allocation of monthly earnings across living outflows, debts, and new loan capacity.</p>
+
+                  <div class="cashflow-progress-bar-wrap">
+                    <div class="cashflow-progress-bar">
+                      <div class="cashflow-segment seg-living" id="seg-bar-living" style="width:0%;" title="Living Expenses"></div>
+                      <div class="cashflow-segment seg-existing" id="seg-bar-debts" style="width:0%;" title="Existing Debts"></div>
+                      <div class="cashflow-segment seg-new-emi" id="seg-bar-new-emi" style="width:0%;" title="New Comfortable EMI"></div>
+                      <div class="cashflow-segment seg-surplus" id="seg-bar-surplus" style="width:0%;" title="Preserved Savings"></div>
+                    </div>
+                  </div>
+
+                  <div class="cashflow-legend-grid">
+                    <div class="cashflow-legend-item">
+                      <span class="legend-color-dot" style="background:#3b82f6;"></span>
+                      <span>Living Expenses: <strong id="leg-val-living">₹0</strong></span>
+                    </div>
+                    <div class="cashflow-legend-item">
+                      <span class="legend-color-dot" style="background:#f59e0b;"></span>
+                      <span>Existing Debts: <strong id="leg-val-debts">₹0</strong></span>
+                    </div>
+                    <div class="cashflow-legend-item">
+                      <span class="legend-color-dot" style="background:#10b981;"></span>
+                      <span>New Loan EMI: <strong id="leg-val-new">₹0</strong></span>
+                    </div>
+                    <div class="cashflow-legend-item">
+                      <span class="legend-color-dot" style="background:#8b5cf6;"></span>
+                      <span>Emergency Buffer: <strong id="leg-val-surplus">₹0</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Budget Details Table -->
+                <div class="card" style="padding:16px; margin-bottom:20px; border:1px solid var(--border); background:var(--bg-card);">
+                  <h4 style="font-size:14px; font-weight:700; margin:0 0 12px; color:var(--text-primary);">Detailed Monthly Cashflow Summary</h4>
+                  <div style="overflow-x:auto;">
+                    <table class="hub-comparison-table">
+                      <thead>
+                        <tr>
+                          <th>Parameter</th>
+                          <th style="text-align:right;">Amount (₹)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="afford-breakdown-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div id="afford-placeholder" style="padding:40px 20px; text-align:center; color:var(--text-muted);">
+                <i class="fas fa-hand-holding-dollar" style="font-size:42px; opacity:0.35; margin-bottom:12px; display:block;"></i>
+                <div style="font-size:15px; font-weight:600; margin-bottom:6px;">Evaluate Real Monthly Affordability</div>
+                <div style="font-size:12.5px; max-width:420px; margin:0 auto;">Enter your monthly cash flow details to evaluate how much loan you can comfortably afford while safeguarding your emergency savings.</div>
+              </div>
+
+              <div class="hub-disclaimer-note">
+                <i class="fas fa-circle-info"></i>
+                <div>
+                  <strong>Financial Prudence Note:</strong> Affordability estimates reflect practical cash flow rather than maximum legal borrowing capacity. Maintaining an emergency buffer ensures loan obligations remain sustainable during unexpected life events or temporary loss of income.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Prepayment Calculator Hub Panel -->
+      <div id="hub-content-prepayment" class="hub-tab-content">
+        <div class="emi-calculator-layout">
+          <!-- Input Form (Left) -->
+          <div class="card" style="margin-bottom:0; height:100%;">
+            <div class="card-header">
+              <h3><i class="fas fa-coins" style="margin-right:8px; color:var(--accent-secondary);"></i>Existing Loan &amp; Prepayment Details</h3>
+            </div>
+            <div class="card-body">
+              <form id="prepay-form" onsubmit="event.preventDefault(); calculatePrepayment();">
+                <div class="form-group">
+                  <label for="input-prepay-principal">Current Outstanding Principal</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="input-prepay-principal" class="form-control" placeholder="e.g. 20,00,000" value="" style="padding-left:28px;" required />
+                  </div>
+                  <div class="error-msg" id="err-prepay-principal" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                  <div class="form-group">
+                    <label for="input-prepay-rate">Interest Rate (% p.a.)</label>
+                    <input type="number" id="input-prepay-rate" step="0.05" class="form-control" placeholder="e.g. 9.5" value="" required />
+                    <div class="error-msg" id="err-prepay-rate" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                  </div>
+                  <div class="form-group">
+                    <label for="input-prepay-tenure">Remaining Tenure</label>
+                    <div class="tenure-input-group">
+                      <input type="number" id="input-prepay-tenure" step="1" class="form-control" placeholder="e.g. 180" value="" required />
+                      <div class="toggle-group">
+                        <button type="button" class="toggle-btn active" id="btn-prepay-months" onclick="setPrepaymentTenureUnit('months')">Mo</button>
+                        <button type="button" class="toggle-btn" id="btn-prepay-years" onclick="setPrepaymentTenureUnit('years')">Yr</button>
+                      </div>
+                    </div>
+                    <div class="error-msg" id="err-prepay-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-prepay-emi">Current Monthly EMI (₹)</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="input-prepay-emi" class="form-control" placeholder="e.g. 20,888 (optional, auto-calculated)" value="" style="padding-left:28px;" />
+                  </div>
+                  <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                    <small style="color:var(--text-muted); font-size:11px;">Leave empty or calculate automatically from terms above.</small>
+                    <button type="button" class="hub-inline-calc-btn" onclick="calculatePrepayEMIFromDetails()">
+                      <i class="fas fa-calculator"></i> Calculate from details
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-prepay-amount">Lump-Sum Part-Prepayment Amount</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="input-prepay-amount" class="form-control" placeholder="e.g. 3,00,000" value="" style="padding-left:28px;" required />
+                  </div>
+                  <div class="error-msg" id="err-prepay-amount" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-prepay-fee">Prepayment Penalty / Processing Fee (% if any)</label>
+                  <input type="number" id="input-prepay-fee" step="0.1" class="form-control" placeholder="0" value="" />
+                  <small style="color:var(--text-muted); font-size:11px;">RBI mandates 0% penalty on floating-rate individual loans; fixed-rate loans may incur fees.</small>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                  <button type="submit" class="btn btn-primary" style="flex:1;">
+                    <i class="fas fa-calculator" style="margin-right:6px;"></i> Calculate Savings
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="resetPrepayment()">
+                    <i class="fas fa-rotate-left"></i> Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Results Section (Right) -->
+          <div class="card" style="margin-bottom:0; height:100%;">
+            <div class="card-header">
+              <h3><i class="fas fa-chart-pie" style="margin-right:8px; color:var(--accent-secondary);"></i>Prepayment Impact &amp; Strategy Comparison</h3>
+            </div>
+            <div class="card-body">
+              <div id="prepay-banner" class="hub-banner positive" style="display:none;"></div>
+
+              <div id="prepay-results-wrapper" style="display:none;">
+                <!-- Strategy Selection Toggle Cards -->
+                <div class="strategy-cards-grid">
+                  <div class="strategy-card" id="strategy-card-a" onclick="setPrepaymentStrategy('tenure'); calculatePrepayment();">
+                    <span class="strategy-badge">Strategy A (Recommended)</span>
+                    <h4 class="strategy-title">Reduce Loan Tenure</h4>
+                    <p class="strategy-desc">Keep your monthly EMI unchanged. Finish loan significantly faster and maximize total interest savings.</p>
+                    <div class="strategy-metric-row">
+                      <span class="strategy-metric-label">Tenure Reduction:</span>
+                      <span class="strategy-metric-value hub-val-positive" id="card-a-tenure-saved">0 Months</span>
+                    </div>
+                    <div class="strategy-metric-row">
+                      <span class="strategy-metric-label">Interest Saved:</span>
+                      <span class="strategy-metric-value hub-val-highlight" id="card-a-interest-saved">₹0</span>
+                    </div>
+                    <div class="strategy-metric-row">
+                      <span class="strategy-metric-label">Net Lifetime Benefit:</span>
+                      <span class="strategy-metric-value hub-val-positive" id="card-a-net-savings">₹0</span>
+                    </div>
+                  </div>
+
+                  <div class="strategy-card" id="strategy-card-b" onclick="setPrepaymentStrategy('emi'); calculatePrepayment();">
+                    <span class="strategy-badge">Strategy B</span>
+                    <h4 class="strategy-title">Reduce Monthly EMI</h4>
+                    <p class="strategy-desc">Keep original tenure unchanged. Lower monthly outgo to improve immediate monthly cash flow.</p>
+                    <div class="strategy-metric-row">
+                      <span class="strategy-metric-label">Monthly EMI Saved:</span>
+                      <span class="strategy-metric-value hub-val-positive" id="card-b-emi-saved">₹0 / mo</span>
+                    </div>
+                    <div class="strategy-metric-row">
+                      <span class="strategy-metric-label">Interest Saved:</span>
+                      <span class="strategy-metric-value hub-val-highlight" id="card-b-interest-saved">₹0</span>
+                    </div>
+                    <div class="strategy-metric-row">
+                      <span class="strategy-metric-label">Net Lifetime Benefit:</span>
+                      <span class="strategy-metric-value hub-val-positive" id="card-b-net-savings">₹0</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Primary KPI Metrics -->
+                <div class="stat-cards-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:20px;">
+                  <div class="stat-card result-card-emerald">
+                    <div class="stat-label">Net Total Savings</div>
+                    <div class="stat-value" id="res-prepay-savings" style="color:var(--success, #0f8b71);">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Interest saved minus charges</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label" id="res-prepay-metric-label">Tenure Saved</div>
+                    <div class="stat-value" id="res-prepay-metric" style="color:var(--accent-secondary);">0 Mos</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Active strategy impact</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">New Remaining Principal</div>
+                    <div class="stat-value" id="res-prepay-remaining">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Adjusted outstanding loan balance</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Prepayment Charges</div>
+                    <div class="stat-value" id="res-prepay-charges">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Penalty / bank fee</small>
+                  </div>
+                </div>
+
+                <!-- Comprehensive Comparison Table -->
+                <div class="card" style="padding:16px; margin-bottom:20px; border:1px solid var(--border); background:var(--bg-card);">
+                  <h4 style="font-size:14px; font-weight:700; margin:0 0 12px; color:var(--text-primary);">Prepayment Strategy Comparison Matrix</h4>
+                  <div style="overflow-x:auto;">
+                    <table class="hub-comparison-table">
+                      <thead>
+                        <tr>
+                          <th>Parameter</th>
+                          <th>Without Prepayment</th>
+                          <th>Option A (Reduce Tenure)</th>
+                          <th>Option B (Reduce EMI)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="prepay-comparison-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div id="prepay-placeholder" style="padding:40px 20px; text-align:center; color:var(--text-muted);">
+                <i class="fas fa-piggy-bank" style="font-size:42px; opacity:0.35; margin-bottom:12px; display:block;"></i>
+                <div style="font-size:15px; font-weight:600; margin-bottom:6px;">Simulate Part-Prepayment Benefits</div>
+                <div style="font-size:12.5px; max-width:420px; margin:0 auto;">Enter your current loan details and proposed lump-sum prepayment to evaluate interest savings and tenure reduction.</div>
+              </div>
+
+              <div class="hub-disclaimer-note">
+                <i class="fas fa-circle-info"></i>
+                <div>
+                  <strong>Regulatory Advisory:</strong> As per RBI guidelines, commercial banks and NBFCs cannot levy prepayment charges on individual floating-rate term loans. Prepayment charges may apply to commercial loans, fixed-rate loans, or non-individual borrowings.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Balance Transfer Calculator Hub Panel -->
+      <div id="hub-content-transfer" class="hub-tab-content">
+        <div class="emi-calculator-layout">
+          <!-- Input Form (Left) -->
+          <div class="card" style="margin-bottom:0; height:100%;">
+            <div class="card-header">
+              <h3><i class="fas fa-right-left" style="margin-right:8px; color:var(--accent-secondary);"></i>Existing vs New Loan Details</h3>
+            </div>
+            <div class="card-body">
+              <form id="transfer-form" onsubmit="event.preventDefault(); calculateBalanceTransfer();">
+                <div style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:6px;">
+                  Current Existing Loan
+                </div>
+
+                <div class="form-group">
+                  <label for="input-transfer-existing-principal">Current Outstanding Principal</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="input-transfer-existing-principal" class="form-control" placeholder="e.g. 15,00,000" value="" style="padding-left:28px;" required />
+                  </div>
+                  <div class="error-msg" id="err-transfer-principal" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                  <div class="form-group">
+                    <label for="input-transfer-existing-rate">Existing Rate (% p.a.)</label>
+                    <input type="number" id="input-transfer-existing-rate" step="0.05" class="form-control" placeholder="e.g. 12.5" value="" required />
+                    <div class="error-msg" id="err-transfer-r1" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                  </div>
+                  <div class="form-group">
+                    <label for="input-transfer-existing-tenure">Remaining Tenure (Mos)</label>
+                    <input type="number" id="input-transfer-existing-tenure" step="1" class="form-control" placeholder="e.g. 48" value="" required />
+                    <div class="error-msg" id="err-transfer-t1" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="input-transfer-existing-emi">Existing Monthly EMI (₹)</label>
+                  <div style="position:relative;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                    <input type="text" id="input-transfer-existing-emi" class="form-control" placeholder="e.g. 39,890 (optional, auto-calculated)" value="" style="padding-left:28px;" />
+                  </div>
+                  <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                    <small style="color:var(--text-muted); font-size:11px;">Leave empty or calculate automatically from terms above.</small>
+                    <button type="button" class="hub-inline-calc-btn" onclick="calculateTransferExistingEMIFromDetails()">
+                      <i class="fas fa-calculator"></i> Calculate from existing loan terms
+                    </button>
+                  </div>
+                </div>
+
+                <div style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--accent-secondary); margin:20px 0 12px; border-bottom:1px solid var(--border); padding-bottom:6px;">
+                  Proposed New Loan (Transfer Target)
+                </div>
+
+                <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                  <div class="form-group">
+                    <label for="input-transfer-new-rate">New Interest Rate (% p.a.)</label>
+                    <input type="number" id="input-transfer-new-rate" step="0.05" class="form-control" placeholder="e.g. 10.5" value="" required />
+                    <div class="error-msg" id="err-transfer-r2" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                  </div>
+                  <div class="form-group">
+                    <label for="input-transfer-new-tenure">New Loan Tenure (Mos)</label>
+                    <input type="number" id="input-transfer-new-tenure" step="1" class="form-control" placeholder="e.g. 48" value="" required />
+                    <div class="error-msg" id="err-transfer-t2" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                  </div>
+                </div>
+
+                <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                  <div class="form-group">
+                    <label for="input-transfer-fee-pct">Processing Fee (%)</label>
+                    <input type="number" id="input-transfer-fee-pct" step="0.05" class="form-control" placeholder="e.g. 0.5" value="" />
+                  </div>
+                  <div class="form-group">
+                    <label for="input-transfer-other-charges">Admin / Legal Charges (₹)</label>
+                    <div style="position:relative;">
+                      <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
+                      <input type="text" id="input-transfer-other-charges" class="form-control" placeholder="e.g. 2,500" value="" style="padding-left:28px;" />
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                  <button type="submit" class="btn btn-primary" style="flex:1;">
+                    <i class="fas fa-right-left" style="margin-right:6px;"></i> Compare &amp; Calculate Savings
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="resetBalanceTransfer()">
+                    <i class="fas fa-rotate-left"></i> Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Results Section (Right) -->
+          <div class="card" style="margin-bottom:0; height:100%;">
+            <div class="card-header">
+              <h3><i class="fas fa-scale-balanced" style="margin-right:8px; color:var(--accent-secondary);"></i>Balance Transfer Benefit Analysis</h3>
+            </div>
+            <div class="card-body">
+              <div id="transfer-banner" class="hub-banner positive" style="display:none;"></div>
+
+              <div id="transfer-results-wrapper" style="display:none;">
+                <div class="stat-cards-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:20px;">
+                  <div class="stat-card result-card-emerald">
+                    <div class="stat-label">Net Lifetime Savings</div>
+                    <div class="stat-value" id="res-transfer-savings" style="color:var(--success, #0f8b71);">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">After all transfer fees &amp; costs</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Monthly EMI Reduction</div>
+                    <div class="stat-value" id="res-transfer-monthly" style="color:var(--success);">₹0 / mo</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Immediate cashflow improvement</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Total Transfer Costs</div>
+                    <div class="stat-value" id="res-transfer-costs">₹0</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Processing fee + legal / admin</small>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Break-Even Period</div>
+                    <div class="stat-value" id="res-transfer-breakeven" style="color:var(--accent-secondary);">0 Months</div>
+                    <small style="font-size:11px; color:var(--text-muted);">Time to recover switching fees</small>
+                  </div>
+                </div>
+
+                <!-- Side-by-side comparison table -->
+                <div class="card" style="padding:16px; margin-bottom:20px; border:1px solid var(--border); background:var(--bg-card);">
+                  <h4 style="font-size:14px; font-weight:700; margin:0 0 12px; color:var(--text-primary);">Side-by-Side Loan Comparison Matrix</h4>
+                  <div style="overflow-x:auto;">
+                    <table class="hub-comparison-table">
+                      <thead>
+                        <tr>
+                          <th>Parameter</th>
+                          <th>Existing Loan</th>
+                          <th>Proposed New Loan</th>
+                          <th>Net Difference</th>
+                        </tr>
+                      </thead>
+                      <tbody id="transfer-comparison-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div id="transfer-placeholder" style="padding:40px 20px; text-align:center; color:var(--text-muted);">
+                <i class="fas fa-shuffle" style="font-size:42px; opacity:0.35; margin-bottom:12px; display:block;"></i>
+                <div style="font-size:15px; font-weight:600; margin-bottom:6px;">Compare Existing vs Refinanced Loan</div>
+                <div style="font-size:12.5px; max-width:420px; margin:0 auto;">Enter existing loan details and new refinancing terms to evaluate net interest savings and break-even period.</div>
+              </div>
+
+              <div class="hub-disclaimer-note">
+                <i class="fas fa-circle-info"></i>
+                <div>
+                  <strong>Refinancing Advisory:</strong> Balance transfers are cost-effective when the break-even period is significantly shorter than the remaining loan tenure. Consider hidden switching expenses including valuation fees, MODT stamp duty, and foreclosure documentation timelines.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20260705d"></script>
+<script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
   const user = requireRole('employee');
   if (user) {
     renderSidebarUser();
-    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   // State parameters
   let tenureUnit = 'years'; // 'years' or 'months'
   let chartGrouping = 'monthly'; // 'monthly' or 'yearly'
+  let scheduleViewMode = 'monthly'; // 'monthly' or 'yearly'
   let calculatedData = {
     originalSchedule: [],
     prepaySchedule: [],
@@ -914,11 +1970,53 @@
   let pieChartInstance = null;
   let lineChartInstance = null;
 
+  // Cached Segoe UI fonts for authentic ₹ symbol in PDF exports
+  let pdfFontsCache = null;
+  async function getPdfFonts() {
+    if (pdfFontsCache) return pdfFontsCache;
+    try {
+      const [regRes, boldRes] = await Promise.all([
+        fetch('/fonts/segoeui.ttf'),
+        fetch('/fonts/segoeuib.ttf')
+      ]);
+      if (!regRes.ok || !boldRes.ok) {
+        throw new Error('Font file HTTP request failed');
+      }
+      const [regBlob, boldBlob] = await Promise.all([regRes.blob(), boldRes.blob()]);
+      const toBase64 = (blob) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (reader.result) {
+            resolve(reader.result.split(',')[1]);
+          } else {
+            reject(new Error('FileReader empty'));
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      const [regular, bold] = await Promise.all([toBase64(regBlob), toBase64(boldBlob)]);
+      pdfFontsCache = { regular, bold };
+      return pdfFontsCache;
+    } catch (err) {
+      console.warn('PDF custom fonts could not be loaded, falling back to standard fonts:', err);
+      return null;
+    }
+  }
+
+  // Preload fonts in background
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(() => getPdfFonts());
+  } else {
+    setTimeout(getPdfFonts, 500);
+  }
+
   // Initialize Input Formatters
   const principalInput = document.getElementById('input-principal');
   const prepaymentInput = document.getElementById('input-prepayment');
 
   function formatInputValue(input) {
+    if (!input) return;
     const rawVal = input.value.replace(/[^0-9]/g, '');
     if (!rawVal) {
       input.value = '';
@@ -927,61 +2025,92 @@
     input.value = Number(rawVal).toLocaleString('en-IN');
   }
 
-  principalInput.addEventListener('input', () => formatInputValue(principalInput));
-  prepaymentInput.addEventListener('input', () => formatInputValue(prepaymentInput));
+  if (principalInput) principalInput.addEventListener('input', () => formatInputValue(principalInput));
+  if (prepaymentInput) prepaymentInput.addEventListener('input', () => formatInputValue(prepaymentInput));
 
   function setTenureUnit(unit) {
     tenureUnit = unit;
-    document.getElementById('btn-years').classList.toggle('active', unit === 'years');
-    document.getElementById('btn-months').classList.toggle('active', unit === 'months');
-    const input = document.getElementById('input-tenure');
-    if (unit === 'years') {
-      input.placeholder = '5';
-    } else {
-      input.placeholder = '60';
+    const btnYears = document.getElementById('btn-years');
+    const btnMonths = document.getElementById('btn-months');
+    if (btnYears) btnYears.classList.toggle('active', unit === 'years');
+    if (btnMonths) btnMonths.classList.toggle('active', unit === 'months');
+
+    const tenureInput = document.getElementById('input-tenure');
+    if (tenureInput) {
+      tenureInput.placeholder = unit === 'years' ? '5' : '60';
     }
-    // Auto-calculate if already calculated
-    if (calculatedData.originalSchedule.length > 0) {
+    if (calculatedData && (calculatedData.principal || (calculatedData.summary && calculatedData.summary.principal))) {
       calculateEMI();
     }
   }
 
   function setChartGrouping(grouping) {
     chartGrouping = grouping;
-    document.getElementById('btn-chart-monthly').classList.toggle('active', grouping === 'monthly');
-    document.getElementById('btn-chart-yearly').classList.toggle('active', grouping === 'yearly');
+    const btnM = document.getElementById('btn-chart-monthly');
+    const btnY = document.getElementById('btn-chart-yearly');
+    if (btnM) btnM.classList.toggle('active', grouping === 'monthly');
+    if (btnY) btnY.classList.toggle('active', grouping === 'yearly');
     if (calculatedData.originalSchedule.length > 0) {
       renderAmortizationChart();
     }
   }
 
-  // Clear errors
+  function setScheduleViewMode(mode) {
+    scheduleViewMode = mode;
+    const btnM = document.getElementById('btn-schedule-monthly');
+    const btnY = document.getElementById('btn-schedule-yearly');
+    if (btnM) btnM.classList.toggle('active', mode === 'monthly');
+    if (btnY) btnY.classList.toggle('active', mode === 'yearly');
+    currentPage = 1;
+    renderRepaymentTable();
+  }
+
+  function setRowsLimit(limit) {
+    rowsPerPage = limit === 'all' ? 999999 : parseInt(limit, 10);
+    currentPage = 1;
+    document.querySelectorAll('#limit-pills-group .segmented-pill-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-limit') == String(limit));
+    });
+    renderRepaymentTable();
+  }
+
+  function triggerPrint() {
+    const schedule = calculatedData && (calculatedData.amortizationSchedule || (calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule));
+    if (!schedule || schedule.length === 0) {
+      alert('Calculate the loan before exporting the repayment schedule.');
+      return;
+    }
+    window.print();
+  }
+
+  // Error messaging helpers
   function clearErrors() {
-    document.querySelectorAll('.error-msg').forEach(el => {
-      el.textContent = '';
-      el.style.display = 'none';
+    ['err-principal', 'err-rate', 'err-tenure', 'err-fee', 'err-prepayment'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = '';
+        el.style.display = 'none';
+      }
     });
   }
 
-  // Show error
-  function showError(id, msg) {
+  function showError(id, message) {
     const el = document.getElementById(id);
     if (el) {
-      el.textContent = msg;
+      el.textContent = message;
       el.style.display = 'block';
     }
   }
 
-  // Main Calculation Engine
+  // Primary calculation orchestrator
   function calculateEMI() {
     clearErrors();
 
-    // Parse Inputs
-    const principalStr = principalInput.value.replace(/,/g, '');
-    const rateStr = document.getElementById('input-rate').value;
-    const tenureStr = document.getElementById('input-tenure').value;
-    const feeStr = document.getElementById('input-fee').value;
-    const prepayStr = prepaymentInput.value.replace(/,/g, '');
+    const principalStr = principalInput ? principalInput.value.replace(/,/g, '') : '';
+    const rateStr = document.getElementById('input-rate') ? document.getElementById('input-rate').value : '';
+    const tenureStr = document.getElementById('input-tenure') ? document.getElementById('input-tenure').value : '';
+    const feeStr = document.getElementById('input-fee') ? document.getElementById('input-fee').value : '';
+    const prepayStr = prepaymentInput ? prepaymentInput.value.replace(/,/g, '') : '';
 
     const principal = parseFloat(principalStr);
     const rateVal = parseFloat(rateStr);
@@ -989,7 +2118,6 @@
     const feePercent = feeStr ? parseFloat(feeStr) : 0;
     const prepayment = prepayStr ? parseFloat(prepayStr) : 0;
 
-    // Validations
     let hasError = false;
     if (isNaN(principal) || principal <= 0) {
       showError('err-principal', 'Please enter a valid loan amount greater than 0.');
@@ -999,11 +2127,11 @@
       showError('err-rate', 'Interest rate must be between 0% and 100%.');
       hasError = true;
     }
-    if (isNaN(tenureVal) || tenureVal <= 0 || !Number.isInteger(tenureVal)) {
-      showError('err-tenure', 'Tenure must be a positive whole number.');
+    if (isNaN(tenureVal) || tenureVal <= 0) {
+      showError('err-tenure', 'Tenure must be a positive number.');
       hasError = true;
     }
-    if (isNaN(feePercent) || feePercent < 0 || feePercent > 100) {
+    if (feeStr && (isNaN(feePercent) || feePercent < 0 || feePercent > 100)) {
       showError('err-fee', 'Processing fee must be between 0% and 100%.');
       hasError = true;
     }
@@ -1014,8 +2142,12 @@
 
     if (hasError) return;
 
-    // Total months calculation
-    const totalMonths = tenureUnit === 'years' ? tenureVal * 12 : tenureVal;
+    // Total months calculation supporting years and months
+    const totalMonths = tenureUnit === 'years' ? Math.round(tenureVal * 12) : Math.round(tenureVal);
+    if (totalMonths <= 0) {
+      showError('err-tenure', 'Calculated tenure must be at least 1 month.');
+      return;
+    }
     if (totalMonths > 600) {
       showError('err-tenure', 'Maximum supported tenure is 50 years (600 months).');
       return;
@@ -1034,16 +2166,38 @@
       prepayResult = runAmortizationSchedule(principal, rateVal, totalMonths, prepayment);
     }
 
-    // Compile calculated data
+    const activeEMI = hasPrepay ? prepayResult.emi : originalResult.emi;
+    const activeTotalInterest = hasPrepay ? prepayResult.totalInterest : originalResult.totalInterest;
+    const activeTotalAmount = hasPrepay ? prepayResult.totalAmount : originalResult.totalAmount;
+    const effectiveCost = activeTotalAmount + feeAmount;
+    const activeSchedule = hasPrepay ? prepayResult.schedule : originalResult.schedule;
+
+    // Compile central calculation state matching Requirement 7 exactly:
     calculatedData = {
+      principal: principal,
+      interestRate: rateVal,
+      tenureMonths: totalMonths,
+      processingFee: feeAmount,
+      prepayment: prepayment,
+      monthlyEMI: activeEMI,
+      totalInterest: activeTotalInterest,
+      totalRepayment: activeTotalAmount,
+      effectiveCost: effectiveCost,
+      amortizationSchedule: activeSchedule,
       originalSchedule: originalResult.schedule,
       prepaySchedule: hasPrepay ? prepayResult.schedule : originalResult.schedule,
       hasPrepayment: hasPrepay,
       summary: {
         principal: principal,
         rate: rateVal,
+        interestRate: rateVal,
         tenureMonths: totalMonths,
         processingFee: feeAmount,
+        prepayment: prepayment,
+        monthlyEMI: activeEMI,
+        totalInterest: activeTotalInterest,
+        totalRepayment: activeTotalAmount,
+        effectiveCost: effectiveCost,
         originalEMI: originalResult.emi,
         originalTotalInterest: originalResult.totalInterest,
         originalTotalAmount: originalResult.totalAmount,
@@ -1054,6 +2208,7 @@
         tenureReducedMonths: hasPrepay ? (originalResult.schedule.length - prepayResult.schedule.length) : 0
       }
     };
+    window.calculatedData = calculatedData;
 
     // Update UI Results
     renderSummaryResults();
@@ -1065,11 +2220,16 @@
     renderRepaymentTable();
   }
 
-  // Generates amortization details
+  function calculateLoan() {
+    return calculateEMI();
+  }
+  window.calculateEMI = calculateEMI;
+  window.calculateLoan = calculateEMI;
+
+  // Generates amortization details with exact zero balance resolution
   function runAmortizationSchedule(principal, annualRate, totalMonths, prepayVal) {
     const monthlyRate = annualRate / 12 / 100;
     
-    // Standard EMI formula
     let emi = 0;
     if (monthlyRate === 0) {
       emi = principal / totalMonths;
@@ -1090,27 +2250,36 @@
         principalPaid = balance;
       }
 
-      // Prepayment applied at the end of Month 1 (after the regular EMI payment is completed)
+      // Prepayment applied at the end of Month 1
       let prepayMade = 0;
       if (month === 1 && prepayVal > 0) {
         prepayMade = Math.min(prepayVal, balance - principalPaid);
       }
 
       const openingBalance = balance;
-      balance = openingBalance - principalPaid - prepayMade;
+      const isFinal = (month === totalMonths || (openingBalance - principalPaid - prepayMade) <= 0.05);
+
+      if (isFinal) {
+        principalPaid = openingBalance - prepayMade;
+        balance = 0;
+      } else {
+        balance = openingBalance - principalPaid - prepayMade;
+      }
       totalInterest += interest;
+
+      const outBal = isFinal ? 0 : Math.max(0, Math.round(balance * 100) / 100);
 
       schedule.push({
         emiNumber: month,
         paymentDate: getNextPaymentDate(month),
-        emiAmount: emi,
+        emiAmount: isFinal ? (principalPaid + interest) : emi,
         principalComponent: principalPaid,
         interestComponent: interest,
         prepayment: prepayMade,
-        outstandingBalance: Math.max(0, balance)
+        outstandingBalance: outBal
       });
 
-      if (balance <= 0.01) {
+      if (isFinal) {
         break;
       }
       month++;
@@ -1124,6 +2293,38 @@
     };
   }
 
+  // Aggregate monthly schedule into yearly data
+  function buildYearlyAmortizationData(schedule) {
+    const yearly = [];
+    const totalYears = Math.ceil(schedule.length / 12);
+    for (let i = 0; i < totalYears; i++) {
+      const startIdx = i * 12;
+      const endIdx = Math.min((i + 1) * 12, schedule.length);
+      const chunk = schedule.slice(startIdx, endIdx);
+      let totalPayments = 0;
+      let principalPaid = 0;
+      let interestPaid = 0;
+      let prepayment = 0;
+      chunk.forEach(m => {
+        totalPayments += m.emiAmount;
+        principalPaid += m.principalComponent;
+        interestPaid += m.interestComponent;
+        prepayment += (m.prepayment || 0);
+      });
+      const lastMonth = chunk[chunk.length - 1];
+      yearly.push({
+        yearNumber: i + 1,
+        periodLabel: `Months ${startIdx + 1}–${endIdx}`,
+        totalPayments: totalPayments,
+        principalPaid: principalPaid,
+        interestPaid: interestPaid,
+        prepayment: prepayment,
+        closingBalance: lastMonth.outstandingBalance
+      });
+    }
+    return yearly;
+  }
+
   // Date helper starting next month
   function getNextPaymentDate(monthIndex) {
     const d = new Date();
@@ -1133,85 +2334,123 @@
 
   // Currency helper formatting numbers
   function formatValueCurrency(num) {
+    if (num === null || num === undefined || isNaN(num)) return '₹0';
     return '₹' + Math.round(num).toLocaleString('en-IN');
   }
 
-  // Render text results in top stats
+  // Render text results in top stats and summary bar
   function renderSummaryResults() {
-    const sum = calculatedData.summary;
-    const activeSchedule = calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule;
-    
-    // EMI, Interest, Total fields
-    document.getElementById('res-emi').textContent = formatValueCurrency(sum.originalEMI);
-    document.getElementById('res-interest').textContent = formatValueCurrency(calculatedData.hasPrepayment ? sum.prepayTotalInterest : sum.originalTotalInterest);
-    document.getElementById('res-total').textContent = formatValueCurrency(calculatedData.hasPrepayment ? sum.prepayTotalAmount : sum.originalTotalAmount);
-    document.getElementById('res-fee').textContent = formatValueCurrency(sum.processingFee);
+    const d = calculatedData;
+    const activeSchedule = d.amortizationSchedule || (d.hasPrepayment ? d.prepaySchedule : d.originalSchedule);
+    const activeEMI = d.monthlyEMI;
+    const activeInterest = d.totalInterest;
+    const activeTotal = d.totalRepayment;
+    const activeFee = d.processingFee;
+    const activeCost = d.effectiveCost;
+
+    // Primary KPI cards
+    const elEmi = document.getElementById('res-emi');
+    const elInt = document.getElementById('res-interest');
+    const elTot = document.getElementById('res-total');
+    const elFee = document.getElementById('res-fee');
+    const elCost = document.getElementById('res-cost');
+
+    if (elEmi) elEmi.textContent = formatValueCurrency(activeEMI);
+    if (elInt) elInt.textContent = formatValueCurrency(activeInterest);
+    if (elTot) elTot.textContent = formatValueCurrency(activeTotal);
+    if (elFee) elFee.textContent = formatValueCurrency(activeFee);
+    if (elCost) {
+      elCost.textContent = formatValueCurrency(activeCost);
+      elCost.style.color = d.hasPrepayment ? 'var(--success)' : 'var(--text-primary)';
+    }
+
+    // Amortization metric bar
+    const sumBar = document.getElementById('amort-summary-bar');
+    if (sumBar) {
+      sumBar.style.display = 'flex';
+      const elInst = document.getElementById('sum-installments');
+      const elBarEmi = document.getElementById('sum-emi');
+      const elBarInt = document.getElementById('sum-interest');
+      const elBarRepay = document.getElementById('sum-repayment');
+      if (elInst) elInst.textContent = `${activeSchedule.length} Months`;
+      if (elBarEmi) elBarEmi.textContent = formatValueCurrency(activeEMI);
+      if (elBarInt) elBarInt.textContent = formatValueCurrency(activeInterest);
+      if (elBarRepay) elBarRepay.textContent = formatValueCurrency(activeTotal);
+    }
 
     // Cost card / Prepayment logic
     const costLabelEl = document.getElementById('res-cost-label');
-    const costValueEl = document.getElementById('res-cost');
     const badgeContainer = document.getElementById('savings-badge-container');
-    badgeContainer.innerHTML = '';
+    if (badgeContainer) badgeContainer.innerHTML = '';
 
     if (calculatedData.hasPrepayment) {
-      costLabelEl.textContent = 'Effective Cost of Loan';
-      // Cost = Principal + Interest + Fee - Prepayment
-      const effCost = sum.principal + sum.prepayTotalInterest + sum.processingFee;
-      costValueEl.textContent = formatValueCurrency(effCost);
-      costValueEl.style.color = 'var(--success)';
+      if (costLabelEl) costLabelEl.textContent = 'Effective Cost of Loan';
 
-      // Append savings and tenure badges
-      const savingsValStr = formatValueCurrency(sum.interestSaved);
-      const savingsBadge = document.createElement('div');
-      savingsBadge.className = 'savings-badge';
-      savingsBadge.style.background = 'rgba(15, 139, 113, 0.12)';
-      savingsBadge.style.color = 'var(--success)';
-      savingsBadge.textContent = `Saved: ${savingsValStr}`;
-      
-      const tenureBadge = document.createElement('div');
-      tenureBadge.className = 'savings-badge';
-      tenureBadge.style.marginLeft = '6px';
-      tenureBadge.style.background = 'rgba(47, 111, 237, 0.12)';
-      tenureBadge.style.color = 'var(--accent)';
-      tenureBadge.textContent = `Tenure Cut: ${sum.tenureReducedMonths} months`;
+      if (badgeContainer) {
+        const savingsValStr = formatValueCurrency(d.summary.interestSaved);
+        const savingsBadge = document.createElement('div');
+        savingsBadge.className = 'savings-badge';
+        savingsBadge.style.background = 'rgba(15, 139, 113, 0.12)';
+        savingsBadge.style.color = 'var(--success)';
+        savingsBadge.textContent = `Saved: ${savingsValStr}`;
+        
+        const tenureBadge = document.createElement('div');
+        tenureBadge.className = 'savings-badge';
+        tenureBadge.style.marginLeft = '6px';
+        tenureBadge.style.background = 'rgba(47, 111, 237, 0.12)';
+        tenureBadge.style.color = 'var(--accent)';
+        tenureBadge.textContent = `Tenure Cut: ${d.summary.tenureReducedMonths}m`;
 
-      badgeContainer.appendChild(savingsBadge);
-      badgeContainer.appendChild(tenureBadge);
+        badgeContainer.appendChild(savingsBadge);
+        badgeContainer.appendChild(tenureBadge);
+      }
     } else {
-      costLabelEl.textContent = 'Effective Cost of Loan';
-      const effCost = sum.principal + sum.originalTotalInterest + sum.processingFee;
-      costValueEl.textContent = formatValueCurrency(effCost);
-      costValueEl.style.color = 'var(--text-primary)';
+      if (costLabelEl) costLabelEl.textContent = 'Effective Cost';
     }
   }
 
-  // Render Pie Chart
+  // Render Doughnut/Pie Chart
   function renderPieChart() {
-    const sum = calculatedData.summary;
-    const principal = sum.principal;
-    const interest = calculatedData.hasPrepayment ? sum.prepayTotalInterest : sum.originalTotalInterest;
-    const fee = sum.processingFee;
-    const grandTotal = principal + interest + fee;
+    const d = calculatedData;
+    const principal = d.principal;
+    const interest = d.totalInterest;
+    const fee = d.processingFee;
+    const grandTotal = d.effectiveCost || (principal + interest + fee);
 
-    const principalPct = ((principal / grandTotal) * 100).toFixed(1);
-    const interestPct = ((interest / grandTotal) * 100).toFixed(1);
-    const feePct = ((fee / grandTotal) * 100).toFixed(1);
+    const principalPct = grandTotal > 0 ? ((principal / grandTotal) * 100).toFixed(1) : '0.0';
+    const interestPct = grandTotal > 0 ? ((interest / grandTotal) * 100).toFixed(1) : '0.0';
+    const feePct = fee > 0 && grandTotal > 0 ? ((fee / grandTotal) * 100).toFixed(1) : '0.0';
 
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const textLabelColor = isDark ? '#c0ccda' : '#526173';
+
+    // Show breakdown content, hide placeholder
+    const placeholder = document.getElementById('breakdown-placeholder');
+    const content = document.getElementById('breakdown-content');
+    if (placeholder) placeholder.style.display = 'none';
+    if (content) content.style.display = 'flex';
 
     if (pieChartInstance) {
       pieChartInstance.destroy();
+      pieChartInstance = null;
+    }
+
+    const pieLabels = [`Principal (${principalPct}%)`, `Interest (${interestPct}%)`];
+    const pieData = [principal, interest];
+    const pieColors = ['#2f6fed', '#b44545'];
+    if (fee > 0) {
+      pieLabels.push(`Fee (${feePct}%)`);
+      pieData.push(fee);
+      pieColors.push('#e2a03f');
     }
 
     const ctx = document.getElementById('chart-pie').getContext('2d');
     pieChartInstance = new Chart(ctx, {
-      type: 'pie',
+      type: 'doughnut',
       data: {
-        labels: [`Principal (${principalPct}%)`, `Interest (${interestPct}%)`, `Fee (${feePct}%)`],
+        labels: pieLabels,
         datasets: [{
-          data: [principal, interest, fee],
-          backgroundColor: ['#2f6fed', '#b44545', '#e2a03f'],
+          data: pieData,
+          backgroundColor: pieColors,
           borderColor: isDark ? '#0b1627' : '#ffffff',
           borderWidth: 2
         }]
@@ -1219,14 +2458,10 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        cutout: '58%',
         plugins: {
           legend: {
-            position: 'bottom',
-            labels: {
-              color: textLabelColor,
-              font: { family: 'Manrope', size: 10, weight: '600' },
-              padding: 10
-            }
+            display: false
           },
           tooltip: {
             callbacks: {
@@ -1239,9 +2474,24 @@
       }
     });
 
-    // Render Progress Bars & Summary Cards
+    // Render Progress Bars & Summary Details
     const detailsContainer = document.getElementById('breakdown-details-container');
     if (detailsContainer) {
+      const feeRow = `
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
+            <span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+              <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#e2a03f;"></span>
+              Processing Fee
+            </span>
+            <span>₹${Math.round(fee).toLocaleString('en-IN')} (${feePct}%)</span>
+          </div>
+          <div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden;">
+            <div style="background:#e2a03f; width:${feePct}%; height:100%;"></div>
+          </div>
+        </div>
+      `;
+
       detailsContainer.innerHTML = `
         <div class="breakdown-summary-list" style="display:flex; flex-direction:column; gap:12px;">
           <!-- Principal -->
@@ -1263,7 +2513,7 @@
             <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
               <span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
                 <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#b44545;"></span>
-                Interest Amount
+                Total Interest
               </span>
               <span>₹${Math.round(interest).toLocaleString('en-IN')} (${interestPct}%)</span>
             </div>
@@ -1272,19 +2522,7 @@
             </div>
           </div>
           
-          <!-- Processing Fee -->
-          <div>
-            <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
-              <span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
-                <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#e2a03f;"></span>
-                Processing Fee
-              </span>
-              <span>₹${Math.round(fee).toLocaleString('en-IN')} (${feePct}%)</span>
-            </div>
-            <div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden;">
-              <div style="background:#e2a03f; width:${feePct}%; height:100%;"></div>
-            </div>
-          </div>
+          ${feeRow}
           
           <!-- Total Cost -->
           <div style="border-top:1px solid var(--border); padding-top:10px; display:flex; justify-content:space-between; font-size:14px; font-weight:700;">
@@ -1299,7 +2537,14 @@
   // Render Amortization Trend Chart
   function renderAmortizationChart() {
     const schedule = calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule;
-    
+    if (!schedule || schedule.length === 0) return;
+
+    // Show canvas wrap, hide placeholder
+    const placeholder = document.getElementById('amort-chart-placeholder');
+    const canvasWrap = document.getElementById('amort-chart-canvas-wrap');
+    if (placeholder) placeholder.style.display = 'none';
+    if (canvasWrap) canvasWrap.style.display = 'block';
+
     let labels = [];
     let balanceData = [];
     let cumulativeInterestData = [];
@@ -1309,9 +2554,8 @@
     let cumPrincipal = 0;
 
     if (chartGrouping === 'monthly') {
-      // Monthly Plot
       schedule.forEach((s) => {
-        labels.push(`Month ${s.emiNumber}`);
+        labels.push(`M${s.emiNumber}`);
         balanceData.push(s.outstandingBalance);
         cumInterest += s.interestComponent;
         cumPrincipal += s.principalComponent + (s.prepayment || 0);
@@ -1319,7 +2563,6 @@
         cumulativePrincipalData.push(cumPrincipal);
       });
     } else {
-      // Yearly Plot
       let yearsCount = Math.ceil(schedule.length / 12);
       for (let i = 0; i < yearsCount; i++) {
         let startIdx = i * 12;
@@ -1329,7 +2572,6 @@
         labels.push(`Year ${i + 1}`);
         balanceData.push(endRecord.outstandingBalance);
 
-        // Sum components for this year
         for (let j = startIdx; j <= endIdx; j++) {
           cumInterest += schedule[j].interestComponent;
           cumPrincipal += schedule[j].principalComponent + (schedule[j].prepayment || 0);
@@ -1403,7 +2645,7 @@
           tooltip: {
             callbacks: {
               label: function(context) {
-                return ' ' + context.dataset.label + ': ' + formatValueCurrency(context.raw);
+                return ' ' + context.label.split(' ')[0] + ': ' + formatValueCurrency(context.raw);
               }
             }
           }
@@ -1438,6 +2680,9 @@
       renderPieChart();
       renderAmortizationChart();
     }
+    if (flatCalculatedData) {
+      renderFlatBreakdown();
+    }
   }
 
   const themeObserver = new MutationObserver((mutations) => {
@@ -1449,21 +2694,38 @@
   });
   themeObserver.observe(document.documentElement, { attributes: true });
 
-  // Reset all parameters
+  // Reset all parameters to initial clean empty state
   function resetCalculator() {
-    principalInput.value = '';
-    document.getElementById('input-rate').value = '';
-    document.getElementById('input-tenure').value = '';
-    document.getElementById('input-fee').value = '';
-    prepaymentInput.value = '';
+    if (principalInput) principalInput.value = '';
+    const rateEl = document.getElementById('input-rate');
+    if (rateEl) rateEl.value = '';
+    const tenureEl = document.getElementById('input-tenure');
+    if (tenureEl) tenureEl.value = '';
+    const feeEl = document.getElementById('input-fee');
+    if (feeEl) feeEl.value = '';
+    if (prepaymentInput) prepaymentInput.value = '';
+    const searchEl = document.getElementById('table-search');
+    if (searchEl) searchEl.value = '';
+    searchQuery = '';
     clearErrors();
 
     calculatedData = {
+      principal: 0,
+      interestRate: 0,
+      tenureMonths: 0,
+      processingFee: 0,
+      prepayment: 0,
+      monthlyEMI: 0,
+      totalInterest: 0,
+      totalRepayment: 0,
+      effectiveCost: 0,
+      amortizationSchedule: [],
       originalSchedule: [],
       prepaySchedule: [],
       hasPrepayment: false,
       summary: {}
     };
+    window.calculatedData = calculatedData;
 
     document.getElementById('res-emi').textContent = '₹0';
     document.getElementById('res-interest').textContent = '₹0';
@@ -1471,28 +2733,35 @@
     document.getElementById('res-fee').textContent = '₹0';
     document.getElementById('res-cost').textContent = '₹0';
     document.getElementById('res-cost').style.color = 'var(--text-primary)';
-    document.getElementById('savings-badge-container').innerHTML = '';
+    const badgeContainer = document.getElementById('savings-badge-container');
+    if (badgeContainer) badgeContainer.innerHTML = '';
 
-    if (pieChartInstance) pieChartInstance.destroy();
-    if (lineChartInstance) lineChartInstance.destroy();
-    pieChartInstance = null;
-    lineChartInstance = null;
+    const sumBar = document.getElementById('amort-summary-bar');
+    if (sumBar) sumBar.style.display = 'none';
 
-    const detailsContainer = document.getElementById('breakdown-details-container');
-    if (detailsContainer) {
-      detailsContainer.innerHTML = `
-        <div style="text-align:center; color:var(--text-muted); font-size:13px; padding:20px 0;">
-          Enter values above and click Calculate to view breakdown.
-        </div>
-      `;
-    }
+    if (pieChartInstance) { pieChartInstance.destroy(); pieChartInstance = null; }
+    if (lineChartInstance) { lineChartInstance.destroy(); lineChartInstance = null; }
+
+    const placeholderBreakdown = document.getElementById('breakdown-placeholder');
+    const contentBreakdown = document.getElementById('breakdown-content');
+    if (placeholderBreakdown) placeholderBreakdown.style.display = 'flex';
+    if (contentBreakdown) contentBreakdown.style.display = 'none';
+
+    const placeholderChart = document.getElementById('amort-chart-placeholder');
+    const canvasWrap = document.getElementById('amort-chart-canvas-wrap');
+    if (placeholderChart) placeholderChart.style.display = 'flex';
+    if (canvasWrap) canvasWrap.style.display = 'none';
 
     document.getElementById('schedule-tbody').innerHTML = `
       <tr>
-        <td colspan="7" class="text-center text-muted" style="padding:40px 0;">Enter values above and click Calculate to view schedule.</td>
+        <td colspan="7" class="text-center text-muted" style="padding:40px 0;">
+          <i class="fas fa-table" style="font-size:32px; opacity:0.35; display:block; margin-bottom:10px;"></i>
+          Enter the loan details above and click Calculate to view the amortization schedule.
+        </td>
       </tr>
     `;
-    document.getElementById('pagination-wrapper').style.display = 'none';
+    const pagWrapper = document.getElementById('pagination-wrapper');
+    if (pagWrapper) pagWrapper.style.display = 'none';
   }
 
   // Repayment Schedule Table rendering, searching, sorting and pagination
@@ -1502,18 +2771,9 @@
     renderRepaymentTable();
   }
 
-  function handleLimitChange() {
-    const limit = document.getElementById('table-limit').value;
-    if (limit === 'all') {
-      rowsPerPage = 99999;
-    } else {
-      rowsPerPage = parseInt(limit);
-    }
-    currentPage = 1;
-    renderRepaymentTable();
-  }
-
   function handleSort(column) {
+    if (scheduleViewMode === 'yearly') return;
+
     if (sortColumn === column) {
       sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
     } else {
@@ -1521,21 +2781,9 @@
       sortOrder = 'asc';
     }
 
-    // Toggle styling classes on headers
     document.querySelectorAll('th.sortable').forEach(th => {
       th.classList.remove('asc', 'desc');
     });
-    
-    // Find target index for click sorting headers
-    const headerMapping = {
-      emiNumber: 0,
-      paymentDate: 1,
-      emiAmount: 2,
-      principalComponent: 3,
-      interestComponent: 4,
-      prepayment: 5,
-      outstandingBalance: 6
-    };
     
     const ths = document.querySelectorAll('th.sortable');
     ths.forEach(th => {
@@ -1548,28 +2796,175 @@
     renderRepaymentTable();
   }
 
+  function renderPaginationControls(options) {
+    const {
+      wrapperId,
+      infoId,
+      btnsContainerId,
+      totalRows,
+      rowsPerPage,
+      currentPage,
+      totalPages,
+      onPageChange
+    } = options;
+
+    const wrapper = document.getElementById(wrapperId);
+    if (!wrapper) return;
+
+    if (totalRows === 0) {
+      wrapper.style.display = 'none';
+      return;
+    }
+
+    wrapper.style.display = 'flex';
+
+    const startIdx = (currentPage - 1) * rowsPerPage;
+    const endIdx = Math.min(startIdx + rowsPerPage, totalRows);
+    const startNum = totalRows === 0 ? 0 : startIdx + 1;
+
+    const infoEl = document.getElementById(infoId);
+    if (infoEl) {
+      infoEl.textContent = `Showing ${startNum} to ${endIdx} of ${totalRows} entries`;
+    }
+
+    const btnsContainer = document.getElementById(btnsContainerId);
+    if (!btnsContainer) return;
+    btnsContainer.innerHTML = '';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'pagination-btn';
+    prevBtn.textContent = 'Previous';
+    prevBtn.disabled = currentPage <= 1;
+    prevBtn.onclick = () => onPageChange(currentPage - 1);
+    btnsContainer.appendChild(prevBtn);
+
+    const maxPagesToShow = 7;
+    let startPage = Math.max(1, currentPage - 3);
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+      const btn = document.createElement('button');
+      btn.className = `pagination-btn ${p === currentPage ? 'active' : ''}`;
+      btn.textContent = p;
+      btn.onclick = () => onPageChange(p);
+      btnsContainer.appendChild(btn);
+    }
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'pagination-btn';
+    nextBtn.textContent = 'Next';
+    nextBtn.disabled = currentPage >= totalPages || totalPages === 0;
+    nextBtn.onclick = () => onPageChange(currentPage + 1);
+    btnsContainer.appendChild(nextBtn);
+  }
+
   function renderRepaymentTable() {
     const schedule = calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule;
     if (!schedule || schedule.length === 0) return;
 
-    // Filter list
+    const theadTr = document.getElementById('schedule-thead-tr');
+    const tbody = document.getElementById('schedule-tbody');
+
+    if (scheduleViewMode === 'yearly') {
+      if (theadTr) {
+        theadTr.innerHTML = `
+          <th class="th-center">Year</th>
+          <th class="th-left">Period</th>
+          <th class="th-right">Total Payments</th>
+          <th class="th-right">Principal Paid</th>
+          <th class="th-right">Interest Paid</th>
+          <th class="th-right">Prepayment</th>
+          <th class="th-right">Closing Balance</th>
+        `;
+      }
+
+      let yearlyRows = buildYearlyAmortizationData(schedule);
+      if (searchQuery) {
+        yearlyRows = yearlyRows.filter(r => {
+          return `year ${r.yearNumber}`.includes(searchQuery) ||
+                 r.periodLabel.toLowerCase().includes(searchQuery) ||
+                 Math.round(r.totalPayments).toString().includes(searchQuery) ||
+                 Math.round(r.closingBalance).toString().includes(searchQuery);
+        });
+      }
+
+      const totalRows = yearlyRows.length;
+      const totalPages = Math.ceil(totalRows / rowsPerPage);
+      if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+      const startIdx = (currentPage - 1) * rowsPerPage;
+      const endIdx = Math.min(startIdx + rowsPerPage, totalRows);
+      const paginated = yearlyRows.slice(startIdx, endIdx);
+
+      tbody.innerHTML = '';
+      if (paginated.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted" style="padding:20px 0;">No matching entries found.</td></tr>`;
+        document.getElementById('pagination-wrapper').style.display = 'none';
+        return;
+      }
+
+      paginated.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="td-center" style="font-weight:700;">Year ${row.yearNumber}</td>
+          <td>${row.periodLabel}</td>
+          <td class="td-right">${formatValueCurrency(row.totalPayments)}</td>
+          <td class="td-right">${formatValueCurrency(row.principalPaid)}</td>
+          <td class="td-right" style="color:var(--danger);">${formatValueCurrency(row.interestPaid)}</td>
+          <td class="td-right">${row.prepayment > 0 ? formatValueCurrency(row.prepayment) : '—'}</td>
+          <td class="td-right" style="font-weight:700;">${formatValueCurrency(row.closingBalance)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      renderPaginationControls({
+        wrapperId: 'pagination-wrapper',
+        infoId: 'pagination-info',
+        btnsContainerId: 'pagination-btns',
+        totalRows: totalRows,
+        rowsPerPage: rowsPerPage,
+        currentPage: currentPage,
+        totalPages: totalPages,
+        onPageChange: (newPage) => {
+          currentPage = newPage;
+          renderRepaymentTable();
+        }
+      });
+      return;
+    }
+
+    if (theadTr) {
+      theadTr.innerHTML = `
+        <th class="th-center sortable ${sortColumn === 'emiNumber' ? sortOrder : ''}" onclick="handleSort('emiNumber')">#</th>
+        <th class="th-left sortable ${sortColumn === 'paymentDate' ? sortOrder : ''}" onclick="handleSort('paymentDate')">Payment Date</th>
+        <th class="th-right sortable ${sortColumn === 'emiAmount' ? sortOrder : ''}" onclick="handleSort('emiAmount')">EMI</th>
+        <th class="th-right sortable ${sortColumn === 'principalComponent' ? sortOrder : ''}" onclick="handleSort('principalComponent')">Principal</th>
+        <th class="th-right sortable ${sortColumn === 'interestComponent' ? sortOrder : ''}" onclick="handleSort('interestComponent')">Interest</th>
+        <th class="th-right sortable ${sortColumn === 'prepayment' ? sortOrder : ''}" onclick="handleSort('prepayment')">Prepayment</th>
+        <th class="th-right sortable ${sortColumn === 'outstandingBalance' ? sortOrder : ''}" onclick="handleSort('outstandingBalance')">Outstanding Balance</th>
+      `;
+    }
+
     let filtered = [...schedule];
     if (searchQuery) {
       filtered = filtered.filter(row => {
         return row.emiNumber.toString().includes(searchQuery) ||
+               `month ${row.emiNumber}`.includes(searchQuery) ||
                row.paymentDate.toLowerCase().includes(searchQuery) ||
                Math.round(row.emiAmount).toString().includes(searchQuery) ||
                Math.round(row.outstandingBalance).toString().includes(searchQuery);
       });
     }
 
-    // Sort list
     filtered.sort((a, b) => {
       let valA = a[sortColumn];
       let valB = b[sortColumn];
 
       if (sortColumn === 'paymentDate') {
-        // Date parse helper for month names
         valA = new Date(valA);
         valB = new Date(valB);
       }
@@ -1579,7 +2974,6 @@
       return 0;
     });
 
-    // Pagination
     const totalRows = filtered.length;
     const totalPages = Math.ceil(totalRows / rowsPerPage);
     if (currentPage > totalPages && totalPages > 0) {
@@ -1590,9 +2984,7 @@
     const endIdx = Math.min(startIdx + rowsPerPage, totalRows);
     const paginated = filtered.slice(startIdx, endIdx);
 
-    const tbody = document.getElementById('schedule-tbody');
     tbody.innerHTML = '';
-
     if (paginated.length === 0) {
       tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted" style="padding:20px 0;">No matching entries found.</td></tr>`;
       document.getElementById('pagination-wrapper').style.display = 'none';
@@ -1602,75 +2994,250 @@
     paginated.forEach(row => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>Month ${row.emiNumber}</td>
+        <td class="td-center">Month ${row.emiNumber}</td>
         <td>${row.paymentDate}</td>
-        <td>${formatValueCurrency(row.emiAmount)}</td>
-        <td>${formatValueCurrency(row.principalComponent)}</td>
-        <td>${formatValueCurrency(row.interestComponent)}</td>
-        <td>${row.prepayment > 0 ? formatValueCurrency(row.prepayment) : '—'}</td>
-        <td style="font-weight:600;">${formatValueCurrency(row.outstandingBalance)}</td>
+        <td class="td-right">${formatValueCurrency(row.emiAmount)}</td>
+        <td class="td-right">${formatValueCurrency(row.principalComponent)}</td>
+        <td class="td-right" style="color:var(--danger);">${formatValueCurrency(row.interestComponent)}</td>
+        <td class="td-right">${row.prepayment > 0 ? formatValueCurrency(row.prepayment) : '—'}</td>
+        <td class="td-right" style="font-weight:700;">${formatValueCurrency(row.outstandingBalance)}</td>
       `;
       tbody.appendChild(tr);
     });
 
-    // Update Pagination UI
-    const paginationWrapper = document.getElementById('pagination-wrapper');
-    if (totalRows <= rowsPerPage && rowsPerPage === 99999) {
-      paginationWrapper.style.display = 'none';
-    } else {
-      paginationWrapper.style.display = 'flex';
-      document.getElementById('pagination-info').textContent = `Showing ${startIdx + 1} to ${endIdx} of ${totalRows} installment periods`;
-      
-      const btnsContainer = document.getElementById('pagination-btns');
-      btnsContainer.innerHTML = '';
-
-      // Prev Button
-      const prevBtn = document.createElement('button');
-      prevBtn.className = 'pagination-btn';
-      prevBtn.textContent = 'Previous';
-      prevBtn.disabled = currentPage === 1;
-      prevBtn.onclick = () => { currentPage--; renderRepaymentTable(); };
-      btnsContainer.appendChild(prevBtn);
-
-      // Page numbers (smart pagination: show current, first, last, and neighbours)
-      const maxPagesToShow = 5;
-      let startPage = Math.max(1, currentPage - 2);
-      let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-      
-      if (endPage - startPage + 1 < maxPagesToShow) {
-        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    renderPaginationControls({
+      wrapperId: 'pagination-wrapper',
+      infoId: 'pagination-info',
+      btnsContainerId: 'pagination-btns',
+      totalRows: totalRows,
+      rowsPerPage: rowsPerPage,
+      currentPage: currentPage,
+      totalPages: totalPages,
+      onPageChange: (newPage) => {
+        currentPage = newPage;
+        renderRepaymentTable();
       }
-
-      for (let p = startPage; p <= endPage; p++) {
-        const btn = document.createElement('button');
-        btn.className = `pagination-btn ${p === currentPage ? 'active' : ''}`;
-        btn.textContent = p;
-        btn.onclick = () => { currentPage = p; renderRepaymentTable(); };
-        btnsContainer.appendChild(btn);
-      }
-
-      // Next Button
-      const nextBtn = document.createElement('button');
-      nextBtn.className = 'pagination-btn';
-      nextBtn.textContent = 'Next';
-      nextBtn.disabled = currentPage === totalPages;
-      nextBtn.onclick = () => { currentPage++; renderRepaymentTable(); };
-      btnsContainer.appendChild(nextBtn);
-    }
+    });
   }
 
-  // Exports capabilities
+  // ── Exports Capabilities ──────────────────────────────────────────────────
 
-  // Excel Export
-  function exportExcel() {
-    const schedule = calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule;
-    if (!schedule || schedule.length === 0) {
-      alert('Please perform calculations first before exporting.');
+  // Professional Customer-Facing PDF Export (Loan Repayment Schedule)
+  async function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    if (!jsPDF) {
+      alert('PDF library not loaded yet. Please wait a moment.');
       return;
     }
 
+    const schedule = calculatedData && (calculatedData.amortizationSchedule || (calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule));
+    if (!schedule || schedule.length === 0) {
+      alert('Calculate the loan before exporting the repayment schedule.');
+      return;
+    }
+
+    const sum = calculatedData.summary;
+    const doc = new jsPDF('p', 'pt', 'a4');
+
+    // Register custom font for authentic ₹ symbol
+    let fontName = 'helvetica';
+    const fonts = await getPdfFonts();
+    if (fonts) {
+      try {
+        doc.addFileToVFS('segoeui.ttf', fonts.regular);
+        doc.addFont('segoeui.ttf', 'SegoeUI', 'normal');
+        doc.addFileToVFS('segoeuib.ttf', fonts.bold);
+        doc.addFont('segoeuib.ttf', 'SegoeUI', 'bold');
+        fontName = 'SegoeUI';
+      } catch (err) {
+        console.warn('Font registration error:', err);
+      }
+    }
+
+    const brandNavy = [15, 39, 71];
+    const textDark = [16, 32, 51];
+    const textMuted = [82, 97, 115];
+    const textLight = [123, 136, 151];
+    const borderStroke = [217, 227, 239];
+    const cardBg = [248, 250, 252];
+
+    // Header branding
+    doc.setFont(fontName, 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...textLight);
+    doc.text('DIXIT LENDING SOLUTION', 40, 42);
+
+    // Document Title
+    doc.setFont(fontName, 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(...brandNavy);
+    doc.text('Loan Repayment Schedule', 40, 64);
+
+    // Subtitle
+    doc.setFont(fontName, 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...textMuted);
+    doc.text('Illustrative repayment schedule based on the loan details provided', 40, 79);
+
+    // Date
+    const formattedDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    doc.setFontSize(9);
+    doc.setTextColor(...textLight);
+    doc.text(`Generated: ${formattedDate}`, 555, 79, { align: 'right' });
+
+    // Divider
+    doc.setDrawColor(...borderStroke);
+    doc.setLineWidth(1);
+    doc.line(40, 90, 555, 90);
+
+    // Loan Summary Box
+    doc.setFillColor(...cardBg);
+    doc.setDrawColor(...borderStroke);
+    doc.roundedRect(40, 102, 515, 94, 6, 6, 'FD');
+
+    // Section title
+    doc.setFont(fontName, 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...brandNavy);
+    doc.text('LOAN DETAILS & REPAYMENT SUMMARY', 54, 120);
+
+    // Left Column details
+    doc.setFont(fontName, 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(...textDark);
+    doc.text(`Principal Amount:`, 54, 138);
+    doc.setFont(fontName, 'bold');
+    doc.text(`₹${Math.round(sum.principal).toLocaleString('en-IN')}`, 160, 138);
+
+    doc.setFont(fontName, 'normal');
+    doc.text(`Annual Interest Rate:`, 54, 154);
+    doc.setFont(fontName, 'bold');
+    doc.text(`${sum.rate}% p.a.`, 160, 154);
+
+    doc.setFont(fontName, 'normal');
+    doc.text(`Loan Tenure:`, 54, 170);
+    doc.setFont(fontName, 'bold');
+    doc.text(`${sum.tenureMonths} Months (${(sum.tenureMonths / 12).toFixed(1)} Years)`, 160, 170);
+
+    doc.setFont(fontName, 'normal');
+    doc.text(`Processing Fee:`, 54, 186);
+    doc.setFont(fontName, 'bold');
+    doc.text(`₹${Math.round(sum.processingFee).toLocaleString('en-IN')}`, 160, 186);
+
+    // Right Column details
+    doc.setFont(fontName, 'normal');
+    doc.text(`Monthly EMI:`, 320, 138);
+    doc.setFont(fontName, 'bold');
+    doc.setTextColor(...brandNavy);
+    doc.text(`₹${Math.round(sum.originalEMI).toLocaleString('en-IN')}`, 430, 138);
+
+    doc.setFont(fontName, 'normal');
+    doc.setTextColor(...textDark);
+    doc.text(`Total Interest Payable:`, 320, 154);
+    doc.setFont(fontName, 'bold');
+    doc.text(`₹${Math.round(calculatedData.hasPrepayment ? sum.prepayTotalInterest : sum.originalTotalInterest).toLocaleString('en-IN')}`, 430, 154);
+
+    doc.setFont(fontName, 'normal');
+    doc.text(`Total Repayment:`, 320, 170);
+    doc.setFont(fontName, 'bold');
+    doc.text(`₹${Math.round(calculatedData.hasPrepayment ? sum.prepayTotalAmount : sum.originalTotalAmount).toLocaleString('en-IN')}`, 430, 170);
+
+    doc.setFont(fontName, 'normal');
+    if (calculatedData.hasPrepayment) {
+      doc.text(`Interest Saved:`, 320, 186);
+      doc.setFont(fontName, 'bold');
+      doc.setTextColor(15, 139, 113);
+      doc.text(`₹${Math.round(sum.interestSaved).toLocaleString('en-IN')}`, 430, 186);
+    } else {
+      const effCost = sum.principal + sum.originalTotalInterest + sum.processingFee;
+      doc.text(`Effective Outflow:`, 320, 186);
+      doc.setFont(fontName, 'bold');
+      doc.text(`₹${Math.round(effCost).toLocaleString('en-IN')}`, 430, 186);
+    }
+
+    // Amortization Table Data
+    const tableData = schedule.map(r => [
+      `Month ${r.emiNumber}`,
+      r.paymentDate,
+      `₹${Math.round(r.emiAmount).toLocaleString('en-IN')}`,
+      `₹${Math.round(r.principalComponent).toLocaleString('en-IN')}`,
+      `₹${Math.round(r.interestComponent).toLocaleString('en-IN')}`,
+      r.prepayment > 0 ? `₹${Math.round(r.prepayment).toLocaleString('en-IN')}` : '—',
+      `₹${Math.round(r.outstandingBalance).toLocaleString('en-IN')}`
+    ]);
+
+    doc.autoTable({
+      head: [["#", "Payment Date", "EMI Amount", "Principal Paid", "Interest Paid", "Prepayment", "Outstanding Balance"]],
+      body: tableData,
+      startY: 210,
+      showHead: 'everyPage',
+      theme: 'plain',
+      headStyles: {
+        fillColor: brandNavy,
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 8.5,
+        halign: 'left',
+        font: fontName
+      },
+      styles: {
+        font: fontName,
+        fontSize: 8,
+        cellPadding: { top: 5, bottom: 5, left: 6, right: 6 },
+        textColor: textDark,
+        lineColor: [230, 236, 244],
+        lineWidth: 0.5
+      },
+      columnStyles: {
+        0: { cellWidth: 50, halign: 'center' },
+        1: { cellWidth: 70, halign: 'left' },
+        2: { cellWidth: 75, halign: 'right' },
+        3: { cellWidth: 80, halign: 'right' },
+        4: { cellWidth: 80, halign: 'right' },
+        5: { cellWidth: 70, halign: 'right' },
+        6: { cellWidth: 90, halign: 'right', fontStyle: 'bold' }
+      },
+      alternateRowStyles: {
+        fillColor: [248, 250, 253]
+      },
+      margin: { left: 40, right: 40, bottom: 35 }
+    });
+
+    // Add page numbers and disclaimer footer to every page
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFont(fontName, 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...textLight);
+      doc.text('This schedule is illustrative and indicative. Actual repayment amounts may vary based on disbursement dates and bank terms.', 40, 822);
+      doc.text(`Page ${i} of ${totalPages}`, 555, 822, { align: 'right' });
+    }
+
+    doc.save(`Loan_Repayment_Schedule_${Math.round(sum.principal)}.pdf`);
+  }
+
+  // Excel Export
+  function exportExcel() {
+    const schedule = calculatedData && (calculatedData.amortizationSchedule || (calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule));
+    if (!schedule || schedule.length === 0) {
+      alert('Calculate the loan before exporting the repayment schedule.');
+      return;
+    }
+
+    const sum = calculatedData.summary;
     const wsData = [
-      ["EMI Number", "Payment Date", "EMI Amount (INR)", "Principal component (INR)", "Interest component (INR)", "Prepayment (INR)", "Outstanding Balance (INR)"]
+      ['DIXIT LENDING SOLUTION — Loan Repayment Schedule'],
+      [],
+      ['Principal Amount', Math.round(sum.principal)],
+      ['Interest Rate (% p.a.)', sum.rate],
+      ['Tenure (Months)', sum.tenureMonths],
+      ['Monthly EMI', Math.round(sum.originalEMI)],
+      ['Total Interest Payable', Math.round(calculatedData.hasPrepayment ? sum.prepayTotalInterest : sum.originalTotalInterest)],
+      ['Total Repayment', Math.round(calculatedData.hasPrepayment ? sum.prepayTotalAmount : sum.originalTotalAmount)],
+      ['Processing Fee', Math.round(sum.processingFee)],
+      [],
+      ['EMI #', 'Payment Date', 'EMI Amount', 'Principal Paid', 'Interest Paid', 'Prepayment', 'Outstanding Balance']
     ];
 
     schedule.forEach(r => {
@@ -1687,179 +3254,49 @@
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(wsData);
-    
-    // Set column widths
-    const wscols = [
-      {wch: 12},
-      {wch: 15},
-      {wch: 18},
-      {wch: 25},
-      {wch: 22},
-      {wch: 18},
-      {wch: 25}
-    ];
-    ws['!cols'] = wscols;
-
+    ws['!cols'] = [{wch:10},{wch:16},{wch:18},{wch:18},{wch:18},{wch:16},{wch:22}];
     XLSX.utils.book_append_sheet(wb, ws, "Repayment Schedule");
-    XLSX.writeFile(wb, `CLN_EMI_Schedule_${Math.round(calculatedData.summary.principal)}.xlsx`);
+    XLSX.writeFile(wb, `Loan_Repayment_Schedule_${Math.round(sum.principal)}.xlsx`);
   }
 
   // CSV Export
   function exportCSV() {
-    const schedule = calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule;
+    const schedule = calculatedData && (calculatedData.amortizationSchedule || (calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule));
     if (!schedule || schedule.length === 0) {
-      alert('Please perform calculations first.');
+      alert('Calculate the loan before exporting the repayment schedule.');
       return;
     }
 
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "EMI Number,Payment Date,EMI Amount (INR),Principal Paid (INR),Interest Paid (INR),Prepayment (INR),Outstanding Balance (INR)\n";
+    let csvContent = "\uFEFFEMI Number,Payment Date,EMI Amount (INR),Principal Paid (INR),Interest Paid (INR),Prepayment (INR),Outstanding Balance (INR)\r\n";
 
     schedule.forEach(r => {
-      csvContent += `${r.emiNumber},${r.paymentDate},${Math.round(r.emiAmount)},${Math.round(r.principalComponent)},${Math.round(r.interestComponent)},${Math.round(r.prepayment)},${Math.round(r.outstandingBalance)}\n`;
+      csvContent += `${r.emiNumber},${r.paymentDate},${Math.round(r.emiAmount)},${Math.round(r.principalComponent)},${Math.round(r.interestComponent)},${Math.round(r.prepayment)},${Math.round(r.outstandingBalance)}\r\n`;
     });
 
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `CLN_EMI_Schedule_${Math.round(calculatedData.summary.principal)}.csv`);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Loan_Repayment_Schedule_${Math.round(calculatedData.principal || calculatedData.summary.principal)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }
-
-  // PDF Report Export
-  function exportPDF() {
-    const { jsPDF } = window.jspdf;
-    if (!jsPDF) {
-      alert('PDF library not loaded yet. Please wait a second.');
-      return;
-    }
-
-    const schedule = calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule;
-    if (!schedule || schedule.length === 0) {
-      alert('Please perform calculations first.');
-      return;
-    }
-
-    const sum = calculatedData.summary;
-    const doc = new jsPDF('p', 'pt', 'a4');
-
-    // Title
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.setTextColor(15, 39, 71); // Accent primary
-    doc.text("CLN Lending Suite", 40, 50);
-
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(82, 97, 115);
-    doc.text("EMI Amortization Summary Report", 40, 72);
-
-    // Date
-    doc.setFontSize(10);
-    doc.setTextColor(123, 136, 151);
-    doc.text(`Generated on: ${new Date().toLocaleDateString('en-IN')}`, 450, 50);
-
-    // Draw horizontal line
-    doc.setDrawColor(217, 227, 239);
-    doc.setLineWidth(1);
-    doc.line(40, 85, 550, 85);
-
-    // Summary section
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.setTextColor(16, 32, 51);
-    doc.text("Loan Details & Summary", 40, 110);
-
-    // Left Column details
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.text(`Principal Amount:  ₹${Math.round(sum.principal).toLocaleString('en-IN')}`, 40, 135);
-    doc.text(`Annual Interest Rate:  ${sum.rate}% p.a.`, 40, 155);
-    doc.text(`Loan Tenure:  ${sum.tenureMonths} Months (${(sum.tenureMonths / 12).toFixed(1)} Years)`, 40, 175);
-    doc.text(`Processing Fee:  ₹${Math.round(sum.processingFee).toLocaleString('en-IN')}`, 40, 195);
-
-    // Right Column details
-    doc.text(`Monthly EMI:  ₹${Math.round(sum.originalEMI).toLocaleString('en-IN')}`, 320, 135);
-    doc.text(`Interest Payable:  ₹${Math.round(calculatedData.hasPrepayment ? sum.prepayTotalInterest : sum.originalTotalInterest).toLocaleString('en-IN')}`, 320, 155);
-    doc.text(`Total Amount Payable:  ₹${Math.round(calculatedData.hasPrepayment ? sum.prepayTotalAmount : sum.originalTotalAmount).toLocaleString('en-IN')}`, 320, 175);
-    
-    if (calculatedData.hasPrepayment) {
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(15, 139, 113); // Success color
-      doc.text(`Interest Saved:  ₹${Math.round(sum.interestSaved).toLocaleString('en-IN')}`, 320, 195);
-      doc.setTextColor(15, 39, 71);
-      doc.text(`Revised Tenure:  ${schedule.length} Months (Reduced by ${sum.tenureReducedMonths}m)`, 320, 215);
-      doc.setFont("helvetica", "normal");
-    } else {
-      const effCost = sum.principal + sum.originalTotalInterest + sum.processingFee;
-      doc.text(`Effective Cost of Loan:  ₹${Math.round(effCost).toLocaleString('en-IN')}`, 320, 195);
-    }
-
-    // Add Pie Chart screenshot if canvas renders
-    const pieCanvas = document.getElementById('chart-pie');
-    if (pieCanvas) {
-      try {
-        const imgData = pieCanvas.toDataURL('image/jpeg', 0.85);
-        doc.addImage(imgData, 'JPEG', 40, 235, 140, 140);
-      } catch (err) {
-        // ignore image error
-      }
-    }
-
-    // Draw amortization table using AutoTable
-    const tableData = schedule.map(r => [
-      `Month ${r.emiNumber}`,
-      r.paymentDate,
-      `₹${Math.round(r.emiAmount).toLocaleString('en-IN')}`,
-      `₹${Math.round(r.principalComponent).toLocaleString('en-IN')}`,
-      `₹${Math.round(r.interestComponent).toLocaleString('en-IN')}`,
-      r.prepayment > 0 ? `₹${Math.round(r.prepayment).toLocaleString('en-IN')}` : '—',
-      `₹${Math.round(r.outstandingBalance).toLocaleString('en-IN')}`
-    ]);
-
-    doc.autoTable({
-      head: [["EMI #", "Payment Date", "EMI Amount", "Principal Part", "Interest Part", "Prepayment", "Balance"]],
-      body: tableData,
-      startY: 395,
-      theme: 'striped',
-      headStyles: {
-        fillColor: [15, 39, 71],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        fontSize: 9
-      },
-      styles: {
-        fontSize: 8.5,
-        cellPadding: 6,
-        font: 'helvetica'
-      },
-      columnStyles: {
-        0: { cellWidth: 50 },
-        1: { cellWidth: 70 },
-        2: { cellWidth: 75 },
-        3: { cellWidth: 85 },
-        4: { cellWidth: 85 },
-        5: { cellWidth: 70 },
-        6: { cellWidth: 95 }
-      },
-      margin: { left: 40, right: 40 }
-    });
-
-    doc.save(`CLN_EMI_Report_${Math.round(sum.principal)}.pdf`);
+    URL.revokeObjectURL(url);
   }
 
   // ── Compare Loans Tab Javascript ──────────────────────────────────────────
-  let activeTab = 'single';
+  let activeTab = 'reducing';
   let comparedData = null;
 
   function switchTab(tab) {
     activeTab = tab;
-    document.getElementById('tab-btn-single').classList.toggle('active', tab === 'single');
+    document.getElementById('tab-btn-reducing').classList.toggle('active', tab === 'reducing');
+    document.getElementById('tab-btn-flat').classList.toggle('active', tab === 'flat');
     document.getElementById('tab-btn-compare').classList.toggle('active', tab === 'compare');
-    document.getElementById('tab-content-single').style.display = tab === 'single' ? 'block' : 'none';
+    document.getElementById('tab-content-reducing').style.display = tab === 'reducing' ? 'block' : 'none';
+    document.getElementById('tab-content-flat').style.display = tab === 'flat' ? 'block' : 'none';
     document.getElementById('tab-content-compare').style.display = tab === 'compare' ? 'block' : 'none';
+    if (window.applyIconography) applyIconography();
   }
 
   const compareP1 = document.getElementById('compare-principal-1');
@@ -1903,7 +3340,6 @@
     if (isNaN(t2) || t2 <= 0) { showCompareError('err-compare-tenure-2', 'Enter a valid tenure in months.'); hasError = true; }
     if (hasError) return;
 
-    // EMI Formula: P × R × (1+R)^N / ((1+R)^N - 1)
     const mR1 = r1 / 12 / 100;
     const emi1 = mR1 > 0 ? (p1 * mR1 * Math.pow(1 + mR1, t1)) / (Math.pow(1 + mR1, t1) - 1) : p1 / t1;
     const total1 = emi1 * t1;
@@ -1953,23 +3389,23 @@
 
     let reasonsHtml = '';
     if (betterOpt.emi < worseOpt.emi)
-      reasonsHtml += `<li>📉 Lower Monthly EMI (saves ₹${Math.round(worseOpt.emi - betterOpt.emi).toLocaleString('en-IN')}/month)</li>`;
+      reasonsHtml += `<li><i class="fas fa-arrow-trend-down" style="color:var(--accent); margin-right:6px;"></i> Lower Monthly EMI (saves ₹${Math.round(worseOpt.emi - betterOpt.emi).toLocaleString('en-IN')}/month)</li>`;
     if (betterOpt.r < worseOpt.r)
-      reasonsHtml += `<li>🎯 Better Interest Rate (${betterOpt.r}% vs ${worseOpt.r}%)</li>`;
+      reasonsHtml += `<li><i class="fas fa-bullseye" style="color:var(--accent); margin-right:6px;"></i> Better Interest Rate (${betterOpt.r}% vs ${worseOpt.r}%)</li>`;
     if (betterOpt.interest < worseOpt.interest)
-      reasonsHtml += `<li>📈 Lower Total Interest (saves ₹${Math.round(interestDiff).toLocaleString('en-IN')})</li>`;
+      reasonsHtml += `<li><i class="fas fa-percent" style="color:var(--accent); margin-right:6px;"></i> Lower Total Interest (saves ₹${Math.round(interestDiff).toLocaleString('en-IN')})</li>`;
     if (betterOpt.total < worseOpt.total)
-      reasonsHtml += `<li>₹ Lower Total Repayment (saves ₹${Math.round(savings).toLocaleString('en-IN')} overall)</li>`;
+      reasonsHtml += `<li><i class="fas fa-wallet" style="color:var(--accent); margin-right:6px;"></i> Lower Total Repayment (saves ₹${Math.round(savings).toLocaleString('en-IN')} overall)</li>`;
     if (!reasonsHtml) reasonsHtml = '<li>Both options have identical financial parameters.</li>';
 
     recCard.innerHTML = `
-      <div style="font-size:24px;color:var(--success);margin-top:2px;">✅</div>
+      <div style="font-size:24px; color:var(--success); margin-top:2px;"><i class="fas fa-circle-check"></i></div>
       <div>
-        <h4 style="color:var(--success);margin:0 0 8px 0;font-size:16px;">Loan Option ${betterOption} is better!</h4>
-        <p style="margin:0 0 10px 0;font-size:14px;color:var(--text-secondary);">
+        <h4 style="color:var(--success); margin:0 0 8px 0; font-size:16px;">Loan Option ${betterOption} is financially better!</h4>
+        <p style="margin:0 0 10px 0; font-size:14px; color:var(--text-secondary);">
           Choosing <strong>Option ${betterOption}</strong> (${betterOpt.b || 'Option ' + betterOption}) saves you <strong>₹${Math.round(savings).toLocaleString('en-IN')}</strong> in total repayment compared to Option ${worseNum}.
         </p>
-        <ul style="margin:0;padding-left:20px;font-size:13px;color:var(--text-secondary);line-height:1.6;">${reasonsHtml}</ul>
+        <ul style="margin:0; padding-left:20px; font-size:13px; color:var(--text-secondary); line-height:1.6;">${reasonsHtml}</ul>
       </div>`;
 
     document.getElementById('table-header-opt1').textContent = `Option 1 ${opt1.b ? '(' + opt1.b + ')' : ''}`;
@@ -1984,51 +3420,51 @@
 
     document.getElementById('compare-table-tbody').innerHTML = `
       <tr>
-        <td style="padding:12px;font-weight:500;">Loan Amount (Principal)</td>
+        <td style="padding:12px; font-weight:500;">Loan Amount (Principal)</td>
         <td style="padding:12px;">${fmtC(opt1.p, hClass(opt1.p, opt2.p))}</td>
         <td style="padding:12px;">${fmtC(opt2.p, hClass(opt2.p, opt1.p))}</td>
-        <td style="padding:12px;font-weight:600;">${fmtDiff(Math.abs(opt1.p - opt2.p))}</td>
+        <td style="padding:12px; font-weight:600;">${fmtDiff(Math.abs(opt1.p - opt2.p))}</td>
       </tr>
       <tr>
-        <td style="padding:12px;font-weight:500;">Interest Rate (% per annum)</td>
+        <td style="padding:12px; font-weight:500;">Interest Rate (% per annum)</td>
         <td style="padding:12px;"><span class="${hClass(opt1.r, opt2.r)}">${opt1.r}% p.a.</span></td>
         <td style="padding:12px;"><span class="${hClass(opt2.r, opt1.r)}">${opt2.r}% p.a.</span></td>
-        <td style="padding:12px;font-weight:600;">${Math.abs(opt1.r - opt2.r).toFixed(2)}%</td>
+        <td style="padding:12px; font-weight:600;">${Math.abs(opt1.r - opt2.r).toFixed(2)}%</td>
       </tr>
       <tr>
-        <td style="padding:12px;font-weight:500;">Loan Tenure (Months)</td>
+        <td style="padding:12px; font-weight:500;">Loan Tenure (Months)</td>
         <td style="padding:12px;"><span class="${hClass(opt1.t, opt2.t)}">${opt1.t} Months</span></td>
         <td style="padding:12px;"><span class="${hClass(opt2.t, opt1.t)}">${opt2.t} Months</span></td>
-        <td style="padding:12px;font-weight:600;">${Math.abs(opt1.t - opt2.t)} Months</td>
+        <td style="padding:12px; font-weight:600;">${Math.abs(opt1.t - opt2.t)} Months</td>
       </tr>
       <tr style="border-top:1.5px solid var(--border);">
-        <td style="padding:12px;font-weight:700;color:var(--accent);">Monthly EMI</td>
+        <td style="padding:12px; font-weight:700; color:var(--accent);">Monthly EMI</td>
         <td style="padding:12px;">${fmtC(opt1.emi, hClass(opt1.emi, opt2.emi))}</td>
         <td style="padding:12px;">${fmtC(opt2.emi, hClass(opt2.emi, opt1.emi))}</td>
-        <td style="padding:12px;font-weight:700;color:var(--accent);">${fmtDiff(emiDiff)}</td>
+        <td style="padding:12px; font-weight:700; color:var(--accent);">${fmtDiff(emiDiff)}</td>
       </tr>
       <tr>
-        <td style="padding:12px;font-weight:600;color:var(--text-secondary);">Total Interest Payable</td>
+        <td style="padding:12px; font-weight:600; color:var(--text-secondary);">Total Interest Payable</td>
         <td style="padding:12px;">${fmtC(opt1.interest, hClass(opt1.interest, opt2.interest))}</td>
         <td style="padding:12px;">${fmtC(opt2.interest, hClass(opt2.interest, opt1.interest))}</td>
-        <td style="padding:12px;font-weight:600;color:var(--warning);">${fmtDiff(interestDiff)}</td>
+        <td style="padding:12px; font-weight:600; color:var(--warning);">${fmtDiff(interestDiff)}</td>
       </tr>
-      <tr style="background:var(--bg-secondary);border-top:1px solid var(--border);">
-        <td style="padding:12px;font-weight:700;">Total Repayment Amount</td>
+      <tr style="background:var(--bg-secondary); border-top:1px solid var(--border);">
+        <td style="padding:12px; font-weight:700;">Total Repayment Amount</td>
         <td style="padding:12px;">${fmtC(opt1.total, hClass(opt1.total, opt2.total))}</td>
         <td style="padding:12px;">${fmtC(opt2.total, hClass(opt2.total, opt1.total))}</td>
-        <td style="padding:12px;font-weight:700;color:var(--success);">${fmtDiff(savings)}</td>
+        <td style="padding:12px; font-weight:700; color:var(--success);">${fmtDiff(savings)}</td>
       </tr>
-      `;
+    `;
   }
 
   function shareCompare() {
     if (!comparedData) return;
     const { opt1, opt2, betterOption, savings } = comparedData;
-    const text = `CLN Loan Comparison Summary:\n` +
+    const text = `Loan Comparison Summary:\n` +
       `Option 1: ₹${Math.round(opt1.p).toLocaleString('en-IN')} @ ${opt1.r}% for ${opt1.t} months (${opt1.b || 'N/A'})\n` +
       `Option 2: ₹${Math.round(opt2.p).toLocaleString('en-IN')} @ ${opt2.r}% for ${opt2.t} months (${opt2.b || 'N/A'})\n` +
-      `👉 Option ${betterOption} is financially better — saves ₹${Math.round(savings).toLocaleString('en-IN')} overall!`;
+      `Result: Option ${betterOption} is financially better — saves ₹${Math.round(savings).toLocaleString('en-IN')} overall!`;
     navigator.clipboard.writeText(text)
       .then(() => alert('Comparison summary copied to clipboard!'))
       .catch(() => alert('Summary:\n\n' + text));
@@ -2038,7 +3474,7 @@
     if (!comparedData) return;
     const { opt1, opt2, betterOption, savings, emiDiff, interestDiff } = comparedData;
     const wsData = [
-      ['CLN Lending Suite — Loan Comparison Report'],
+      ['DIXIT LENDING SOLUTION — Loan Comparison Report'],
       [],
       ['Parameters', `Option 1 (${opt1.b || 'N/A'})`, `Option 2 (${opt2.b || 'N/A'})`, 'Difference'],
       ['Loan Amount (Principal)', Math.round(opt1.p), Math.round(opt2.p), Math.round(Math.abs(opt1.p - opt2.p))],
@@ -2054,31 +3490,47 @@
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     ws['!cols'] = [{wch:28},{wch:20},{wch:20},{wch:15}];
     XLSX.utils.book_append_sheet(wb, ws, 'Comparison Report');
-    XLSX.writeFile(wb, `CLN_Loan_Comparison_${Math.round(opt1.p)}.xlsx`);
+    XLSX.writeFile(wb, `Loan_Comparison_${Math.round(opt1.p)}.xlsx`);
   }
 
-  function exportComparePDF() {
+  async function exportComparePDF() {
     const { jsPDF } = window.jspdf;
     if (!jsPDF) { alert('PDF library not loaded yet.'); return; }
     if (!comparedData) return;
     const { opt1, opt2, betterOption, savings, emiDiff, interestDiff } = comparedData;
     const doc = new jsPDF('p', 'pt', 'a4');
 
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(15, 39, 71);
-    doc.text('CLN Lending Suite', 40, 50);
-    doc.setFontSize(14); doc.setFont('helvetica', 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Loan Comparison Report', 40, 72);
-    doc.setFontSize(10); doc.setTextColor(123, 136, 151);
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}`, 430, 50);
-    doc.setDrawColor(217, 227, 239); doc.line(40, 85, 550, 85);
+    let fontName = 'helvetica';
+    const fonts = await getPdfFonts();
+    if (fonts) {
+      try {
+        doc.addFileToVFS('segoeui.ttf', fonts.regular);
+        doc.addFont('segoeui.ttf', 'SegoeUI', 'normal');
+        doc.addFileToVFS('segoeuib.ttf', fonts.bold);
+        doc.addFont('segoeuib.ttf', 'SegoeUI', 'bold');
+        fontName = 'SegoeUI';
+      } catch (err) {}
+    }
 
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(15, 139, 113);
-    doc.text(`✅ Recommendation: Loan Option ${betterOption} is financially better!`, 40, 110);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(82, 97, 115);
-    doc.text(`Choosing Option ${betterOption} saves ₹${Math.round(savings).toLocaleString('en-IN')} overall vs Option ${betterOption === 1 ? 2 : 1}.`, 40, 130);
+    const brandNavy = [15, 39, 71];
+    doc.setFont(fontName, 'bold'); doc.setFontSize(10); doc.setTextColor(123, 136, 151);
+    doc.text('DIXIT LENDING SOLUTION', 40, 42);
+
+    doc.setFont(fontName, 'bold'); doc.setFontSize(20); doc.setTextColor(...brandNavy);
+    doc.text('Loan Comparison Report', 40, 64);
+    doc.setFontSize(10); doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
+    doc.text('Comparative analysis between loan options', 40, 79);
+    doc.setFontSize(9); doc.setTextColor(123, 136, 151);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`, 555, 79, { align: 'right' });
+    doc.setDrawColor(217, 227, 239); doc.line(40, 90, 555, 90);
+
+    doc.setFont(fontName, 'bold'); doc.setFontSize(11); doc.setTextColor(15, 139, 113);
+    doc.text(`Recommendation: Loan Option ${betterOption} is financially better`, 40, 115);
+    doc.setFont(fontName, 'normal'); doc.setFontSize(9.5); doc.setTextColor(82, 97, 115);
+    doc.text(`Choosing Option ${betterOption} saves ₹${Math.round(savings).toLocaleString('en-IN')} in total repayment versus Option ${betterOption === 1 ? 2 : 1}.`, 40, 132);
 
     doc.autoTable({
-      head: [['Details', `Option 1 (${opt1.b||'N/A'})`, `Option 2 (${opt2.b||'N/A'})`, 'Difference']],
+      head: [['Loan Parameters', `Option 1 (${opt1.b || 'N/A'})`, `Option 2 (${opt2.b || 'N/A'})`, 'Difference']],
       body: [
         ['Principal Amount', `₹${Math.round(opt1.p).toLocaleString('en-IN')}`, `₹${Math.round(opt2.p).toLocaleString('en-IN')}`, `₹${Math.round(Math.abs(opt1.p-opt2.p)).toLocaleString('en-IN')}`],
         ['Interest Rate', `${opt1.r}% p.a.`, `${opt2.r}% p.a.`, `${Math.abs(opt1.r-opt2.r).toFixed(2)}%`],
@@ -2087,14 +3539,654 @@
         ['Total Interest', `₹${Math.round(opt1.interest).toLocaleString('en-IN')}`, `₹${Math.round(opt2.interest).toLocaleString('en-IN')}`, `₹${Math.round(interestDiff).toLocaleString('en-IN')}`],
         ['Total Repayment', `₹${Math.round(opt1.total).toLocaleString('en-IN')}`, `₹${Math.round(opt2.total).toLocaleString('en-IN')}`, `₹${Math.round(savings).toLocaleString('en-IN')}`]
       ],
-      startY: 155,
-      theme: 'striped',
-      headStyles: { fillColor: [15, 39, 71], textColor: [255, 255, 255], fontStyle: 'bold' },
-      styles: { fontSize: 9, cellPadding: 8, font: 'helvetica' }
+      startY: 150,
+      showHead: 'everyPage',
+      theme: 'plain',
+      headStyles: { fillColor: brandNavy, textColor: [255, 255, 255], fontStyle: 'bold', font: fontName, fontSize: 9 },
+      styles: { fontSize: 8.5, cellPadding: 8, font: fontName, lineColor: [230, 236, 244], lineWidth: 0.5 },
+      alternateRowStyles: { fillColor: [248, 250, 253] },
+      columnStyles: {
+        0: { cellWidth: 155 },
+        1: { cellWidth: 120, halign: 'right' },
+        2: { cellWidth: 120, halign: 'right' },
+        3: { cellWidth: 120, halign: 'right', fontStyle: 'bold' }
+      },
+      margin: { left: 40, right: 40, bottom: 35 }
     });
 
-    doc.save(`CLN_Loan_Comparison_${Math.round(opt1.p)}.pdf`);
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFont(fontName, 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(140, 150, 165);
+      doc.text('This comparison is illustrative and indicative. Actual bank terms may vary.', 40, 822);
+      doc.text(`Page ${i} of ${totalPages}`, 555, 822, { align: 'right' });
+    }
+
+    doc.save(`Loan_Comparison_${Math.round(opt1.p)}.pdf`);
+  }
+
+  // ── Flat Rate Calculator ──────────────────────────────────────────────────
+  let flatTenureUnit = 'years';
+  let flatCalculatedData = null;
+  let flatPieChartInstance = null;
+  let flatCurrentPage = 1;
+  let flatRowsPerPage = 12;
+
+  function setFlatRowsLimit(limit) {
+    flatRowsPerPage = limit === 'all' ? 999999 : parseInt(limit, 10);
+    flatCurrentPage = 1;
+    document.querySelectorAll('#flat-limit-pills-group .segmented-pill-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-limit') == String(limit));
+    });
+    renderFlatSchedule();
+  }
+
+  const flatPrincipalInput = document.getElementById('flat-principal');
+  if (flatPrincipalInput) {
+    flatPrincipalInput.addEventListener('input', () => formatInputValue(flatPrincipalInput));
+  }
+
+  function setFlatTenureUnit(unit) {
+    flatTenureUnit = unit;
+    document.getElementById('flat-btn-years').classList.toggle('active', unit === 'years');
+    document.getElementById('flat-btn-months').classList.toggle('active', unit === 'months');
+    document.getElementById('flat-tenure').placeholder = unit === 'years' ? '2' : '24';
+    if (flatCalculatedData) calculateFlatRateLoan();
+  }
+
+  function clearFlatErrors() {
+    ['flat-err-principal', 'flat-err-rate', 'flat-err-tenure', 'flat-err-fee'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = ''; el.style.display = 'none'; }
+    });
+  }
+
+  function showFlatError(id, msg) {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = msg; el.style.display = 'block'; }
+  }
+
+  function calculateFlatRateLoan() {
+    clearFlatErrors();
+
+    const principalStr = flatPrincipalInput ? flatPrincipalInput.value.replace(/,/g, '') : '';
+    const rateStr = document.getElementById('flat-rate') ? document.getElementById('flat-rate').value : '';
+    const tenureStr = document.getElementById('flat-tenure') ? document.getElementById('flat-tenure').value : '';
+    const feeStr = document.getElementById('flat-fee') ? document.getElementById('flat-fee').value : '';
+
+    const principal = parseFloat(principalStr);
+    const rateVal = parseFloat(rateStr);
+    const tenureVal = parseFloat(tenureStr);
+    const feePercent = feeStr ? parseFloat(feeStr) : 0;
+
+    let hasError = false;
+    if (isNaN(principal) || principal <= 0) {
+      showFlatError('flat-err-principal', 'Please enter a valid loan amount greater than 0.');
+      hasError = true;
+    }
+    if (isNaN(rateVal) || rateVal < 0 || rateVal > 100) {
+      showFlatError('flat-err-rate', 'Flat interest rate must be between 0% and 100%.');
+      hasError = true;
+    }
+    if (isNaN(tenureVal) || tenureVal <= 0 || !Number.isInteger(tenureVal)) {
+      showFlatError('flat-err-tenure', 'Tenure must be a positive whole number.');
+      hasError = true;
+    }
+    if (feeStr && (isNaN(feePercent) || feePercent < 0 || feePercent > 100)) {
+      showFlatError('flat-err-fee', 'Processing fee must be between 0% and 100%.');
+      hasError = true;
+    }
+    if (hasError) return;
+
+    const totalMonths = flatTenureUnit === 'years' ? tenureVal * 12 : tenureVal;
+    if (totalMonths > 600) {
+      showFlatError('flat-err-tenure', 'Maximum supported tenure is 50 years (600 months).');
+      return;
+    }
+    const tenureYears = totalMonths / 12;
+
+    const totalInterest = principal * (rateVal / 100) * tenureYears;
+    const totalAmount = principal + totalInterest;
+    const monthlyPayment = totalAmount / totalMonths;
+    const processingFee = principal * (feePercent / 100);
+    const effectiveCost = totalAmount + processingFee;
+
+    flatCalculatedData = {
+      principal: principal,
+      rateVal: rateVal,
+      totalMonths: totalMonths,
+      tenureYears: tenureYears,
+      totalInterest: totalInterest,
+      totalAmount: totalAmount,
+      monthlyPayment: monthlyPayment,
+      processingFee: processingFee,
+      effectiveCost: effectiveCost
+    };
+    window.flatCalculatedData = flatCalculatedData;
+
+    flatCurrentPage = 1;
+    renderFlatResults();
+    renderFlatBreakdown();
+    renderFlatSchedule();
+  }
+  window.calculateFlatRateLoan = calculateFlatRateLoan;
+
+  function renderFlatResults() {
+    const d = flatCalculatedData;
+    document.getElementById('flat-res-payment').textContent = formatFlatCurrency(d.monthlyPayment);
+    document.getElementById('flat-res-interest').textContent = formatFlatCurrency(d.totalInterest);
+    document.getElementById('flat-res-total').textContent = formatFlatCurrency(d.totalAmount);
+    document.getElementById('flat-res-fee').textContent = formatFlatCurrency(d.processingFee);
+    document.getElementById('flat-res-cost').textContent = formatFlatCurrency(d.effectiveCost);
+  }
+
+  function formatFlatCurrency(num) {
+    if (num === null || num === undefined || isNaN(num)) return '₹0';
+    const rounded = Math.round(num * 100) / 100;
+    const wholePart = Math.floor(rounded);
+    const decPart = Math.round((rounded - wholePart) * 100);
+    if (decPart === 0) {
+      return '₹' + wholePart.toLocaleString('en-IN');
+    }
+    return '₹' + wholePart.toLocaleString('en-IN') + '.' + String(decPart).padStart(2, '0');
+  }
+
+  function renderFlatBreakdown() {
+    const d = flatCalculatedData;
+    const grandTotal = d.totalAmount + d.processingFee;
+    const principalPct = ((d.principal / grandTotal) * 100).toFixed(1);
+    const interestPct = ((d.totalInterest / grandTotal) * 100).toFixed(1);
+    const feePct = d.processingFee > 0 ? ((d.processingFee / grandTotal) * 100).toFixed(1) : '0.0';
+
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+    // Show content, hide placeholder
+    const placeholder = document.getElementById('flat-breakdown-placeholder');
+    const content = document.getElementById('flat-breakdown-content');
+    if (placeholder) placeholder.style.display = 'none';
+    if (content) content.style.display = 'flex';
+
+    if (flatPieChartInstance) flatPieChartInstance.destroy();
+
+    const pieLabels = ['Principal (' + principalPct + '%)', 'Flat Interest (' + interestPct + '%)'];
+    const pieData = [d.principal, d.totalInterest];
+    const pieColors = ['#2f6fed', '#b44545'];
+    if (d.processingFee > 0) {
+      pieLabels.push('Fee (' + feePct + '%)');
+      pieData.push(d.processingFee);
+      pieColors.push('#e2a03f');
+    }
+
+    const ctx = document.getElementById('flat-chart-pie').getContext('2d');
+    flatPieChartInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: pieLabels,
+        datasets: [{
+          data: pieData,
+          backgroundColor: pieColors,
+          borderColor: isDark ? '#0b1627' : '#ffffff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '58%',
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return ' ' + context.label.split(' ')[0] + ': ' + formatFlatCurrency(context.raw);
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const feeRow = d.processingFee > 0 ? `
+      <div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
+          <span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+            <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#e2a03f;"></span>Processing Fee
+          </span>
+          <span>₹${Math.round(d.processingFee).toLocaleString('en-IN')} (${feePct}%)</span>
+        </div>
+        <div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden;">
+          <div style="background:#e2a03f; width:${feePct}%; height:100%;"></div>
+        </div>
+      </div>
+    ` : '';
+
+    document.getElementById('flat-breakdown-details').innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
+            <span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+              <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#2f6fed;"></span>Principal Amount
+            </span>
+            <span>₹${Math.round(d.principal).toLocaleString('en-IN')} (${principalPct}%)</span>
+          </div>
+          <div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden;">
+            <div style="background:#2f6fed; width:${principalPct}%; height:100%;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
+            <span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+              <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#b44545;"></span>Total Flat Interest
+            </span>
+            <span>₹${Math.round(d.totalInterest).toLocaleString('en-IN')} (${interestPct}%)</span>
+          </div>
+          <div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden;">
+            <div style="background:#b44545; width:${interestPct}%; height:100%;"></div>
+          </div>
+        </div>
+        ${feeRow}
+        <div style="border-top:1px solid var(--border); padding-top:10px; display:flex; justify-content:space-between; font-size:14px; font-weight:700;">
+          <span>Total Cost of Loan</span>
+          <span>₹${Math.round(grandTotal).toLocaleString('en-IN')}</span>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('flat-payment-summary').innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+          <span style="font-size:13px; color:var(--text-secondary);">Principal</span>
+          <span style="font-size:14px; font-weight:700; color:#2f6fed;">₹${Math.round(d.principal).toLocaleString('en-IN')}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+          <span style="font-size:13px; color:var(--text-secondary);">Total Flat Interest<br><small style="font-size:11px;">(${d.rateVal}% × ${d.tenureYears.toFixed(2)} yrs)</small></span>
+          <span style="font-size:14px; font-weight:700; color:var(--danger);">₹${Math.round(d.totalInterest).toLocaleString('en-IN')}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+          <span style="font-size:13px; color:var(--text-secondary);">Total Repayment</span>
+          <span style="font-size:14px; font-weight:700;">₹${Math.round(d.totalAmount).toLocaleString('en-IN')}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0;">
+          <span style="font-size:13px; font-weight:600; color:var(--text-primary);">Monthly Payment</span>
+          <span style="font-size:18px; font-weight:800; color:var(--accent);">${formatFlatCurrency(d.monthlyPayment)}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function buildFlatScheduleRows(d) {
+    const N = d.totalMonths;
+    const monthlyInterest = d.totalInterest / N;
+    const monthlyPrincipal = d.principal / N;
+    const rows = [];
+    let rem = d.principal;
+    for (let i = 1; i <= N; i++) {
+      const isLast = (i === N);
+      const open = Math.round(rem * 100) / 100;
+      let prinComp, flatInt, payment;
+      if (isLast) {
+        prinComp = open;
+        flatInt = Math.round((d.totalInterest - monthlyInterest * (N - 1)) * 100) / 100;
+        payment = Math.round((prinComp + flatInt) * 100) / 100;
+      } else {
+        prinComp = Math.round(monthlyPrincipal * 100) / 100;
+        flatInt = Math.round(monthlyInterest * 100) / 100;
+        payment = Math.round((prinComp + flatInt) * 100) / 100;
+      }
+      rem = isLast ? 0 : Math.max(0, Math.round((open - prinComp) * 100) / 100);
+      rows.push({ period: i, open: open, prinComp: prinComp, flatInt: flatInt, payment: payment, rem: rem });
+    }
+    return rows;
+  }
+
+  function renderFlatSchedule() {
+    if (!flatCalculatedData) return;
+    const d = flatCalculatedData;
+    const rows = buildFlatScheduleRows(d);
+    const totalRows = rows.length;
+    const totalPages = Math.ceil(totalRows / flatRowsPerPage);
+
+    if (flatCurrentPage > totalPages && totalPages > 0) {
+      flatCurrentPage = totalPages;
+    }
+    if (flatCurrentPage < 1) {
+      flatCurrentPage = 1;
+    }
+
+    const startIdx = (flatCurrentPage - 1) * flatRowsPerPage;
+    const endIdx = Math.min(startIdx + flatRowsPerPage, totalRows);
+    const paginated = rows.slice(startIdx, endIdx);
+
+    const tbody = document.getElementById('flat-schedule-tbody');
+    tbody.innerHTML = '';
+
+    paginated.forEach(function(r) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="td-center">Month ${r.period}</td>
+        <td class="td-right">${formatFlatCurrency(r.open)}</td>
+        <td class="td-right" style="color:var(--danger);">${formatFlatCurrency(r.flatInt)}</td>
+        <td class="td-right">${formatFlatCurrency(r.prinComp)}</td>
+        <td class="td-right">${formatFlatCurrency(r.payment)}</td>
+        <td class="td-right" style="font-weight:700;">${formatFlatCurrency(r.rem)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    renderPaginationControls({
+      wrapperId: 'flat-pagination-wrapper',
+      infoId: 'flat-pagination-info',
+      btnsContainerId: 'flat-pagination-btns',
+      totalRows: totalRows,
+      rowsPerPage: flatRowsPerPage,
+      currentPage: flatCurrentPage,
+      totalPages: totalPages,
+      onPageChange: function(newPage) {
+        flatCurrentPage = newPage;
+        renderFlatSchedule();
+      }
+    });
+  }
+
+  function resetFlatCalculator() {
+    if (flatPrincipalInput) flatPrincipalInput.value = '';
+    const rEl = document.getElementById('flat-rate');
+    if (rEl) rEl.value = '';
+    const tEl = document.getElementById('flat-tenure');
+    if (tEl) tEl.value = '';
+    const fEl = document.getElementById('flat-fee');
+    if (fEl) fEl.value = '';
+    clearFlatErrors();
+    flatCalculatedData = null;
+    window.flatCalculatedData = null;
+    flatCurrentPage = 1;
+    flatRowsPerPage = 12;
+
+    ['flat-res-payment', 'flat-res-interest', 'flat-res-total', 'flat-res-fee', 'flat-res-cost'].forEach(function(id) {
+      document.getElementById(id).textContent = '₹0';
+    });
+
+    if (flatPieChartInstance) { flatPieChartInstance.destroy(); flatPieChartInstance = null; }
+
+    const placeholderBreakdown = document.getElementById('flat-breakdown-placeholder');
+    const contentBreakdown = document.getElementById('flat-breakdown-content');
+    if (placeholderBreakdown) placeholderBreakdown.style.display = 'flex';
+    if (contentBreakdown) contentBreakdown.style.display = 'none';
+
+    document.getElementById('flat-payment-summary').innerHTML = `
+      <div class="calculator-empty-state">
+        <div class="calculator-empty-icon"><i class="fas fa-receipt"></i></div>
+        <div class="calculator-empty-title">Summary inactive</div>
+        <div class="calculator-empty-desc">Enter loan parameters and calculate to generate borrowing overview.</div>
+      </div>
+    `;
+
+    document.getElementById('flat-schedule-tbody').innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center text-muted" style="padding:40px 0;">
+          <i class="fas fa-table" style="font-size:32px; opacity:0.35; display:block; margin-bottom:10px;"></i>
+          Enter the loan details above and click Calculate to view the payment schedule.
+        </td>
+      </tr>
+    `;
+    const pagWrapper = document.getElementById('flat-pagination-wrapper');
+    if (pagWrapper) pagWrapper.style.display = 'none';
+  }
+
+  // ── Flat Rate Exports ─────────────────────────────────────────────────────
+
+  function exportFlatExcel() {
+    if (!flatCalculatedData) { alert('Please perform calculations first before exporting.'); return; }
+    const d = flatCalculatedData;
+    const rows = buildFlatScheduleRows(d);
+
+    const wsData = [
+      ['DIXIT LENDING SOLUTION — Flat Rate Loan Schedule'],
+      [],
+      ['Principal', Math.round(d.principal)],
+      ['Flat Interest Rate', d.rateVal + '% p.a.'],
+      ['Tenure', d.totalMonths + ' Months (' + d.tenureYears.toFixed(2) + ' Years)'],
+      ['Total Flat Interest', Math.round(d.totalInterest)],
+      ['Total Amount Payable', Math.round(d.totalAmount)],
+      ['Monthly Payment', Math.round(d.monthlyPayment)],
+      ['Processing Fee', Math.round(d.processingFee)],
+      ['Effective Cost of Loan', Math.round(d.effectiveCost)],
+      [],
+      ['Period', 'Opening Principal', 'Flat Interest', 'Principal Component', 'Monthly Payment', 'Remaining Principal']
+    ];
+    rows.forEach(function(r) {
+      wsData.push(['Month ' + r.period, Math.round(r.open), Math.round(r.flatInt), Math.round(r.prinComp), Math.round(r.payment), Math.round(r.rem)]);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = [{wch:10},{wch:20},{wch:16},{wch:22},{wch:18},{wch:22}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Flat Rate Schedule');
+    XLSX.writeFile(wb, `Loan_Repayment_Schedule_Flat_${Math.round(d.principal)}.xlsx`);
+  }
+
+  function exportFlatCSV() {
+    if (!flatCalculatedData) { alert('Please perform calculations first.'); return; }
+    const d = flatCalculatedData;
+    const rows = buildFlatScheduleRows(d);
+
+    let csv = 'data:text/csv;charset=utf-8,';
+    csv += 'Period,Opening Principal,Flat Interest,Principal Component,Monthly Payment,Remaining Principal\n';
+    rows.forEach(function(r) {
+      csv += 'Month ' + r.period + ',' + Math.round(r.open) + ',' + Math.round(r.flatInt) + ',' + Math.round(r.prinComp) + ',' + Math.round(r.payment) + ',' + Math.round(r.rem) + '\n';
+    });
+
+    const link = document.createElement('a');
+    link.setAttribute('href', encodeURI(csv));
+    link.setAttribute('download', `Loan_Repayment_Schedule_Flat_${Math.round(d.principal)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  async function exportFlatPDF() {
+    const jsPDFLib = window.jspdf;
+    if (!jsPDFLib || !jsPDFLib.jsPDF) { alert('PDF library not loaded yet. Please wait a second.'); return; }
+    if (!flatCalculatedData) { alert('Please perform calculations first.'); return; }
+    const d = flatCalculatedData;
+    const rows = buildFlatScheduleRows(d);
+
+    const doc = new jsPDFLib.jsPDF('p', 'pt', 'a4');
+    let fontName = 'helvetica';
+    const fonts = await getPdfFonts();
+    if (fonts) {
+      try {
+        doc.addFileToVFS('segoeui.ttf', fonts.regular);
+        doc.addFont('segoeui.ttf', 'SegoeUI', 'normal');
+        doc.addFileToVFS('segoeuib.ttf', fonts.bold);
+        doc.addFont('segoeuib.ttf', 'SegoeUI', 'bold');
+        fontName = 'SegoeUI';
+      } catch (err) {}
+    }
+
+    const brandNavy = [15, 39, 71];
+    const textDark = [16, 32, 51];
+    const textMuted = [82, 97, 115];
+    const textLight = [123, 136, 151];
+    const borderStroke = [217, 227, 239];
+    const cardBg = [248, 250, 252];
+
+    doc.setFont(fontName, 'bold'); doc.setFontSize(10); doc.setTextColor(...textLight);
+    doc.text('DIXIT LENDING SOLUTION', 40, 42);
+
+    doc.setFont(fontName, 'bold'); doc.setFontSize(20); doc.setTextColor(...brandNavy);
+    doc.text('Loan Repayment Schedule (Flat Rate)', 40, 64);
+    doc.setFontName ? doc.setFont(fontName, 'normal') : doc.setFont('normal'); doc.setFontSize(10); doc.setTextColor(...textMuted);
+    doc.text('Illustrative flat rate repayment schedule based on the loan details provided', 40, 79);
+    doc.setFontSize(9); doc.setTextColor(...textLight);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`, 555, 79, { align: 'right' });
+    doc.setDrawColor(...borderStroke); doc.line(40, 90, 555, 90);
+
+    // Summary Box
+    doc.setFillColor(...cardBg); doc.setDrawColor(...borderStroke);
+    doc.roundedRect(40, 102, 515, 94, 6, 6, 'FD');
+
+    doc.setFont(fontName, 'bold'); doc.setFontSize(11); doc.setTextColor(...brandNavy);
+    doc.text('FLAT RATE LOAN SUMMARY', 54, 120);
+
+    doc.setFont(fontName, 'normal'); doc.setFontSize(9.5); doc.setTextColor(...textDark);
+    doc.text('Principal Amount:', 54, 138);
+    doc.setFont(fontName, 'bold');
+    doc.text(`₹${Math.round(d.principal).toLocaleString('en-IN')}`, 160, 138);
+
+    doc.setFont(fontName, 'normal');
+    doc.text('Flat Interest Rate:', 54, 154);
+    doc.setFont(fontName, 'bold');
+    doc.text(`${d.rateVal}% p.a.`, 160, 154);
+
+    doc.setFont(fontName, 'normal');
+    doc.text('Loan Tenure:', 54, 170);
+    doc.setFont(fontName, 'bold');
+    doc.text(`${d.totalMonths} Months (${d.tenureYears.toFixed(1)} Years)`, 160, 170);
+
+    doc.setFont(fontName, 'normal');
+    doc.text('Processing Fee:', 54, 186);
+    doc.setFont(fontName, 'bold');
+    doc.text(`₹${Math.round(d.processingFee).toLocaleString('en-IN')}`, 160, 186);
+
+    doc.setFont(fontName, 'normal');
+    doc.text('Monthly Payment:', 320, 138);
+    doc.setFont(fontName, 'bold'); doc.setTextColor(...brandNavy);
+    doc.text(`₹${Math.round(d.monthlyPayment).toLocaleString('en-IN')}`, 430, 138);
+
+    doc.setFont(fontName, 'normal'); doc.setTextColor(...textDark);
+    doc.text('Total Flat Interest:', 320, 154);
+    doc.setFont(fontName, 'bold');
+    doc.text(`₹${Math.round(d.totalInterest).toLocaleString('en-IN')}`, 430, 154);
+
+    doc.setFont(fontName, 'normal');
+    doc.text('Total Repayment:', 320, 170);
+    doc.setFont(fontName, 'bold');
+    doc.text(`₹${Math.round(d.totalAmount).toLocaleString('en-IN')}`, 430, 170);
+
+    doc.setFont(fontName, 'normal');
+    doc.text('Effective Outflow:', 320, 186);
+    doc.setFont(fontName, 'bold');
+    doc.text(`₹${Math.round(d.effectiveCost).toLocaleString('en-IN')}`, 430, 186);
+
+    const tableData = rows.map(function(r) {
+      return [
+        'Month ' + r.period,
+        '₹' + Math.round(r.open).toLocaleString('en-IN'),
+        '₹' + Math.round(r.flatInt).toLocaleString('en-IN'),
+        '₹' + Math.round(r.prinComp).toLocaleString('en-IN'),
+        '₹' + Math.round(r.payment).toLocaleString('en-IN'),
+        '₹' + Math.round(r.rem).toLocaleString('en-IN')
+      ];
+    });
+
+    doc.autoTable({
+      head: [['Period', 'Opening Principal', 'Flat Interest', 'Principal Comp.', 'Monthly Payment', 'Remaining Principal']],
+      body: tableData,
+      startY: 210,
+      showHead: 'everyPage',
+      theme: 'plain',
+      headStyles: { fillColor: brandNavy, textColor: [255, 255, 255], fontStyle: 'bold', font: fontName, fontSize: 8.5 },
+      styles: { fontSize: 8, cellPadding: { top: 5, bottom: 5, left: 6, right: 6 }, font: fontName, lineColor: [230, 236, 244], lineWidth: 0.5 },
+      alternateRowStyles: { fillColor: [248, 250, 253] },
+      columnStyles: {
+        0: { cellWidth: 60, halign: 'center' },
+        1: { cellWidth: 90, halign: 'right' },
+        2: { cellWidth: 90, halign: 'right' },
+        3: { cellWidth: 90, halign: 'right' },
+        4: { cellWidth: 90, halign: 'right' },
+        5: { cellWidth: 95, halign: 'right', fontStyle: 'bold' }
+      },
+      margin: { left: 40, right: 40, bottom: 35 }
+    });
+
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFont(fontName, 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...textLight);
+      doc.text('This schedule is illustrative and indicative. Actual repayment amounts may vary based on disbursement dates and bank terms.', 40, 822);
+      doc.text(`Page ${i} of ${totalPages}`, 555, 822, { align: 'right' });
+    }
+
+    doc.save(`Loan_Repayment_Schedule_Flat_${Math.round(d.principal)}.pdf`);
+  }
+
+  // Ensure full schedule is printed on print action
+  window.addEventListener('beforeprint', function() {
+    if (activeTab === 'flat' && flatCalculatedData) {
+      const allRows = buildFlatScheduleRows(flatCalculatedData);
+      const tbody = document.getElementById('flat-schedule-tbody');
+      tbody.innerHTML = '';
+      allRows.forEach(function(r) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="td-center">Month ${r.period}</td>
+          <td class="td-right">${formatFlatCurrency(r.open)}</td>
+          <td class="td-right">${formatFlatCurrency(r.flatInt)}</td>
+          <td class="td-right">${formatFlatCurrency(r.prinComp)}</td>
+          <td class="td-right">${formatFlatCurrency(r.payment)}</td>
+          <td class="td-right" style="font-weight:700;">${formatFlatCurrency(r.rem)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else if (activeTab === 'reducing' && calculatedData.originalSchedule.length > 0) {
+      const schedule = calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule;
+      const tbody = document.getElementById('schedule-tbody');
+      tbody.innerHTML = '';
+      schedule.forEach(function(row) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="td-center">Month ${row.emiNumber}</td>
+          <td>${row.paymentDate}</td>
+          <td class="td-right">${formatValueCurrency(row.emiAmount)}</td>
+          <td class="td-right">${formatValueCurrency(row.principalComponent)}</td>
+          <td class="td-right">${formatValueCurrency(row.interestComponent)}</td>
+          <td class="td-right">${row.prepayment > 0 ? formatValueCurrency(row.prepayment) : '—'}</td>
+          <td class="td-right" style="font-weight:700;">${formatValueCurrency(row.outstandingBalance)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  });
+
+  window.addEventListener('afterprint', function() {
+    if (activeTab === 'flat' && flatCalculatedData) {
+      renderFlatSchedule();
+    } else if (activeTab === 'reducing' && calculatedData.originalSchedule.length > 0) {
+      renderRepaymentTable();
+    }
+  });
+
+  // Attach explicit listeners for Calculate EMI, Reset, and Form submission
+  const calcBtn = document.getElementById('btn-calculate-emi');
+  if (calcBtn) {
+    calcBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      calculateEMI();
+    });
+  }
+  const emiForm = document.getElementById('emi-form');
+  if (emiForm) {
+    emiForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      calculateEMI();
+    });
+  }
+  const resetBtn = document.getElementById('btn-reset-calculator');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      resetCalculator();
+    });
   }
 </script>
+
+<script src="/js/calculator-hub.js?v=20260925"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@ const UserModel = require('../models/userModel');
 const PasswordResetModel = require('../models/passwordResetModel');
 const { sendPasswordResetEmail } = require('../utils/mailer');
 const db = require('../config/db');
+const { recordFailedLogin, recordSuccessfulLogin } = require('../middleware/rateLimit');
 
 const RESET_TOKEN_TTL_MS = 30 * 60 * 1000;
 
@@ -72,7 +73,7 @@ const authController = {
    */
   async login(req, res) {
     try {
-      const { email, password, role } = req.body;
+      const { email, password, role, keepMeSignedIn } = req.body;
 
       if (!email || !password || !role) {
         return res.status(400).json({ success: false, message: 'Email, password, and role are required.' });
@@ -82,6 +83,7 @@ const authController = {
       const user = await UserModel.findByEmail(normalized);
 
       if (!user) {
+        recordFailedLogin(req.ip, normalized);
         // Don't reveal if email exists or not (prevents user enumeration)
         return res.status(401).json({ success: false, message: 'Authentication failed. Please check your credentials.' });
       }
@@ -127,18 +129,30 @@ const authController = {
       }
 
       if (user.role !== role) {
+        recordFailedLogin(req.ip, normalized);
         return res.status(403).json({ success: false, message: `This account is not registered as ${role}.` });
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
+        recordFailedLogin(req.ip, normalized);
         return res.status(401).json({ success: false, message: 'Authentication failed. Please check your credentials.' });
       }
 
+      // Credentials valid — reset any failed attempt counters immediately
+      recordSuccessfulLogin(req.ip, normalized);
+
+      const expiresIn = keepMeSignedIn ? '30d' : (process.env.JWT_EXPIRES_IN || '8h');
       const token = jwt.sign(
-        { id: user.id, name: user.name, email: user.email, role: user.role },
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          token_version: user.token_version || 1
+        },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
+        { expiresIn }
       );
 
       const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || req.connection?.remoteAddress || null;
@@ -194,11 +208,13 @@ const authController = {
         success: true,
         message: 'Login successful',
         token,
+        must_change_password: Boolean(user.must_change_password),
         user: {
           id: user.id,
           name: user.name,
           email: user.email,
           role: user.role,
+          must_change_password: Boolean(user.must_change_password),
           profile_picture: user.profile_picture || null
         }
       });
@@ -295,6 +311,7 @@ const authController = {
 
       const hashedPassword = await bcrypt.hash(password, 10);
       await UserModel.updatePassword(resetEntry.user_id, hashedPassword);
+      await db.query('UPDATE users SET token_version = token_version + 1 WHERE id = ?', [resetEntry.user_id]);
       await PasswordResetModel.markUsed(resetEntry.id);
       await PasswordResetModel.deleteForUser(resetEntry.user_id);
 
@@ -310,14 +327,23 @@ const authController = {
    */
   async logout(req, res) {
     try {
-      const employeeId = req.user.id;
+      const userId = req.user.id;
       const role = req.user.role;
+
+      // Invalidate token server-side for this user by incrementing token_version
+      await db.query('UPDATE users SET token_version = token_version + 1 WHERE id = ?', [userId]);
+
+      const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || null;
+      await db.query(
+        'INSERT INTO user_activity_logs (user_id, activity, status, ip_address) VALUES (?, ?, ?, ?)',
+        [userId, 'Logged out', 'Success', ip]
+      ).catch(() => {});
 
       if (role === 'employee') {
         // Find active open session
         const [activeSessions] = await db.query(
           'SELECT id, login_time FROM attendance_logs WHERE employee_id = ? AND session_status = "Active Session" AND logout_time IS NULL ORDER BY login_time DESC LIMIT 1',
-          [employeeId]
+          [userId]
         );
 
         if (activeSessions.length > 0) {
@@ -336,7 +362,7 @@ const authController = {
         // Set status to Offline
         await db.query(
           "UPDATE users SET current_status = 'Offline', last_active_at = NOW() WHERE id = ?",
-          [employeeId]
+          [userId]
         );
       }
 

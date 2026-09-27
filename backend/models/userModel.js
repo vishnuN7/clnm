@@ -23,10 +23,26 @@ const UserModel = {
     return rows;
   },
 
-  async create({ name, email, password, role, phone, department }) {
+  async findByUsername(username) {
+    if (!username) return null;
+    const [rows] = await db.query('SELECT * FROM users WHERE LOWER(username) = ?', [username.toLowerCase()]);
+    return rows[0] || null;
+  },
+
+  async create({ name, email, password, role, phone, designation, username, must_change_password }) {
     const [result] = await db.query(
-      'INSERT INTO users (name, email, password, role, phone, department) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, email, password, role || 'employee', phone || null, department || 'Operations']
+      `INSERT INTO users (name, email, password, role, phone, designation, username, must_change_password, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+      [
+        name,
+        email.toLowerCase(),
+        password,
+        role || 'employee',
+        phone || null,
+        designation || 'Loan Executive',
+        username ? username.toLowerCase() : null,
+        must_change_password ? 1 : 0
+      ]
     );
     return result.insertId;
   },

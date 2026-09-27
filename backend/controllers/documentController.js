@@ -68,6 +68,7 @@ const documentController = {
       const contentType = contentTypeFor(doc.file_name);
       res.setHeader('Content-Type', contentType);
       res.setHeader('Content-Disposition', `inline; filename="${doc.file_name}"`);
+      res.setHeader('X-Frame-Options', 'SAMEORIGIN');
       // Never let this response be cached by shared/proxy caches
       res.setHeader('Cache-Control', 'private, no-store');
 

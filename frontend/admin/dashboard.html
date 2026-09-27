@@ -32,8 +32,102 @@
       }
     })();
   </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
   <style>
+    /* ── Topbar Centered Header (Matching Customers Page) ──────────────── */
+    .admin-page .topbar {
+      display: flex !important;
+      align-items: center !important;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      min-height: 64px;
+      height: auto;
+      padding: 10px 24px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    :root[data-theme='dark'] .admin-page .topbar {
+      background: linear-gradient(90deg, rgba(9, 17, 29, 0.95) 0%, rgba(12, 24, 41, 0.92) 100%);
+      border-bottom-color: rgba(151, 176, 210, 0.12);
+    }
+    .admin-page .topbar-title {
+      position: absolute !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      text-align: center !important;
+      max-width: min(720px, calc(100% - 240px)) !important;
+      pointer-events: auto !important;
+      margin: 0 !important;
+    }
+    .admin-page .topbar-title h2 {
+      margin: 0 !important;
+      font-size: 18px !important;
+      font-weight: 800 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1.25 !important;
+      color: var(--text-primary) !important;
+      letter-spacing: -0.2px;
+    }
+    .admin-page .topbar-title h2 i {
+      color: var(--accent);
+      margin-right: 8px;
+      font-size: 17px;
+    }
+    .admin-page .topbar-title p {
+      margin: 2px 0 0 !important;
+      font-size: 12px !important;
+      color: var(--text-secondary) !important;
+      line-height: 1.35 !important;
+      text-align: center !important;
+      white-space: normal !important;
+    }
+    .topbar-date-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-body);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .topbar-date-badge i {
+      color: var(--accent);
+      font-size: 11px;
+    }
+    @media (max-width: 900px) {
+      .admin-page .topbar {
+        position: relative;
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 12px;
+        padding: 12px 16px;
+      }
+      .admin-page .topbar-title {
+        position: static !important;
+        transform: none !important;
+        max-width: 100% !important;
+        text-align: left !important;
+      }
+      .admin-page .topbar-title h2 {
+        justify-content: flex-start !important;
+      }
+      .admin-page .topbar-title p {
+        text-align: left !important;
+      }
+      .admin-page .topbar-actions {
+        margin-left: 0 !important;
+        justify-content: space-between;
+      }
+    }
+
     /* ── Table Pagination ─────────────────────────────────────────────── */
     .tbl-pagination {
       display: flex;
@@ -723,7 +817,7 @@
       box-shadow: none;
     }
     .weekly-performance-table {
-      min-width: 1060px;
+      min-width: 1280px;
     }
     .weekly-performance-table th {
       white-space: nowrap;
@@ -1837,6 +1931,299 @@
         flex-direction: column;
       }
     }
+
+    /* ── Primary KPI Overview Cards ────────────────────────────────────── */
+    .primary-kpis-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1400px) {
+      .primary-kpis-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 768px) {
+      .primary-kpis-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+    }
+    @media (max-width: 480px) {
+      .primary-kpis-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .primary-kpi-card {
+      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.98) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 16px rgba(16,32,51,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+    :root[data-theme='dark'] .primary-kpi-card {
+      background: linear-gradient(135deg, rgba(10, 19, 32, 0.92) 0%, rgba(14, 25, 42, 0.96) 100%);
+      border-color: rgba(151, 176, 210, 0.14);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+    }
+    .primary-kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--kpi-accent, var(--accent));
+      opacity: 0.8;
+      transition: height 0.2s ease, opacity 0.2s ease;
+    }
+    .primary-kpi-card:hover,
+    .primary-kpi-card:focus-visible {
+      transform: translateY(-4px);
+      border-color: var(--kpi-accent, var(--accent));
+      box-shadow: 0 12px 24px rgba(16,32,51,0.1);
+      outline: none;
+    }
+    :root[data-theme='dark'] .primary-kpi-card:hover,
+    :root[data-theme='dark'] .primary-kpi-card:focus-visible {
+      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.32);
+    }
+    .primary-kpi-card:hover::before {
+      height: 4px;
+      opacity: 1;
+    }
+    .primary-kpi-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .primary-kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      line-height: 1.2;
+    }
+    .primary-kpi-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--kpi-bg, rgba(47,111,237,0.1));
+      color: var(--kpi-accent, var(--accent));
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+    .primary-kpi-card:hover .primary-kpi-icon {
+      transform: scale(1.1);
+    }
+    .primary-kpi-value {
+      font-size: 26px;
+      font-weight: 850;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+    .primary-kpi-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      line-height: 1.2;
+    }
+
+    /* ── Redesigned Loan Status Breakdown (Balanced Two-Column Panel) ── */
+    .status-panel-layout {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex: 1;
+      width: 100%;
+    }
+    .status-chart-col {
+      flex: 0 0 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-chart-donut {
+      width: 130px;
+      height: 130px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .status-chart-donut canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+    .status-total-box {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    :root[data-theme='dark'] .status-total-box {
+      background: rgba(10, 19, 32, 0.6);
+      border-color: rgba(151, 176, 210, 0.14);
+    }
+    .status-total-box .st-total-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      display: block;
+    }
+    .status-total-box .st-total-num {
+      font-size: 22px;
+      font-weight: 850;
+      color: var(--text-primary);
+      line-height: 1.1;
+      margin-top: 2px;
+      display: block;
+    }
+
+    .status-list-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .status-table-header {
+      display: grid;
+      grid-template-columns: 16px 1fr 50px 65px;
+      gap: 8px;
+      padding: 6px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+    .status-table-header .col-num {
+      text-align: right;
+    }
+    .status-table-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .status-row {
+      display: grid;
+      grid-template-columns: 16px 1fr 50px 65px;
+      gap: 8px;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+      font-size: 12px;
+    }
+    .status-row:hover {
+      background: rgba(47, 111, 237, 0.05);
+    }
+    :root[data-theme='dark'] .status-row:hover {
+      background: rgba(139, 180, 255, 0.06);
+    }
+    .status-row.has-data {
+      font-weight: 600;
+    }
+    .status-row.is-zero {
+      opacity: 0.6;
+    }
+    .status-row.is-zero:hover {
+      opacity: 0.85;
+    }
+    .status-indicator-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      justify-self: center;
+    }
+    .status-row-name {
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .status-row-count {
+      color: var(--text-primary);
+      font-weight: 750;
+      text-align: right;
+      font-feature-settings: "tnum";
+    }
+    .status-row-pct {
+      color: var(--text-secondary);
+      font-weight: 750;
+      text-align: right;
+      font-feature-settings: "tnum";
+    }
+    .status-row.has-data .status-row-pct {
+      color: var(--st-color, var(--text-primary));
+    }
+    .status-empty-notice {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(47, 111, 237, 0.05);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    :root[data-theme='dark'] .status-empty-notice {
+      background: rgba(139, 180, 255, 0.05);
+      border-color: rgba(151, 176, 210, 0.15);
+    }
+    @media (max-width: 900px) {
+      .status-panel-layout {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .status-chart-col {
+        flex: 0 0 auto;
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+      }
+      .status-total-box {
+        width: 140px;
+      }
+    }
+
+    /* ── Table Helpers & Alignments ────────────────────────────────────── */
+    th.text-center, td.text-center {
+      text-align: center !important;
+    }
+    .employee-avatar-wrapper {
+      user-select: none;
+      -webkit-user-select: none;
+      pointer-events: none;
+      flex: 0 0 auto;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -1845,29 +2232,29 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo">
+      <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
-        <div><h2><span class="emoji-sm">📊</span>CLN Lending Suite</h2><span>Admin Console</span></div>
+        <div><h2><i class="fas fa-landmark" aria-hidden="true" style="margin-right:6px;font-size:14px;"></i>CLN Lending Suite</h2><span>Admin Console</span></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-                <a href="/admin/dashboard.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span> Dashboard</a>
-        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users"></i></span> Employees</a>
-        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book"></i></span> Customers</a>
-        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase"></i></span> Loan Applications</a>
-        <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span> EMI Calculator</a>
-        <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> Data Excel Document</a>
-        <a href="/admin/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line"></i></span> APR</a>
-</div>
+        <a href="/admin/dashboard.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users" aria-hidden="true"></i></span> <span>Employees</span></a>
+        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Customers</span></a>
+        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>Loan Applications</span></a>
+        <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+        <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>Data Excel Document</span></a>
+        <a href="/admin/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="sidebar-user-avatar">A</div>
         <div class="user-details"><p id="sidebar-user-name">Admin</p><span id="sidebar-user-role">admin</span></div>
       </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
     </div>
   </aside>
 
@@ -1877,21 +2264,77 @@
   <!-- Main -->
   <main class="main-content">
     <div class="topbar">
-      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2><span class="emoji">📊</span>Dashboard</h2>
-        <p>Unified Loan and Customer Management</p></div>
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+        <span>Menu</span>
+      </button>
+      <div class="topbar-title">
+        <h2><i class="fas fa-chart-pie" aria-hidden="true"></i> <span>Dashboard</span></h2>
+        <p>Unified Loan and Customer Management</p>
+      </div>
       <div class="topbar-actions">
-        <span id="current-date" style="font-size:13px;color:var(--text-secondary);"></span>
+        <div class="topbar-date-badge">
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+          <span id="current-date">Today</span>
+        </div>
       </div>
     </div>
 
     <div class="page-content">
-      <!-- Stats -->
-      <div class="stats-grid" id="stats-grid">
-        <div class="stat-card" role="button" tabindex="0" onclick="toggleEmployeesInsights()" onkeydown="if(event.key==='Enter' || event.key===' ') toggleEmployeesInsights()" style="cursor:pointer;">
-          <div class="stat-icon">👥</div>
-          <div class="stat-value" id="stat-employees">—</div>
-          <div class="stat-label"><span class="emoji-sm">👥</span>Employees</div>
+      <!-- Primary KPI Overview -->
+      <div class="primary-kpis-grid" id="stats-grid">
+        <div class="primary-kpi-card" role="button" tabindex="0" onclick="toggleEmployeesInsights()" onkeydown="if(event.key==='Enter' || event.key===' ') toggleEmployeesInsights()" title="Click to view employees overview" style="--kpi-accent:#2563eb; --kpi-bg:rgba(37,99,235,0.12);">
+          <div class="primary-kpi-head">
+            <span class="primary-kpi-label">Employees</span>
+            <span class="primary-kpi-icon" aria-hidden="true"><i class="fas fa-users"></i></span>
+          </div>
+          <div class="primary-kpi-value" id="stat-employees">—</div>
+          <div class="primary-kpi-sub" id="stat-employees-sub">Active workforce</div>
+        </div>
+
+        <div class="primary-kpi-card" role="button" tabindex="0" onclick="location.href='/admin/customers.html'" onkeydown="if(event.key==='Enter' || event.key===' ') location.href='/admin/customers.html'" title="View Customers" style="--kpi-accent:#6366f1; --kpi-bg:rgba(99,102,241,0.12);">
+          <div class="primary-kpi-head">
+            <span class="primary-kpi-label">Total Customers</span>
+            <span class="primary-kpi-icon" aria-hidden="true"><i class="fas fa-address-book"></i></span>
+          </div>
+          <div class="primary-kpi-value" id="stat-customers">—</div>
+          <div class="primary-kpi-sub" id="stat-customers-sub">September borrowers</div>
+        </div>
+
+        <div class="primary-kpi-card" role="button" tabindex="0" onclick="location.href='/admin/loans.html'" onkeydown="if(event.key==='Enter' || event.key===' ') location.href='/admin/loans.html'" title="View Loan Applications" style="--kpi-accent:#0891b2; --kpi-bg:rgba(8,145,178,0.12);">
+          <div class="primary-kpi-head">
+            <span class="primary-kpi-label">Total Loans</span>
+            <span class="primary-kpi-icon" aria-hidden="true"><i class="fas fa-briefcase"></i></span>
+          </div>
+          <div class="primary-kpi-value" id="stat-loans">—</div>
+          <div class="primary-kpi-sub" id="stat-loans-sub">September applications</div>
+        </div>
+
+        <div class="primary-kpi-card" role="button" tabindex="0" onclick="location.href='/admin/loans.html?status=Pending'" onkeydown="if(event.key==='Enter' || event.key===' ') location.href='/admin/loans.html?status=Pending'" title="View Pending Loans" style="--kpi-accent:#d97706; --kpi-bg:rgba(217,119,6,0.12);">
+          <div class="primary-kpi-head">
+            <span class="primary-kpi-label">Pending Loans</span>
+            <span class="primary-kpi-icon" aria-hidden="true"><i class="fas fa-clock"></i></span>
+          </div>
+          <div class="primary-kpi-value" id="stat-pending">—</div>
+          <div class="primary-kpi-sub" id="stat-pending-sub">Awaiting action</div>
+        </div>
+
+        <div class="primary-kpi-card" role="button" tabindex="0" onclick="location.href='/admin/loans.html?status=Approved'" onkeydown="if(event.key==='Enter' || event.key===' ') location.href='/admin/loans.html?status=Approved'" title="View Approved Loans" style="--kpi-accent:#3b82f6; --kpi-bg:rgba(59,130,246,0.12);">
+          <div class="primary-kpi-head">
+            <span class="primary-kpi-label">Approved Loans</span>
+            <span class="primary-kpi-icon" aria-hidden="true"><i class="fas fa-check-circle"></i></span>
+          </div>
+          <div class="primary-kpi-value" id="stat-approved">—</div>
+          <div class="primary-kpi-sub" id="stat-approved-sub">Sanctioned</div>
+        </div>
+
+        <div class="primary-kpi-card" role="button" tabindex="0" onclick="location.href='/admin/loans.html?status=Loan+Disbursed'" onkeydown="if(event.key==='Enter' || event.key===' ') location.href='/admin/loans.html?status=Loan+Disbursed'" title="View Disbursed Loans" style="--kpi-accent:#059669; --kpi-bg:rgba(5,150,105,0.12);">
+          <div class="primary-kpi-head">
+            <span class="primary-kpi-label">Loan Disbursed</span>
+            <span class="primary-kpi-icon" aria-hidden="true"><i class="fas fa-money-bill-wave"></i></span>
+          </div>
+          <div class="primary-kpi-value" id="stat-disbursed">—</div>
+          <div class="primary-kpi-sub" id="stat-disbursed-sub">Successfully funded</div>
         </div>
       </div>
 
@@ -1899,7 +2342,7 @@
         <div class="employee-insights-header">
           <div class="employee-insights-title-group">
             <span class="employee-insights-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <i class="fas fa-users"></i>
             </span>
             <div>
               <p class="employee-insights-kicker">Team performance</p>
@@ -1907,8 +2350,8 @@
             </div>
           </div>
           <button class="btn btn-secondary btn-sm employee-insights-close" onclick="toggleEmployeesInsights()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
-            Close
+            <i class="fas fa-times" aria-hidden="true"></i>
+            <span>Close</span>
           </button>
         </div>
         <div class="employee-insights-body">
@@ -1917,7 +2360,7 @@
               <div class="employee-panel-header">
                 <div class="employee-panel-title">
                   <span class="employee-panel-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+                    <i class="fas fa-user-friends"></i>
                   </span>
                   <h3 class="employee-panel-heading">Employee Names</h3>
                 </div>
@@ -1929,20 +2372,20 @@
               <div class="employee-detail-header">
                 <div class="employee-detail-title-row">
                   <span class="employee-panel-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                    <i class="fas fa-id-card"></i>
                   </span>
                   <h3 id="employee-detail-title" class="employee-detail-heading">Select an employee</h3>
                 </div>
                 <button class="btn btn-secondary btn-sm employee-refresh-btn" onclick="refreshEmployeeDetails()">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"></path><path d="M21 21v-5h-5"></path></svg>
-                  Refresh
+                  <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                  <span>Refresh</span>
                 </button>
               </div>
               <div class="employee-detail-body" id="employee-detail-body">
                 <div class="employee-empty-state">
                   <div class="employee-empty-state-inner">
                     <span class="employee-empty-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+                      <i class="fas fa-user-circle"></i>
                     </span>
                     <h4>Select an employee</h4>
                     <p>Choose a team member to review profile details, loan progress, and customer activity.</p>
@@ -1960,53 +2403,62 @@
         <div class="analytics-card">
           <div class="analytics-card-header">
             <div class="analytics-card-title">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M4 20H20"/><path d="M8 20V7"/><path d="M12 20V4"/><path d="M16 20v-9"/></svg>
-              Loan Trend
+              <i class="fas fa-chart-line" aria-hidden="true"></i>
+              <span>Loan Trend</span>
             </div>
             <div class="analytics-period-filters" id="trend-period-filters" role="group" aria-label="Trend period filter">
-              <button class="analytics-period-btn active" data-period="monthly" onclick="setAnalyticsPeriod('trend','monthly',this)">Monthly</button>
-              <button class="analytics-period-btn" data-period="yearly" onclick="setAnalyticsPeriod('trend','yearly',this)">Yearly</button>
-              <button class="analytics-period-btn" data-period="alltime" onclick="setAnalyticsPeriod('trend','alltime',this)">All Time</button>
+              <button class="analytics-period-btn active" data-period="monthly" onclick="setDashboardPeriod('monthly', this)">Monthly</button>
+              <button class="analytics-period-btn" data-period="yearly" onclick="setDashboardPeriod('yearly', this)">Yearly</button>
+              <button class="analytics-period-btn" data-period="alltime" onclick="setDashboardPeriod('alltime', this)">All Time</button>
             </div>
           </div>
           <div class="analytics-card-body">
             <div class="analytics-metrics" id="trend-metrics"></div>
-            <div class="analytics-chart-wrapper">
+            <div class="analytics-chart-wrapper" style="position:relative;">
+              <div id="trend-empty-state" class="status-empty-state" style="display:none;position:absolute;inset:0;">
+                <i class="fas fa-chart-line" aria-hidden="true" style="font-size:32px;opacity:0.4;"></i>
+                <p>No loan activity recorded for this period</p>
+              </div>
               <canvas id="chart-trend"></canvas>
             </div>
           </div>
         </div>
+
         <!-- Loan Status Breakdown -->
         <div class="analytics-card">
           <div class="analytics-card-header">
             <div class="analytics-card-title">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-              Loan Status Breakdown
+              <i class="fas fa-chart-pie" aria-hidden="true"></i>
+              <span>Loan Status Breakdown</span>
             </div>
             <div class="analytics-period-filters" id="status-period-filters" role="group" aria-label="Status period filter">
-              <button class="analytics-period-btn active" data-period="monthly" onclick="setAnalyticsPeriod('status','monthly',this)">Monthly</button>
-              <button class="analytics-period-btn" data-period="yearly" onclick="setAnalyticsPeriod('status','yearly',this)">Yearly</button>
-              <button class="analytics-period-btn" data-period="alltime" onclick="setAnalyticsPeriod('status','alltime',this)">All Time</button>
+              <button class="analytics-period-btn active" data-period="monthly" onclick="setDashboardPeriod('monthly', this)">Monthly</button>
+              <button class="analytics-period-btn" data-period="yearly" onclick="setDashboardPeriod('yearly', this)">Yearly</button>
+              <button class="analytics-period-btn" data-period="alltime" onclick="setDashboardPeriod('alltime', this)">All Time</button>
             </div>
           </div>
           <div class="analytics-card-body">
-            <div class="status-breakdown-layout" id="status-breakdown">
-              <div class="status-donut-column">
-                <div class="status-donut-wrapper">
+            <div class="status-panel-layout" id="status-breakdown">
+              <div class="status-chart-col">
+                <div class="status-chart-donut">
                   <div id="status-empty-state" class="status-empty-state" style="display:none;">
-                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-                    <p>No loan data available yet</p>
+                    <i class="fas fa-chart-pie" aria-hidden="true" style="font-size:28px;opacity:0.4;"></i>
                   </div>
                   <canvas id="chart-status"></canvas>
                 </div>
-                <div class="status-total-badge" id="status-total-badge">
-                  <span class="status-total-label">Total Loans</span>
-                  <span class="status-total-value" id="status-total-value">0</span>
+                <div class="status-total-box" id="status-total-badge">
+                  <span class="st-total-lbl">Total Loans</span>
+                  <span class="st-total-num" id="status-total-value">0</span>
                 </div>
               </div>
-              <div class="status-cards-area">
-                <div class="status-cards-grid" id="status-cards-grid"></div>
-                <div id="status-other-section" style="display:none;"></div>
+              <div class="status-list-col">
+                <div class="status-table-header">
+                  <span></span>
+                  <span>Status</span>
+                  <span class="col-num">Loans</span>
+                  <span class="col-num">Share</span>
+                </div>
+                <div class="status-table-list" id="status-cards-grid"></div>
               </div>
             </div>
           </div>
@@ -2018,7 +2470,7 @@
         <div class="weekly-performance-header">
           <div class="weekly-performance-title-group">
             <span class="weekly-performance-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"></path><path d="M4 19h16"></path><path d="m7 14 3-3 3 2 5-6"></path><path d="M18 7h-4"></path><path d="M18 7v4"></path></svg>
+              <i class="fas fa-chart-bar"></i>
             </span>
             <div>
               <h3 id="weekly-performance-title">Employees Weekly Performance</h3>
@@ -2027,12 +2479,13 @@
           </div>
           <div class="weekly-performance-actions">
             <div class="weekly-date-pill" title="Current week">
+              <i class="fas fa-calendar-alt" aria-hidden="true"></i>
               <span>Current Week</span>
               <strong id="weekly-current-date">--</strong>
             </div>
             <button type="button" class="btn btn-secondary btn-sm weekly-refresh-btn" onclick="loadWeeklyPerformance(true)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"></path><path d="M21 21v-5h-5"></path></svg>
-              Refresh
+              <i class="fas fa-sync-alt" aria-hidden="true"></i>
+              <span>Refresh</span>
             </button>
           </div>
         </div>
@@ -2041,16 +2494,16 @@
           <table class="weekly-performance-table">
             <thead>
               <tr>
-                <th>Rank</th>
+                <th class="text-center">Rank</th>
                 <th>Employee</th>
-                <th>Customers Added</th>
-                <th>Loans Applied</th>
-                <th>Approved</th>
-                <th>Rejected</th>
-                <th>Pending</th>
-                <th>Disbursed</th>
-                <th>Success Rate</th>
-                <th>Performance</th>
+                <th class="text-center">Customers Added</th>
+                <th class="text-center">Loans Applied</th>
+                <th class="text-center">Approved</th>
+                <th class="text-center">Rejected</th>
+                <th class="text-center">Pending</th>
+                <th class="text-center">Disbursed</th>
+                <th class="text-center">Success Rate</th>
+                <th class="text-center">Performance</th>
               </tr>
             </thead>
             <tbody id="weekly-performance-tbody">
@@ -2082,13 +2535,6 @@
   let weeklyPage = 1;
   const WEEKLY_PER_PAGE = 20;
   let allWeeklyRows = [];
-
-  const user = requireRole('admin');
-  if (user) { 
-    renderSidebarUser();
-    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
-    loadDashboard();
-  }
 
   async function viewCustomerDetail(id) {
     if (!id) return;
@@ -2181,7 +2627,7 @@
             <div class="employee-empty-state customer-empty-state--compact">
               <div class="employee-empty-state-inner">
                 <span class="employee-empty-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5"></path><path d="M9 12h6"></path><path d="M9 16h6"></path></svg>
+                  <i class="fas fa-folder-open"></i>
                 </span>
                 <h4>No documents uploaded</h4>
                 <p>This customer has no uploaded files yet.</p>
@@ -2208,7 +2654,7 @@
             <div class="employee-empty-state customer-empty-state--compact">
               <div class="employee-empty-state-inner">
                 <span class="employee-empty-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+                  <i class="fas fa-briefcase"></i>
                 </span>
                 <h4>No loans found</h4>
                 <p>No loan records are linked to this customer yet.</p>
@@ -2360,27 +2806,54 @@
       <div class="weekly-summary-item"><span class="weekly-summary-label">Loan Disbursed</span><span class="weekly-summary-value">${disbursed}</span></div>`;
   }
 
+  let isWeeklyRefreshing = false;
   async function loadWeeklyPerformance(forceReload = false) {
+    if (isWeeklyRefreshing) return;
     const tbody = document.getElementById('weekly-performance-tbody');
     const currentDateEl = document.getElementById('weekly-current-date');
     const refreshBtn = document.querySelector('.weekly-refresh-btn');
+    const refreshIcon = refreshBtn?.querySelector('i');
     if (!tbody) return;
 
+    isWeeklyRefreshing = true;
     if (refreshBtn) refreshBtn.disabled = true;
-    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Loading weekly performance...</td></tr>';
+    if (refreshIcon) refreshIcon.classList.add('fa-spin');
+    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted"><i class="fas fa-spinner fa-spin" aria-hidden="true" style="margin-right:8px;"></i>Loading weekly performance...</td></tr>';
     document.getElementById('weekly-pagination').innerHTML = '';
 
     try {
       const res = await api.get('/admin/dashboard/weekly-employee-performance');
       if (!res?.ok) {
         if (currentDateEl) currentDateEl.textContent = getCurrentWeekLabelFallback();
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Unable to load weekly performance.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Unable to load weekly performance. <button type="button" class="btn btn-sm btn-secondary" onclick="loadWeeklyPerformance(true)" style="margin-left:8px;">Retry</button></td></tr>';
         renderWeeklyPerformanceSummary([]);
         return;
       }
 
       const data = normalizeWeeklyPerformancePayload(res.data);
       allWeeklyRows = data.employees;
+
+      // Sort complete employee dataset globally by performance ranking before pagination
+      allWeeklyRows.sort((a, b) => {
+        const disbA = weeklyMetric(a, 'disbursed', 'disbursed');
+        const disbB = weeklyMetric(b, 'disbursed', 'disbursed');
+        if (disbB !== disbA) return disbB - disbA;
+
+        const appliedA = weeklyMetric(a, 'loansApplied', 'loans_applied');
+        const appliedB = weeklyMetric(b, 'loansApplied', 'loans_applied');
+        if (appliedB !== appliedA) return appliedB - appliedA;
+
+        const custA = weeklyMetric(a, 'customersAdded', 'customers_added');
+        const custB = weeklyMetric(b, 'customersAdded', 'customers_added');
+        if (custB !== custA) return custB - custA;
+
+        const rateA = Number(a.successRate ?? a.success_rate ?? 0) || 0;
+        const rateB = Number(b.successRate ?? b.success_rate ?? 0) || 0;
+        if (rateB !== rateA) return rateB - rateA;
+
+        return String(a.name || '').localeCompare(String(b.name || ''));
+      });
+
       if (currentDateEl) currentDateEl.textContent = data.weekLabel || (data.currentDate ? formatDate(data.currentDate) : formatDate(new Date()));
       renderWeeklyPerformanceSummary(allWeeklyRows, data.summary);
       weeklyPage = 1;
@@ -2389,9 +2862,11 @@
     } catch (err) {
       console.error('[Dashboard] Weekly performance error:', err);
       if (currentDateEl) currentDateEl.textContent = getCurrentWeekLabelFallback();
-      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Unable to load weekly performance.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Unable to load weekly performance. <button type="button" class="btn btn-sm btn-secondary" onclick="loadWeeklyPerformance(true)" style="margin-left:8px;">Retry</button></td></tr>';
     } finally {
       if (refreshBtn) refreshBtn.disabled = false;
+      if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+      isWeeklyRefreshing = false;
     }
   }
 
@@ -2399,6 +2874,8 @@
     const list = allWeeklyRows;
     const total = list.length;
     const totalPages = Math.ceil(total / WEEKLY_PER_PAGE);
+    if (weeklyPage > totalPages && totalPages > 0) weeklyPage = totalPages;
+    if (weeklyPage < 1) weeklyPage = 1;
     const start = (weeklyPage - 1) * WEEKLY_PER_PAGE;
     const end = Math.min(start + WEEKLY_PER_PAGE, total);
     const pageItems = list.slice(start, end);
@@ -2420,29 +2897,31 @@
       const safeId = Number(employee.employeeId ?? employee.id) || 0;
       return `
         <tr class="weekly-row${isTop ? ' top-performer' : ''}" onclick="openEmployeePerformanceProfile(${safeId})" tabindex="0" onkeydown="if(event.key==='Enter' || event.key===' ') openEmployeePerformanceProfile(${safeId})">
-          <td><span class="weekly-rank">#${globalIndex + 1}</span></td>
+          <td class="text-center"><span class="weekly-rank">#${globalIndex + 1}</span></td>
           <td>
             <div class="weekly-employee-cell">
-              ${employeeAvatarHtml(employee)}
-              <span class="weekly-employee-copy">
-                <strong class="weekly-employee-name">${safeName}</strong>
-                <small class="weekly-employee-email">${safeEmail}</small>
-              </span>
+              <div class="employee-avatar-wrapper" aria-hidden="true">
+                ${employeeAvatarHtml(employee)}
+              </div>
+              <div class="weekly-employee-copy">
+                <span class="weekly-employee-name">${safeName}</span>
+                <span class="weekly-employee-email">${safeEmail}</span>
+              </div>
             </div>
           </td>
-          <td>${weeklyNumberCell(weeklyMetric(employee, 'customersAdded', 'customers_added'))}</td>
-          <td>${weeklyNumberCell(weeklyMetric(employee, 'loansApplied', 'loans_applied'))}</td>
-          <td>${weeklyNumberCell(employee.approved)}</td>
-          <td>${weeklyNumberCell(employee.rejected)}</td>
-          <td>${weeklyNumberCell(employee.pending)}</td>
-          <td>${weeklyNumberCell(employee.disbursed)}</td>
-          <td>
+          <td class="text-center">${weeklyNumberCell(weeklyMetric(employee, 'customersAdded', 'customers_added'))}</td>
+          <td class="text-center">${weeklyNumberCell(weeklyMetric(employee, 'loansApplied', 'loans_applied'))}</td>
+          <td class="text-center">${weeklyNumberCell(employee.approved)}</td>
+          <td class="text-center">${weeklyNumberCell(employee.rejected)}</td>
+          <td class="text-center">${weeklyNumberCell(employee.pending)}</td>
+          <td class="text-center">${weeklyNumberCell(employee.disbursed)}</td>
+          <td class="text-center">
             <span class="weekly-success">
               ${formatSuccessRate(rate)}
               <span class="weekly-success-bar" aria-hidden="true"><span class="weekly-success-fill" style="--success-width:${Math.min(100, Math.max(0, rate))}%;--success-color:${meta.color};"></span></span>
             </span>
           </td>
-          <td><span class="performance-badge ${meta.className}"><span class="performance-dot"></span>${meta.label}</span></td>
+          <td class="text-center"><span class="performance-badge ${meta.className}"><span class="performance-dot"></span>${meta.label}</span></td>
         </tr>`;
     }).join('');
 
@@ -2450,22 +2929,26 @@
   }
 
   function buildWeeklyPagination(total, current, totalPages) {
-    if (total <= WEEKLY_PER_PAGE) return '';
+    if (!total) return '';
     const start = (current - 1) * WEEKLY_PER_PAGE + 1;
     const end = Math.min(current * WEEKLY_PER_PAGE, total);
     let html = `<div class="tbl-pagination"><span class="tbl-pg-info">Showing ${start}–${end} of ${total} employees</span>`;
-    html += `<button class="tbl-pg-btn" ${current===1?'disabled':''} onclick="goWeeklyPage(${current-1})">← Prev</button>`;
-    const pages = getPagPages(current, totalPages);
-    for (const p of pages) {
-      if (p === '...') html += `<span class="tbl-pg-btn" style="cursor:default;pointer-events:none;">…</span>`;
-      else html += `<button class="tbl-pg-btn${p===current?' active':''}" onclick="goWeeklyPage(${p})">${p}</button>`;
+    if (totalPages > 1) {
+      html += `<button type="button" class="tbl-pg-btn" ${current === 1 ? 'disabled' : ''} onclick="goWeeklyPage(${current - 1})">Previous</button>`;
+      const pages = getPagPages(current, totalPages);
+      for (const p of pages) {
+        if (p === '...') html += `<span class="tbl-pg-btn" style="cursor:default;pointer-events:none;">…</span>`;
+        else html += `<button type="button" class="tbl-pg-btn${p === current ? ' active' : ''}" onclick="goWeeklyPage(${p})">${p}</button>`;
+      }
+      html += `<button type="button" class="tbl-pg-btn" ${current === totalPages ? 'disabled' : ''} onclick="goWeeklyPage(${current + 1})">Next</button>`;
     }
-    html += `<button class="tbl-pg-btn" ${current===totalPages?'disabled':''} onclick="goWeeklyPage(${current+1})">Next →</button>`;
     html += '</div>';
     return html;
   }
 
   function goWeeklyPage(p) {
+    const totalPages = Math.ceil(allWeeklyRows.length / WEEKLY_PER_PAGE);
+    if (p < 1 || (totalPages > 0 && p > totalPages)) return;
     weeklyPage = p;
     renderWeeklyPerformancePage();
   }
@@ -2520,7 +3003,7 @@
       <div class="employee-empty-state">
         <div class="employee-empty-state-inner">
           <span class="employee-empty-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+            <i class="fas fa-user-circle"></i>
           </span>
           <h4>${dashboardEscapeHtml(title)}</h4>
           <p>${dashboardEscapeHtml(copy)}</p>
@@ -2580,14 +3063,16 @@
       const safeEmail = dashboardEscapeHtml(emp.email || 'No email');
       return `
         <button type="button" class="employee-list-item${isSelected ? ' active' : ''}" onclick='selectEmployee(${JSON.stringify(emp.id)})'>
-          ${employeeAvatarHtml(emp)}
-          <span class="employee-list-copy">
-            <strong class="employee-list-name">${safeName}</strong>
+          <div class="employee-avatar-wrapper" aria-hidden="true">
+            ${employeeAvatarHtml(emp)}
+          </div>
+          <div class="employee-list-copy">
+            <span class="employee-list-name">${safeName}</span>
             <span class="employee-list-meta">
-              <small class="employee-list-email">${safeEmail}</small>
+              <span class="employee-list-email">${safeEmail}</span>
               <span class="employee-loan-badge">${pluralize(metrics.totalLoans, 'loan')}</span>
             </span>
-          </span>
+          </div>
         </button>`;
     }).join('');
   }
@@ -2689,24 +3174,24 @@
       </div>
       <div class="employee-metrics-grid">
         <button class="employee-metric-card loans" type="button" data-employee-view="loans" onclick="showEmployeeView('loans')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('loans')">
-          <span class="employee-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg></span>
+          <span class="employee-metric-icon" aria-hidden="true"><i class="fas fa-file-invoice-dollar"></i></span>
           <span><span class="employee-metric-value">${metrics.totalLoans}</span><span class="employee-metric-label">Loans Applied</span></span>
         </button>
         <button class="employee-metric-card pending" type="button" data-employee-view="pending" onclick="showEmployeeView('pending')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('pending')">
-          <span class="employee-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></span>
+          <span class="employee-metric-icon" aria-hidden="true"><i class="fas fa-clock"></i></span>
           <span><span class="employee-metric-value">${metrics.pending}</span><span class="employee-metric-label">Pending</span></span>
         </button>
         <button class="employee-metric-card approved" type="button" data-employee-view="approved" onclick="showEmployeeView('approved')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('approved')">
-          <span class="employee-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-5"></path></svg></span>
+          <span class="employee-metric-icon" aria-hidden="true"><i class="fas fa-check-circle"></i></span>
           <span><span class="employee-metric-value">${metrics.approved}</span><span class="employee-metric-label">Approved</span></span>
         </button>
         <button class="employee-metric-card customers" type="button" data-employee-view="customers" onclick="showEmployeeView('customers')" onkeydown="if(event.key==='Enter' || event.key===' ') showEmployeeView('customers')">
-          <span class="employee-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path></svg></span>
+          <span class="employee-metric-icon" aria-hidden="true"><i class="fas fa-users"></i></span>
           <span><span class="employee-metric-value">${metrics.employeeCustomers.length}</span><span class="employee-metric-label">Customers Added</span></span>
         </button>
       </div>
       <div id="employee-view-message" class="employee-view-message">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+        <i class="fas fa-info-circle" aria-hidden="true"></i>
         <span>Click one of the KPI cards above to review this employee's loan or customer details.</span>
       </div>
       <div id="employee-view-output" class="employee-view-output"></div>`;
@@ -2852,23 +3337,90 @@
     outputEl.innerHTML = renderEmployeeLoanView(view, filteredLoans, config, page);
   }
 
-  // Premium Analytics Chart Functions
+  // ── Unified Dashboard Period State ──
+  let activeDashboardPeriod = 'monthly';
+  let dashboardRequestId = 0;
+
+  function getPeriodScopeMeta(period, customStart = null, customEnd = null) {
+    const now = new Date();
+    const monthName = now.toLocaleDateString('en-US', { month: 'long' });
+    const yearName = now.getFullYear();
+
+    if (period === 'monthly') {
+      return {
+        scopeLabel: `${monthName} ${yearName}`,
+        customersSub: `${monthName} borrowers`,
+        loansSub: `${monthName} applications`
+      };
+    } else if (period === 'yearly') {
+      return {
+        scopeLabel: `${yearName}`,
+        customersSub: `${yearName} borrowers`,
+        loansSub: `${yearName} applications`
+      };
+    } else if (period === 'custom' && customStart && customEnd) {
+      return {
+        scopeLabel: `${customStart} – ${customEnd}`,
+        customersSub: 'Period borrowers',
+        loansSub: 'Period applications'
+      };
+    } else {
+      return {
+        scopeLabel: 'All Time',
+        customersSub: 'Lifetime borrowers',
+        loansSub: 'Lifetime applications'
+      };
+    }
+  }
+
+  // Helper: format trend axis labels based on groupLabel
+  function formatTrendLabel(dateStr, groupLabel) {
+    if (!dateStr) return '';
+    if (groupLabel === 'year') return dateStr;
+    const parts = dateStr.split('-');
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    if (groupLabel === 'day') {
+      return monthNames[parseInt(parts[1], 10) - 1] + ' ' + parseInt(parts[2], 10);
+    }
+    return monthNames[parseInt(parts[1], 10) - 1] + " '" + parts[0].slice(2);
+  }
+
+  // ── Loan Trend Metrics & Chart ──
   function renderTrendMetrics(loans) {
     const container = document.getElementById('trend-metrics');
-    if (!loans.monthlyTrend || !loans.monthlyTrend.length) {
-      container.innerHTML = '';
+    if (!container) return;
+
+    const trend = loans?.monthlyTrend || [];
+    const groupLabel = loans?.groupLabel || 'month';
+    const totalLoans = Number(loans?.periodTotal ?? trend.reduce((s, m) => s + Number(m.count || 0), 0));
+
+    if (!trend.length || totalLoans === 0) {
+      container.innerHTML = `
+        <div class="metric-item">
+          <span class="metric-label">Total Loans</span>
+          <span class="metric-value">0</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Current Activity</span>
+          <span class="metric-value">0</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Peak Activity</span>
+          <span class="metric-value">—</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Growth</span>
+          <span class="metric-value">—</span>
+        </div>`;
       return;
     }
-    const trend = loans.monthlyTrend;
-    const groupLabel = loans.groupLabel || 'month'; // 'day', 'month', or 'year'
-    const totalLoans = trend.reduce((s, m) => s + m.count, 0);
+
     const latestCount = trend[trend.length - 1]?.count || 0;
     const highestEntry = trend.reduce((max, m) => m.count > max.count ? m : max, trend[0]);
     const prevCount = trend.length > 1 ? trend[trend.length - 2].count : 0;
     const change = latestCount - prevCount;
     const changePercent = prevCount > 0 ? ((change / prevCount) * 100).toFixed(1) : null;
 
-    // Context-aware labels
     const latestLabel  = groupLabel === 'year' ? 'Latest Year'  : groupLabel === 'day' ? 'Today' : 'Current Month';
     const highestLabel = groupLabel === 'year' ? 'Best Year'    : groupLabel === 'day' ? 'Best Day'  : 'Highest Month';
     const growthLabel  = groupLabel === 'year' ? 'YoY Growth'   : groupLabel === 'day' ? 'Day Growth' : 'Growth';
@@ -2897,15 +3449,17 @@
   function renderTrendChart(months, counts) {
     destroyChartInstance('trend');
     const ctx = document.getElementById('chart-trend');
-    if (!months || !months.length) {
+    const emptyEl = document.getElementById('trend-empty-state');
+    if (!ctx) return;
+
+    if (!months || !months.length || counts.every(c => Number(c || 0) === 0)) {
       ctx.style.display = 'none';
-      document.querySelector('#trend-metrics').innerHTML = `
-        <div class="metric-item" style="grid-column:1/-1;justify-content:center;padding:20px;">
-          <span style="color:var(--text-secondary);font-size:14px;">No loan data available yet</span>
-        </div>`;
+      if (emptyEl) emptyEl.style.display = 'flex';
       return;
     }
+
     ctx.style.display = 'block';
+    if (emptyEl) emptyEl.style.display = 'none';
 
     const textColor = getCSSVar('--text-secondary') || '#526173';
     const gridColor = getCSSVar('--border') || 'rgba(151,176,210,0.14)';
@@ -2920,8 +3474,8 @@
           label: 'Loans',
           data: counts,
           borderColor: accentColor,
-          backgroundColor: (ctx) => {
-            const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height);
+          backgroundColor: (ctxArea) => {
+            const gradient = ctxArea.chart.ctx.createLinearGradient(0, 0, 0, ctxArea.chart.height);
             gradient.addColorStop(0, accentColor.replace(')', ',0.25)'));
             gradient.addColorStop(0.5, accentColor.replace(')', ',0.12)'));
             gradient.addColorStop(1, accentColor.replace(')', ',0.02)'));
@@ -2940,6 +3494,7 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: { duration: 250 },
         interaction: {
           intersect: false,
           mode: 'index'
@@ -2956,7 +3511,7 @@
             cornerRadius: 8,
             boxPadding: 6,
             callbacks: {
-              label: (ctx) => ` Loans: ${ctx.parsed.y}`
+              label: (ctxItem) => ` Loans: ${ctxItem.parsed.y}`
             }
           }
         },
@@ -2991,26 +3546,11 @@
     });
   }
 
-  // ── Status Chart ──
-
-  // ── Status Icons (SVG paths) ──
-  const STATUS_ICONS = {
-    'Loan Disbursed': '<svg viewBox="0 0 24 24"><path d="M12 2l-8 4v12l8 4 8-4V6l-8-4z"/><path d="M8 12l2 2 4-4"/></svg>',
-    'Approved': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l2 2 4-4"/></svg>',
-    'Pending': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
-    'Rejected': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
-    'Hold': '<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M10 10v4"/><path d="M14 10v4"/></svg>',
-    'Cancelled': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6"/></svg>',
-    'ABND': '<svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><path d="M4 4l16 16"/></svg>',
-    'Other': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 12h.01M12 16h.01"/></svg>',
-    'Under Review': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 8.5h5M9.5 12h5M9.5 15.5h3"/></svg>',
-    'Documents Pending': '<svg viewBox="0 0 24 24"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>'
-  };
-
+  // ── Loan Status Breakdown ──
   const STATUS_META = [
+    { key: 'Pending', label: 'Pending', color: '#d97706', bgColor: 'rgba(217,119,6,0.12)' },
     { key: 'Loan Disbursed', label: 'Loan Disbursed', color: '#059669', bgColor: 'rgba(5,150,105,0.12)' },
     { key: 'Approved', label: 'Approved', color: '#3b82f6', bgColor: 'rgba(59,130,246,0.12)' },
-    { key: 'Pending', label: 'Pending', color: '#d97706', bgColor: 'rgba(217,119,6,0.12)' },
     { key: 'Rejected', label: 'Rejected', color: '#dc2626', bgColor: 'rgba(220,38,38,0.12)' },
     { key: 'Under Review', label: 'Under Review', color: '#6366f1', bgColor: 'rgba(99,102,241,0.12)' },
     { key: 'Documents Pending', label: 'Documents Pending', color: '#0891b2', bgColor: 'rgba(8,145,178,0.12)' },
@@ -3020,205 +3560,244 @@
     { key: 'Other', label: 'Other', color: '#94a3b8', bgColor: 'rgba(148,163,184,0.12)' }
   ];
 
-  const STATUS_ORDER = ['Loan Disbursed', 'Approved', 'Pending', 'Rejected', 'Hold', 'Under Review', 'Documents Pending', 'Cancelled', 'ABND', 'Other'];
-
-  function renderStatusChart(statusMap) {
+  function renderStatusChart(statusMap, totalLoans = null) {
     destroyChartInstance('status');
 
-    // Sort statuses by the defined order
-    const allStatuses = STATUS_ORDER.map(key => STATUS_META.find(s => s.key === key)).filter(Boolean);
+    const total = totalLoans !== null ? Number(totalLoans) : Object.values(statusMap || {}).reduce((s, v) => s + Number(v || 0), 0);
+    const totalValEl = document.getElementById('status-total-value');
+    if (totalValEl) totalValEl.textContent = total;
 
-    const total = Object.values(statusMap).reduce((s, v) => s + v, 0);
-    document.getElementById('status-total-value').textContent = total;
+    const chartCanvas = document.getElementById('chart-status');
+    const emptyStateEl = document.getElementById('status-empty-state');
+    const gridEl = document.getElementById('status-cards-grid');
+
+    const activeStatuses = STATUS_META.filter(s => Number(statusMap[s.key] || 0) > 0);
+    const zeroStatuses = STATUS_META.filter(s => Number(statusMap[s.key] || 0) === 0);
+
+    const ctx = document.getElementById('chart-status');
+    const cardBg = getCSSVar('--bg-card') || '#0b1422';
 
     if (total === 0) {
-      document.getElementById('chart-status').style.display = 'none';
-      document.getElementById('status-empty-state').style.display = 'flex';
-      document.getElementById('status-cards-grid').innerHTML = '';
-      document.getElementById('status-other-section').style.display = 'none';
-      return;
-    }
-    document.getElementById('chart-status').style.display = 'block';
-    document.getElementById('status-empty-state').style.display = 'none';
+      if (chartCanvas) chartCanvas.style.display = 'block';
+      if (emptyStateEl) emptyStateEl.style.display = 'none';
 
-    // Separate active (>0) and zero-value statuses
-    const activeStatuses = allStatuses.filter(s => (statusMap[s.key] || 0) > 0);
-    const zeroStatuses = allStatuses.filter(s => (statusMap[s.key] || 0) === 0);
+      // Subtle placeholder doughnut
+      chartStatusInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['No Loans'],
+          datasets: [{
+            data: [1],
+            backgroundColor: [getCSSVar('--border') || 'rgba(151,176,210,0.18)'],
+            borderColor: cardBg,
+            borderWidth: 2,
+            hoverOffset: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+          }
+        }
+      });
+    } else {
+      if (chartCanvas) chartCanvas.style.display = 'block';
+      if (emptyStateEl) emptyStateEl.style.display = 'none';
 
-    // ── Build Donut Chart ──
-    const labels = activeStatuses.map(s => s.label);
-    const data = activeStatuses.map(s => statusMap[s.key] || 0);
-    const bgColors = activeStatuses.map(s => s.bgColor.replace('0.12', '0.85'));
-    const ctx = document.getElementById('chart-status');
-    const cardBg = getCSSVar('--bg-card') || '#ffffff';
-
-    chartStatusInstance = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels,
-        datasets: [{
-          data,
-          backgroundColor: activeStatuses.map(s => s.color),
-          borderColor: cardBg,
-          borderWidth: 2.5,
-          hoverOffset: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '68%',
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: getCSSVar('--bg-card') || '#1a2635',
-            titleColor: getCSSVar('--text-primary') || '#eef4ff',
-            bodyColor: getCSSVar('--text-secondary') || '#c0ccda',
-            borderColor: getCSSVar('--border') || 'rgba(151,176,210,0.18)',
-            borderWidth: 1,
-            padding: 12,
-            cornerRadius: 8,
-            callbacks: {
-              label: (ctx) => {
-                const val = ctx.parsed;
-                const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-                return ` ${ctx.label}: ${val} (${pct}%)`;
+      chartStatusInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: activeStatuses.map(s => s.label),
+          datasets: [{
+            data: activeStatuses.map(s => Number(statusMap[s.key] || 0)),
+            backgroundColor: activeStatuses.map(s => s.color),
+            borderColor: cardBg,
+            borderWidth: 2.5,
+            hoverOffset: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 200 },
+          cutout: '72%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: getCSSVar('--bg-card') || '#1a2635',
+              titleColor: getCSSVar('--text-primary') || '#eef4ff',
+              bodyColor: getCSSVar('--text-secondary') || '#c0ccda',
+              borderColor: getCSSVar('--border') || 'rgba(151,176,210,0.18)',
+              borderWidth: 1,
+              padding: 10,
+              cornerRadius: 8,
+              callbacks: {
+                label: (c) => {
+                  const val = c.parsed;
+                  const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
+                  return ` ${c.label}: ${val} loans (${pct}%)`;
+                }
               }
             }
           }
         }
+      });
+    }
+
+    // ── Build Compact Aligned Status Table ──
+    if (gridEl) {
+      if (total === 0) {
+        gridEl.innerHTML = `
+          <div class="status-empty-notice">
+            <i class="fas fa-info-circle" aria-hidden="true"></i>
+            <span>No loan activity recorded for this period.</span>
+          </div>
+          ${STATUS_META.map(s => `
+            <div class="status-row is-zero">
+              <span class="status-indicator-dot" style="background-color: ${s.color};"></span>
+              <span class="status-row-name">${s.label}</span>
+              <span class="status-row-count">0</span>
+              <span class="status-row-pct">0.0%</span>
+            </div>
+          `).join('')}
+        `;
+      } else {
+        const rowsHtml = [
+          ...activeStatuses.map(s => {
+            const count = Number(statusMap[s.key] || 0);
+            const pct = ((count / total) * 100).toFixed(1);
+            return `
+              <div class="status-row has-data" style="--st-color: ${s.color};">
+                <span class="status-indicator-dot" style="background-color: ${s.color};"></span>
+                <span class="status-row-name">${s.label}</span>
+                <span class="status-row-count">${count}</span>
+                <span class="status-row-pct">${pct}%</span>
+              </div>`;
+          }),
+          ...zeroStatuses.map(s => `
+            <div class="status-row is-zero">
+              <span class="status-indicator-dot" style="background-color: ${s.color};"></span>
+              <span class="status-row-name">${s.label}</span>
+              <span class="status-row-count">0</span>
+              <span class="status-row-pct">0.0%</span>
+            </div>
+          `)
+        ].join('');
+
+        gridEl.innerHTML = rowsHtml;
       }
+    }
+  }
+
+  // ── Central Dashboard Period Controller ──
+  async function setDashboardPeriod(period, btn = null, customStart = null, customEnd = null) {
+    activeDashboardPeriod = period;
+
+    // Synchronize all period buttons across the dashboard
+    document.querySelectorAll('.analytics-period-btn').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-period') === period);
     });
 
-    // ── Build Stat Cards for active statuses ──
-    const gridEl = document.getElementById('status-cards-grid');
-    gridEl.innerHTML = activeStatuses.map(s => {
-      const count = statusMap[s.key] || 0;
-      const pct = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
-      const icon = STATUS_ICONS[s.key] || STATUS_ICONS['Other'];
-      return `
-        <div class="status-card" style="--status-color: ${s.color}; --status-bg: ${s.bgColor};">
-          <div class="status-card-header">
-            <div class="status-card-icon">${icon}</div>
-            <span class="status-card-name">${s.label}</span>
-          </div>
-          <div class="status-card-stats">
-            <span class="status-card-count">${count}</span>
-            <span class="status-card-pct">${pct}%</span>
-          </div>
-          <div class="status-card-progress">
-            <div class="status-card-progress-fill" style="width: ${pct}%;"></div>
-          </div>
-        </div>`;
-    }).join('');
+    // Temporary loading states on KPI cards to prevent showing stale values
+    const custEl = document.getElementById('stat-customers');
+    const loansEl = document.getElementById('stat-loans');
+    const pendEl = document.getElementById('stat-pending');
+    const appEl = document.getElementById('stat-approved');
+    const disbEl = document.getElementById('stat-disbursed');
 
-    // ── Build "Other Statuses" pills for zero-value statuses ──
-    const otherSection = document.getElementById('status-other-section');
-    if (zeroStatuses.length > 0) {
-      otherSection.style.display = 'block';
-      otherSection.innerHTML = `
-        <div class="status-other-section">
-          <span class="status-other-label">Other Statuses</span>
-          <div class="status-other-pills">
-            ${zeroStatuses.map(s => {
-              const icon = STATUS_ICONS[s.key] || STATUS_ICONS['Other'];
-              return `
-                <span class="status-other-pill" style="--pill-color: ${s.color};">
-                  ${icon} ${s.label}
-                </span>`;
-            }).join('')}
-          </div>
-        </div>`;
-    } else {
-      otherSection.style.display = 'none';
+    if (custEl) custEl.textContent = '—';
+    if (loansEl) loansEl.textContent = '—';
+    if (pendEl) pendEl.textContent = '—';
+    if (appEl) appEl.textContent = '—';
+    if (disbEl) disbEl.textContent = '—';
+
+    // Show loading on Trend & Status
+    const trendMetricsEl = document.getElementById('trend-metrics');
+    if (trendMetricsEl) {
+      trendMetricsEl.innerHTML = '<div class="metric-item" style="grid-column:1/-1;justify-content:center;padding:12px;"><span style="color:var(--text-secondary);font-size:12px;"><i class="fas fa-spinner fa-spin" aria-hidden="true" style="margin-right:6px;"></i>Loading trend…</span></div>';
     }
-  }
-
-  // ── Main Dashboard Load ──
-
-  // Track current periods for both sections (can be independently filtered)
-  const analyticsPeriod = { trend: 'monthly', status: 'monthly' };
-
-  // Helper: format trend axis labels based on groupLabel
-  function formatTrendLabel(dateStr, groupLabel) {
-    if (!dateStr) return '';
-    if (groupLabel === 'year') return dateStr; // e.g. '2024'
-    const parts = dateStr.split('-');
-    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    if (groupLabel === 'day') {
-      // parts: [YYYY, MM, DD] → "Aug 12"
-      return monthNames[parseInt(parts[1]) - 1] + ' ' + parseInt(parts[2]);
-    }
-    // month groupLabel → "Aug '26"
-    return monthNames[parseInt(parts[1]) - 1] + " '" + parts[0].slice(2);
-  }
-
-  // Called when user clicks a period filter button
-  async function setAnalyticsPeriod(section, period, btn) {
-    // Update active button state in that section's filter group
-    const groupId = section === 'trend' ? 'trend-period-filters' : 'status-period-filters';
-    document.querySelectorAll(`#${groupId} .analytics-period-btn`).forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    // Only re-fetch if the period actually changed
-    if (analyticsPeriod[section] === period) return;
-    analyticsPeriod[section] = period;
-
-    await reloadAnalytics(section, period);
-  }
-
-  async function reloadAnalytics(section, period) {
-    // Show subtle loading state
-    if (section === 'trend') {
-      document.getElementById('trend-metrics').innerHTML = '<div class="metric-item" style="grid-column:1/-1;justify-content:center;padding:12px;"><span style="color:var(--text-secondary);font-size:12px;">Loading…</span></div>';
-    } else {
-      document.getElementById('status-cards-grid').innerHTML = '<div style="padding:16px;color:var(--text-secondary);font-size:12px;">Loading…</div>';
+    const statusGridEl = document.getElementById('status-cards-grid');
+    if (statusGridEl) {
+      statusGridEl.innerHTML = '<div style="padding:16px;color:var(--text-secondary);font-size:12px;text-align:center;"><i class="fas fa-spinner fa-spin" aria-hidden="true" style="margin-right:6px;"></i>Loading status…</div>';
     }
 
-    const res = await api.get(`/admin/dashboard?period=${period}`);
-    if (!res?.ok) return;
-    const { loans } = res.data.data;
+    // Race-condition tracking
+    const thisRequestId = ++dashboardRequestId;
 
-    // Set Chart defaults for dark mode support
-    Chart.defaults.color = getCSSVar('--text-secondary') || '#526173';
+    let url = `/admin/dashboard?period=${period}`;
+    if (period === 'custom' && customStart && customEnd) {
+      url += `&startDate=${encodeURIComponent(customStart)}&endDate=${encodeURIComponent(customEnd)}`;
+    }
+
+    const res = await api.get(url);
+    if (thisRequestId !== dashboardRequestId) return; // Stale response, discard
+    if (!res?.ok || !res?.data?.data) return;
+
+    const { totalCustomers, totalEmployees, totalLoans, pendingLoans, approvedLoans, disbursedLoans, loans } = res.data.data;
+
+    // Update KPI card numbers
+    const empEl = document.getElementById('stat-employees');
+    if (empEl) empEl.textContent = totalEmployees ?? 0;
+    if (custEl) custEl.textContent = totalCustomers ?? 0;
+    if (loansEl) loansEl.textContent = totalLoans ?? 0;
+    if (pendEl) pendEl.textContent = pendingLoans ?? 0;
+    if (appEl) appEl.textContent = approvedLoans ?? 0;
+    if (disbEl) disbEl.textContent = disbursedLoans ?? 0;
+
+    // Update dynamic subtitles
+    const meta = getPeriodScopeMeta(period, customStart, customEnd);
+    const custSubEl = document.getElementById('stat-customers-sub');
+    const loansSubEl = document.getElementById('stat-loans-sub');
+    if (custSubEl) custSubEl.textContent = meta.customersSub;
+    if (loansSubEl) loansSubEl.textContent = meta.loansSub;
+
+    Chart.defaults.color = getCSSVar('--text-secondary') || '#94a3b8';
     Chart.defaults.borderColor = getCSSVar('--border') || 'rgba(151,176,210,0.14)';
+    Chart.defaults.font.family = "'Manrope', sans-serif";
 
-    if (section === 'trend') {
-      const months = (loans.monthlyTrend || []).map(m => formatTrendLabel(m.month, loans.groupLabel));
-      const counts = (loans.monthlyTrend || []).map(m => m.count);
-      renderTrendMetrics(loans);
-      renderTrendChart(months, counts);
-    } else {
-      const statusMap = {};
-      (loans.statusBreakdown || []).forEach(s => statusMap[s.status] = parseInt(s.count));
-      renderStatusChart(statusMap);
+    // Update Trend
+    renderTrendMetrics(loans);
+    const months = (loans?.monthlyTrend || []).map(m => formatTrendLabel(m.month, loans.groupLabel));
+    const counts = (loans?.monthlyTrend || []).map(m => m.count);
+    renderTrendChart(months, counts);
+
+    // Update Status Breakdown
+    const statusMap = {};
+    (loans?.statusBreakdown || []).forEach(s => statusMap[s.status] = parseInt(s.count, 10));
+    renderStatusChart(statusMap, totalLoans);
+  }
+
+  function renderDashboardDate() {
+    const el = document.getElementById('current-date');
+    if (!el) return;
+    try {
+      const now = new Date();
+      el.textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch (e) {
+      el.textContent = 'Today';
     }
   }
 
   async function loadDashboard() {
-    const res = await api.get('/admin/dashboard?period=monthly');
-    if (!res?.ok) return;
-    const { totalCustomers, totalEmployees, loans } = res.data.data;
+    // Default to monthly as required
+    renderDashboardDate();
+    await Promise.all([
+      setDashboardPeriod('monthly'),
+      loadEmployeesOverviewData(),
+      loadWeeklyPerformance()
+    ]);
+  }
 
-    const statusMap = {};
-    loans.statusBreakdown.forEach(s => statusMap[s.status] = parseInt(s.count));
-
-    document.getElementById('stat-employees').textContent = totalEmployees;
-    await Promise.all([loadEmployeesOverviewData(), loadWeeklyPerformance()]);
-
-    // Set Chart defaults for dark mode support
-    Chart.defaults.color = getCSSVar('--text-secondary') || '#526173';
-    Chart.defaults.borderColor = getCSSVar('--border') || 'rgba(151,176,210,0.14)';
-
-    // Loan Trend Chart
-    const months = loans.monthlyTrend.map(m => formatTrendLabel(m.month, loans.groupLabel));
-    const counts = loans.monthlyTrend.map(m => m.count);
-
-    renderTrendMetrics(loans);
-    renderTrendChart(months, counts);
-
-    // Status Breakdown Chart
-    renderStatusChart(statusMap);
+  // ── Initialize Dashboard ──
+  const user = requireRole('admin');
+  if (user) { 
+    renderSidebarUser();
+    renderDashboardDate();
+    loadDashboard();
   }
 </script>
 </body>

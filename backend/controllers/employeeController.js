@@ -1,4 +1,5 @@
 const upload = require('../middleware/upload');
+const db = require('../config/db');
 const CustomerModel = require('../models/customerModel');
 const LoanModel = require('../models/loanModel');
 const DocumentModel = require('../models/documentModel');
@@ -11,26 +12,143 @@ const employeeController = {
   async getDashboard(req, res) {
     try {
       const employeeId = req.user.id;
-      const customers = await CustomerModel.getAll({ added_by: employeeId });
-      const loans = await LoanModel.getAll({ applied_by: employeeId });
+      const period = (req.query.period || 'monthly').toLowerCase();
+      const startDate = req.query.startDate || null;
+      const endDate = req.query.endDate || null;
+      const area = req.query.area ? String(req.query.area).trim() : null;
+      const statusFilter = req.query.status ? String(req.query.status).trim() : null;
 
-      const pending = loans.filter(l => l.status === 'Pending').length;
-      const approved = loans.filter(l => l.status === 'Approved').length;
-      const rejected = loans.filter(l => l.status === 'Rejected').length;
+      // ── Build Date Filters ──
+      let loanDateFilter = '';
+      let custDateFilter = '';
+      const loanParams = [employeeId];
+      const custParams = [employeeId];
+
+      if (period === 'monthly') {
+        loanDateFilter = ' AND YEAR(l.created_at) = YEAR(NOW()) AND MONTH(l.created_at) = MONTH(NOW())';
+        custDateFilter = ' AND YEAR(c.created_at) = YEAR(NOW()) AND MONTH(c.created_at) = MONTH(NOW())';
+      } else if (period === 'yearly') {
+        loanDateFilter = ' AND YEAR(l.created_at) = YEAR(NOW())';
+        custDateFilter = ' AND YEAR(c.created_at) = YEAR(NOW())';
+      } else if (period === 'custom' && startDate && endDate) {
+        loanDateFilter = ' AND l.created_at >= ? AND l.created_at <= ?';
+        custDateFilter = ' AND c.created_at >= ? AND c.created_at <= ?';
+        const s = startDate.includes(' ') ? startDate : `${startDate} 00:00:00`;
+        const e = endDate.includes(' ') ? endDate : `${endDate} 23:59:59`;
+        loanParams.push(s, e);
+        custParams.push(s, e);
+      }
+      // 'alltime' or 'all_time': no date filter
+
+      // ── Build Area Filters ──
+      let loanAreaFilter = '';
+      let custAreaFilter = '';
+      if (area) {
+        loanAreaFilter = ' AND c.area = ?';
+        custAreaFilter = ' AND c.area = ?';
+        loanParams.push(area);
+        custParams.push(area);
+      }
+
+      // ── Build Status Filter for loans (if specified) ──
+      let loanStatusFilter = '';
+      const loanStatusParams = [...loanParams];
+      if (statusFilter) {
+        loanStatusFilter = ' AND l.status = ?';
+        loanStatusParams.push(statusFilter);
+      }
+
+      // 1. Customer Count (period + area)
+      const [custRows] = await db.query(
+        `SELECT COUNT(*) AS count FROM customers c WHERE c.added_by = ?${custDateFilter}${custAreaFilter}`,
+        custParams
+      );
+      const totalCustomers = Number(custRows[0]?.count || 0);
+
+      // All-time customer count for reference
+      const [allCustRows] = await db.query(
+        'SELECT COUNT(*) AS count FROM customers WHERE added_by = ?',
+        [employeeId]
+      );
+      const allTimeTotalCustomers = Number(allCustRows[0]?.count || 0);
+
+      // 2. Loan Count (period + area + status)
+      const [loanRows] = await db.query(
+        `SELECT COUNT(*) AS count FROM loans l LEFT JOIN customers c ON l.customer_id = c.id WHERE l.applied_by = ?${loanDateFilter}${loanAreaFilter}${loanStatusFilter}`,
+        loanStatusParams
+      );
+      const totalLoans = Number(loanRows[0]?.count || 0);
+
+      // All-time loan count for reference
+      const [allLoanRows] = await db.query(
+        'SELECT COUNT(*) AS count FROM loans WHERE applied_by = ?',
+        [employeeId]
+      );
+      const allTimeTotalLoans = Number(allLoanRows[0]?.count || 0);
+
+      // 3. Status Breakdown for the selected period (+ area)
+      const [statusRows] = await db.query(
+        `SELECT l.status, COUNT(*) AS count FROM loans l LEFT JOIN customers c ON l.customer_id = c.id WHERE l.applied_by = ?${loanDateFilter}${loanAreaFilter} GROUP BY l.status`,
+        loanParams
+      );
+      const statusCounts = {};
+      statusRows.forEach(r => {
+        statusCounts[r.status] = Number(r.count || 0);
+      });
+
+      // Total loans in this period + area (unfiltered by status) for percentage denominator
+      const periodTotalLoansUnfiltered = statusRows.reduce((sum, r) => sum + Number(r.count || 0), 0);
+
+      // 4. Distinct Cities/Areas for this employee
+      const [cityRows] = await db.query(
+        `SELECT DISTINCT c.area FROM customers c WHERE c.added_by = ? AND c.area IS NOT NULL AND c.area != '' ORDER BY c.area ASC`,
+        [employeeId]
+      );
+      const cities = cityRows.map(r => r.area).filter(Boolean);
+
+      // 5. Recent Loans (5)
+      const [recentLoans] = await db.query(
+        `SELECT l.id, l.amount, l.status, l.created_at, c.id AS customer_id, c.name AS customer_name, c.area
+         FROM loans l
+         LEFT JOIN customers c ON l.customer_id = c.id
+         WHERE l.applied_by = ?
+         ORDER BY l.created_at DESC
+         LIMIT 5`,
+        [employeeId]
+      );
+
+      // 6. Recent Customers (5)
+      const [recentCustomers] = await db.query(
+        `SELECT c.id, c.name, c.phone, c.area, c.created_at
+         FROM customers c
+         WHERE c.added_by = ?
+         ORDER BY c.created_at DESC
+         LIMIT 5`,
+        [employeeId]
+      );
 
       return res.json({
         success: true,
         data: {
-          totalCustomers: customers.length,
-          totalLoans: loans.length,
-          pending,
-          approved,
-          rejected,
-          recentLoans: loans.slice(0, 5),
-          recentCustomers: customers.slice(0, 5)
+          period,
+          totalCustomers,
+          allTimeTotalCustomers,
+          totalLoans: statusFilter ? totalLoans : periodTotalLoansUnfiltered,
+          periodTotalLoans: periodTotalLoansUnfiltered,
+          allTimeTotalLoans,
+          pending: statusCounts['Pending'] || 0,
+          approved: statusCounts['Approved'] || 0,
+          rejected: statusCounts['Rejected'] || 0,
+          disbursed: statusCounts['Loan Disbursed'] || 0,
+          statusCounts,
+          statusBreakdown: statusRows.map(r => ({ status: r.status, count: Number(r.count || 0) })),
+          cities,
+          recentLoans,
+          recentCustomers
         }
       });
     } catch (err) {
+      console.error('[Employee] Dashboard error:', err);
       return res.status(500).json({ success: false, message: 'Failed to load dashboard.' });
     }
   },
@@ -38,8 +156,8 @@ const employeeController = {
   // ── Customers ───────────────────────────────────────────────
   async getCustomers(req, res) {
     try {
-      const { area, search } = req.query;
-      const customers = await CustomerModel.getAll({ area, search, added_by: req.user.id });
+      const { area, search, period, startDate, endDate } = req.query;
+      const customers = await CustomerModel.getAll({ area, search, period, startDate, endDate, added_by: req.user.id });
       return res.json({ success: true, data: customers });
     } catch (err) {
       return res.status(500).json({ success: false, message: 'Failed to fetch customers.' });
@@ -157,6 +275,9 @@ const employeeController = {
       const { id } = req.params;
       const customer = await CustomerModel.findById(id);
       if (!customer) return res.status(404).json({ success: false, message: 'Customer not found.' });
+      if (String(customer.added_by) !== String(req.user.id)) {
+        return res.status(403).json({ success: false, message: 'You are not authorized to view this customer.' });
+      }
 
       const documents = await DocumentModel.getByCustomer(id);
       const loans = await LoanModel.getAll({ applied_by: req.user.id });
@@ -173,13 +294,16 @@ const employeeController = {
       const { id } = req.params;
       const customer = await CustomerModel.findById(id);
       if (!customer) return res.status(404).json({ success: false, message: 'Customer not found.' });
+      if (String(customer.added_by) !== String(req.user.id)) {
+        return res.status(403).json({ success: false, message: 'You can delete only your own customers.' });
+      }
 
       // Check if customer has loans
       const loans = await LoanModel.getAll({ customer_id: parseInt(id) });
       if (loans.length > 0) {
         return res.status(400).json({
           success: false,
-          message: 'Cannot delete customer with existing loans.',
+          message: `Cannot delete customer with ${loans.length} existing loan application${loans.length > 1 ? 's' : ''}.`,
           loansCount: loans.length
         });
       }
@@ -212,6 +336,10 @@ const employeeController = {
           const customer = await CustomerModel.findById(id);
           if (!customer) {
             results.push({ id, success: false, reason: 'Not Found' });
+            continue;
+          }
+          if (String(customer.added_by) !== String(req.user.id)) {
+            results.push({ id, success: false, reason: 'Unauthorized' });
             continue;
           }
 
@@ -247,7 +375,7 @@ const employeeController = {
   async uploadDocuments(req, res) {
     try {
       const { customerId } = req.params;
-      const { doc_type, document_password } = req.body;
+      const { doc_type, document_password, doc_types, document_passwords, metadata } = req.body;
 
       const files = Array.isArray(req.files) ? req.files : [];
       if (files.length === 0) {
@@ -258,33 +386,51 @@ const employeeController = {
       if (!customer) {
         return res.status(404).json({ success: false, message: 'Customer not found.' });
       }
+      if (String(customer.added_by) !== String(req.user.id)) {
+        return res.status(403).json({ success: false, message: 'You are not authorized to upload documents for this customer.' });
+      }
+
+      let metaList = [];
+      if (typeof metadata === 'string') {
+        try { metaList = JSON.parse(metadata); } catch (e) {}
+      } else if (Array.isArray(metadata)) {
+        metaList = metadata;
+      }
 
       const uploadedDocuments = [];
       const rejectedFiles = [];
 
-      for (const file of files) {
-       const ext = path.extname(file.originalname).toLowerCase();
-       const isGenuine = await upload.verifyUploadedFile(file, ext);
-       if (!isGenuine) {
-         await upload.deleteFile(upload.getFileUrl(req, file));
-         rejectedFiles.push(file.originalname);
-         continue;
-       }
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ext = path.extname(file.originalname).toLowerCase();
+        const isGenuine = await upload.verifyUploadedFile(file, ext);
+        if (!isGenuine) {
+          await upload.deleteFile(upload.getFileUrl(req, file));
+          rejectedFiles.push(file.originalname);
+          continue;
+        }
 
-       const filePath = upload.getFileUrl(req, file);
-       let fileData = null;
-       try {
-         if (file.path && fs.existsSync(file.path)) {
-           fileData = fs.readFileSync(file.path);
-         }
-       } catch (readErr) {
-         console.error('[Employee] Error reading file into buffer:', readErr.message);
-       }
+        const filePath = upload.getFileUrl(req, file);
+        let fileData = null;
+        try {
+          if (file.path && fs.existsSync(file.path)) {
+            fileData = fs.readFileSync(file.path);
+          }
+        } catch (readErr) {
+          console.error('[Employee] Error reading file into buffer:', readErr.message);
+        }
+
+        const fileDocType = (metaList[i] && metaList[i].doc_type) ||
+          (Array.isArray(doc_types) ? doc_types[i] : null) ||
+          doc_type || 'Other';
+        const filePassword = (metaList[i] && metaList[i].document_password) ||
+          (Array.isArray(document_passwords) ? document_passwords[i] : null) ||
+          document_password || null;
 
         const id = await DocumentModel.create({
           customer_id: customerId,
-          doc_type: doc_type || 'Other',
-          document_password: document_password || null,
+          doc_type: fileDocType,
+          document_password: filePassword,
           file_name: file.originalname,
           file_path: filePath,
           uploaded_by: req.user.id,
@@ -557,6 +703,11 @@ const employeeController = {
       const document = await DocumentModel.findById(id);
       if (!document) {
         return res.status(404).json({ success: false, message: 'Document not found.' });
+      }
+
+      const customer = await CustomerModel.findById(document.customer_id);
+      if (!customer || String(customer.added_by) !== String(req.user.id)) {
+        return res.status(403).json({ success: false, message: 'You are not authorized to delete this document.' });
       }
 
       // Try to delete physical file from disk

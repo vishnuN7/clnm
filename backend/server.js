@@ -77,10 +77,18 @@ app.use(express.urlencoded({ extended: true }));
 // ── Security Headers ────────────────────────────────────────────
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob:; frame-src 'self' blob:; object-src 'self' blob:; connect-src 'self';");
+
+  // Prevent caching of API responses and HTML templates to ensure multi-user isolation on shared computers
+  if (req.path.startsWith('/api') || req.path.endsWith('.html') || req.path === '/' || req.path === '/index.html') {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+
   next();
 });
 
@@ -91,7 +99,15 @@ app.use((req, res, next) => {
 // customer before releasing any file bytes.
 
 // Serve frontend static files
-app.use(express.static(path.join(__dirname, '..', 'frontend')));
+app.use(express.static(path.join(__dirname, '..', 'frontend'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }
+}));
 
 // Apply rate limiting to API routes before handlers
 app.use('/api/', apiLimiter);
@@ -389,10 +405,6 @@ async function ensureBreakTimeTables() {
     const [cols] = await db.query("SHOW COLUMNS FROM users");
     const colNames = cols.map(c => c.Field);
 
-    if (!colNames.includes('department')) {
-      await db.query("ALTER TABLE users ADD COLUMN department VARCHAR(50) DEFAULT 'Operations'");
-      console.log("Added 'department' column to 'users' table.");
-    }
     if (!colNames.includes('current_status')) {
       await db.query("ALTER TABLE users ADD COLUMN current_status VARCHAR(20) DEFAULT 'Offline'");
       console.log("Added 'current_status' column to 'users' table.");
@@ -400,6 +412,10 @@ async function ensureBreakTimeTables() {
     if (!colNames.includes('last_active_at')) {
       await db.query("ALTER TABLE users ADD COLUMN last_active_at TIMESTAMP NULL DEFAULT NULL");
       console.log("Added 'last_active_at' column to 'users' table.");
+    }
+    if (!colNames.includes('token_version')) {
+      await db.query("ALTER TABLE users ADD COLUMN token_version INT NOT NULL DEFAULT 1");
+      console.log("Added 'token_version' column to 'users' table.");
     }
 
     // 2. Create break_rules table
@@ -437,7 +453,7 @@ async function ensureBreakTimeTables() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         employee_id INT NOT NULL,
         employee_name VARCHAR(100) NOT NULL,
-        department VARCHAR(50) NOT NULL,
+        department VARCHAR(50) NULL DEFAULT '',
         break_type VARCHAR(50) NOT NULL,
         custom_reason TEXT NULL,
         start_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -448,6 +464,7 @@ async function ensureBreakTimeTables() {
         FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+    await db.query("ALTER TABLE break_records MODIFY COLUMN department VARCHAR(50) NULL DEFAULT ''").catch(() => {});
 
     // 4. Create attendance_logs table
     await db.query(`
@@ -463,6 +480,16 @@ async function ensureBreakTimeTables() {
         FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+
+    // Clean up any historical duplicate attendance_logs records (same employee, same login & logout time)
+    await db.query(`
+      DELETE a1 FROM attendance_logs a1
+      INNER JOIN attendance_logs a2
+      WHERE a1.id > a2.id
+        AND a1.employee_id = a2.employee_id
+        AND a1.login_time = a2.login_time
+        AND (a1.logout_time = a2.logout_time OR (a1.logout_time IS NULL AND a2.logout_time IS NULL))
+    `).catch(() => {});
 
     console.log("Break Time and Attendance tables initialized successfully.");
   } catch (err) {
@@ -494,7 +521,10 @@ async function ensureProfileTables() {
       { name: 'pan_number', def: 'VARCHAR(20) NULL' },
       { name: 'pan_card', def: 'VARCHAR(255) NULL' },
       { name: 'verification_status', def: "VARCHAR(30) DEFAULT 'Pending'" },
-      { name: 'verification_remarks', def: 'TEXT NULL' }
+      { name: 'verification_remarks', def: 'TEXT NULL' },
+      { name: 'aadhaar_document_password', def: 'VARCHAR(255) NULL' },
+      { name: 'pan_document_password', def: 'VARCHAR(255) NULL' },
+      { name: 'must_change_password', def: 'TINYINT(1) NOT NULL DEFAULT 0' }
     ];
 
     for (const col of colsToAdd) {
@@ -576,10 +606,10 @@ async function ensureProfileTables() {
       WHERE email = 'dixitlendingsolution@gmail.com' AND (username IS NULL OR username = '')
     `);
 
-    // Employee: employee@cln.com -> username = employee, designation = Loan Executive, department = Sales, joining_date = 2026-05-16
+    // Employee: employee@cln.com -> username = employee, designation = Loan Executive, joining_date = 2026-05-16
     await db.query(`
       UPDATE users 
-      SET username = 'employee', designation = 'Loan Executive', department = 'Sales', joining_date = '2026-05-16' 
+      SET username = 'employee', designation = 'Loan Executive', joining_date = '2026-05-16' 
       WHERE email = 'employee@cln.com' AND (username IS NULL OR username = '')
     `);
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — Excel Data Management</title>
+  <title>CLN Lending Suite — Data Excel Document</title>
   <meta name="description" content="Admin Data Excel Document — Upload, assign, monitor and export Excel task sheets." />
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -22,6 +22,7 @@
       }
     })();
   </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -29,7 +30,15 @@
 
   <style>
     /* ═══ Module-scoped styles ═══════════════════════════════════════════════ */
-    .content-body { padding: 24px; }
+    .content-body {
+      padding: 24px 28px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    @media (max-width: 768px) {
+      .content-body { padding: 16px; }
+    }
+
     .excel-topbar { gap: 14px; }
     .excel-topbar .mobile-menu-btn { flex: 0 0 auto; }
     .excel-topbar-actions {
@@ -86,223 +95,834 @@
       }
     }
 
-    /* ── Tabs ── */
+    /* ── Tab Navigation ── */
     .seg-nav {
-      display: flex; gap: 4px; padding: 4px;
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); width: fit-content;
-      box-shadow: var(--shadow-soft); margin-bottom: 24px; flex-wrap: wrap;
+      display: flex;
+      gap: 6px;
+      padding: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: fit-content;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
     }
     .seg-btn {
-      padding: 9px 22px; border: none; background: transparent;
-      border-radius: calc(var(--radius) - 4px); font-size: 13px; font-weight: 600;
-      font-family: inherit; color: var(--text-secondary); cursor: pointer;
-      transition: all 0.22s ease; white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      border-radius: calc(var(--radius) - 4px);
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.22s ease;
+      white-space: nowrap;
     }
     .seg-btn.active {
       background: linear-gradient(135deg, var(--accent) 0%, #173b6b 100%);
-      color: #fff; box-shadow: 0 4px 14px rgba(15,39,71,.22);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(15,39,71,.25);
     }
-    .seg-btn:hover:not(.active) { background: var(--accent-soft); color: var(--accent); }
+    .seg-btn:hover:not(.active) {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.22);
+      color: inherit;
+    }
+    .seg-btn:not(.active) .tab-badge {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+    }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; animation: fadeUp .3s ease; }
     @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 
-    /* ── KPI strip ── */
+    /* ── KPI Row & Cards ── */
     .kpi-row {
-      display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
     }
-    @media(max-width:1100px){ .kpi-row { grid-template-columns: repeat(3,1fr); } }
-    @media(max-width:640px)  { .kpi-row { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 1200px) {
+      .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .kpi-row { grid-template-columns: 1fr; }
+    }
     .kpi-card {
-      background: linear-gradient(135deg, var(--bg-card), rgba(255,255,255,.98));
-      border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 18px 16px 14px; box-shadow: var(--shadow-soft);
-      transition: transform .28s ease, box-shadow .28s ease; position: relative; overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 18px 16px;
+      box-shadow: var(--shadow-soft);
+      transition: transform .25s ease, box-shadow .25s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-    :root[data-theme='dark'] .kpi-card {
-      background: linear-gradient(135deg, rgba(10,19,32,.92), rgba(14,25,42,.96));
-      border-color: rgba(151,176,210,.14);
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-medium);
     }
-    .kpi-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-medium); }
     .kpi-card::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:3px;
-      border-radius: var(--radius) var(--radius) 0 0;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3.5px;
     }
-    .kpi-blue::before   { background: linear-gradient(90deg,#3b82f6,#1d4ed8); }
-    .kpi-green::before  { background: linear-gradient(90deg,#22c55e,#16a34a); }
-    .kpi-amber::before  { background: linear-gradient(90deg,#f59e0b,#d97706); }
-    .kpi-rose::before   { background: linear-gradient(90deg,#f43f5e,#e11d48); }
-    .kpi-purple::before { background: linear-gradient(90deg,#a855f7,#7c3aed); }
-    .kpi-icon { font-size: 22px; margin-bottom: 8px; }
-    .kpi-val  { font-size: 28px; font-weight: 800; color: var(--text-primary); line-height:1; }
-    .kpi-lbl  { font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-weight:600; }
+    .kpi-blue::before   { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+    .kpi-amber::before  { background: linear-gradient(90deg, #f59e0b, #d97706); }
+    .kpi-green::before  { background: linear-gradient(90deg, #10b981, #059669); }
+    .kpi-rose::before   { background: linear-gradient(90deg, #6366f1, #4f46e5); }
+    .kpi-purple::before { background: linear-gradient(90deg, #8b5cf6, #7c3aed); }
 
-    /* ── Upload zone ── */
-    .upload-zone {
-      border: 2.5px dashed var(--border-strong); border-radius: var(--radius-lg);
-      padding: 48px 32px; text-align: center; cursor: pointer;
-      transition: all .25s ease; background: var(--bg-body); position: relative;
+    .kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
     }
-    .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--accent); background: var(--accent-soft);
-      transform: scale(1.01);
+    .kpi-icon-wrap {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
     }
-    .upload-icon-wrap {
-      width: 72px; height: 72px; margin: 0 auto 16px;
-      border-radius: 50%; background: linear-gradient(135deg, var(--accent), #2563eb);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 8px 24px rgba(15,39,71,.25);
-    }
-    .upload-icon-wrap svg { width:32px; height:32px; stroke:#fff; stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round; }
-    .upload-title { font-size:18px; font-weight:700; color:var(--text-primary); margin-bottom:6px; }
-    .upload-hint  { font-size:13px; color:var(--text-secondary); }
-    .upload-formats { display:inline-flex; gap:8px; margin-top:12px; }
-    .fmt-badge { padding:4px 10px; border:1px solid var(--border); border-radius:999px; font-size:11px; font-weight:700; color:var(--accent); background:var(--accent-soft); }
+    .kpi-blue .kpi-icon-wrap   { background: rgba(59,130,246,0.14); color: #2563eb; }
+    .kpi-amber .kpi-icon-wrap  { background: rgba(245,158,11,0.14); color: #d97706; }
+    .kpi-green .kpi-icon-wrap  { background: rgba(16,185,129,0.14); color: #059669; }
+    .kpi-rose .kpi-icon-wrap   { background: rgba(99,102,241,0.14); color: #4f46e5; }
+    .kpi-purple .kpi-icon-wrap { background: rgba(139,92,246,0.14); color: #7c3aed; }
 
-    /* ── Employee selector ── */
-    .emp-search-box {
-      display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap:wrap;
+    .kpi-val {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
     }
-    .emp-search-box input { flex:1; min-width:180px; }
-    .emp-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 8px;
-      max-height: 280px; overflow-y: auto; padding: 4px;
+    .kpi-lbl {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-top: 4px;
     }
-    .emp-chip {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-      cursor: pointer; transition: all .2s ease; background: var(--bg-card);
-    }
-    .emp-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
-    .emp-chip.selected { border-color: var(--accent); background: var(--accent-soft); }
-    .emp-chip input[type="checkbox"] { accent-color: var(--accent); width:16px; height:16px; }
-    .emp-chip .emp-avatar {
-      width:32px; height:32px; border-radius:50%;
-      background: linear-gradient(135deg,var(--accent),#2563eb);
-      display:flex; align-items:center; justify-content:center;
-      color:#fff; font-size:12px; font-weight:700; flex-shrink:0;
-    }
-    .emp-chip .emp-info { min-width:0; }
-    .emp-chip .emp-name  { font-size:13px; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .emp-chip .emp-email { font-size:11px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-    /* ── Status badge ── */
-    .badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space:nowrap;
+    /* ── Toolbar & Filters ── */
+    .filter-toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
     }
-    .badge-assigned   { background:rgba(59,130,246,.12);  color:#2563eb; }
-    .badge-inprogress { background:rgba(245,158,11,.13);  color:#b45309; }
-    .badge-completed  { background:rgba(34,197,94,.13);   color:#15803d; }
-    .badge-closed     { background:rgba(148,163,184,.15); color:#64748b; }
-    .badge-pending    { background:rgba(239,68,68,.12);   color:#dc2626; }
+    .filter-control {
+      padding: 8px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .filter-control:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15,39,71,0.1);
+    }
+    .search-input-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .search-input-wrap i {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+      pointer-events: none;
+    }
+    .search-input-wrap input {
+      padding-left: 34px;
+      min-width: 220px;
+    }
 
-    /* ── Progress bar ── */
-    .prog-wrap { display:flex; align-items:center; gap:8px; min-width:120px; }
-    .prog-bar  { flex:1; height:6px; border-radius:999px; background:var(--bg-secondary); overflow:hidden; }
-    .prog-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--accent),#22c55e); transition:width .5s ease; }
-    .prog-pct  { font-size:11px; font-weight:700; color:var(--text-secondary); min-width:32px; text-align:right; }
+    /* ── Data Tables ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    .table-wrap::-webkit-scrollbar,
+    .emp-grid::-webkit-scrollbar,
+    .modal::-webkit-scrollbar,
+    .modal-body-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .table-wrap::-webkit-scrollbar-track,
+    .emp-grid::-webkit-scrollbar-track,
+    .modal::-webkit-scrollbar-track,
+    .modal-body-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .table-wrap::-webkit-scrollbar-thumb,
+    .emp-grid::-webkit-scrollbar-thumb,
+    .modal::-webkit-scrollbar-thumb,
+    .modal-body-scroll::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.35);
+      border-radius: 999px;
+    }
+    .table-wrap::-webkit-scrollbar-thumb:hover,
+    .emp-grid::-webkit-scrollbar-thumb:hover,
+    .modal::-webkit-scrollbar-thumb:hover,
+    .modal-body-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.55);
+    }
 
-    /* ── Data table extras ── */
-    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
-    .table-wrap table { width:100%; border-collapse:collapse; font-size:13px; }
+    .table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
     .table-wrap thead th {
-      background: linear-gradient(90deg,var(--bg-secondary),var(--bg-card));
-      padding:12px 14px; text-align:left; font-size:11px; font-weight:700;
-      text-transform:uppercase; letter-spacing:.5px; color:var(--text-secondary);
-      border-bottom:2px solid var(--border); position:sticky; top:0; z-index:1;
-      white-space:nowrap;
+      background: var(--bg-secondary);
+      padding: 13px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-secondary);
+      border-bottom: 2px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      white-space: nowrap;
     }
-    .table-wrap tbody tr { transition:background .15s; }
-    .table-wrap tbody tr:hover { background: var(--bg-secondary); }
-    .table-wrap tbody td { padding:11px 14px; border-bottom:1px solid var(--border); color:var(--text-primary); vertical-align:middle; }
-    .table-wrap tbody tr:last-child td { border-bottom:none; }
+    #files-table th:nth-child(1) { min-width: 200px; }
+    #files-table th:nth-child(2) { min-width: 110px; }
+    #files-table th:nth-child(3) { min-width: 110px; }
+    #files-table th:nth-child(4) { min-width: 100px; }
+    #files-table th:nth-child(5) { min-width: 150px; }
+    #files-table th:nth-child(6) { min-width: 90px; }
+    #files-table th:nth-child(7) { min-width: 90px; }
+    #files-table th:nth-child(8) { min-width: 120px; }
+    #files-table th:nth-child(9) { min-width: 110px; }
+    #files-table th:nth-child(10) { min-width: 260px; }
 
-    /* ── Action buttons row ── */
-    .actions-cell { display:flex; gap:4px; flex-wrap:wrap; }
-    .btn-xs { padding:5px 10px; font-size:11px; font-weight:600; border-radius:6px; border:none; cursor:pointer; transition:all .2s; }
-    .btn-view { background:var(--accent-soft); color:var(--accent); }
-    .btn-view:hover { background:var(--accent); color:#fff; }
-    .btn-edit { background:rgba(245,158,11,.12); color:#b45309; }
-    .btn-edit:hover { background:#f59e0b; color:#fff; }
-    .btn-dl   { background:rgba(34,197,94,.12); color:#15803d; }
-    .btn-dl:hover { background:#22c55e; color:#fff; }
-    .btn-close { background:rgba(148,163,184,.15); color:#64748b; }
-    .btn-close:hover { background:#94a3b8; color:#fff; }
-    .btn-del  { background:rgba(239,68,68,.12); color:#dc2626; }
-    .btn-del:hover { background:#ef4444; color:#fff; }
-
-    /* ── Monitor panel ── */
-    .monitor-header {
-      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
-      margin-bottom:16px;
+    .table-wrap tbody tr {
+      transition: background .15s ease;
     }
-    .live-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--success); margin-right:6px; animation:blink 1.4s ease-in-out infinite; }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+    .table-wrap tbody tr:hover {
+      background: var(--bg-secondary);
+    }
+    .table-wrap tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .table-wrap tbody tr:last-child td {
+      border-bottom: none;
+    }
 
-    /* ── Modal extras ── */
-    .modal { max-width: 880px; }
-    .modal-sm { max-width: 480px; }
-    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    @media(max-width:640px){ .form-row { grid-template-columns:1fr; } }
-    .form-group label { font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.4px; display:block; margin-bottom:5px; }
-    .form-group input,
-    .form-group select { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-primary); font-family:inherit; font-size:13px; transition:border .2s; }
-    .form-group input:focus,
-    .form-group select:focus { outline:none; border-color:var(--accent); }
+    /* ── File Disambiguation & Badges ── */
+    .file-name-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 180px;
+    }
+    .file-primary-name {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 13.5px;
+      white-space: nowrap;
+    }
+    .file-meta-sub {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .file-id-tag {
+      display: inline-block;
+      padding: 1px 6px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 10px;
+      color: var(--accent);
+    }
+    .file-meta-dot {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
 
-    /* ── Search bar ── */
-    .search-filter-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
-    .search-filter-bar input { max-width:260px; }
-    .search-filter-bar select { max-width:160px; }
+    /* ── Assigned Employees ── */
+    .emp-tags-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .emp-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--accent-soft);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .emp-tag-more {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      cursor: help;
+      border: 1px solid var(--border);
+    }
 
-    /* ── Empty state ── */
-    .empty-state { text-align:center; padding:60px 24px; color:var(--text-secondary); }
-    .empty-state svg { width:56px; height:56px; stroke:var(--text-muted); fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; margin:0 auto 16px; display:block; }
-    .empty-state h3 { font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:6px; }
-    .empty-state p  { font-size:13px; }
+    /* ── Count Pills ── */
+    .count-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .count-completed {
+      background: rgba(16,185,129,0.13);
+      color: #059669;
+    }
+    .count-pending {
+      background: rgba(239,68,68,0.12);
+      color: #dc2626;
+    }
 
-    /* ── Skeleton ── */
-    .skeleton { background:linear-gradient(90deg,var(--bg-secondary) 25%,var(--bg-card) 50%,var(--bg-secondary) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:6px; height:40px; margin-bottom:8px; }
-    @keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+    /* ── Status Badges ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge-assigned   { background: rgba(59,130,246,0.14); color: #2563eb; }
+    .badge-inprogress { background: rgba(245,158,11,0.15); color: #b45309; }
+    .badge-completed  { background: rgba(16,185,129,0.15); color: #059669; }
+    .badge-closed     { background: rgba(148,163,184,0.18); color: #64748b; }
+    .badge-pending    { background: rgba(239,68,68,0.13); color: #dc2626; }
+    .badge-unassigned { background: rgba(148,163,184,0.15); color: var(--text-muted); }
 
-    /* ── File info card ── */
-    .file-info-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-bottom:20px; }
-    .file-info-item { background:var(--bg-body); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; }
-    .file-info-item label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--accent); display:block; margin-bottom:4px; }
-    .file-info-item span  { font-size:14px; font-weight:700; color:var(--text-primary); }
+    /* ── Progress Bar ── */
+    .prog-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+    }
+    .prog-bar {
+      flex: 1;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--bg-secondary);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .prog-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), #10b981);
+      transition: width .5s ease;
+    }
+    .prog-pct {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      min-width: 32px;
+      text-align: right;
+    }
+
+    /* ── Action Buttons Cell ── */
+    .actions-cell {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .btn-xs {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 9px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all .2s ease;
+      white-space: nowrap;
+    }
+    .btn-view {
+      background: var(--accent-soft);
+      border-color: transparent;
+      color: var(--accent);
+    }
+    .btn-view:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-edit {
+      background: rgba(245,158,11,0.12);
+      border-color: transparent;
+      color: #b45309;
+    }
+    .btn-edit:hover {
+      background: #f59e0b;
+      color: #fff;
+    }
+    .btn-dl {
+      background: rgba(16,185,129,0.12);
+      border-color: transparent;
+      color: #059669;
+    }
+    .btn-dl:hover {
+      background: #10b981;
+      color: #fff;
+    }
+    .btn-close-action {
+      background: rgba(148,163,184,0.15);
+      border-color: transparent;
+      color: #64748b;
+    }
+    .btn-close-action:hover {
+      background: #64748b;
+      color: #fff;
+    }
+    .btn-del {
+      background: rgba(239,68,68,0.12);
+      border-color: transparent;
+      color: #dc2626;
+    }
+    .btn-del:hover {
+      background: #dc2626;
+      color: #fff;
+    }
 
     /* ── Pagination ── */
-    .pag-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 0; flex-wrap:wrap; }
-    .pag-btns { display:flex; gap:4px; }
-    .pag-btn  { padding:6px 12px; border:1px solid var(--border); border-radius:6px; background:var(--bg-card); color:var(--text-primary); font-size:12px; cursor:pointer; transition:all .2s; }
-    .pag-btn:hover, .pag-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
-    .pag-btn:disabled { opacity:.4; cursor:not-allowed; }
-    .pag-info { font-size:12px; color:var(--text-muted); }
+    .pag-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    .pag-btns { display: flex; gap: 4px; align-items: center; }
+    .pag-btn {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .pag-btn:hover:not(:disabled),
+    .pag-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .pag-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+    .pag-info {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
 
-    /* ── Report export buttons ── */
-    .export-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+    /* ── Live Monitoring Specifics ── */
+    .live-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulseLive 1.4s ease-in-out infinite;
+    }
+    @keyframes pulseLive {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .3; transform: scale(0.85); }
+    }
+    .live-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16,185,129,0.12);
+      color: #059669;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    /* ── File Info Overview Grid ── */
+    .file-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .file-overview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-soft);
+    }
+    .file-overview-card label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .file-overview-card .val {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* ── Report Export Cards ── */
+    .export-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
     .export-card {
-      border:1.5px solid var(--border); border-radius:var(--radius); padding:20px;
-      text-align:center; cursor:pointer; transition:all .25s; background:var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: all .25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
     }
-    .export-card:hover { border-color:var(--accent); transform:translateY(-3px); box-shadow:var(--shadow-medium); }
-    .export-card .ec-icon { font-size:28px; margin-bottom:8px; }
-    .export-card .ec-title { font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:4px; }
-    .export-card .ec-desc  { font-size:11px; color:var(--text-secondary); }
+    .export-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-medium);
+    }
+    .ec-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .ec-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .ec-icon-csv  { background: rgba(16,185,129,0.13); color: #059669; }
+    .ec-icon-xlsx { background: rgba(37,99,235,0.13); color: #2563eb; }
+    .ec-icon-pdf  { background: rgba(220,38,38,0.13); color: #dc2626; }
+    .ec-icon-emp  { background: rgba(147,51,234,0.13); color: #9333ea; }
+    .ec-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .ec-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+    .ec-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--accent);
+    }
 
-    /* ── Notification toast ── */
-    .toast-wrap { position:fixed; bottom:24px; right:24px; display:flex; flex-direction:column-reverse; gap:8px; z-index:9999; }
-    .toast {
-      padding:12px 18px; border-radius:var(--radius-sm); font-size:13px; font-weight:600;
-      box-shadow:var(--shadow-medium); color:#fff; min-width:260px; max-width:380px;
-      animation:toastIn .3s ease; display:flex; align-items:center; gap:10px;
+    /* ── Empty State ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--text-secondary);
     }
-    .toast-success { background:linear-gradient(135deg,#15803d,#16a34a); }
-    .toast-error   { background:linear-gradient(135deg,#dc2626,#b91c1c); }
-    .toast-info    { background:linear-gradient(135deg,var(--accent),#1d4ed8); }
-    @keyframes toastIn { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:none;} }
+    .empty-state i {
+      font-size: 44px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+    .empty-state h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .empty-state p {
+      font-size: 13.5px;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    /* ── Skeletons ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+      height: 40px;
+      margin-bottom: 8px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Upload Zone ── */
+    .upload-zone {
+      border: 2px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .25s ease;
+      background: var(--bg-body);
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      transform: scale(1.008);
+    }
+    .upload-icon-wrap {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 16px rgba(15,39,71,.25);
+      color: #fff;
+      font-size: 22px;
+    }
+    .upload-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+    .upload-hint {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .upload-formats {
+      display: inline-flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .fmt-badge {
+      padding: 3px 9px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    /* ── Employee Chip Grid ── */
+    .emp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 8px;
+      max-height: 175px;
+      overflow-y: auto;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-body);
+    }
+    .emp-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all .2s ease;
+      background: var(--bg-card);
+    }
+    .emp-chip:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .emp-chip.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .emp-chip input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+    .emp-chip .emp-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .emp-chip .emp-info { min-width: 0; }
+    .emp-chip .emp-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .emp-chip .emp-email {
+      font-size: 11px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Modals ── */
+    .modal {
+      max-width: 880px;
+      max-height: 88vh;
+      padding: 22px 24px !important;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-medium);
+      display: flex;
+      flex-direction: column;
+    }
+    :root[data-theme='dark'] .modal {
+      background: linear-gradient(135deg, #0f1c2e 0%, #0a1320 100%) !important;
+      border-color: rgba(148, 163, 184, 0.22) !important;
+    }
+    .modal-sm { max-width: 500px; }
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Toast Notifications ── */
+    .toast-wrap {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 8px;
+      z-index: 9999;
+    }
+    .toast {
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow-medium);
+      color: #fff;
+      min-width: 280px;
+      max-width: 420px;
+      animation: toastIn .3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toast-success { background: linear-gradient(135deg, #15803d, #16a34a); }
+    .toast-error   { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+    .toast-info    { background: linear-gradient(135deg, var(--accent), #1d4ed8); }
+    @keyframes toastIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
   </style>
 </head>
 <body>
@@ -313,20 +933,20 @@
     <div class="sidebar-header">
       <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
-        <div><h2><span class="emoji-sm">📊</span>CLN Lending Suite</h2><span>Admin Console</span></div>
+        <div><h2>CLN Lending Suite</h2><span>Admin Console</span></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-                <a href="/admin/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span> Dashboard</a>
+        <a href="/admin/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span> Dashboard</a>
         <a href="/admin/employees.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users"></i></span> Employees</a>
         <a href="/admin/customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book"></i></span> Customers</a>
         <a href="/admin/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase"></i></span> Loan Applications</a>
         <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span> EMI Calculator</a>
         <a href="/admin/data-excel.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> Data Excel Document</a>
         <a href="/admin/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line"></i></span> APR</a>
-</div>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
@@ -341,92 +961,136 @@
 
   <!-- ═══ MAIN ═══ -->
   <main class="main-content">
-    <div class="topbar excel-topbar">
-      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">Menu</button>
+    <!-- Topbar (PRESERVED EXACTLY AS REQUIRED) -->
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+        <span>Menu</span>
+      </button>
       <div class="topbar-title">
-        <h2>
-          <svg style="width:22px;height:22px;vertical-align:middle;margin-right:8px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
-          Excel Data Management
-        </h2>
-        <p>Upload, assign, monitor, and export employee Excel tasks.</p>
+        <h2><i class="fas fa-file-excel" aria-hidden="true"></i> <span>Data Excel Document</span></h2>
+        <p>Upload, assign, and manage customer Excel datasets.</p>
       </div>
-      <div class="topbar-actions excel-topbar-actions">
-        <button class="btn btn-primary btn-sm" onclick="openUploadModal()" id="btn-upload-main">
-          <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-right:5px;" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 20h16"/></svg>
-          Upload Excel
-        </button>
-        <div class="excel-date-time">
-          <span id="current-date" style="font-size:12px;font-weight:600;color:var(--text-primary);"></span>
-          <span id="current-time" style="font-size:11px;color:var(--text-muted);"></span>
+      <div class="topbar-actions">
+        <div class="topbar-date-badge">
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+          <span id="current-date">Today</span>
         </div>
+        <button class="btn btn-primary btn-sm" onclick="openUploadModal()" id="btn-upload-main" style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:20px;font-size:12.5px;font-weight:700;">
+          <i class="fas fa-upload" aria-hidden="true" style="font-size:12px;"></i>
+          <span>Upload Excel</span>
+        </button>
       </div>
     </div>
 
     <div class="content-body">
       <div id="page-alert" class="alert" style="display:none;"></div>
 
-      <!-- KPI Strip -->
+      <!-- ─── KPI Metrics Strip ────────────────────────────────────────── -->
       <div class="kpi-row" id="kpi-strip">
         <div class="kpi-card kpi-blue">
+          <div class="kpi-header">
+            <span class="kpi-lbl">Total Files</span>
+            <div class="kpi-icon-wrap"><i class="fas fa-folder-open"></i></div>
+          </div>
           <div class="kpi-val" id="kpi-total-files">—</div>
-          <div class="kpi-lbl">Total Files</div>
         </div>
         <div class="kpi-card kpi-amber">
+          <div class="kpi-header">
+            <span class="kpi-lbl">In Progress</span>
+            <div class="kpi-icon-wrap"><i class="fas fa-spinner fa-spin-pulse"></i></div>
+          </div>
           <div class="kpi-val" id="kpi-in-progress">—</div>
-          <div class="kpi-lbl">In Progress</div>
         </div>
         <div class="kpi-card kpi-green">
+          <div class="kpi-header">
+            <span class="kpi-lbl">Completed</span>
+            <div class="kpi-icon-wrap"><i class="fas fa-check-circle"></i></div>
+          </div>
           <div class="kpi-val" id="kpi-completed">—</div>
-          <div class="kpi-lbl">Completed</div>
         </div>
         <div class="kpi-card kpi-rose">
+          <div class="kpi-header">
+            <span class="kpi-lbl">Total Records</span>
+            <div class="kpi-icon-wrap"><i class="fas fa-database"></i></div>
+          </div>
           <div class="kpi-val" id="kpi-total-records">—</div>
-          <div class="kpi-lbl">Total Records</div>
         </div>
         <div class="kpi-card kpi-purple">
+          <div class="kpi-header">
+            <span class="kpi-lbl">Closed</span>
+            <div class="kpi-icon-wrap"><i class="fas fa-lock"></i></div>
+          </div>
           <div class="kpi-val" id="kpi-closed">—</div>
-          <div class="kpi-lbl">Closed</div>
         </div>
       </div>
 
-      <!-- Tab navigation -->
+      <!-- ─── Tab Navigation ────────────────────────────────────────────── -->
       <div class="seg-nav">
-        <button class="seg-btn active" onclick="switchTab('tab-files')"     id="btn-tab-files">All Files</button>
-        <button class="seg-btn"        onclick="switchTab('tab-monitor')"   id="btn-tab-monitor">Live Monitoring</button>
-        <button class="seg-btn"        onclick="switchTab('tab-audit')"     id="btn-tab-audit">Audit Trail</button>
-        <button class="seg-btn"        onclick="switchTab('tab-reports')"   id="btn-tab-reports">Reports</button>
+        <button class="seg-btn active" onclick="switchTab('tab-files')" id="btn-tab-files">
+          <i class="fas fa-table-list"></i>
+          <span>All Files</span>
+          <span class="tab-badge" id="tab-badge-files">0</span>
+        </button>
+        <button class="seg-btn" onclick="switchTab('tab-monitor')" id="btn-tab-monitor">
+          <span class="live-dot"></span>
+          <span>Live Monitoring</span>
+        </button>
+        <button class="seg-btn" onclick="switchTab('tab-audit')" id="btn-tab-audit">
+          <i class="fas fa-history"></i>
+          <span>Audit Trail</span>
+        </button>
+        <button class="seg-btn" onclick="switchTab('tab-reports')" id="btn-tab-reports">
+          <i class="fas fa-file-export"></i>
+          <span>Reports</span>
+        </button>
       </div>
 
       <!-- ─── Tab: All Files ─────────────────────────────────────────────── -->
       <div class="tab-panel active" id="tab-files">
         <div class="card" style="padding:0; overflow:hidden;">
           <div class="card-header" style="padding:16px 20px; border-bottom:1px solid var(--border); display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
-            <h3 style="margin:0;">Uploaded Excel Files</h3>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-              <input id="files-search" type="text" placeholder="Search files..." style="max-width:200px;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;" oninput="renderFilesTable()" />
-              <select id="files-status-filter" onchange="renderFilesTable()" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;">
+            <div>
+              <h3 style="margin:0; font-size:16px;">Uploaded Excel Datasets</h3>
+              <p style="margin:2px 0 0; font-size:12px; color:var(--text-secondary);">Manage phone lists, employee allocations, and execution status.</p>
+            </div>
+            <div class="filter-toolbar">
+              <div class="search-input-wrap">
+                <i class="fas fa-search"></i>
+                <input id="files-search" class="filter-control" type="text" placeholder="Search files, uploader, or staff..." oninput="handleFilesFilterChange()" />
+              </div>
+              <select id="files-status-filter" class="filter-control" onchange="handleFilesFilterChange()">
                 <option value="">All Statuses</option>
                 <option value="Assigned">Assigned</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Completed">Completed</option>
                 <option value="Closed">Closed</option>
               </select>
-              <button class="btn btn-secondary btn-sm" onclick="loadFiles()">
-                <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35"/><circle cx="11" cy="11" r="8"/></svg>
-                Refresh
+              <select id="files-emp-filter" class="filter-control" onchange="handleFilesFilterChange()">
+                <option value="">All Employees</option>
+              </select>
+              <button class="btn btn-secondary btn-sm" onclick="resetFilesFilters()" title="Reset Filters">
+                <i class="fas fa-rotate-left"></i>
+                <span>Reset</span>
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="loadFiles()" title="Reload from server">
+                <i class="fas fa-sync-alt"></i>
+                <span>Refresh</span>
               </button>
             </div>
           </div>
 
           <div id="files-loading" style="padding:24px;">
-            <div class="skeleton"></div><div class="skeleton" style="height:32px;"></div><div class="skeleton" style="height:32px;"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton" style="height:32px;"></div>
+            <div class="skeleton" style="height:32px;"></div>
           </div>
 
           <div id="files-table-wrap" class="table-wrap" style="display:none;">
             <table id="files-table">
               <thead>
                 <tr>
-                  <th>File Name</th>
+                  <th>File Name &amp; ID</th>
                   <th>Uploaded By</th>
                   <th>Upload Date</th>
                   <th>Total Records</th>
@@ -444,14 +1108,16 @@
 
           <div id="files-empty" style="display:none;">
             <div class="empty-state">
-              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 3v18"/></svg>
-              <h3>No Excel Files Yet</h3>
-              <p>Upload your first Excel file to get started.</p>
-              <button class="btn btn-primary" style="margin-top:12px;" onclick="openUploadModal()">Upload Excel File</button>
+              <i class="fas fa-file-excel"></i>
+              <h3>No Excel Files Found</h3>
+              <p>Upload a new Excel file (.xlsx, .xls) to assign records to telecallers and track progress in real time.</p>
+              <button class="btn btn-primary" style="margin-top:14px;" onclick="openUploadModal()">
+                <i class="fas fa-upload"></i> Upload Excel File
+              </button>
             </div>
           </div>
 
-          <div class="pag-row" id="files-pag" style="padding:12px 16px; display:none;">
+          <div class="pag-row" id="files-pag" style="display:none;">
             <span class="pag-info" id="files-pag-info"></span>
             <div class="pag-btns" id="files-pag-btns"></div>
           </div>
@@ -460,36 +1126,53 @@
 
       <!-- ─── Tab: Live Monitor ───────────────────────────────────────────── -->
       <div class="tab-panel" id="tab-monitor">
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-header">
-            <h3><span class="live-dot"></span>Live Record Monitor</h3>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <select id="monitor-file-select" onchange="loadMonitorData()" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;min-width:220px;">
+        <div class="card" style="margin-bottom:16px; padding:16px 20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="live-dot"></span>
+              <h3 style="margin:0; font-size:16px;">Live Workforce Monitoring</h3>
+            </div>
+            <div class="filter-toolbar">
+              <select id="monitor-file-select" class="filter-control" style="min-width:280px; max-width:440px;" onchange="loadMonitorData()">
                 <option value="">Select a file to monitor...</option>
               </select>
-              <span id="monitor-poll-label" style="font-size:11px;color:var(--text-muted);">Auto-refresh: 5s</span>
+              <span id="monitor-poll-badge" class="live-status-badge">
+                <i class="fas fa-satellite-dish"></i> Auto-refresh: 5s
+              </span>
+              <button class="btn btn-secondary btn-sm" id="btn-toggle-poll" onclick="toggleMonitorPoll()">
+                <i class="fas fa-pause"></i> <span>Pause</span>
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="loadMonitorData()">
+                <i class="fas fa-sync-alt"></i> <span>Refresh Now</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <div id="monitor-file-info" class="file-info-grid" style="display:none;"></div>
+        <!-- Selected File KPI Overview -->
+        <div id="monitor-file-info" class="file-overview-grid" style="display:none;"></div>
 
-        <div class="card" style="padding:0;overflow:hidden;">
-          <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-            <input id="monitor-search" type="text" placeholder="Search phone / disposition..." style="max-width:240px;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;" oninput="filterMonitorTable()" />
-            <select id="monitor-filter" onchange="filterMonitorTable()" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;">
-              <option value="">All Records</option>
-              <option value="completed">Completed</option>
-              <option value="pending">Pending</option>
-            </select>
-            <button class="btn btn-secondary btn-sm" onclick="loadMonitorData()">Refresh Now</button>
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div style="padding:14px 18px; border-bottom:1px solid var(--border); display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <div class="search-input-wrap">
+                <i class="fas fa-search"></i>
+                <input id="monitor-search" class="filter-control" type="text" placeholder="Search phone, disposition, sub-disp..." oninput="filterMonitorTable()" />
+              </div>
+              <select id="monitor-filter" class="filter-control" onchange="filterMonitorTable()">
+                <option value="">All Records</option>
+                <option value="completed">Completed Only</option>
+                <option value="pending">Pending Only</option>
+              </select>
+            </div>
+            <div style="font-size:12px; color:var(--text-secondary);" id="monitor-record-summary"></div>
           </div>
 
           <div id="monitor-loading" style="padding:24px;">
             <div class="empty-state">
-              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
-              <h3>Select a File</h3>
-              <p>Choose a file from the dropdown above to monitor employee progress in real time.</p>
+              <i class="fas fa-table-list"></i>
+              <h3>Select a Dataset to Monitor</h3>
+              <p>Choose an uploaded Excel file from the dropdown above to view telecaller actions and live dispositions.</p>
             </div>
           </div>
 
@@ -497,9 +1180,9 @@
             <table>
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th>#Row</th>
                   <th>Phone Number</th>
-                  <th>Employee</th>
+                  <th>Assigned Employee</th>
                   <th>Disposition</th>
                   <th>Sub Disposition</th>
                   <th>Status</th>
@@ -509,7 +1192,8 @@
               <tbody id="monitor-tbody"></tbody>
             </table>
           </div>
-          <div class="pag-row" id="monitor-pag" style="padding:12px 16px; display:none;">
+
+          <div class="pag-row" id="monitor-pag" style="display:none;">
             <span class="pag-info" id="monitor-pag-info"></span>
             <div class="pag-btns" id="monitor-pag-btns"></div>
           </div>
@@ -518,41 +1202,57 @@
 
       <!-- ─── Tab: Audit Trail ───────────────────────────────────────────── -->
       <div class="tab-panel" id="tab-audit">
-        <div class="card" style="padding:0;overflow:hidden;">
-          <div class="card-header" style="padding:16px 20px;border-bottom:1px solid var(--border);">
-            <h3>Audit Trail</h3>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <select id="audit-file-filter" onchange="loadAudit()" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;min-width:180px;">
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div class="card-header" style="padding:16px 20px; border-bottom:1px solid var(--border); display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+            <div>
+              <h3 style="margin:0; font-size:16px;">Audit Trail &amp; Activity Log</h3>
+              <p style="margin:2px 0 0; font-size:12px; color:var(--text-secondary);">Historical log of all disposition updates made by employees.</p>
+            </div>
+            <div class="filter-toolbar">
+              <select id="audit-file-filter" class="filter-control" style="min-width:240px; max-width:340px;" onchange="loadAudit()">
                 <option value="">All Files</option>
               </select>
-              <button class="btn btn-secondary btn-sm" onclick="loadAudit()">Refresh</button>
+              <select id="audit-emp-filter" class="filter-control" style="min-width:160px;" onchange="loadAudit()">
+                <option value="">All Employees</option>
+              </select>
+              <button class="btn btn-secondary btn-sm" onclick="loadAudit()">
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
             </div>
           </div>
-          <div id="audit-loading" style="padding:24px;"><div class="skeleton"></div><div class="skeleton" style="height:32px;"></div></div>
+
+          <div id="audit-loading" style="padding:24px;">
+            <div class="skeleton"></div>
+            <div class="skeleton" style="height:32px;"></div>
+          </div>
+
           <div id="audit-table-wrap" class="table-wrap" style="display:none;">
             <table>
               <thead>
                 <tr>
-                  <th>Time</th>
-                  <th>File</th>
+                  <th>Timestamp</th>
+                  <th>File (ID)</th>
                   <th>Employee</th>
                   <th>Phone Number</th>
-                  <th>Old Disposition</th>
+                  <th>Previous Disposition</th>
                   <th>New Disposition</th>
-                  <th>Old Sub Disp.</th>
-                  <th>New Sub Disp.</th>
+                  <th>Previous Sub-Disp</th>
+                  <th>New Sub-Disp</th>
                 </tr>
               </thead>
               <tbody id="audit-tbody"></tbody>
             </table>
           </div>
+
           <div id="audit-empty" style="display:none;">
             <div class="empty-state">
-              <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              <h3>No Audit Records</h3><p>Changes will appear here once employees start working.</p>
+              <i class="fas fa-clipboard-list"></i>
+              <h3>No Audit Records Found</h3>
+              <p>Activity logs will appear automatically as employees work through their assigned datasets.</p>
             </div>
           </div>
-          <div class="pag-row" id="audit-pag" style="padding:12px 16px;display:none;">
+
+          <div class="pag-row" id="audit-pag" style="display:none;">
             <span class="pag-info" id="audit-pag-info"></span>
             <div class="pag-btns" id="audit-pag-btns"></div>
           </div>
@@ -561,44 +1261,68 @@
 
       <!-- ─── Tab: Reports ──────────────────────────────────────────────── -->
       <div class="tab-panel" id="tab-reports">
-        <div class="card" style="margin-bottom:20px;">
-          <div class="card-header"><h3>Export Reports</h3></div>
-          <div class="card-body">
-            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">Select a file to export, then choose your report format.</p>
-            <div class="form-group" style="max-width:400px;margin-bottom:20px;">
-              <label>Select File</label>
-              <select id="report-file-select" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;">
-                <option value="">Choose a file...</option>
+        <div class="card" style="margin-bottom:20px; padding:20px 24px;">
+          <div class="card-header" style="padding:0 0 16px; border-bottom:1px solid var(--border);">
+            <div>
+              <h3 style="margin:0; font-size:16px;">Export &amp; Analytics Reports</h3>
+              <p style="margin:3px 0 0; font-size:12px; color:var(--text-secondary);">Download structured reports for executive review and operational auditing.</p>
+            </div>
+          </div>
+          <div class="card-body" style="padding:20px 0 0;">
+            <div style="max-width:540px; margin-bottom:24px;">
+              <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary); margin-bottom:6px;">Select Dataset to Export</label>
+              <select id="report-file-select" class="filter-control" style="width:100%; padding:10px 12px; font-size:13.5px;">
+                <option value="">Choose an Excel dataset...</option>
               </select>
             </div>
+
             <div class="export-grid" id="export-grid">
+              <!-- CSV -->
               <div class="export-card" onclick="exportReport('csv')">
-                <div class="ec-icon">
-                  <svg style="width:32px;height:32px;stroke:#15803d;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M8 13h2"/><path d="M8 17h8"/></svg>
+                <div class="ec-header">
+                  <div class="ec-icon ec-icon-csv"><i class="fas fa-file-csv"></i></div>
+                  <div>
+                    <div class="ec-title">Export CSV Dataset</div>
+                    <div class="ec-desc">All records with current dispositions, sub-dispositions, and timestamps in standard CSV format.</div>
+                  </div>
                 </div>
-                <div class="ec-title">Export CSV</div>
-                <div class="ec-desc">All records in comma-separated format</div>
+                <div class="ec-action"><i class="fas fa-download"></i> Download CSV</div>
               </div>
+
+              <!-- XLSX -->
               <div class="export-card" onclick="exportReport('xlsx')">
-                <div class="ec-icon">
-                  <svg style="width:32px;height:32px;stroke:#2563eb;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
+                <div class="ec-header">
+                  <div class="ec-icon ec-icon-xlsx"><i class="fas fa-file-excel"></i></div>
+                  <div>
+                    <div class="ec-title">Export Excel (.xlsx)</div>
+                    <div class="ec-desc">Complete multi-column spreadsheet with employee attributions, disposition values, and formatting.</div>
+                  </div>
                 </div>
-                <div class="ec-title">Export Excel (.xlsx)</div>
-                <div class="ec-desc">Full spreadsheet with all data</div>
+                <div class="ec-action"><i class="fas fa-download"></i> Download XLSX</div>
               </div>
+
+              <!-- PDF -->
               <div class="export-card" onclick="exportReport('pdf')">
-                <div class="ec-icon">
-                  <svg style="width:32px;height:32px;stroke:#dc2626;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                <div class="ec-header">
+                  <div class="ec-icon ec-icon-pdf"><i class="fas fa-file-pdf"></i></div>
+                  <div>
+                    <div class="ec-title">Export PDF Report</div>
+                    <div class="ec-desc">Executive-ready landscape PDF document with branding, summaries, and complete data tables.</div>
+                  </div>
                 </div>
-                <div class="ec-title">Export PDF</div>
-                <div class="ec-desc">Formatted PDF report for printing</div>
+                <div class="ec-action"><i class="fas fa-download"></i> Download PDF</div>
               </div>
+
+              <!-- Employee Performance CSV -->
               <div class="export-card" onclick="exportEmployeeReport()">
-                <div class="ec-icon">
-                  <svg style="width:32px;height:32px;stroke:#a855f7;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <div class="ec-header">
+                  <div class="ec-icon ec-icon-emp"><i class="fas fa-users-cog"></i></div>
+                  <div>
+                    <div class="ec-title">Employee Performance Report</div>
+                    <div class="ec-desc">Per-employee completion breakdown with total records, completed rows, and completion percentages.</div>
+                  </div>
                 </div>
-                <div class="ec-title">Employee-wise Report</div>
-                <div class="ec-desc">Per-employee completion summary (CSV)</div>
+                <div class="ec-action"><i class="fas fa-download"></i> Download CSV</div>
               </div>
             </div>
           </div>
@@ -608,57 +1332,59 @@
   </main>
 </div><!-- /.app-layout -->
 
-<!-- ═══ TOAST ═══ -->
+<!-- ═══ TOAST WRAPPER ═══ -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <!-- ═══ MODAL: Upload Excel ═══ -->
 <div class="modal-overlay" id="upload-modal">
-  <div class="modal modal-sm" style="max-width:680px;">
+  <div class="modal" style="max-width:700px;">
     <div class="modal-header">
-      <h3>Upload Excel File</h3>
+      <h3><i class="fas fa-cloud-upload-alt" style="margin-right:8px; color:var(--accent);"></i> Upload &amp; Assign Excel File</h3>
       <button class="modal-close" onclick="closeModal('upload-modal')">Close</button>
     </div>
-    <div style="padding:0 0 20px;">
+    <div class="modal-body-scroll" style="overflow-y:auto; flex:1 1 auto; padding:8px 4px 10px 0;">
       <!-- Upload Zone -->
       <div id="upload-zone" class="upload-zone" onclick="document.getElementById('file-input').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
         <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none;" onchange="handleFileSelect(event)" />
         <div class="upload-icon-wrap">
-          <svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 20h16"/></svg>
+          <i class="fas fa-file-excel"></i>
         </div>
-        <div class="upload-title">Drop your Excel file here</div>
-        <div class="upload-hint">or click to browse from your computer</div>
+        <div class="upload-title">Drop your Excel file here or click to browse</div>
+        <div class="upload-hint">Supported formats: Microsoft Excel (.xlsx, .xls). Max file size 20MB.</div>
         <div class="upload-formats">
-          <span class="fmt-badge">.xlsx</span>
-          <span class="fmt-badge">.xls</span>
+          <span class="fmt-badge"><i class="fas fa-check"></i> .xlsx</span>
+          <span class="fmt-badge"><i class="fas fa-check"></i> .xls</span>
         </div>
-        <div id="selected-file-name" style="margin-top:14px;font-size:13px;font-weight:600;color:var(--accent);display:none;"></div>
+        <div id="selected-file-name" style="margin-top:14px; font-size:13.5px; font-weight:700; color:var(--accent); display:none;"></div>
       </div>
 
       <!-- Assign Employees -->
-      <div id="assign-section" style="margin-top:24px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-secondary);">Assign to Employees</label>
-          <div style="display:flex;gap:6px;">
+      <div id="assign-section" style="margin-top:20px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary);">
+            Assign To Employees <span style="color:#dc2626;">*</span>
+          </label>
+          <div style="display:flex; gap:6px;">
             <button class="btn btn-secondary btn-sm" onclick="selectAllEmployees()">Select All</button>
             <button class="btn btn-secondary btn-sm" onclick="clearAllEmployees()">Clear</button>
           </div>
         </div>
-        <div class="emp-search-box">
-          <input id="emp-search" type="text" placeholder="Search employees..." style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;" oninput="filterEmployees()" />
+        <div class="emp-search-box" style="margin-bottom:8px;">
+          <input id="emp-search" type="text" placeholder="Search employees by name or email..." class="filter-control" style="width:100%; box-sizing:border-box;" oninput="filterEmployees()" />
         </div>
         <div class="emp-grid" id="emp-grid">
-          <div class="skeleton" style="height:52px;"></div>
-          <div class="skeleton" style="height:52px;"></div>
-          <div class="skeleton" style="height:52px;"></div>
+          <div class="skeleton" style="height:48px;"></div>
+          <div class="skeleton" style="height:48px;"></div>
+          <div class="skeleton" style="height:48px;"></div>
         </div>
-        <div style="margin-top:8px;font-size:12px;color:var(--text-secondary);" id="selected-emp-count">0 employees selected</div>
+        <div style="margin-top:8px; font-size:12px; font-weight:600; color:var(--text-secondary);" id="selected-emp-count">0 employees selected</div>
       </div>
     </div>
-    <div class="modal-actions">
+    <div class="modal-actions" style="margin-top:12px; padding-top:12px; flex-shrink:0;">
       <button class="btn btn-secondary" onclick="closeModal('upload-modal')">Cancel</button>
       <button class="btn btn-primary" id="btn-do-upload" onclick="doUpload()" disabled>
-        <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 20h16"/></svg>
-        Upload &amp; Assign
+        <i class="fas fa-upload" style="margin-right:6px;"></i>
+        <span>Upload &amp; Assign</span>
       </button>
     </div>
   </div>
@@ -666,65 +1392,71 @@
 
 <!-- ═══ MODAL: Reassign ═══ -->
 <div class="modal-overlay" id="reassign-modal">
-  <div class="modal modal-sm" style="max-width:580px;">
-    <div class="modal-header">
-      <h3>Edit Assignment</h3>
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-header" style="flex-shrink:0;">
+      <h3><i class="fas fa-user-gear" style="margin-right:8px; color:var(--accent);"></i> Edit Employee Assignment</h3>
       <button class="modal-close" onclick="closeModal('reassign-modal')">Close</button>
     </div>
-    <div style="padding:0 0 20px;">
-      <p id="reassign-file-label" style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;"></p>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-secondary);">Assign to Employees</label>
-        <div style="display:flex;gap:6px;">
+    <div class="modal-body-scroll" style="overflow-y:auto; flex:1 1 auto; padding:8px 4px 10px 0;">
+      <p id="reassign-file-label" style="font-size:13.5px; font-weight:600; color:var(--text-primary); margin-bottom:14px; padding:8px 12px; background:var(--bg-secondary); border-radius:var(--radius-sm); border:1px solid var(--border);"></p>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary);">Assign To Employees</label>
+        <div style="display:flex; gap:6px;">
           <button class="btn btn-secondary btn-sm" onclick="selectAllReassign()">Select All</button>
           <button class="btn btn-secondary btn-sm" onclick="clearAllReassign()">Clear</button>
         </div>
       </div>
-      <div class="emp-search-box">
-        <input id="reassign-emp-search" type="text" placeholder="Search employees..." style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-primary);font-size:13px;" oninput="filterReassignEmployees()" />
+      <div class="emp-search-box" style="margin-bottom:8px;">
+        <input id="reassign-emp-search" type="text" placeholder="Search employees..." class="filter-control" style="width:100%; box-sizing:border-box;" oninput="filterReassignEmployees()" />
       </div>
       <div class="emp-grid" id="reassign-emp-grid"></div>
-      <div style="margin-top:8px;font-size:12px;color:var(--text-secondary);" id="reassign-emp-count">0 employees selected</div>
+      <div style="margin-top:8px; font-size:12px; font-weight:600; color:var(--text-secondary);" id="reassign-emp-count">0 employees selected</div>
     </div>
-    <div class="modal-actions">
+    <div class="modal-actions" style="margin-top:12px; padding-top:12px; flex-shrink:0;">
       <button class="btn btn-secondary" onclick="closeModal('reassign-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="doReassign()">Save Assignment</button>
+      <button class="btn btn-primary" onclick="doReassign()">
+        <i class="fas fa-check" style="margin-right:6px;"></i> Save Assignment
+      </button>
     </div>
   </div>
 </div>
 
 <!-- ═══ MODAL: Confirm Delete ═══ -->
 <div class="modal-overlay" id="delete-modal">
-  <div class="modal" style="max-width:420px;">
+  <div class="modal modal-sm">
     <div class="modal-header">
-      <h3>Delete File</h3>
+      <h3 style="color:#dc2626;"><i class="fas fa-triangle-exclamation" style="margin-right:8px;"></i> Delete Dataset File</h3>
       <button class="modal-close" onclick="closeModal('delete-modal')">Close</button>
     </div>
     <div style="padding:16px 0;">
-      <p style="font-size:14px;color:var(--text-primary);">Are you sure you want to <strong>permanently delete</strong> this file and all its records? This action cannot be undone.</p>
-      <p id="delete-file-label" style="font-size:13px;color:var(--text-secondary);margin-top:8px;"></p>
+      <p style="font-size:14px; color:var(--text-primary); line-height:1.5;">Are you sure you want to <strong>permanently delete</strong> this file and all its records and assignments? This action cannot be undone.</p>
+      <p id="delete-file-label" style="font-size:13px; font-weight:600; color:var(--accent); margin-top:10px;"></p>
     </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('delete-modal')">Cancel</button>
-      <button class="btn btn-danger" id="btn-confirm-delete" onclick="doDelete()">Delete Permanently</button>
+      <button class="btn btn-danger" id="btn-confirm-delete" onclick="doDelete()">
+        <i class="fas fa-trash-alt" style="margin-right:6px;"></i> Delete Permanently
+      </button>
     </div>
   </div>
 </div>
 
 <!-- ═══ MODAL: Close Assignment ═══ -->
 <div class="modal-overlay" id="close-modal">
-  <div class="modal" style="max-width:420px;">
+  <div class="modal modal-sm">
     <div class="modal-header">
-      <h3>Close Assignment</h3>
+      <h3><i class="fas fa-lock" style="margin-right:8px; color:var(--accent);"></i> Close Assignment</h3>
       <button class="modal-close" onclick="closeModal('close-modal')">Close</button>
     </div>
     <div style="padding:16px 0;">
-      <p style="font-size:14px;color:var(--text-primary);">Closing this assignment will lock it from further editing by employees. You can still view and export the data.</p>
-      <p id="close-file-label" style="font-size:13px;color:var(--text-secondary);margin-top:8px;"></p>
+      <p style="font-size:14px; color:var(--text-primary); line-height:1.5;">Closing this dataset will lock all records from further editing by employees. You can still view, monitor, and export the finalized data at any time.</p>
+      <p id="close-file-label" style="font-size:13px; font-weight:600; color:var(--accent); margin-top:10px;"></p>
     </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('close-modal')">Cancel</button>
-      <button class="btn btn-primary" id="btn-confirm-close" onclick="doClose()">Close Assignment</button>
+      <button class="btn btn-primary" id="btn-confirm-close" onclick="doClose()">
+        <i class="fas fa-check" style="margin-right:6px;"></i> Confirm Close
+      </button>
     </div>
   </div>
 </div>
@@ -738,151 +1470,212 @@ if (user) {
   renderSidebarUser();
   applyIconography();
   applyActionButtonIcons();
-  document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-IN', {weekday:'short',year:'numeric',month:'short',day:'numeric'});
-  setInterval(() => {
-    const t = new Date();
-    const el = document.getElementById('current-time');
-    if (el) el.textContent = t.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
-  }, 1000);
+  const dateEl = document.getElementById('current-date');
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
   init();
 }
 
 // ── State ─────────────────────────────────────────────────────────────────
-let allFiles      = [];
-let allEmployees  = [];
-let selectedFile  = null;    // for upload modal
-let pendingUploadFile = null;
-let fileToDelete  = null;
-let fileToClose   = null;
-let fileToReassign = null;
-let monitorAllRecords = [];
-let monitorPollTimer  = null;
+let allFiles           = [];
+let allEmployees       = [];
+let pendingUploadFile  = null;
+let fileToDelete       = null;
+let fileToClose        = null;
+let fileToReassign     = null;
+let monitorAllRecords  = [];
+let monitorPollTimer   = null;
+let isPollPaused       = false;
 
-let filesPage = 1;
+let filesPage   = 1;
 let monitorPage = 1;
-let auditPage = 1;
-const RECORDS_PER_PAGE = 100;
+let auditPage   = 1;
+const RECORDS_PER_PAGE = 20;
 
 let auditAllRecords = [];
-
-const DISP_OPTIONS = [
-  'Connected','Not Connected','Ringing','Busy','Switched Off','Out of Coverage',
-  'Number Invalid','Wrong Number','Call Back Requested','Call Later','Voice Mail',
-  'No Response','Customer Interested','Customer Not Interested','Follow Up Required',
-  'Loan Inquiry','Existing Customer','Duplicate Lead','Do Not Call','Language Barrier',
-  'Call Disconnected','Pending Verification','Converted','Rejected','Other'
-];
 
 // ── Init ──────────────────────────────────────────────────────────────────
 async function init() {
   await Promise.all([loadFiles(), loadEmployees()]);
   populateFileSelects();
+  populateEmployeeFilters();
+}
+
+// ── Disambiguation Label Helper ───────────────────────────────────────────
+function formatFileOptionLabel(f) {
+  if (!f) return '';
+  const dateStr = fmtDate(f.uploaded_at);
+  const recStr = `${f.total_records || 0} records`;
+  return `${f.original_name} • ${dateStr} • ${recStr} (ID: #${f.id})`;
 }
 
 // ── Tab switching ─────────────────────────────────────────────────────────
 function switchTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  const map = { 'tab-files':'btn-tab-files','tab-monitor':'btn-tab-monitor','tab-audit':'btn-tab-audit','tab-reports':'btn-tab-reports' };
-  document.getElementById(map[id]).classList.add('active');
-  if (id === 'tab-audit')  loadAudit();
-  if (id === 'tab-monitor') startMonitorPoll();
-  else stopMonitorPoll();
+  
+  const targetPanel = document.getElementById(id);
+  if (targetPanel) targetPanel.classList.add('active');
+
+  const map = {
+    'tab-files': 'btn-tab-files',
+    'tab-monitor': 'btn-tab-monitor',
+    'tab-audit': 'btn-tab-audit',
+    'tab-reports': 'btn-tab-reports'
+  };
+  const activeBtn = document.getElementById(map[id]);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  if (id === 'tab-audit') {
+    loadAudit();
+  }
+  if (id === 'tab-monitor') {
+    startMonitorPoll();
+  } else {
+    stopMonitorPoll();
+  }
 }
 
 // ── Load Files ────────────────────────────────────────────────────────────
 async function loadFiles() {
-  document.getElementById('files-loading').style.display = 'block';
-  document.getElementById('files-table-wrap').style.display = 'none';
-  document.getElementById('files-empty').style.display = 'none';
+  const loading = document.getElementById('files-loading');
+  const wrap = document.getElementById('files-table-wrap');
+  const empty = document.getElementById('files-empty');
+  
+  if (loading) loading.style.display = 'block';
+  if (wrap) wrap.style.display = 'none';
+  if (empty) empty.style.display = 'none';
+
   try {
     const res = await apiFetch('/excel/files');
-    allFiles  = res.files || [];
+    allFiles = res.files || [];
     updateKPIs();
-    filesPage = 1;
     renderFilesTable();
     populateFileSelects();
   } catch(e) {
     const msg = e.message || '';
     if (msg === 'Session expired') return;
-    showAlert('Something went wrong while loading files. ' + (msg || 'Please refresh the page.'), 'error');
+    showAlert('Failed to load dataset files: ' + (msg || 'Please try again.'), 'error');
   } finally {
-    document.getElementById('files-loading').style.display = 'none';
+    if (loading) loading.style.display = 'none';
   }
 }
 
 function updateKPIs() {
-  const total    = allFiles.length;
-  const inProg   = allFiles.filter(f => f.status === 'In Progress').length;
-  const done     = allFiles.filter(f => f.status === 'Completed').length;
-  const closed   = allFiles.filter(f => f.status === 'Closed').length;
-  const records  = allFiles.reduce((s,f) => s + (f.total_records||0), 0);
+  const total   = allFiles.length;
+  const inProg  = allFiles.filter(f => f.status === 'In Progress').length;
+  const done    = allFiles.filter(f => f.status === 'Completed').length;
+  const closed  = allFiles.filter(f => f.status === 'Closed').length;
+  const records = allFiles.reduce((s,f) => s + (f.total_records || 0), 0);
+
   document.getElementById('kpi-total-files').textContent  = total;
   document.getElementById('kpi-in-progress').textContent  = inProg;
   document.getElementById('kpi-completed').textContent    = done;
-  document.getElementById('kpi-total-records').textContent = records;
+  document.getElementById('kpi-total-records').textContent = records.toLocaleString('en-IN');
   document.getElementById('kpi-closed').textContent       = closed;
+
+  const badgeEl = document.getElementById('tab-badge-files');
+  if (badgeEl) badgeEl.textContent = total;
+}
+
+function handleFilesFilterChange() {
+  filesPage = 1;
+  renderFilesTable();
+}
+
+function resetFilesFilters() {
+  document.getElementById('files-search').value = '';
+  document.getElementById('files-status-filter').value = '';
+  document.getElementById('files-emp-filter').value = '';
+  filesPage = 1;
+  renderFilesTable();
 }
 
 function renderFilesTable() {
-  const search   = (document.getElementById('files-search').value || '').toLowerCase();
-  const statusF  = document.getElementById('files-status-filter').value;
-  let filtered   = allFiles;
-  if (search)  filtered = filtered.filter(f => f.original_name.toLowerCase().includes(search) || (f.uploaded_by_name||'').toLowerCase().includes(search));
-  if (statusF) filtered = filtered.filter(f => f.status === statusF);
+  const search  = (document.getElementById('files-search').value || '').trim().toLowerCase();
+  const statusF = document.getElementById('files-status-filter').value;
+  const empF    = document.getElementById('files-emp-filter').value;
+
+  let filtered = allFiles.filter(f => {
+    if (statusF && f.status !== statusF) return false;
+    if (empF) {
+      const assigned = f.assigned_employees || [];
+      if (!assigned.some(name => name.toLowerCase() === empF.toLowerCase())) return false;
+    }
+    if (search) {
+      const matchName = f.original_name.toLowerCase().includes(search);
+      const matchUser = (f.uploaded_by_name || '').toLowerCase().includes(search);
+      const matchEmps = (f.assigned_employees || []).some(e => e.toLowerCase().includes(search));
+      const matchId   = String(f.id).includes(search);
+      if (!matchName && !matchUser && !matchEmps && !matchId) return false;
+    }
+    return true;
+  });
 
   const tbody = document.getElementById('files-tbody');
   const wrap  = document.getElementById('files-table-wrap');
   const empty = document.getElementById('files-empty');
   const pag   = document.getElementById('files-pag');
 
-  // Reset page if search or status filter changes
-  // To avoid resetting while user is on page 2 and clicks renderFilesTable without filter change, we can reset only if filters change.
-  // The simplest reliable way for client-side search is to reset page to 1 whenever loadFiles or a filter handler is invoked. Let's make sure it resets on inputs.
-  // We'll set filesPage = 1 in filter handlers. Let's look at HTML inputs. They call renderFilesTable() directly on input/change.
-  // So we can check if the call comes from input (we can reset inside renderFilesTable if the dataset changes, or simply reset filesPage = 1 when renderFilesTable is called, unless specified otherwise. Wait, if pagination buttons call renderFilesTable, we don't want to reset page to 1! So let's handle page change separately, or pass a flag, or do filter tracking).
-  // Let's use a state for active filters:
-  if (typeof renderFilesTable.lastSearch === 'undefined') {
-    renderFilesTable.lastSearch = '';
-    renderFilesTable.lastStatus = '';
-  }
-  if (renderFilesTable.lastSearch !== search || renderFilesTable.lastStatus !== statusF) {
-    filesPage = 1;
-    renderFilesTable.lastSearch = search;
-    renderFilesTable.lastStatus = statusF;
-  }
-
   const total = filtered.length;
   const totalPages = Math.ceil(total / RECORDS_PER_PAGE);
 
   if (total === 0) {
-    wrap.style.display = 'none'; empty.style.display = 'block'; pag.style.display = 'none';
+    if (wrap) wrap.style.display = 'none';
+    if (empty) empty.style.display = 'block';
+    if (pag) pag.style.display = 'none';
     return;
   }
-  empty.style.display = 'none'; wrap.style.display = 'block';
-  
+
+  if (empty) empty.style.display = 'none';
+  if (wrap) wrap.style.display = 'block';
+
   if (total > RECORDS_PER_PAGE) {
-    pag.style.display = 'flex';
+    if (pag) pag.style.display = 'flex';
   } else {
-    pag.style.display = 'none';
+    if (pag) pag.style.display = 'none';
   }
+
+  if (filesPage > totalPages) filesPage = totalPages;
+  if (filesPage < 1) filesPage = 1;
 
   const start = (filesPage - 1) * RECORDS_PER_PAGE;
   const end = Math.min(start + RECORDS_PER_PAGE, total);
   const paginated = filtered.slice(start, end);
 
   tbody.innerHTML = paginated.map(f => {
-    const pct     = f.completion_pct || 0;
-    const empList = (f.assigned_employees||[]).slice(0,2).join(', ') + ((f.assigned_employees||[]).length > 2 ? ` +${f.assigned_employees.length-2}` : '');
+    const pct = f.completion_pct || 0;
+    const emps = f.assigned_employees || [];
+    let empHtml = '';
+    if (emps.length === 0) {
+      empHtml = `<span class="badge badge-unassigned"><i class="fas fa-user-slash"></i> Unassigned</span>`;
+    } else if (emps.length === 1) {
+      empHtml = `<div class="emp-tags-wrap"><span class="emp-tag"><i class="fas fa-user"></i> ${escHtml(emps[0])}</span></div>`;
+    } else {
+      empHtml = `<div class="emp-tags-wrap">
+        <span class="emp-tag"><i class="fas fa-user"></i> ${escHtml(emps[0])}</span>
+        <span class="emp-tag-more" title="${escHtml(emps.join(', '))}"><i class="fas fa-users"></i> +${emps.length - 1}</span>
+      </div>`;
+    }
+
     return `<tr>
-      <td><span style="font-weight:600;color:var(--accent);">${escHtml(f.original_name)}</span></td>
-      <td>${escHtml(f.uploaded_by_name||'—')}</td>
+      <td>
+        <div class="file-name-cell">
+          <span class="file-primary-name">${escHtml(f.original_name)}</span>
+          <div class="file-meta-sub">
+            <span class="file-id-tag">ID: #${f.id}</span>
+            <span class="file-meta-dot">•</span>
+            <span>${(f.total_records || 0).toLocaleString('en-IN')} records</span>
+          </div>
+        </div>
+      </td>
+      <td>${escHtml(f.uploaded_by_name || 'Admin')}</td>
       <td>${fmtDate(f.uploaded_at)}</td>
-      <td><strong>${f.total_records}</strong></td>
-      <td title="${(f.assigned_employees||[]).join(', ')}">${empList || '<em style="color:var(--text-muted);">Unassigned</em>'}</td>
-      <td><span style="color:#15803d;font-weight:700;">${f.completed_count||0}</span></td>
-      <td><span style="color:#dc2626;font-weight:700;">${f.pending_count||0}</span></td>
+      <td><strong>${(f.total_records || 0).toLocaleString('en-IN')}</strong></td>
+      <td>${empHtml}</td>
+      <td><span class="count-pill count-completed">${(f.completed_count || 0).toLocaleString('en-IN')}</span></td>
+      <td><span class="count-pill count-pending">${(f.pending_count || 0).toLocaleString('en-IN')}</span></td>
       <td>
         <div class="prog-wrap">
           <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;"></div></div>
@@ -892,12 +1685,26 @@ function renderFilesTable() {
       <td>${statusBadge(f.status)}</td>
       <td>
         <div class="actions-cell">
-          <button class="btn-xs btn-view" onclick="viewFileMonitor(${f.id})" title="Monitor">View</button>
-          <button class="btn-xs btn-edit" onclick="openReassign(${f.id})" title="Edit Assignment">Assign</button>
-          <button class="btn-xs btn-dl"   onclick="downloadFile(${f.id},'csv')" title="Download CSV">CSV</button>
-          <button class="btn-xs btn-dl"   onclick="downloadFile(${f.id},'xlsx')" title="Download XLSX">XLSX</button>
-          ${f.status !== 'Closed' ? `<button class="btn-xs btn-close" onclick="openClose(${f.id})" title="Close">Close</button>` : ''}
-          <button class="btn-xs btn-del"  onclick="openDelete(${f.id})" title="Delete">Delete</button>
+          <button class="btn-xs btn-view" onclick="viewFileMonitor(${f.id})" title="View Live Monitor">
+            <i class="fas fa-eye"></i> View
+          </button>
+          <button class="btn-xs btn-edit" onclick="openReassign(${f.id})" title="Edit Employee Assignment">
+            <i class="fas fa-user-gear"></i> Assign
+          </button>
+          <button class="btn-xs btn-dl" onclick="downloadFile(${f.id}, 'csv')" title="Download CSV">
+            <i class="fas fa-download"></i> CSV
+          </button>
+          <button class="btn-xs btn-dl" onclick="downloadFile(${f.id}, 'xlsx')" title="Download Excel">
+            <i class="fas fa-file-excel"></i> XLSX
+          </button>
+          ${f.status !== 'Closed' ? `
+            <button class="btn-xs btn-close-action" onclick="openClose(${f.id})" title="Close Dataset">
+              <i class="fas fa-lock"></i> Close
+            </button>
+          ` : ''}
+          <button class="btn-xs btn-del" onclick="openDelete(${f.id})" title="Delete File">
+            <i class="fas fa-trash-alt"></i> Delete
+          </button>
         </div>
       </td>
     </tr>`;
@@ -915,11 +1722,34 @@ function goFilesPage(p) {
 // ── Load Employees ────────────────────────────────────────────────────────
 async function loadEmployees() {
   try {
-    const res    = await apiFetch('/excel/employees-list');
+    const res = await apiFetch('/excel/employees-list');
     allEmployees = res.employees || [];
     renderEmpGrid('emp-grid', 'selected-emp-count');
+    populateEmployeeFilters();
   } catch(e) {
-    showToast('Failed to load employees: ' + e.message, 'error');
+    showToast('Failed to load eligible employees: ' + e.message, 'error');
+  }
+}
+
+function populateEmployeeFilters() {
+  const fFilter = document.getElementById('files-emp-filter');
+  const aFilter = document.getElementById('audit-emp-filter');
+  
+  const options = '<option value="">All Employees</option>' + allEmployees.map(e =>
+    `<option value="${escHtml(e.name)}">${escHtml(e.name)}</option>`
+  ).join('');
+
+  if (fFilter) {
+    const cur = fFilter.value;
+    fFilter.innerHTML = options;
+    fFilter.value = cur;
+  }
+  if (aFilter) {
+    const curA = aFilter.value;
+    aFilter.innerHTML = '<option value="">All Employees</option>' + allEmployees.map(e =>
+      `<option value="${e.id}">${escHtml(e.name)}</option>`
+    ).join('');
+    aFilter.value = curA;
   }
 }
 
@@ -930,12 +1760,12 @@ function renderEmpGrid(gridId, countId, selectedIds = [], search = '') {
     !search || e.name.toLowerCase().includes(search.toLowerCase()) || e.email.toLowerCase().includes(search.toLowerCase())
   );
   grid.innerHTML = filtered.length === 0
-    ? '<p style="color:var(--text-muted);font-size:13px;padding:8px;">No employees found.</p>'
+    ? '<p style="color:var(--text-muted);font-size:13px;padding:12px;grid-column:1/-1;text-align:center;">No employees found.</p>'
     : filtered.map(e => {
         const checked = selectedIds.includes(e.id);
-        return `<label class="emp-chip ${checked ? 'selected':''}">
-          <input type="checkbox" value="${e.id}" ${checked?'checked':''} onchange="updateEmpCount('${gridId}','${countId}')" />
-          <div class="emp-avatar">${(e.name||'?')[0].toUpperCase()}</div>
+        return `<label class="emp-chip ${checked ? 'selected' : ''}">
+          <input type="checkbox" value="${e.id}" ${checked ? 'checked' : ''} onchange="updateEmpCount('${gridId}','${countId}')" />
+          <div class="emp-avatar">${(e.name || '?')[0].toUpperCase()}</div>
           <div class="emp-info">
             <div class="emp-name">${escHtml(e.name)}</div>
             <div class="emp-email">${escHtml(e.email)}</div>
@@ -948,12 +1778,14 @@ function renderEmpGrid(gridId, countId, selectedIds = [], search = '') {
 function updateEmpCount(gridId, countId) {
   const count = getCheckedEmpIds(gridId).length;
   const el = document.getElementById(countId);
-  if (el) el.textContent = `${count} employee${count !== 1 ? 's':''} selected`;
-  // toggle chip style
+  if (el) el.textContent = `${count} employee${count !== 1 ? 's' : ''} selected`;
   document.querySelectorAll(`#${gridId} .emp-chip`).forEach(chip => {
     chip.classList.toggle('selected', chip.querySelector('input[type="checkbox"]').checked);
   });
-  if (gridId === 'emp-grid') document.getElementById('btn-do-upload').disabled = (!pendingUploadFile || count === 0);
+  if (gridId === 'emp-grid') {
+    const btn = document.getElementById('btn-do-upload');
+    if (btn) btn.disabled = (!pendingUploadFile || count === 0);
+  }
 }
 
 function getCheckedEmpIds(gridId) {
@@ -970,9 +1802,10 @@ function selectAllEmployees()  { document.querySelectorAll('#emp-grid input[type
 function clearAllEmployees()   { document.querySelectorAll('#emp-grid input[type="checkbox"]').forEach(c => c.checked = false); updateEmpCount('emp-grid','selected-emp-count'); }
 function selectAllReassign()   { document.querySelectorAll('#reassign-emp-grid input[type="checkbox"]').forEach(c => c.checked = true);  updateEmpCount('reassign-emp-grid','reassign-emp-count'); }
 function clearAllReassign()    { document.querySelectorAll('#reassign-emp-grid input[type="checkbox"]').forEach(c => c.checked = false); updateEmpCount('reassign-emp-grid','reassign-emp-count'); }
+
 function filterReassignEmployees() {
-  const search  = document.getElementById('reassign-emp-search').value;
-  const sel     = getCheckedEmpIds('reassign-emp-grid');
+  const search = document.getElementById('reassign-emp-search').value;
+  const sel    = getCheckedEmpIds('reassign-emp-grid');
   renderEmpGrid('reassign-emp-grid', 'reassign-emp-count', sel, search);
 }
 
@@ -980,8 +1813,10 @@ function filterReassignEmployees() {
 function openUploadModal() {
   pendingUploadFile = null;
   document.getElementById('file-input').value = '';
-  document.getElementById('selected-file-name').style.display = 'none';
+  const selName = document.getElementById('selected-file-name');
+  if (selName) selName.style.display = 'none';
   document.getElementById('btn-do-upload').disabled = true;
+  document.getElementById('emp-search').value = '';
   renderEmpGrid('emp-grid', 'selected-emp-count');
   openModal('upload-modal');
 }
@@ -998,10 +1833,13 @@ function handleFileSelect(e) { const file = e.target.files[0]; if (file) process
 
 function processFile(file) {
   const ext = file.name.split('.').pop().toLowerCase();
-  if (ext !== 'xlsx' && ext !== 'xls') { showToast('Only .xlsx and .xls files are allowed.', 'error'); return; }
+  if (ext !== 'xlsx' && ext !== 'xls') {
+    showToast('Only .xlsx and .xls files are supported.', 'error');
+    return;
+  }
   pendingUploadFile = file;
   const nameEl = document.getElementById('selected-file-name');
-  nameEl.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+  nameEl.innerHTML = `<i class="fas fa-file-excel" style="margin-right:6px;"></i> ${escHtml(file.name)} (${(file.size / 1024).toFixed(1)} KB)`;
   nameEl.style.display = 'block';
   const count = getCheckedEmpIds('emp-grid').length;
   document.getElementById('btn-do-upload').disabled = (count === 0);
@@ -1010,25 +1848,25 @@ function processFile(file) {
 async function doUpload() {
   if (!pendingUploadFile) { showToast('Please select an Excel file to upload.', 'error'); return; }
   const empIds = getCheckedEmpIds('emp-grid');
-  if (empIds.length === 0) { showToast('Please select at least one employee to assign the file to.', 'error'); return; }
+  if (empIds.length === 0) { showToast('Please select at least one employee for assignment.', 'error'); return; }
 
   const btn = document.getElementById('btn-do-upload');
   btn.disabled = true;
-  btn.innerHTML = '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-right:5px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Uploading...';
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Validating &amp; Uploading...';
 
-  // Validate column headers before uploading
+  // Client-side schema verification using SheetJS
   try {
     const validationError = await validateExcelFile(pendingUploadFile);
     if (validationError) {
       showToast(validationError, 'error');
       btn.disabled = false;
-      btn.innerHTML = '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 20h16"/></svg>Upload &amp; Assign';
+      btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i> Upload &amp; Assign';
       return;
     }
   } catch (e) {
-    showToast('The Excel file could not be read. Please verify the file is not corrupted.', 'error');
+    showToast('Could not parse the Excel file. Please ensure it is not corrupt or password-protected.', 'error');
     btn.disabled = false;
-    btn.innerHTML = '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 20h16"/></svg>Upload &amp; Assign';
+    btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i> Upload &amp; Assign';
     return;
   }
 
@@ -1042,61 +1880,62 @@ async function doUpload() {
       body: formData
     });
     const data = await res.json();
-    if (!data.success) throw new Error(data.message);
+    if (!data.success) throw new Error(data.message || 'File upload failed.');
 
     // Assign employees
     const fileId = data.file.id;
-    await apiFetch(`/excel/files/${fileId}/assign`, { method: 'POST', body: JSON.stringify({ employee_ids: empIds }) });
+    await apiFetch(`/excel/files/${fileId}/assign`, {
+      method: 'POST',
+      body: JSON.stringify({ employee_ids: empIds })
+    });
 
-    showToast(`Excel file uploaded and assigned to ${empIds.length} employee(s) successfully.`, 'success');
+    showToast(`Excel dataset uploaded and assigned to ${empIds.length} employee(s) successfully.`, 'success');
     closeModal('upload-modal');
     await loadFiles();
   } catch(e) {
     const msg = e.message || '';
     if (msg.toLowerCase().includes('token') || msg.toLowerCase().includes('expired')) {
-      showToast('Your session has expired. Please sign in again to continue.', 'error');
+      showToast('Your session has expired. Please sign in again.', 'error');
       setTimeout(() => { clearSession(); window.location.href = '/index.html'; }, 2000);
     } else {
-      showToast('The Excel file could not be uploaded. ' + (msg || 'Please verify the file format and try again.'), 'error');
+      showToast('Upload failed: ' + (msg || 'Please verify file format and try again.'), 'error');
     }
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 20h16"/></svg>Upload &amp; Assign';
+    btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i> Upload &amp; Assign';
   }
 }
 
-// ── Column alias map: any recognised variation → canonical name ────────────
+// ── Column Aliases for Flexible File Schema Matching ─────────────────────
 const COL_ALIASES = {
   'phone number':   ['phone number','phone no','phone','mobile','mobile number','mobile no','contact','contact number','mob','mob no','phonenumber','mobilenumber'],
-  'disposition':    ['disposition','desposition','desposition','disp','dispo','call disposition','call status'],
-  'sub disposition':['sub disposition','sub desposition','sub desposition','sub disp','sub dispo','sub-disposition','sub-desposition','subdisposition','subdesposition','sub call status','sub status']
+  'disposition':    ['disposition','desposition','disp','dispo','call disposition','call status'],
+  'sub disposition':['sub disposition','sub desposition','sub disp','sub dispo','sub-disposition','sub-desposition','subdisposition','subdesposition','sub call status','sub status']
 };
 
-// Returns canonical name if header h matches any alias, else null
 function matchCol(h) {
-  const hl = h.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+  const hl = String(h || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
   for (const [canon, aliases] of Object.entries(COL_ALIASES)) {
     if (aliases.includes(hl)) return canon;
   }
   return null;
 }
 
-// Client-side Excel validation using the bundled XLSX library
 function validateExcelFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
-        const data   = new Uint8Array(e.target.result);
-        const wb     = XLSX.read(data, { type: 'array' });
+        const data = new Uint8Array(e.target.result);
+        const wb   = XLSX.read(data, { type: 'array' });
         const wsName = wb.SheetNames[0];
-        if (!wsName) { resolve('The Excel file is empty or has no sheets.'); return; }
-        const ws   = wb.Sheets[wsName];
+        if (!wsName) { resolve('The Excel workbook contains no sheets.'); return; }
+        const ws = wb.Sheets[wsName];
         const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-        if (!rows || rows.length < 2) { resolve('The Excel file contains no data rows. Please add at least one phone number row.'); return; }
+        if (!rows || rows.length < 2) { resolve('The Excel sheet contains no data rows. Please ensure at least one phone number row exists.'); return; }
 
         const headerRaw = rows[0].map(h => String(h).trim());
-        const matched   = headerRaw.map(h => matchCol(h));  // canonical or null
+        const matched   = headerRaw.map(h => matchCol(h));
 
         const required = ['phone number', 'disposition', 'sub disposition'];
         const missing  = required.filter(col => !matched.includes(col));
@@ -1104,22 +1943,21 @@ function validateExcelFile(file) {
           const missingLabels = missing.map(c => ({ 'phone number':'Phone Number','disposition':'Disposition','sub disposition':'Sub Disposition' }[c]));
           resolve(
             'Invalid Excel format. Required columns are missing:\n' +
-            missingLabels.map(l => '\u2022 ' + l).join('\n') +
+            missingLabels.map(l => '• ' + l).join('\n') +
             '\n\nFound columns: ' + (headerRaw.join(', ') || '(none)')
           );
           return;
         }
 
-        // Find phone column index by canonical match
         const phoneIdx = matched.indexOf('phone number');
         const dataRows = rows.slice(1).filter(r => String(r[phoneIdx] || '').trim() !== '');
-        if (dataRows.length === 0) { resolve('No phone number rows found in the file. Please ensure the Phone Number column has data.'); return; }
-        resolve(null); // OK
+        if (dataRows.length === 0) { resolve('No valid phone number rows found in the sheet. Please populate the Phone Number column.'); return; }
+        resolve(null);
       } catch(err) {
         reject(err);
       }
     };
-    reader.onerror = () => reject(new Error('File read error'));
+    reader.onerror = () => reject(new Error('File reading error.'));
     reader.readAsArrayBuffer(file);
   });
 }
@@ -1128,60 +1966,78 @@ function validateExcelFile(file) {
 async function openReassign(fileId) {
   fileToReassign = fileId;
   const f = allFiles.find(x => x.id === fileId);
-  document.getElementById('reassign-file-label').textContent = f ? `File: ${f.original_name}` : '';
+  document.getElementById('reassign-file-label').innerHTML = f
+    ? `<i class="fas fa-file-excel" style="margin-right:6px; color:var(--accent);"></i> ${escHtml(f.original_name)} <span class="file-id-tag" style="margin-left:8px;">ID: #${f.id}</span>`
+    : '';
   document.getElementById('reassign-emp-search').value = '';
-  // Load current assignment
   try {
     const res = await apiFetch(`/excel/files/${fileId}`);
     const currentIds = (res.assignments || []).map(a => a.employee_id);
     renderEmpGrid('reassign-emp-grid', 'reassign-emp-count', currentIds);
-  } catch(e) { renderEmpGrid('reassign-emp-grid', 'reassign-emp-count'); }
+  } catch(e) {
+    renderEmpGrid('reassign-emp-grid', 'reassign-emp-count');
+  }
   openModal('reassign-modal');
 }
 
 async function doReassign() {
   const empIds = getCheckedEmpIds('reassign-emp-grid');
-  if (empIds.length === 0) { showToast('Select at least one employee.', 'error'); return; }
+  if (empIds.length === 0) { showToast('Select at least one employee to assign.', 'error'); return; }
   try {
-    await apiFetch(`/excel/files/${fileToReassign}/assign`, { method:'POST', body: JSON.stringify({ employee_ids: empIds }) });
-    showToast('Assignment updated successfully!', 'success');
+    await apiFetch(`/excel/files/${fileToReassign}/assign`, {
+      method: 'POST',
+      body: JSON.stringify({ employee_ids: empIds })
+    });
+    showToast('Assignment updated successfully.', 'success');
     closeModal('reassign-modal');
     await loadFiles();
-  } catch(e) { showToast('Failed: ' + (e.message||'Error'), 'error'); }
+  } catch(e) {
+    showToast('Assignment update failed: ' + (e.message || 'Error'), 'error');
+  }
 }
 
-// ── Delete ────────────────────────────────────────────────────────────────
+// ── Delete Dataset ────────────────────────────────────────────────────────
 function openDelete(fileId) {
   fileToDelete = fileId;
   const f = allFiles.find(x => x.id === fileId);
-  document.getElementById('delete-file-label').textContent = f ? `"${f.original_name}"` : '';
+  document.getElementById('delete-file-label').textContent = f ? `"${f.original_name}" (ID: #${f.id})` : '';
   openModal('delete-modal');
 }
+
 async function doDelete() {
   try {
-    await apiFetch(`/excel/files/${fileToDelete}`, { method:'DELETE' });
-    showToast('File deleted successfully.', 'success');
+    await apiFetch(`/excel/files/${fileToDelete}`, { method: 'DELETE' });
+    showToast('Dataset permanently deleted.', 'success');
     closeModal('delete-modal');
     await loadFiles();
-  } catch(e) { showToast('Delete failed: ' + (e.message||'Error'), 'error'); }
+  } catch(e) {
+    showToast('Delete failed: ' + (e.message || 'Error'), 'error');
+  }
 }
 
-// ── Close Assignment ──────────────────────────────────────────────────────
+// ── Close Dataset ─────────────────────────────────────────────────────────
 function openClose(fileId) {
   fileToClose = fileId;
   const f = allFiles.find(x => x.id === fileId);
-  document.getElementById('close-file-label').textContent = f ? `"${f.original_name}"` : '';
+  document.getElementById('close-file-label').textContent = f ? `"${f.original_name}" (ID: #${f.id})` : '';
   openModal('close-modal');
 }
+
 async function doClose() {
   try {
-    await apiFetch(`/excel/files/${fileToClose}/status`, { method:'PATCH', body: JSON.stringify({ status:'Closed' }) });
-    showToast('Assignment closed successfully.', 'success');
+    await apiFetch(`/excel/files/${fileToClose}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'Closed' })
+    });
+    showToast('Dataset closed successfully.', 'success');
     closeModal('close-modal');
     await loadFiles();
-  } catch(e) { showToast('Failed: ' + (e.message||'Error'), 'error'); }
+  } catch(e) {
+    showToast('Failed to close dataset: ' + (e.message || 'Error'), 'error');
+  }
 }
 
+// ── File Direct Download ──────────────────────────────────────────────────
 async function downloadFile(fileId, fmt) {
   try {
     const token = getToken();
@@ -1197,7 +2053,6 @@ async function downloadFile(fileId, fmt) {
     const blobUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = blobUrl;
-    // Try to use the server-provided filename if present, otherwise a sensible default
     const disposition = res.headers.get('Content-Disposition') || '';
     const match = disposition.match(/filename="?([^"]+)"?/);
     a.download = match ? match[1] : `export-${fileId}.${fmt === 'excel' ? 'xlsx' : fmt}`;
@@ -1205,33 +2060,51 @@ async function downloadFile(fileId, fmt) {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    showToast(`Dataset downloaded as ${fmt.toUpperCase()}.`, 'success');
   } catch (e) {
-    showToast('Failed to download file: ' + (e.message || 'Error'), 'error');
+    showToast('Download error: ' + (e.message || 'Error'), 'error');
   }
+}
+
+// ── Dropdowns Disambiguation ──────────────────────────────────────────────
+function populateFileSelects() {
+  const selects = [
+    { id: 'monitor-file-select', defaultOption: '<option value="">Select a file to monitor...</option>' },
+    { id: 'audit-file-filter',   defaultOption: '<option value="">All Files</option>' },
+    { id: 'report-file-select',  defaultOption: '<option value="">Choose an Excel dataset...</option>' }
+  ];
+
+  selects.forEach(({ id, defaultOption }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const currentVal = el.value;
+    el.innerHTML = defaultOption + allFiles.map(f =>
+      `<option value="${f.id}" ${f.id == currentVal ? 'selected' : ''}>${escHtml(formatFileOptionLabel(f))}</option>`
+    ).join('');
+  });
 }
 
 // ── Monitor Tab ───────────────────────────────────────────────────────────
 function viewFileMonitor(fileId) {
   switchTab('tab-monitor');
-  document.getElementById('monitor-file-select').value = fileId;
-  loadMonitorData();
-}
-
-function populateFileSelects() {
-  ['monitor-file-select','audit-file-filter','report-file-select'].forEach(id => {
-    const sel = document.getElementById(id);
-    if (!sel) return;
-    const cur = sel.value;
-    const placeholder = id === 'audit-file-filter' ? '<option value="">All Files</option>' : '<option value="">Select a file...</option>';
-    sel.innerHTML = placeholder + allFiles.map(f =>
-      `<option value="${f.id}" ${f.id == cur ? 'selected':''}>${escHtml(f.original_name)}</option>`
-    ).join('');
-  });
+  const sel = document.getElementById('monitor-file-select');
+  if (sel) {
+    sel.value = fileId;
+    loadMonitorData();
+  }
 }
 
 async function loadMonitorData() {
   const fileId = document.getElementById('monitor-file-select').value;
-  if (!fileId) return;
+  if (!fileId) {
+    document.getElementById('monitor-file-info').style.display = 'none';
+    document.getElementById('monitor-loading').style.display = 'block';
+    document.getElementById('monitor-table-wrap').style.display = 'none';
+    document.getElementById('monitor-pag').style.display = 'none';
+    document.getElementById('monitor-record-summary').textContent = '';
+    return;
+  }
+
   const fileChanged = loadMonitorData.lastFileId !== String(fileId);
   if (fileChanged) {
     monitorPage = 1;
@@ -1239,7 +2112,7 @@ async function loadMonitorData() {
   }
 
   try {
-    const res = await apiFetch(`/excel/files/${fileId}/records?limit=500`);
+    const res = await apiFetch(`/excel/files/${fileId}/records?limit=5000`);
     monitorAllRecords = res.records || [];
 
     const f = allFiles.find(x => x.id == fileId);
@@ -1248,48 +2121,90 @@ async function loadMonitorData() {
       infoEl.style.display = 'grid';
       const completedCount = monitorAllRecords.filter(r => r.status === 'Completed').length;
       const pendingCount   = monitorAllRecords.filter(r => r.status === 'Pending').length;
-      const pct = f.total_records > 0 ? Math.round((completedCount / f.total_records) * 100) : 0;
+      const totalRec       = f.total_records || monitorAllRecords.length || 0;
+      const pct            = totalRec > 0 ? Math.round((completedCount / totalRec) * 100) : 0;
+      const emps           = f.assigned_employees || [];
+
       infoEl.innerHTML = `
-        <div class="file-info-item"><label>File Name</label><span>${escHtml(f.original_name)}</span></div>
-        <div class="file-info-item"><label>Total Records</label><span>${f.total_records}</span></div>
-        <div class="file-info-item"><label>Completed</label><span style="color:#15803d;">${completedCount}</span></div>
-        <div class="file-info-item"><label>Pending</label><span style="color:#dc2626;">${pendingCount}</span></div>
-        <div class="file-info-item"><label>Progress</label><span>${pct}%</span></div>
-        <div class="file-info-item"><label>Status</label><span>${statusBadge(f.status)}</span></div>
+        <div class="file-overview-card">
+          <label>File Name &amp; ID</label>
+          <div class="val" style="font-size:14px; word-break:break-word;">
+            ${escHtml(f.original_name)} <span class="file-id-tag">#${f.id}</span>
+          </div>
+        </div>
+        <div class="file-overview-card">
+          <label>Total Records</label>
+          <div class="val">${totalRec.toLocaleString('en-IN')}</div>
+        </div>
+        <div class="file-overview-card">
+          <label>Completed</label>
+          <div class="val" style="color:#059669;">${completedCount.toLocaleString('en-IN')}</div>
+        </div>
+        <div class="file-overview-card">
+          <label>Pending</label>
+          <div class="val" style="color:#dc2626;">${pendingCount.toLocaleString('en-IN')}</div>
+        </div>
+        <div class="file-overview-card">
+          <label>Overall Progress</label>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+            <div class="prog-bar" style="flex:1;"><div class="prog-fill" style="width:${pct}%;"></div></div>
+            <span class="prog-pct" style="font-size:13px;">${pct}%</span>
+          </div>
+        </div>
+        <div class="file-overview-card">
+          <label>Status &amp; Assigned</label>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
+            ${statusBadge(f.status)}
+            <span style="font-size:12px; color:var(--text-secondary);">${emps.length} staff assigned</span>
+          </div>
+        </div>
       `;
     }
 
     filterMonitorTable();
   } catch(e) {
-    showToast('Failed to load monitor data.', 'error');
+    showToast('Failed to load dataset records.', 'error');
   }
 }
 
 function filterMonitorTable() {
-  const search = (document.getElementById('monitor-search').value || '').toLowerCase();
+  const search = (document.getElementById('monitor-search').value || '').trim().toLowerCase();
   const filter = document.getElementById('monitor-filter').value;
   let records  = monitorAllRecords;
-  if (search)                  records = records.filter(r => r.phone_number.includes(search) || (r.disposition||'').toLowerCase().includes(search) || (r.sub_disposition||'').toLowerCase().includes(search));
-  if (filter === 'completed')  records = records.filter(r => r.status === 'Completed');
-  if (filter === 'pending')    records = records.filter(r => r.status === 'Pending');
 
-  if (typeof filterMonitorTable.lastSearch === 'undefined') {
-    filterMonitorTable.lastSearch = '';
-    filterMonitorTable.lastStatus = '';
+  if (search) {
+    records = records.filter(r =>
+      String(r.phone_number || '').includes(search) ||
+      (r.disposition || '').toLowerCase().includes(search) ||
+      (r.sub_disposition || '').toLowerCase().includes(search) ||
+      (r.employee_name || '').toLowerCase().includes(search)
+    );
   }
-  if (filterMonitorTable.lastSearch !== search || filterMonitorTable.lastStatus !== filter) {
+  if (filter === 'completed') records = records.filter(r => r.status === 'Completed');
+  if (filter === 'pending')   records = records.filter(r => r.status === 'Pending');
+
+  if (filterMonitorTable.lastSearch !== search || filterMonitorTable.lastFilter !== filter) {
     monitorPage = 1;
     filterMonitorTable.lastSearch = search;
-    filterMonitorTable.lastStatus = filter;
+    filterMonitorTable.lastFilter = filter;
   }
 
   const loading = document.getElementById('monitor-loading');
   const wrap    = document.getElementById('monitor-table-wrap');
   const tbody   = document.getElementById('monitor-tbody');
   const pag     = document.getElementById('monitor-pag');
+  const summary = document.getElementById('monitor-record-summary');
 
-  if (monitorAllRecords.length === 0) { loading.style.display = 'block'; wrap.style.display = 'none'; pag.style.display = 'none'; return; }
-  loading.style.display = 'none'; wrap.style.display = 'block';
+  if (monitorAllRecords.length === 0) {
+    loading.style.display = 'block';
+    wrap.style.display = 'none';
+    pag.style.display = 'none';
+    summary.textContent = '';
+    return;
+  }
+
+  loading.style.display = 'none';
+  wrap.style.display = 'block';
 
   const total = records.length;
   const totalPages = Math.ceil(total / RECORDS_PER_PAGE);
@@ -1302,18 +2217,20 @@ function filterMonitorTable() {
     pag.style.display = 'none';
   }
 
+  summary.textContent = `Filtered ${total.toLocaleString('en-IN')} of ${monitorAllRecords.length.toLocaleString('en-IN')} records`;
+
   const start = (monitorPage - 1) * RECORDS_PER_PAGE;
   const end = Math.min(start + RECORDS_PER_PAGE, total);
   const paginated = records.slice(start, end);
 
-  tbody.innerHTML = paginated.map((r, i) => `<tr>
-    <td style="color:var(--text-muted);font-size:11px;">${r.row_index}</td>
-    <td style="font-weight:600;">${escHtml(r.phone_number)}</td>
-    <td>${escHtml(r.employee_name || '—')}</td>
-    <td>${r.disposition ? escHtml(r.disposition) : '<em style="color:var(--text-muted);">—</em>'}</td>
+  tbody.innerHTML = paginated.map(r => `<tr>
+    <td style="color:var(--text-muted); font-size:11px; font-weight:700;">#${r.row_index}</td>
+    <td style="font-weight:700; font-size:13.5px;"><i class="fas fa-phone" style="font-size:11px; color:var(--text-muted); margin-right:6px;"></i>${escHtml(r.phone_number)}</td>
+    <td><span class="emp-tag"><i class="fas fa-user"></i> ${escHtml(r.employee_name || 'Unassigned')}</span></td>
+    <td>${r.disposition ? `<span style="font-weight:600; color:var(--accent);">${escHtml(r.disposition)}</span>` : '<em style="color:var(--text-muted);">Not Called</em>'}</td>
     <td>${r.sub_disposition ? escHtml(r.sub_disposition) : '<em style="color:var(--text-muted);">—</em>'}</td>
     <td>${statusBadge(r.status)}</td>
-    <td style="font-size:12px;color:var(--text-secondary);">${r.updated_at ? fmtDatetime(r.updated_at) : '—'}</td>
+    <td style="font-size:12px; color:var(--text-secondary);">${r.updated_at ? fmtDatetime(r.updated_at) : '—'}</td>
   </tr>`).join('');
 
   document.getElementById('monitor-pag-info').textContent = `Showing ${start + 1}–${end} of ${total} records`;
@@ -1325,36 +2242,62 @@ function goMonitorPage(p) {
   filterMonitorTable();
 }
 
+// ── Polling Controls ──────────────────────────────────────────────────────
 function startMonitorPoll() {
   stopMonitorPoll();
+  if (isPollPaused) return;
   monitorPollTimer = setInterval(() => {
     const fileId = document.getElementById('monitor-file-select').value;
-    if (fileId) loadMonitorData();
+    if (fileId && document.getElementById('tab-monitor').classList.contains('active')) {
+      loadMonitorData();
+    }
   }, 5000);
 }
+
 function stopMonitorPoll() {
-  if (monitorPollTimer) { clearInterval(monitorPollTimer); monitorPollTimer = null; }
+  if (monitorPollTimer) {
+    clearInterval(monitorPollTimer);
+    monitorPollTimer = null;
+  }
+}
+
+function toggleMonitorPoll() {
+  isPollPaused = !isPollPaused;
+  const btn = document.getElementById('btn-toggle-poll');
+  const badge = document.getElementById('monitor-poll-badge');
+  if (isPollPaused) {
+    stopMonitorPoll();
+    btn.innerHTML = '<i class="fas fa-play"></i> <span>Resume</span>';
+    badge.innerHTML = '<i class="fas fa-pause-circle" style="color:#d97706;"></i> Auto-refresh: Paused';
+    badge.style.color = '#b45309';
+    badge.style.background = 'rgba(245,158,11,0.14)';
+  } else {
+    btn.innerHTML = '<i class="fas fa-pause"></i> <span>Pause</span>';
+    badge.innerHTML = '<i class="fas fa-satellite-dish"></i> Auto-refresh: 5s';
+    badge.style.color = '#059669';
+    badge.style.background = 'rgba(16,185,129,0.12)';
+    startMonitorPoll();
+    loadMonitorData();
+  }
 }
 
 // ── Audit Trail ───────────────────────────────────────────────────────────
 async function loadAudit() {
   const fileId = document.getElementById('audit-file-filter').value;
-  const url    = '/excel/audit?limit=200' + (fileId ? `&file_id=${fileId}` : '');
+  const empId  = document.getElementById('audit-emp-filter').value;
+  let url = '/excel/audit?limit=1000';
+  if (fileId) url += `&file_id=${fileId}`;
+  if (empId)  url += `&employee_id=${empId}`;
+
   document.getElementById('audit-loading').style.display = 'block';
   document.getElementById('audit-table-wrap').style.display = 'none';
   document.getElementById('audit-empty').style.display = 'none';
   document.getElementById('audit-pag').style.display = 'none';
-  
-  if (typeof loadAudit.lastFileId === 'undefined') {
-    loadAudit.lastFileId = '';
-  }
-  if (loadAudit.lastFileId !== fileId) {
-    auditPage = 1;
-    loadAudit.lastFileId = fileId;
-  }
+
+  auditPage = 1;
 
   try {
-    const res  = await apiFetch(url);
+    const res = await apiFetch(url);
     auditAllRecords = res.audit || [];
     document.getElementById('audit-loading').style.display = 'none';
     renderAuditPage();
@@ -1390,14 +2333,17 @@ function renderAuditPage() {
   const paginated = rows.slice(start, end);
 
   document.getElementById('audit-tbody').innerHTML = paginated.map(r => `<tr>
-    <td style="font-size:12px;white-space:nowrap;">${fmtDatetime(r.created_at)}</td>
-    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(r.file_name||'')}">${escHtml(r.file_name||'—')}</td>
-    <td>${escHtml(r.employee_name||'—')}</td>
-    <td style="font-weight:600;">${escHtml(r.phone_number)}</td>
-    <td>${r.old_disposition ? escHtml(r.old_disposition) : '<em style="color:var(--text-muted);">—</em>'}</td>
-    <td>${r.new_disposition ? `<span style="color:var(--accent);font-weight:600;">${escHtml(r.new_disposition)}</span>` : '<em style="color:var(--text-muted);">—</em>'}</td>
-    <td>${r.old_sub_disposition ? escHtml(r.old_sub_disposition) : '<em style="color:var(--text-muted);">—</em>'}</td>
-    <td>${r.new_sub_disposition ? `<span style="color:var(--accent);font-weight:600;">${escHtml(r.new_sub_disposition)}</span>` : '<em style="color:var(--text-muted);">—</em>'}</td>
+    <td style="font-size:12px; white-space:nowrap; color:var(--text-secondary);"><i class="fas fa-clock" style="margin-right:5px;"></i>${fmtDatetime(r.created_at)}</td>
+    <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escHtml(r.file_name || '')}">
+      <span style="font-weight:600;">${escHtml(r.file_name || '—')}</span>
+      <span class="file-id-tag" style="margin-left:4px;">#${r.file_id}</span>
+    </td>
+    <td><span class="emp-tag"><i class="fas fa-user"></i> ${escHtml(r.employee_name || '—')}</span></td>
+    <td style="font-weight:700;">${escHtml(r.phone_number)}</td>
+    <td>${r.old_disposition ? escHtml(r.old_disposition) : '<em style="color:var(--text-muted);">(None)</em>'}</td>
+    <td>${r.new_disposition ? `<span style="color:#059669; font-weight:700;"><i class="fas fa-arrow-right" style="font-size:10px; margin-right:4px;"></i>${escHtml(r.new_disposition)}</span>` : '<em style="color:var(--text-muted);">(None)</em>'}</td>
+    <td>${r.old_sub_disposition ? escHtml(r.old_sub_disposition) : '<em style="color:var(--text-muted);">(None)</em>'}</td>
+    <td>${r.new_sub_disposition ? `<span style="color:#059669; font-weight:700;"><i class="fas fa-arrow-right" style="font-size:10px; margin-right:4px;"></i>${escHtml(r.new_sub_disposition)}</span>` : '<em style="color:var(--text-muted);">(None)</em>'}</td>
   </tr>`).join('');
 
   document.getElementById('audit-pag-info').textContent = `Showing ${start + 1}–${end} of ${total} audit logs`;
@@ -1409,23 +2355,24 @@ function goAuditPage(p) {
   renderAuditPage();
 }
 
+// ── Pagination Buttons Builder ────────────────────────────────────────────
 function buildPageBtns(current, total, callbackName) {
   if (total <= 1) return '';
-  let html = `<button class="pag-btn" ${current===1?'disabled':''} onclick="${callbackName}(${current-1})">Prev</button>`;
+  let html = `<button class="pag-btn" ${current === 1 ? 'disabled' : ''} onclick="${callbackName}(${current - 1})"><i class="fas fa-chevron-left"></i></button>`;
   const pages = getPagPages(current, total);
   for (const p of pages) {
     if (p === '...') {
-      html += `<span class="pag-btn" style="cursor:default;pointer-events:none;">…</span>`;
+      html += `<span class="pag-btn" style="cursor:default; pointer-events:none; border-color:transparent;">…</span>`;
     } else {
-      html += `<button class="pag-btn${p===current?' active':''}" onclick="${callbackName}(${p})">${p}</button>`;
+      html += `<button class="pag-btn ${p === current ? 'active' : ''}" onclick="${callbackName}(${p})">${p}</button>`;
     }
   }
-  html += `<button class="pag-btn" ${current===total?'disabled':''} onclick="${callbackName}(${current+1})">Next</button>`;
+  html += `<button class="pag-btn" ${current === total ? 'disabled' : ''} onclick="${callbackName}(${current + 1})"><i class="fas fa-chevron-right"></i></button>`;
   return html;
 }
 
 function getPagPages(current, total) {
-  if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
   const pages = [];
   if (current <= 4) {
     for (let i = 1; i <= 5; i++) pages.push(i);
@@ -1442,8 +2389,14 @@ function getPagPages(current, total) {
 // ── Reports ───────────────────────────────────────────────────────────────
 function exportReport(fmt) {
   const fileId = document.getElementById('report-file-select').value;
-  if (!fileId) { showToast('Please select a file first.', 'error'); return; }
-  if (fmt === 'pdf') { exportReportPDF(fileId); return; }
+  if (!fileId) {
+    showToast('Please select an Excel dataset to export first.', 'error');
+    return;
+  }
+  if (fmt === 'pdf') {
+    exportReportPDF(fileId);
+    return;
+  }
   downloadFile(fileId, fmt);
 }
 
@@ -1453,51 +2406,76 @@ async function exportReportPDF(fileId) {
     const records = res.records || [];
     const f = allFiles.find(x => x.id == fileId);
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation:'landscape' });
-    doc.setFontSize(14);
-    doc.text(`CLN Lending Suite — Excel Report`, 14, 16);
-    doc.setFontSize(10);
-    doc.text(`File: ${f ? f.original_name : fileId}   Generated: ${new Date().toLocaleString('en-IN')}`, 14, 24);
+    const doc = new jsPDF({ orientation: 'landscape' });
+
+    doc.setFontSize(15);
+    doc.text(`CLN Lending Suite — Excel Dataset Report`, 14, 16);
+    doc.setFontSize(9.5);
+    doc.text(`File: ${f ? f.original_name : fileId} (ID: #${fileId})   |   Generated: ${new Date().toLocaleString('en-IN')}   |   Total Rows: ${records.length}`, 14, 24);
+
     doc.autoTable({
-      startY: 30,
-      head: [['#','Phone Number','Disposition','Sub Disposition','Employee','Status','Updated']],
-      body: records.map((r,i) => [
-        r.row_index, r.phone_number, r.disposition||'', r.sub_disposition||'',
-        r.employee_name||'—', r.status, r.updated_at ? fmtDatetime(r.updated_at) : '—'
+      startY: 28,
+      head: [['#', 'Phone Number', 'Disposition', 'Sub Disposition', 'Employee', 'Status', 'Last Updated']],
+      body: records.map(r => [
+        r.row_index,
+        r.phone_number,
+        r.disposition || '—',
+        r.sub_disposition || '—',
+        r.employee_name || 'Unassigned',
+        r.status,
+        r.updated_at ? fmtDatetime(r.updated_at) : '—'
       ]),
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [15,39,71] }
+      styles: { fontSize: 8, cellPadding: 3 },
+      headStyles: { fillColor: [15, 39, 71], textColor: [255, 255, 255], fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] }
     });
-    doc.save(`report_${fileId}.pdf`);
-    showToast('PDF exported successfully!', 'success');
-  } catch(e) { showToast('PDF export failed.', 'error'); }
+
+    const safeName = f ? f.original_name.replace(/[^a-z0-9._-]/gi, '_') : fileId;
+    doc.save(`report_${safeName}.pdf`);
+    showToast('PDF report generated successfully.', 'success');
+  } catch(e) {
+    showToast('PDF export failed: ' + (e.message || 'Error'), 'error');
+  }
 }
 
 async function exportEmployeeReport() {
   const fileId = document.getElementById('report-file-select').value;
-  if (!fileId) { showToast('Please select a file first.', 'error'); return; }
+  if (!fileId) {
+    showToast('Please select an Excel dataset first.', 'error');
+    return;
+  }
   try {
     const res = await apiFetch(`/excel/files/${fileId}`);
     const assignments = res.assignments || [];
-    let csv = 'Employee,Email,Total Records,Completed,Progress (%),Status\n';
+    const file = res.file || {};
+
+    let csv = 'Employee Name,Email,Total File Records,Completed Count,Pending Count,Completion (%),Status\n';
     for (const a of assignments) {
-      const pct = res.file.total_records > 0 ? Math.round((a.completed / res.file.total_records)*100) : 0;
-      csv += [a.employee_name, a.employee_email, res.file.total_records, a.completed, pct, a.status].map(v=>`"${v}"`).join(',') + '\n';
+      const completed = a.completed || 0;
+      const total = file.total_records || 0;
+      const pending = Math.max(0, total - completed);
+      const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+      csv += [a.employee_name, a.employee_email, total, completed, pending, `${pct}%`, a.status].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',') + '\n';
     }
-    const blob = new Blob([csv], {type:'text/csv'});
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    a.href = url; a.download = `employee_report_${fileId}.csv`; a.click();
+    a.href     = url;
+    a.download = `employee_performance_dataset_${fileId}.csv`;
+    a.click();
     URL.revokeObjectURL(url);
-    showToast('Employee report exported!', 'success');
-  } catch(e) { showToast('Export failed.', 'error'); }
+    showToast('Employee summary report exported successfully.', 'success');
+  } catch(e) {
+    showToast('Export failed: ' + (e.message || 'Error'), 'error');
+  }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
+// ── Generic API & Modal Helpers ───────────────────────────────────────────
 async function apiFetch(path, opts = {}) {
   const token = getToken();
   const res   = await fetch(`${API_BASE}${path}`, {
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers||{}) },
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) },
     ...opts
   });
   const data = await res.json().catch(() => ({ success: false, message: 'Server returned an invalid response.' }));
@@ -1505,16 +2483,13 @@ async function apiFetch(path, opts = {}) {
     const msg = data.message || '';
     if (msg.toLowerCase().includes('expired') || msg.toLowerCase().includes('invalid') || res.status === 401) {
       clearSession();
-      localStorage.setItem('login_error', 'Your session has expired. Please sign in again to continue.');
+      localStorage.setItem('login_error', 'Your session has expired. Please sign in again.');
       window.location.href = '/index.html';
       throw new Error('Session expired');
     }
-    if (msg.toLowerCase().includes('working hours') || msg.toLowerCase().includes('deactivated')) {
-      throw new Error(msg);
-    }
     throw new Error(data.message || 'Access denied.');
   }
-  if (!data.success) throw new Error(data.message || 'Something went wrong while processing your request. Please try again.');
+  if (!data.success) throw new Error(data.message || 'Server error occurred.');
   return data;
 }
 
@@ -1522,8 +2497,14 @@ function openModal(id)  { document.getElementById(id).classList.add('show'); doc
 function closeModal(id) { document.getElementById(id).classList.remove('show'); document.body.style.overflow = ''; }
 
 function statusBadge(s) {
-  const map = { 'Assigned':'badge-assigned','In Progress':'badge-inprogress','Completed':'badge-completed','Closed':'badge-closed','Pending':'badge-pending' };
-  return `<span class="badge ${map[s]||'badge-assigned'}">${escHtml(s||'Unknown')}</span>`;
+  const map = {
+    'Assigned': 'badge-assigned',
+    'In Progress': 'badge-inprogress',
+    'Completed': 'badge-completed',
+    'Closed': 'badge-closed',
+    'Pending': 'badge-pending'
+  };
+  return `<span class="badge ${map[s] || 'badge-assigned'}">${escHtml(s || 'Unknown')}</span>`;
 }
 
 function escHtml(v) {
@@ -1543,23 +2524,30 @@ function fmtDatetime(d) {
 
 function showAlert(msg, type) {
   const el = document.getElementById('page-alert');
+  if (!el) return;
   el.className = `alert alert-${type === 'error' ? 'danger' : 'success'}`;
   el.textContent = msg;
   el.style.display = 'block';
-  setTimeout(() => { el.style.display = 'none'; }, 5000);
+  setTimeout(() => { el.style.display = 'none'; }, 6000);
 }
 
 let toastCount = 0;
 function showToast(msg, type = 'info') {
-  const wrap  = document.getElementById('toast-wrap');
-  const id    = 'toast-' + (++toastCount);
-  const cls   = type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : 'toast-info';
-  const icons = { success:'✓', error:'✗', info:'ℹ' };
-  const el    = document.createElement('div');
-  el.id = id; el.className = `toast ${cls}`;
-  el.innerHTML = `<span>${icons[type]||'ℹ'}</span><span>${escHtml(msg)}</span>`;
+  const wrap = document.getElementById('toast-wrap');
+  if (!wrap) return;
+  const id = 'toast-' + (++toastCount);
+  const cls = type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : 'toast-info';
+  const iconClass = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+  const el = document.createElement('div');
+  el.id = id;
+  el.className = `toast ${cls}`;
+  el.innerHTML = `<i class="fas ${iconClass}"></i><span>${escHtml(msg)}</span>`;
   wrap.appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 3500);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity .3s ease';
+    setTimeout(() => el.remove(), 300);
+  }, 3800);
 }
 </script>
 </body>

@@ -1,0 +1,903 @@
+/* ==========================================================================
+   CLN Lending Suite — Loan Calculator Hub Styles
+   Shared across Admin and Employee Calculator Hubs
+   ========================================================================== */
+
+/* ── Calculator Hub Top Navigation Card ── */
+.loan-hub-nav-card {
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 12px);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-soft, 0 2px 6px rgba(0, 0, 0, 0.04));
+  transition: all 0.2s ease;
+}
+
+.loan-hub-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 12px;
+}
+
+.loan-hub-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.loan-hub-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm, 8px);
+  background: linear-gradient(135deg, rgba(15, 39, 71, 0.08) 0%, rgba(47, 111, 237, 0.12) 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-secondary, #2f6fed);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+:root[data-theme='dark'] .loan-hub-icon {
+  background: linear-gradient(135deg, rgba(47, 111, 237, 0.2) 0%, rgba(15, 139, 113, 0.15) 100%);
+  color: #8bb4ff;
+}
+
+.loan-hub-title {
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.loan-hub-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 2px 0 0;
+  font-weight: 500;
+}
+
+/* ── Segmented Tab System ── */
+.loan-hub-segmented-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: var(--bg-secondary, #ecf1f8);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+:root[data-theme='dark'] .loan-hub-segmented-tabs {
+  background: rgba(10, 19, 32, 0.7);
+  border-color: rgba(151, 176, 210, 0.16);
+}
+
+.hub-tab-btn {
+  flex: 1 1 auto;
+  min-width: 140px;
+  padding: 10px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  user-select: none;
+  font-family: inherit;
+  outline: none;
+}
+
+.hub-tab-btn i {
+  font-size: 14px;
+  opacity: 0.85;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.hub-tab-btn:hover {
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+:root[data-theme='dark'] .hub-tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.hub-tab-btn.active {
+  background: var(--bg-card);
+  color: var(--accent-secondary, #2f6fed);
+  border-color: var(--border);
+  box-shadow: 0 2px 8px rgba(16, 32, 51, 0.08);
+}
+
+:root[data-theme='dark'] .hub-tab-btn.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: rgba(139, 180, 255, 0.3);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+.hub-tab-btn.active i {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+/* ── Hub Content Containers ── */
+.hub-tab-content {
+  display: none;
+  animation: hubFadeIn 0.22s ease forwards;
+}
+
+.hub-tab-content.active {
+  display: block;
+}
+
+@keyframes hubFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Preset Pills (FOIR, Buffers, Strategies) ── */
+.preset-pills-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.preset-pill {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.preset-pill:hover {
+  border-color: var(--accent-secondary);
+  color: var(--accent-secondary);
+  background: var(--accent-soft);
+}
+
+.preset-pill.active {
+  background: var(--accent-secondary);
+  color: #fff;
+  border-color: var(--accent-secondary);
+  box-shadow: 0 2px 6px rgba(47, 111, 237, 0.25);
+}
+
+:root[data-theme='dark'] .preset-pill.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #3b82f6;
+}
+
+/* ── Result Cards Refinements ── */
+.stat-card.result-card-emerald {
+  border-left: 4px solid var(--success, #0f8b71);
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(15, 139, 113, 0.05) 100%);
+}
+
+:root[data-theme='dark'] .stat-card.result-card-emerald {
+  background: linear-gradient(135deg, rgba(10, 19, 32, 0.92) 0%, rgba(16, 185, 129, 0.08) 100%);
+}
+
+.stat-card.result-card-purple {
+  border-left: 4px solid #8b5cf6;
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+:root[data-theme='dark'] .stat-card.result-card-purple {
+  background: linear-gradient(135deg, rgba(10, 19, 32, 0.92) 0%, rgba(139, 92, 246, 0.08) 100%);
+}
+
+/* ── Recommendation / Notice Banners ── */
+.hub-banner {
+  padding: 16px 18px;
+  border-radius: var(--radius-sm, 8px);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+
+.hub-banner i {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.hub-banner-title {
+  font-weight: 800;
+  font-size: 14.5px;
+  margin: 0 0 3px;
+}
+
+.hub-banner.positive {
+  background: rgba(16, 185, 129, 0.09);
+  border-color: rgba(16, 185, 129, 0.28);
+  color: #065f46;
+}
+
+:root[data-theme='dark'] .hub-banner.positive {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(52, 211, 153, 0.32);
+  color: #a7f3d0;
+}
+
+.hub-banner.neutral {
+  background: rgba(47, 111, 237, 0.08);
+  border-color: rgba(47, 111, 237, 0.24);
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] .hub-banner.neutral {
+  background: rgba(47, 111, 237, 0.12);
+  border-color: rgba(139, 180, 255, 0.26);
+  color: var(--text-primary);
+}
+
+.hub-banner.warning {
+  background: rgba(245, 158, 11, 0.09);
+  border-color: rgba(245, 158, 11, 0.28);
+  color: #92400e;
+}
+
+:root[data-theme='dark'] .hub-banner.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(251, 191, 36, 0.32);
+  color: #fde68a;
+}
+
+/* ── Multi-Segment Cash Flow Progress Bar ── */
+.cashflow-progress-bar-wrap {
+  margin: 16px 0 10px;
+}
+
+.cashflow-progress-bar {
+  height: 18px;
+  border-radius: 999px;
+  display: flex;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+}
+
+.cashflow-segment {
+  height: 100%;
+  transition: width 0.35s ease;
+  position: relative;
+}
+
+.seg-living {
+  background: #3b82f6;
+}
+.seg-existing {
+  background: #f59e0b;
+}
+.seg-new-emi {
+  background: #10b981;
+}
+.seg-surplus {
+  background: #8b5cf6;
+}
+
+.cashflow-legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.cashflow-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.legend-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ── Comparison Tables ── */
+.hub-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.hub-comparison-table th {
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.hub-comparison-table td {
+  padding: 12px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.hub-comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.hub-comparison-table tr:hover td {
+  background: rgba(47, 111, 237, 0.035);
+}
+
+:root[data-theme='dark'] .hub-comparison-table tr:hover td {
+  background: rgba(139, 180, 255, 0.04);
+}
+
+.hub-val-positive {
+  color: var(--success, #0f8b71) !important;
+  font-weight: 700;
+}
+
+.hub-val-negative {
+  color: var(--danger, #ef4444) !important;
+  font-weight: 700;
+}
+
+.hub-val-highlight {
+  font-weight: 800;
+  color: var(--accent-secondary, #2f6fed);
+}
+
+/* ── Prepayment Strategy Cards ── */
+.strategy-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.strategy-card {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm, 8px);
+  padding: 16px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.strategy-card:hover {
+  border-color: var(--accent-secondary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+.strategy-card.selected {
+  border-color: var(--accent-secondary);
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(47, 111, 237, 0.05) 100%);
+  box-shadow: 0 4px 14px rgba(47, 111, 237, 0.14);
+}
+
+:root[data-theme='dark'] .strategy-card.selected {
+  background: linear-gradient(135deg, rgba(15, 28, 46, 0.95) 0%, rgba(47, 111, 237, 0.12) 100%);
+  border-color: #3b82f6;
+}
+
+.strategy-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.strategy-card.selected .strategy-badge {
+  background: var(--accent-secondary);
+  color: #fff;
+}
+
+.strategy-title {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 0 6px;
+  color: var(--text-primary);
+}
+
+.strategy-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.strategy-metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-top: 1px dashed var(--border);
+  font-size: 12.5px;
+}
+
+.strategy-metric-label {
+  color: var(--text-muted);
+}
+
+.strategy-metric-value {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Indicative Disclaimer Card ── */
+.hub-disclaimer-note {
+  margin-top: 20px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.hub-disclaimer-note i {
+  color: var(--accent-secondary);
+  font-size: 14px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Responsive adjustments ── */
+@media (max-width: 900px) {
+  .strategy-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .loan-hub-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .loan-hub-segmented-tabs {
+    width: 100%;
+  }
+  .hub-tab-btn {
+    min-width: 120px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+  }
+  .hub-comparison-table th,
+  .hub-comparison-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+}
+
+/* ── Inline Helper Calculate Button ── */
+.hub-inline-calc-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--accent-secondary);
+  border-radius: var(--radius-sm, 6px);
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.hub-inline-calc-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-secondary);
+  color: var(--accent-secondary);
+}
+
+:root[data-theme='dark'] .hub-inline-calc-btn {
+  background: rgba(47, 111, 237, 0.12);
+  border-color: rgba(139, 180, 255, 0.25);
+  color: #8bb4ff;
+}
+
+:root[data-theme='dark'] .hub-inline-calc-btn:hover {
+  background: rgba(47, 111, 237, 0.22);
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+/* ==========================================================================
+   Professional Loan Calculation & Analysis Workspace Enhancements
+   ========================================================================== */
+
+/* ── Amortization Metric Summary Bar ── */
+.amort-summary-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--bg-secondary, #f0f4f9);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+:root[data-theme='dark'] .amort-summary-bar {
+  background: rgba(10, 19, 32, 0.7);
+  border-bottom-color: rgba(151, 176, 210, 0.14);
+}
+
+.amort-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.amort-summary-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+}
+
+.amort-summary-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+/* ── Result KPI Cards Refinement ── */
+.results-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.results-stats-grid .stat-card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 10px);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.results-stats-grid .stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft, 0 4px 12px rgba(0, 0, 0, 0.05));
+}
+
+.stat-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.stat-card-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+:root[data-theme='dark'] .stat-card-icon-wrap {
+  background: rgba(47, 111, 237, 0.18);
+  color: #8bb4ff;
+}
+
+.stat-card .results-header-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.stat-card .primary-result-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.stat-card .stat-card-desc {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin-top: auto;
+}
+
+/* ── Segmented Control / Pill Toggles ── */
+.segmented-pills-group {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-secondary, #ecf1f8);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+
+:root[data-theme='dark'] .segmented-pills-group {
+  background: rgba(10, 19, 32, 0.8);
+  border-color: rgba(151, 176, 210, 0.2);
+}
+
+.segmented-pill-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  user-select: none;
+}
+
+.segmented-pill-btn:hover:not(.active) {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+:root[data-theme='dark'] .segmented-pill-btn:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.segmented-pill-btn.active {
+  background: var(--bg-card, #ffffff);
+  color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='dark'] .segmented-pill-btn.active {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Monetary & Alignment Utilities in Table ── */
+th.th-right,
+td.td-right {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+th.th-center,
+td.td-center {
+  text-align: center !important;
+}
+
+th.th-left,
+td.td-left {
+  text-align: left !important;
+}
+
+/* Subtle table styling enhancements */
+.full-table table th {
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: var(--bg-secondary, #f4f7fb);
+  border-bottom: 2px solid var(--border);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+:root[data-theme='dark'] .full-table table th {
+  background: rgba(10, 19, 32, 0.85);
+  border-bottom-color: rgba(151, 176, 210, 0.18);
+  color: #c0ccda;
+}
+
+.full-table table td {
+  padding: 11px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.full-table table tbody tr:hover {
+  background: var(--accent-soft, rgba(47, 111, 237, 0.04));
+}
+
+:root[data-theme='dark'] .full-table table tbody tr:hover {
+  background: rgba(47, 111, 237, 0.08);
+}
+
+/* ── Empty State Cards ── */
+.calculator-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.calculator-empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--text-muted);
+  opacity: 0.6;
+  margin-bottom: 12px;
+}
+
+:root[data-theme='dark'] .calculator-empty-icon {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.calculator-empty-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.calculator-empty-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  max-width: 320px;
+  line-height: 1.45;
+}
+
+/* ── Responsive Horizontal Scroll Container ── */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+/* ── Print Styling ── */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #102033 !important;
+    font-size: 11pt !important;
+  }
+  .sidebar,
+  .sidebar-overlay,
+  .topbar,
+  .loan-hub-nav-card,
+  .tabs-navigation,
+  .notif-bell-wrap,
+  .mobile-menu-btn,
+  .topbar-actions,
+  #tab-content-reducing .emi-calculator-layout > .card:first-child,
+  .table-controls-wrapper,
+  .pagination-container,
+  .export-btn-group,
+  .btn,
+  button {
+    display: none !important;
+  }
+  .app-layout {
+    display: block !important;
+  }
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .page-content {
+    padding: 0 !important;
+  }
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  .results-stats-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+  .calculator-charts-grid {
+    display: none !important;
+  }
+  .amort-summary-bar {
+    display: grid !important;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+  }
+  .full-table table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+  .full-table table th,
+  .full-table table td {
+    border: 1px solid #e0e0e0 !important;
+    padding: 6px 8px !important;
+    font-size: 9pt !important;
+  }
+  .full-table table th {
+    background: #0f2747 !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print-only-header {
+    display: block !important;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #0f2747;
+    padding-bottom: 10px;
+  }
+}

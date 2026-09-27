@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CLN Lending Suite — My Profile</title>
-  <meta name="description" content="Employee Profile — manage personal info, upload KYC documents, bank details, and emergency contacts." />
+  <meta name="description" content="Employee Profile Workspace — manage personal info, KYC documents, bank details, and security." />
   <script>
     (function () {
       try {
@@ -23,217 +23,1219 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    /* ── Profile Layout ── */
-    .profile-page { max-width: 1150px; margin: 0 auto; padding: 0 4px; }
-    .profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
-    @media (max-width: 900px) { .profile-grid { grid-template-columns: 1fr; } }
+    /* ==========================================================================
+       MY PROFILE WORKSPACE — PRODUCTION FINTECH CRM DESIGN SYSTEM
+       ========================================================================== */
 
-    /* ── Overview Card ── */
-    .overview-card {
+    .profile-workspace {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 4px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Global Alert Container ── */
+    #page-alert {
+      margin-bottom: 0;
+    }
+
+    /* ── 1. Profile Overview Hero Card ── */
+    .profile-hero-card {
       background: var(--bg-card);
-      border: 1px solid var(--border); border-radius: var(--radius);
-      overflow: hidden; box-shadow: var(--shadow-soft);
-      position: sticky; top: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg, 16px);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
-    :root[data-theme='dark'] .overview-card { background: linear-gradient(135deg, rgba(10,19,32,0.94) 0%, rgba(14,25,42,0.97) 100%); }
-    .overview-banner { height: 90px; background: linear-gradient(135deg, #0f8b71 0%, #2f6fed 60%, #7c3aed 100%); position: relative; }
-    :root[data-theme='dark'] .overview-banner { background: linear-gradient(135deg, #0d6b57 0%, #1a4a9e 60%, #4a1e7a 100%); }
-    .avatar-wrap { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); }
-    .profile-avatar-big { width: 84px; height: 84px; border-radius: 50%; border: 4px solid var(--bg-card); background: linear-gradient(135deg, #0f8b71 0%, #2f6fed 100%); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; color: #fff; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.18); }
-    .profile-avatar-big img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-    .avatar-upload-btn { position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px; background: #0f8b71; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; cursor: pointer; border: 2px solid var(--bg-card); transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-    .avatar-upload-btn:hover { background: #0d6b57; transform: scale(1.08); }
-    .overview-body { padding: 54px 22px 22px; text-align: center; }
-    .overview-name { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 2px; letter-spacing: -0.2px; }
-    .overview-role { font-size: 0.82rem; color: #10b981; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 14px; }
-    
-    .overview-meta { border-top: 1px solid var(--border); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
-    .meta-row { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-secondary); }
-    .meta-row i { width: 18px; text-align: center; font-size: 13px; color: #10b981; flex-shrink: 0; }
 
-    /* ── Completion Widget ── */
-    .completion-card { background: var(--bg-secondary); border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); text-align: left; }
-    .completion-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .completion-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
-    .completion-pct { font-size: 1.2rem; font-weight: 800; color: #10b981; }
-    .completion-bar-wrap { background: var(--border); border-radius: 99px; height: 8px; overflow: hidden; margin-bottom: 12px; }
-    .completion-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #10b981, #2f6fed); transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-    .completion-items { display: grid; grid-template-columns: 1fr; gap: 6px; }
-    .ci { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--text-secondary); font-weight: 500; }
-    .ci .ck { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; }
-    .ci .ck.done { background: rgba(16,185,129,0.15); color: #10b981; }
-    .ci .ck.todo { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border); }
-
-    /* ── KYC status badge ── */
-    .kyc-status { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 99px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.3px; }
-    .kyc-pending  { background: rgba(245,158,11,0.12);  color: #b57a1f; border: 1px solid rgba(245,158,11,0.3);  }
-    .kyc-approved { background: rgba(16,185,129,0.12);  color: #0f8b71; border: 1px solid rgba(16,185,129,0.3); }
-    .kyc-rejected { background: rgba(180,69,69,0.12);   color: #b44545; border: 1px solid rgba(180,69,69,0.3);  }
-
-    /* ── Doc upload area ── */
-    .doc-upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 20px 16px; text-align: center; cursor: pointer; transition: all 0.2s ease; background: var(--bg-secondary); }
-    .doc-upload-area:hover { border-color: var(--accent-secondary); background: rgba(47,111,237,0.04); }
-    .doc-upload-area .icon { font-size: 1.8rem; margin-bottom: 8px; color: var(--accent-secondary); }
-    .doc-upload-area p { font-size: 12.5px; color: var(--text-muted); margin: 0; }
-    .doc-preview { max-width: 100%; max-height: 150px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; box-shadow: var(--shadow-soft); }
-    .doc-preview-pdf { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border); font-size: 12.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
-
-    /* ── Tabs ── */
-    .profile-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; background: var(--bg-secondary); padding: 6px; border-radius: 12px; border: 1px solid var(--border); }
-    .ptab {
-      padding: 9px 18px; border: none; border-radius: 8px;
-      font-size: 12.5px; font-weight: 600; cursor: pointer; color: var(--text-secondary);
-      background: transparent; transition: all 0.2s ease; white-space: nowrap;
-      display: inline-flex; align-items: center; gap: 8px;
+    .profile-hero-banner {
+      height: 110px;
+      background: linear-gradient(135deg, #0b2239 0%, #153e75 40%, #0f8b71 100%);
+      position: relative;
+      background-size: cover;
     }
-    .ptab i { font-size: 13px; }
-    .ptab:hover { color: #10b981; background: var(--bg-card); }
-    .ptab.active { background: #10b981; color: #fff; box-shadow: 0 2px 8px rgba(16,185,129,0.3); }
-    
-    .ptab-panel { display: none; }
-    .ptab-panel.active { display: block; animation: fadeUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-    @keyframes fadeUp { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: none; } }
+    :root[data-theme='dark'] .profile-hero-banner {
+      background: linear-gradient(135deg, #071321 0%, #0d274c 50%, #095c4b 100%);
+    }
 
-    /* ── Section card ── */
-    .sec-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-soft); margin-bottom: 20px; }
-    .sec-head { display: flex; align-items: center; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--border); background: linear-gradient(90deg, var(--bg-card) 0%, var(--bg-secondary) 100%); }
-    .sec-head-icon { font-size: 1.2rem; color: #10b981; width: 36px; height: 36px; border-radius: 8px; background: rgba(16,185,129,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .sec-head h3 { font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0; }
-    .sec-head p  { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; }
-    .sec-body { padding: 24px; }
-    
-    /* ── Form Grid ── */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group.full { grid-column: 1 / -1; }
-    .form-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
-    .form-group input, .form-group select, .form-group textarea { padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13.5px; color: var(--text-primary); background: var(--bg-secondary); font-family: inherit; outline: none; transition: all 0.2s; }
-    .form-group input:focus, .form-group select:focus { border-color: #10b981; background: var(--bg-card); box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
-    .form-group input.readonly-field[readonly] { color: var(--text-secondary); background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(148,163,184,0.08) 100%); border-color: var(--border); box-shadow: inset 0 0 0 1px rgba(148,163,184,0.12); cursor: not-allowed; }
-    .form-group input.readonly-field[readonly]:focus { border-color: var(--border); background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(148,163,184,0.08) 100%); box-shadow: inset 0 0 0 1px rgba(148,163,184,0.12); }
-    .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+    .profile-hero-content {
+      padding: 0 28px 24px;
+      display: grid;
+      grid-template-columns: minmax(300px, 1.2fr) minmax(280px, 0.8fr);
+      gap: 28px;
+      align-items: start;
+    }
 
-    /* Password strength */
-    .pw-toggle { position: relative; }
-    .pw-eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 14px; color: var(--text-muted); transition: color 0.2s; }
-    .pw-eye:hover { color: var(--text-primary); }
-    .pw-strength { margin-top: 6px; }
-    .pw-strength-bar { height: 4px; border-radius: 4px; background: var(--border); overflow: hidden; }
-    .pw-strength-fill { height: 100%; border-radius: 4px; transition: width 0.3s, background 0.3s; width: 0%; }
-    .pw-strength-label { font-size: 10px; font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    /* Left: Identity */
+    .hero-identity-section {
+      display: flex;
+      gap: 20px;
+      position: relative;
+      margin-top: -46px;
+    }
 
-    #page-alert { margin-bottom: 16px; }
-    .remarks-box { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 12px 14px; margin-top: 12px; font-size: 12.5px; color: var(--text-secondary); }
-    .remarks-box strong { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; color: #b57a1f; font-weight: 700; }
+    .hero-avatar-box {
+      position: relative;
+      flex-shrink: 0;
+      width: 96px;
+      height: 96px;
+    }
+
+    .hero-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid var(--bg-card);
+      background: linear-gradient(135deg, #10b981 0%, #2f6fed 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      overflow: hidden;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+      user-select: none;
+    }
+
+    .hero-avatar-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .hero-avatar-upload-btn {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 30px;
+      height: 30px;
+      background: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #ffffff;
+      cursor: pointer;
+      border: 2.5px solid var(--bg-card);
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    .hero-avatar-upload-btn:hover {
+      background: #059669;
+      transform: scale(1.1);
+    }
+
+    .hero-info {
+      padding-top: 52px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .hero-name-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-employee-name {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.12);
+      color: #0f8b71;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    :root[data-theme='dark'] .role-badge {
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge-active {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(47, 111, 237, 0.1);
+      color: var(--accent-secondary);
+      border: 1px solid rgba(47, 111, 237, 0.25);
+    }
+
+    .hero-meta-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 18px;
+      margin-top: 8px;
+    }
+
+    .hero-meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .hero-meta-item i {
+      font-size: 13px;
+      color: #10b981;
+      width: 14px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .hero-meta-item strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .avatar-action-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .avatar-action-links button {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s ease;
+    }
+    .btn-link-upload {
+      color: var(--accent-secondary);
+    }
+    .btn-link-upload:hover {
+      text-decoration: underline;
+    }
+    .btn-link-remove {
+      color: var(--danger);
+    }
+    .btn-link-remove:hover {
+      text-decoration: underline;
+    }
+
+    /* Right: Completion & KYC Box */
+    .hero-completion-section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .comp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .comp-header-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .comp-pct-number {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #10b981;
+      letter-spacing: -0.3px;
+    }
+
+    .comp-bar-container {
+      background: var(--border);
+      border-radius: 99px;
+      height: 8px;
+      overflow: hidden;
+      width: 100%;
+    }
+    .comp-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #10b981 0%, #2f6fed 100%);
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 0%;
+    }
+
+    .comp-footer-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .kyc-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .kyc-chip.kyc-pending {
+      background: rgba(245, 158, 11, 0.12);
+      color: #b57a1f;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .kyc-chip.kyc-approved {
+      background: rgba(16, 185, 129, 0.12);
+      color: #0f8b71;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .kyc-chip.kyc-rejected {
+      background: rgba(180, 69, 69, 0.12);
+      color: #b44545;
+      border: 1px solid rgba(180, 69, 69, 0.3);
+    }
+
+    /* ── 2. Profile Status Summary Cards ── */
+    .status-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+
+    .status-summary-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      text-align: left;
+    }
+    .status-summary-card:hover {
+      border-color: #10b981;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+    .status-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .status-icon-wrap {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      flex-shrink: 0;
+    }
+    .status-indicator-badge {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+    }
+    .status-indicator-badge.done {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+    .status-indicator-badge.pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: #b57a1f;
+    }
+    .status-indicator-badge.todo {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .status-card-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .status-card-value {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* ── 3. Profile Navigation Tabs ── */
+    .profile-tabs-nav {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-secondary);
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+    }
+    .profile-tabs-nav::-webkit-scrollbar {
+      height: 4px;
+    }
+    .profile-tabs-nav::-webkit-scrollbar-thumb {
+      background: var(--border-strong);
+      border-radius: 4px;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-secondary);
+      background: transparent;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      font-family: inherit;
+    }
+    .tab-btn i {
+      font-size: 13px;
+    }
+    .tab-btn:hover {
+      color: #10b981;
+      background: var(--bg-card);
+    }
+    .tab-btn.active {
+      background: #10b981;
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+    }
+
+    /* ── 4. Active Profile Section Panel ── */
+    .tab-content-panel {
+      display: none;
+    }
+    .tab-content-panel.active {
+      display: block;
+      animation: panelFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes panelFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg, 16px);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .panel-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(90deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+    }
+    .panel-card-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .panel-header-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .panel-card-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .panel-card-header p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin: 2px 0 0;
+    }
+
+    .panel-card-body {
+      padding: 28px;
+    }
+
+    /* Form Grids */
+    .form-grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 24px;
+    }
+    .form-group-full {
+      grid-column: 1 / -1;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-field label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm, 8px);
+      font-size: 13.5px;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      border-color: #10b981;
+      background: var(--bg-card);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+    .form-field input.field-readonly {
+      color: var(--text-secondary);
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(148, 163, 184, 0.08) 100%);
+      border-color: var(--border);
+      cursor: not-allowed;
+      user-select: all;
+    }
+    .field-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    /* Form Actions */
+    .form-actions-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-action-primary {
+      padding: 10px 22px;
+      border-radius: var(--radius-sm, 8px);
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      background: linear-gradient(135deg, #10b981 0%, #0d9488 100%);
+      border: 1px solid #0f8b71;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+    .btn-action-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #059669 0%, #0f766e 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+    }
+    .btn-action-primary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-action-secondary {
+      padding: 10px 18px;
+      border-radius: var(--radius-sm, 8px);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-action-secondary:hover:not(:disabled) {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    /* ── 5. KYC Documents Specialized Layout ── */
+    .kyc-status-banner-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .kyc-locked-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(13, 148, 136, 0.08) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+    .kyc-locked-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .kyc-locked-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #065f46;
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    :root[data-theme="dark"] .kyc-locked-title {
+      color: #34d399;
+    }
+    .kyc-locked-desc {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .badge-pw-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+    .badge-pw-configured {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    :root[data-theme="dark"] .badge-pw-configured {
+      color: #34d399;
+    }
+    .badge-pw-none {
+      background: rgba(100, 116, 139, 0.1);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .kyc-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .kyc-remarks-box {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .kyc-remarks-box strong {
+      color: #b57a1f;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .doc-upload-box {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--bg-secondary);
+      position: relative;
+    }
+    .doc-upload-box:hover {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.03);
+    }
+    .doc-upload-icon {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      color: #10b981;
+    }
+    .doc-upload-box p {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+    .doc-upload-box .doc-upload-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .doc-preview-wrap {
+      margin-bottom: 12px;
+    }
+    .doc-img-preview {
+      max-width: 100%;
+      max-height: 180px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      display: block;
+      margin: 0 auto 10px;
+    }
+    .doc-pdf-preview {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+    .doc-pdf-preview a {
+      color: var(--accent-secondary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .doc-pdf-preview a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── 6. Security & Password Elements ── */
+    .pw-input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    .pw-input-wrapper input {
+      padding-right: 40px;
+    }
+    .pw-eye-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 14px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+    }
+    .pw-eye-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .pw-meter {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .pw-meter-bar {
+      height: 4px;
+      border-radius: 4px;
+      background: var(--border);
+      overflow: hidden;
+      width: 100%;
+    }
+    .pw-meter-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s ease, background 0.3s ease;
+      width: 0%;
+    }
+    .pw-meter-text {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .security-notice-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      background: rgba(47, 111, 237, 0.06);
+      border: 1px solid rgba(47, 111, 237, 0.2);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+    .security-notice-box i {
+      color: var(--accent-secondary);
+      font-size: 15px;
+      margin-top: 2px;
+    }
+
+    /* ── Loading Skeleton / Overlay ── */
+    .profile-loading-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      gap: 14px;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .spinner-ring {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(16, 185, 129, 0.2);
+      border-top-color: #10b981;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Responsive Behavior ── */
+    @media (max-width: 1024px) {
+      .status-summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .profile-hero-content {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .hero-completion-section {
+        margin-top: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .profile-workspace {
+        padding: 0 0 32px;
+        gap: 18px;
+      }
+      .panel-card-header {
+        padding: 16px 20px;
+      }
+      .panel-card-body {
+        padding: 20px;
+      }
+      .form-grid-2col {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .status-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .hero-identity-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-top: -48px;
+      }
+      .hero-info {
+        padding-top: 0;
+        align-items: center;
+      }
+      .hero-name-row {
+        justify-content: center;
+      }
+      .hero-meta-grid {
+        justify-content: center;
+      }
+      .avatar-action-links {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .status-summary-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-actions-bar {
+        flex-direction: column-reverse;
+      }
+      .form-actions-bar button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
   </style>
 </head>
 <body>
-<div class="app-layout">
+<div class="app-layout employee-page">
+  <!-- ── Sidebar ── -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
-        <div><h2><i class="fas fa-briefcase" style="color:#10b981; margin-right:6px;"></i>CLN Lending Suite</h2><span>Employee Workspace</span></div>
+        <div>
+          <h2>CLN Lending Suite</h2>
+          <span>Employee Workspace</span>
+        </div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-                <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span> Dashboard</a>
-        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon"><i class="fas fa-user-plus"></i></span> Add Customer</a>
-        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users"></i></span> My Customers</a>
-        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase"></i></span> My Loans</a>
-        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> My Assigned Records</a>
-        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line"></i></span> APR</a>
-</div>
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Add Customer</span></a>
+        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>My Customers</span></a>
+        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>My Loans</span></a>
+        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>My Assigned Records</span></a>
+        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="sidebar-user-avatar">E</div>
-        <div class="user-details"><p id="sidebar-user-name">Employee</p><span id="sidebar-user-role">employee</span></div>
+        <div class="user-details">
+          <p id="sidebar-user-name">Employee</p>
+          <span id="sidebar-user-role">employee</span>
+        </div>
       </div>
-      <button class="logout-btn" onclick="logout()"><i class="fas fa-right-from-bracket" style="margin-right:4px;"></i> Logout</button>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
     </div>
   </aside>
   <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 
+  <!-- ── Main Content Area ── -->
   <main class="main-content">
+    <!-- Topbar (Title & Subtitle centered relative to content area) -->
     <div class="topbar">
-      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()"><i class="fas fa-bars"></i> Menu</button>
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i> <span>Menu</span>
+      </button>
       <div class="topbar-title">
-        <h2><i class="fas fa-id-card-clip" style="margin-right:8px; color:#10b981;"></i>My Profile</h2>
-        <p>Manage your personal information, upload documents, and keep your profile up to date.</p>
+        <h2><i class="fas fa-user-circle" aria-hidden="true"></i> <span>My Profile</span></h2>
+        <p>Manage your account information, security settings, and preferences.</p>
       </div>
-      <div class="topbar-actions"></div>
+      <div class="topbar-actions">
+        <div class="topbar-date-badge">
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+          <span id="current-date">Today</span>
+        </div>
+      </div>
     </div>
 
-    <div class="page-content">
-      <div id="page-alert" class="alert"></div>
+    <!-- Page Content Container -->
+        <div id="force-password-banner" class="alert alert-warning" style="display:none; align-items:center; gap:14px; margin-bottom:18px; padding:14px 18px; border-left:4px solid var(--warning, #f59e0b); background:rgba(245, 158, 11, 0.12); border-radius:10px;">
+          <i class="fas fa-shield-halved" style="font-size:22px; color:var(--warning, #f59e0b); flex-shrink:0;"></i>
+          <div style="flex:1;">
+            <strong style="color:var(--text-primary); font-size:14px; display:block; margin-bottom:2px;">Temporary Onboarding Password Detected</strong>
+            <span style="color:var(--text-secondary); font-size:13px; line-height:1.4;">For security reasons, you must change your temporary onboarding password to a permanent one before accessing operational features.</span>
+          </div>
+          <button type="button" class="btn btn-sm btn-primary" onclick="focusChangePasswordCard()" style="white-space:nowrap; flex-shrink:0;">Change Password Now</button>
+        </div>
+        <div id="page-alert" class="alert"></div>
 
-      <div class="profile-page">
-        <div class="profile-grid">
+        <!-- Initial Loading State -->
+        <div id="profile-loading" class="profile-loading-overlay">
+          <div class="spinner-ring"></div>
+          <span>Loading your profile workspace...</span>
+        </div>
 
-          <!-- ── Left: Overview + Completion ── -->
-          <div>
-            <div class="overview-card">
-              <div class="overview-banner">
-                <div class="avatar-wrap">
-                  <div class="profile-avatar-big" id="big-avatar">E</div>
-                  <input type="file" id="avatar-file-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleAvatarUpload(event)" />
-                  <div class="avatar-upload-btn" onclick="document.getElementById('avatar-file-input').click()" title="Change photo"><i class="fas fa-camera"></i></div>
+        <!-- Profile Workspace Content (revealed once loaded) -->
+        <div id="profile-container" style="display:none; flex-direction:column; gap:24px;">
+
+          <!-- ── 1. Profile Overview Hero Card ── -->
+          <div class="profile-hero-card">
+            <div class="profile-hero-banner"></div>
+            <div class="profile-hero-content">
+              <!-- Left: Identity -->
+              <div class="hero-identity-section">
+                <div class="hero-avatar-box">
+                  <div class="hero-avatar-img" id="hero-avatar">E</div>
+                  <input type="file" id="avatar-file-input" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="handleAvatarUpload(event)" />
+                  <div class="hero-avatar-upload-btn" onclick="document.getElementById('avatar-file-input').click()" title="Upload new photo" aria-label="Change photo">
+                    <i class="fas fa-camera"></i>
+                  </div>
+                </div>
+                <div class="hero-info">
+                  <div class="hero-name-row">
+                    <h1 class="hero-employee-name" id="hero-name">—</h1>
+                    <span class="role-badge" id="hero-role"><i class="fas fa-briefcase"></i> Loan Executive</span>
+                    <span class="status-badge-active" id="hero-account-status"><i class="fas fa-circle-check"></i> Active</span>
+                  </div>
+                  <div class="hero-meta-grid">
+                    <div class="hero-meta-item"><i class="fas fa-id-badge"></i><span>ID: <strong id="hero-id">—</strong></span></div>
+                    <div class="hero-meta-item"><i class="fas fa-envelope"></i><span id="hero-email">—</span></div>
+                    <div class="hero-meta-item"><i class="fas fa-phone"></i><span id="hero-phone">—</span></div>
+                    <div class="hero-meta-item"><i class="fas fa-calendar-days"></i><span id="hero-joined">—</span></div>
+                  </div>
+                  <div class="avatar-action-links">
+                    <button type="button" class="btn-link-upload" onclick="document.getElementById('avatar-file-input').click()">
+                      <i class="fas fa-cloud-arrow-up"></i> Change Photo
+                    </button>
+                    <button type="button" class="btn-link-remove" id="btn-remove-photo" style="display:none;" onclick="removeAvatar()">
+                      <i class="fas fa-trash-can"></i> Remove Photo
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div class="overview-body">
-                <div class="overview-name" id="ov-name">—</div>
-                <div class="overview-role" id="ov-role">—</div>
-                
-                <div class="completion-card">
-                  <div class="completion-header">
-                    <div class="completion-title"><i class="fas fa-chart-line" style="color:#10b981;"></i> Profile Completion</div>
-                    <div class="completion-pct" id="comp-pct">0%</div>
-                  </div>
-                  <div class="completion-bar-wrap"><div class="completion-bar-fill" id="comp-bar" style="width:0%"></div></div>
-                  <div class="completion-items" id="comp-items"></div>
-                </div>
 
-                <div class="overview-meta">
-                  <div class="meta-row"><i class="fas fa-envelope"></i><span id="ov-email">—</span></div>
-                  <div class="meta-row"><i class="fas fa-phone"></i><span id="ov-phone">—</span></div>
-                  <div class="meta-row" style="display:none;"><i class="fas fa-building"></i><span id="ov-dept">—</span></div>
-                  <div class="meta-row"><i class="fas fa-calendar-days"></i><span id="ov-joined">—</span></div>
-                  <div class="meta-row" id="kyc-status-row"><i class="fas fa-id-card"></i><span>—</span></div>
+              <!-- Right: Profile Completion & KYC -->
+              <div class="hero-completion-section">
+                <div class="comp-header">
+                  <div class="comp-header-title">
+                    <i class="fas fa-chart-line" style="color:#10b981;"></i> Profile Completion
+                  </div>
+                  <div class="comp-pct-number" id="hero-comp-pct">0%</div>
                 </div>
-                <div style="margin-top:16px; display:flex; gap:8px;">
-                  <button class="btn btn-danger btn-sm" onclick="removeAvatar()" style="flex:1;font-size:11.5px; display:flex; align-items:center; justify-content:center; gap:6px;"><i class="fas fa-trash-can"></i> Remove Photo</button>
+                <div class="comp-bar-container">
+                  <div class="comp-bar-fill" id="hero-comp-bar"></div>
+                </div>
+                <div class="comp-footer-meta">
+                  <span id="hero-comp-summary"><strong id="hero-comp-count">0 of 6</strong> items completed</span>
+                  <div id="hero-kyc-chip-wrap">
+                    <span class="kyc-chip kyc-pending" id="hero-kyc-chip"><i class="fas fa-clock-rotate-left"></i> KYC: Pending</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- ── Right: Tabbed Sections ── -->
-          <div>
-            <div class="profile-tabs">
-              <button class="ptab active" onclick="switchTab('personal')"><i class="fas fa-user"></i> Personal Information</button>
-              <button class="ptab" onclick="switchTab('kyc')"><i class="fas fa-id-card"></i> KYC Documents</button>
-              <button class="ptab" onclick="switchTab('bank')"><i class="fas fa-building-columns"></i> Bank Details</button>
-              <button class="ptab" onclick="switchTab('emergency')"><i class="fas fa-triangle-exclamation"></i> Emergency Contact</button>
-              <button class="ptab" onclick="switchTab('security')"><i class="fas fa-shield-halved"></i> Security</button>
+          <!-- ── 2. Profile Status Summary Cards (6 Compact Items) ── -->
+          <div class="status-summary-grid" id="status-summary-grid">
+            <!-- 1. Personal Information -->
+            <div class="status-summary-card" onclick="switchTab('personal')" title="Click to view Personal Information">
+              <div class="status-card-top">
+                <div class="status-icon-wrap"><i class="fas fa-user"></i></div>
+                <div class="status-indicator-badge" id="sc-badge-personal"><i class="far fa-circle"></i></div>
+              </div>
+              <p class="status-card-label">Personal Info</p>
+              <span class="status-card-value" id="sc-val-personal">Pending</span>
             </div>
 
-            <!-- Personal Info -->
-            <div class="ptab-panel active" id="panel-personal">
-              <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-user"></i></div><div><h3>Personal Information</h3><p>Update your personal and identification details.</p></div></div>
-                <div class="sec-body">
-                  <div class="form-grid">
-                    <div class="form-group"><label>Enter the full name</label><input type="text" id="pi-name" class="readonly-field" readonly aria-readonly="true" /></div>
-                    <div class="form-group"><label>Phone Number</label><input type="tel" id="pi-phone" class="readonly-field" readonly aria-readonly="true" /></div>
-                    <div class="form-group"><label>Email Address</label><input type="email" id="pi-email" class="readonly-field" readonly aria-readonly="true" /></div>
-                    <div class="form-group"><label>Date of Birth</label><input type="date" id="pi-dob" /></div>
-                    <div class="form-group">
-                      <label>Gender</label>
+            <!-- 2. Profile Picture -->
+            <div class="status-summary-card" onclick="document.getElementById('avatar-file-input').click()" title="Click to upload profile photo">
+              <div class="status-card-top">
+                <div class="status-icon-wrap"><i class="fas fa-camera"></i></div>
+                <div class="status-indicator-badge" id="sc-badge-photo"><i class="far fa-circle"></i></div>
+              </div>
+              <p class="status-card-label">Profile Photo</p>
+              <span class="status-card-value" id="sc-val-photo">Not Added</span>
+            </div>
+
+            <!-- 3. Aadhaar Card -->
+            <div class="status-summary-card" onclick="switchTab('kyc')" title="Click to view KYC Aadhaar documents">
+              <div class="status-card-top">
+                <div class="status-icon-wrap"><i class="fas fa-id-card"></i></div>
+                <div class="status-indicator-badge" id="sc-badge-aadhaar"><i class="far fa-circle"></i></div>
+              </div>
+              <p class="status-card-label">Aadhaar Card</p>
+              <span class="status-card-value" id="sc-val-aadhaar">Pending</span>
+            </div>
+
+            <!-- 4. PAN Card -->
+            <div class="status-summary-card" onclick="switchTab('kyc')" title="Click to view KYC PAN card">
+              <div class="status-card-top">
+                <div class="status-icon-wrap"><i class="fas fa-file-invoice"></i></div>
+                <div class="status-indicator-badge" id="sc-badge-pan"><i class="far fa-circle"></i></div>
+              </div>
+              <p class="status-card-label">PAN Card</p>
+              <span class="status-card-value" id="sc-val-pan">Pending</span>
+            </div>
+
+            <!-- 5. Bank Details -->
+            <div class="status-summary-card" onclick="switchTab('bank')" title="Click to view Bank Details">
+              <div class="status-card-top">
+                <div class="status-icon-wrap"><i class="fas fa-building-columns"></i></div>
+                <div class="status-indicator-badge" id="sc-badge-bank"><i class="far fa-circle"></i></div>
+              </div>
+              <p class="status-card-label">Bank Details</p>
+              <span class="status-card-value" id="sc-val-bank">Not Added</span>
+            </div>
+
+            <!-- 6. Emergency Contact -->
+            <div class="status-summary-card" onclick="switchTab('emergency')" title="Click to view Emergency Contact">
+              <div class="status-card-top">
+                <div class="status-icon-wrap"><i class="fas fa-phone-volume"></i></div>
+                <div class="status-indicator-badge" id="sc-badge-emergency"><i class="far fa-circle"></i></div>
+              </div>
+              <p class="status-card-label">Emergency Contact</p>
+              <span class="status-card-value" id="sc-val-emergency">Not Added</span>
+            </div>
+          </div>
+
+          <!-- ── 3. Profile Navigation Tabs ── -->
+          <nav class="profile-tabs-nav" aria-label="Profile Sections">
+            <button type="button" class="tab-btn active" data-tab="personal" onclick="switchTab('personal')">
+              <i class="fas fa-user"></i> Personal Information
+            </button>
+            <button type="button" class="tab-btn" data-tab="kyc" onclick="switchTab('kyc')">
+              <i class="fas fa-id-card"></i> KYC Documents
+            </button>
+            <button type="button" class="tab-btn" data-tab="bank" onclick="switchTab('bank')">
+              <i class="fas fa-building-columns"></i> Bank Details
+            </button>
+            <button type="button" class="tab-btn" data-tab="emergency" onclick="switchTab('emergency')">
+              <i class="fas fa-triangle-exclamation"></i> Emergency Contact
+            </button>
+            <button type="button" class="tab-btn" data-tab="security" onclick="switchTab('security')">
+              <i class="fas fa-shield-halved"></i> Security
+            </button>
+          </nav>
+
+          <!-- ── 4. Active Profile Section Panels ── -->
+
+          <!-- Panel 1: Personal Information -->
+          <div class="tab-content-panel active" id="panel-personal">
+            <div class="panel-card">
+              <div class="panel-card-header">
+                <div class="panel-card-header-left">
+                  <div class="panel-header-icon"><i class="fas fa-user"></i></div>
+                  <div>
+                    <h3>Personal Information</h3>
+                    <p>Update your personal and identification details.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-card-body">
+                <form id="form-personal" onsubmit="event.preventDefault(); savePersonalInfo();">
+                  <div class="form-grid-2col">
+                    <div class="form-field">
+                      <label for="pi-name"><i class="fas fa-user"></i> Full Name</label>
+                      <input type="text" id="pi-name" class="field-readonly" readonly aria-readonly="true" />
+                      <span class="field-hint"><i class="fas fa-lock"></i> Managed by administrator</span>
+                    </div>
+
+                    <div class="form-field">
+                      <label for="pi-phone"><i class="fas fa-phone"></i> Phone Number</label>
+                      <input type="tel" id="pi-phone" class="field-readonly" readonly aria-readonly="true" />
+                      <span class="field-hint"><i class="fas fa-lock"></i> Managed by administrator</span>
+                    </div>
+
+                    <div class="form-field">
+                      <label for="pi-email"><i class="fas fa-envelope"></i> Email Address</label>
+                      <input type="email" id="pi-email" class="field-readonly" readonly aria-readonly="true" />
+                      <span class="field-hint"><i class="fas fa-lock"></i> Managed by administrator</span>
+                    </div>
+
+                    <div class="form-field">
+                      <label for="pi-dob"><i class="fas fa-calendar"></i> Date of Birth</label>
+                      <input type="date" id="pi-dob" />
+                    </div>
+
+                    <div class="form-field">
+                      <label for="pi-gender"><i class="fas fa-venus-mars"></i> Gender</label>
                       <select id="pi-gender">
                         <option value="">Select Gender</option>
                         <option value="Male">Male</option>
@@ -242,113 +1244,280 @@
                         <option value="Prefer not to say">Prefer not to say</option>
                       </select>
                     </div>
-                    <div class="form-group"><label>City</label><input type="text" id="pi-city" placeholder="City" /></div>
-                    <div class="form-group full"><label>Current Address</label><input type="text" id="pi-address" placeholder="Enter your current residential address" /></div>
-                    <div class="form-group full"><label>Permanent Address</label><input type="text" id="pi-perm-address" placeholder="Permanent address as per your government-issued ID" /></div>
-                    <div class="form-group"><label>State</label><input type="text" id="pi-state" placeholder="State" /></div>
-                    <div class="form-group"><label>Country</label><input type="text" id="pi-country" placeholder="Country" /></div>
-                    <div class="form-group"><label>Postal Code</label><input type="text" id="pi-postal" placeholder="PIN Code" /></div>
+
+                    <div class="form-field">
+                      <label for="pi-city"><i class="fas fa-city"></i> City</label>
+                      <input type="text" id="pi-city" placeholder="City" />
+                    </div>
+
+                    <div class="form-field form-group-full">
+                      <label for="pi-address"><i class="fas fa-location-dot"></i> Current Address</label>
+                      <input type="text" id="pi-address" placeholder="Enter your current residential address" />
+                    </div>
+
+                    <div class="form-field form-group-full">
+                      <label for="pi-perm-address"><i class="fas fa-house"></i> Permanent Address</label>
+                      <input type="text" id="pi-perm-address" placeholder="Permanent address as per government-issued ID" />
+                    </div>
+
+                    <div class="form-field">
+                      <label for="pi-state"><i class="fas fa-map"></i> State</label>
+                      <input type="text" id="pi-state" placeholder="State" />
+                    </div>
+
+                    <div class="form-field">
+                      <label for="pi-country"><i class="fas fa-globe"></i> Country</label>
+                      <input type="text" id="pi-country" placeholder="Country" />
+                    </div>
+
+                    <div class="form-field">
+                      <label for="pi-postal"><i class="fas fa-signs-post"></i> Postal Code</label>
+                      <input type="text" id="pi-postal" placeholder="PIN Code" maxlength="15" />
+                    </div>
                   </div>
-                  <div class="form-actions">
-                    <button class="btn btn-secondary" onclick="loadProfile()"><i class="fas fa-xmark" style="margin-right:4px;"></i> Cancel</button>
-                    <button class="btn btn-primary" onclick="savePersonalInfo()"><i class="fas fa-check" style="margin-right:4px;"></i> Save Changes</button>
+
+                  <div class="form-actions-bar">
+                    <button type="button" class="btn-action-secondary" onclick="resetFormToLoaded('personal')">
+                      <i class="fas fa-xmark"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn-action-primary" id="btn-save-personal">
+                      <i class="fas fa-check"></i> <span>Save Changes</span>
+                    </button>
                   </div>
-                </div>
+                </form>
               </div>
             </div>
+          </div>
 
-            <!-- KYC Documents -->
-            <div class="ptab-panel" id="panel-kyc">
-              <!-- KYC Status Banner -->
-              <div class="sec-card" id="kyc-status-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-clipboard-check"></i></div><div><h3>Verification Status</h3><p>Your current KYC document verification status.</p></div></div>
-                <div class="sec-body">
-                  <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                    <span id="kyc-status-badge">—</span>
-                    <span id="kyc-status-text" style="font-size:12.5px; color:var(--text-muted);"></span>
+          <!-- Panel 2: KYC Documents -->
+          <div class="tab-content-panel" id="panel-kyc">
+            <div class="panel-card">
+              <div class="panel-card-header">
+                <div class="panel-card-header-left">
+                  <div class="panel-header-icon"><i class="fas fa-id-card"></i></div>
+                  <div>
+                    <h3>KYC Documents Workspace</h3>
+                    <p>Upload and manage government-issued identification cards for verification.</p>
                   </div>
-                  <div id="kyc-remarks-box"></div>
                 </div>
               </div>
-              <!-- Aadhaar -->
-              <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-id-card"></i></div><div><h3>Aadhaar Card</h3><p>Upload the front and back of your Aadhaar card.</p></div></div>
-                <div class="sec-body">
-                  <div class="form-grid">
-                    <div class="form-group full"><label>Aadhaar Number</label><input type="text" id="aadhaar-number" placeholder="XXXX XXXX 1234" maxlength="20" /></div>
+              <div class="panel-card-body">
+                <!-- KYC Locked Banner (shown when Approved) -->
+                <div id="kyc-locked-banner" style="display:none;" class="kyc-locked-banner">
+                  <div class="kyc-locked-icon"><i class="fas fa-lock"></i></div>
+                  <div>
+                    <div class="kyc-locked-title"><i class="fas fa-shield-halved"></i> KYC Documents Locked</div>
+                    <p class="kyc-locked-desc">
+                      Your government identification documents have been verified and approved by the administrator. Uploading new documents, replacing files, and modifying document details are locked for security compliance. If your details need to be updated, please contact the administrator.
+                    </p>
                   </div>
-                  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
-                    <div>
-                      <p style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Front Side</p>
-                      <div id="aadhaar-front-preview"></div>
-                      <div class="doc-upload-area" onclick="document.getElementById('aadhaar-front-input').click()">
-                        <div class="icon"><i class="fas fa-cloud-arrow-up"></i></div>
-                        <p style="font-weight:600; color:var(--text-primary);">Click to upload the front of your Aadhaar card.</p>
-                        <p style="margin-top:3px;">JPG, PNG, WEBP, or PDF • Maximum file size: 5 MB</p>
+                </div>
+
+                <!-- KYC Verification Status Banner -->
+                <div class="kyc-status-banner-card">
+                  <div class="kyc-status-row">
+                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                      <span id="kyc-banner-badge" class="kyc-chip kyc-pending"><i class="fas fa-clock-rotate-left"></i> Pending</span>
+                      <span id="kyc-banner-text" style="font-size:13px; font-weight:500; color:var(--text-secondary);">
+                        Your documents have been submitted and are awaiting administrator review.
+                      </span>
+                    </div>
+                  </div>
+                  <div id="kyc-remarks-container" style="display:none;"></div>
+                </div>
+
+                <!-- 1. Aadhaar Card Section -->
+                <div style="margin-bottom:32px;">
+                  <h4 style="font-size:14px; font-weight:700; color:var(--text-primary); margin:0 0 14px; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-id-card" style="color:#10b981;"></i> Aadhaar Card
+                  </h4>
+                  <div class="form-grid-2col" style="margin-bottom:20px;">
+                    <div class="form-field">
+                      <label for="aadhaar-number">Aadhaar Number</label>
+                      <input type="text" id="aadhaar-number" placeholder="XXXX XXXX 1234" maxlength="20" />
+                    </div>
+                    <div class="form-field">
+                      <label for="aadhaar-doc-password" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fas fa-key"></i> Document Password (PDF)</span>
+                        <span id="aadhaar-pw-badge" class="badge-pw-status badge-pw-none">Not Configured</span>
+                      </label>
+                      <div class="pw-input-wrapper">
+                        <input type="password" id="aadhaar-doc-password" placeholder="e.g. NAME1990" autocomplete="new-password" />
+                        <button type="button" class="pw-eye-btn" id="btn-eye-aadhaar" onclick="togglePasswordVisibility('aadhaar-doc-password', this)" title="Toggle visibility" aria-label="Toggle password visibility">
+                          <i class="fas fa-eye"></i>
+                        </button>
                       </div>
-                      <input type="file" id="aadhaar-front-input" accept="image/*,.pdf" style="display:none" onchange="uploadKYC(event,'aadhaar_front')" />
+                      <span class="field-hint"><i class="fas fa-info-circle"></i> If your Aadhaar e-PDF is password-protected (e.g. first 4 letters of name in CAPITAL + birth year), enter it here.</span>
+                      <label style="font-size:11.5px; font-weight:500; color:var(--text-muted); margin-top:4px; display:none; align-items:center; gap:6px; cursor:pointer;" id="clear-aadhaar-pw-wrap">
+                        <input type="checkbox" id="clear-aadhaar-pw" /> Remove saved document password
+                      </label>
                     </div>
+                  </div>
+
+                  <div class="form-grid-2col">
+                    <!-- Front Side -->
                     <div>
-                      <p style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Back Side</p>
-                      <div id="aadhaar-back-preview"></div>
-                      <div class="doc-upload-area" onclick="document.getElementById('aadhaar-back-input').click()">
-                        <div class="icon"><i class="fas fa-cloud-arrow-up"></i></div>
-                        <p style="font-weight:600; color:var(--text-primary);">Click to upload the back of your Aadhaar card.</p>
-                        <p style="margin-top:3px;">JPG, PNG, WEBP, or PDF • Maximum file size: 5 MB</p>
+                      <p style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+                        Front Side
+                      </p>
+                      <div id="aadhaar-front-preview" class="doc-preview-wrap"></div>
+                      <div class="doc-upload-box" id="aadhaar-front-upload-box" onclick="document.getElementById('aadhaar-front-input').click()">
+                        <div class="doc-upload-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+                        <p class="doc-upload-title" id="aadhaar-front-upload-label">Click to upload Front Side</p>
+                        <p>JPG, PNG, WEBP, or PDF • Max 5 MB</p>
                       </div>
-                      <input type="file" id="aadhaar-back-input" accept="image/*,.pdf" style="display:none" onchange="uploadKYC(event,'aadhaar_back')" />
+                      <input type="file" id="aadhaar-front-input" accept="image/*,.pdf" style="display:none;" onchange="uploadKYC(event, 'aadhaar_front')" />
+                    </div>
+
+                    <!-- Back Side -->
+                    <div>
+                      <p style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+                        Back Side
+                      </p>
+                      <div id="aadhaar-back-preview" class="doc-preview-wrap"></div>
+                      <div class="doc-upload-box" id="aadhaar-back-upload-box" onclick="document.getElementById('aadhaar-back-input').click()">
+                        <div class="doc-upload-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+                        <p class="doc-upload-title" id="aadhaar-back-upload-label">Click to upload Back Side</p>
+                        <p>JPG, PNG, WEBP, or PDF • Max 5 MB</p>
+                      </div>
+                      <input type="file" id="aadhaar-back-input" accept="image/*,.pdf" style="display:none;" onchange="uploadKYC(event, 'aadhaar_back')" />
                     </div>
                   </div>
                 </div>
-              </div>
-              <!-- PAN -->
-              <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-file-invoice"></i></div><div><h3>PAN Card</h3><p>Upload your Permanent Account Number (PAN) card.</p></div></div>
-                <div class="sec-body">
-                  <div class="form-grid">
-                    <div class="form-group"><label>PAN Number</label><input type="text" id="pan-number" placeholder="ABCDE1234F" maxlength="10" style="text-transform:uppercase;" /></div>
-                  </div>
-                  <div style="margin-top:16px; max-width:320px;">
-                    <div id="pan-preview"></div>
-                    <div class="doc-upload-area" onclick="document.getElementById('pan-input').click()">
-                      <div class="icon"><i class="fas fa-cloud-arrow-up"></i></div>
-                      <p style="font-weight:600; color:var(--text-primary);">Click to upload your PAN card.</p>
-                      <p style="margin-top:3px;">JPG, PNG, WEBP, or PDF • Maximum file size: 5 MB</p>
+
+                <hr style="border:0; border-top:1px solid var(--border); margin:24px 0;" />
+
+                <!-- 2. PAN Card Section -->
+                <div>
+                  <h4 style="font-size:14px; font-weight:700; color:var(--text-primary); margin:0 0 14px; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-file-invoice" style="color:#10b981;"></i> PAN Card
+                  </h4>
+                  <div class="form-grid-2col" style="margin-bottom:20px;">
+                    <div class="form-field">
+                      <label for="pan-number">PAN Number</label>
+                      <input type="text" id="pan-number" placeholder="ABCDE1234F" maxlength="10" style="text-transform:uppercase;" />
                     </div>
-                    <input type="file" id="pan-input" accept="image/*,.pdf" style="display:none" onchange="uploadKYC(event,'pan_card')" />
+                    <div class="form-field">
+                      <label for="pan-doc-password" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fas fa-key"></i> Document Password (PDF)</span>
+                        <span id="pan-pw-badge" class="badge-pw-status badge-pw-none">Not Configured</span>
+                      </label>
+                      <div class="pw-input-wrapper">
+                        <input type="password" id="pan-doc-password" placeholder="e.g. DDMMYYYY" autocomplete="new-password" />
+                        <button type="button" class="pw-eye-btn" id="btn-eye-pan" onclick="togglePasswordVisibility('pan-doc-password', this)" title="Toggle visibility" aria-label="Toggle password visibility">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </div>
+                      <span class="field-hint"><i class="fas fa-info-circle"></i> If your e-PAN PDF is password-protected (e.g. Date of Birth DDMMYYYY), enter it here.</span>
+                      <label style="font-size:11.5px; font-weight:500; color:var(--text-muted); margin-top:4px; display:none; align-items:center; gap:6px; cursor:pointer;" id="clear-pan-pw-wrap">
+                        <input type="checkbox" id="clear-pan-pw" /> Remove saved document password
+                      </label>
+                    </div>
                   </div>
+
+                  <div style="max-width:560px;">
+                    <p style="font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+                      PAN Card Document
+                    </p>
+                    <div id="pan-preview" class="doc-preview-wrap"></div>
+                    <div class="doc-upload-box" id="pan-upload-box" onclick="document.getElementById('pan-input').click()">
+                      <div class="doc-upload-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+                      <p class="doc-upload-title" id="pan-upload-label">Click to upload PAN Card</p>
+                      <p>JPG, PNG, WEBP, or PDF • Max 5 MB</p>
+                    </div>
+                    <input type="file" id="pan-input" accept="image/*,.pdf" style="display:none;" onchange="uploadKYC(event, 'pan_card')" />
+                  </div>
+                </div>
+
+                <!-- KYC Save Actions Bar -->
+                <div class="form-actions-bar" id="kyc-actions-bar">
+                  <button type="button" class="btn-action-secondary" onclick="resetFormToLoaded('kyc')">
+                    <i class="fas fa-xmark"></i> Cancel
+                  </button>
+                  <button type="button" class="btn-action-primary" id="btn-save-kyc" onclick="saveKYCDetails()">
+                    <i class="fas fa-check"></i> <span>Save KYC Details</span>
+                  </button>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Bank Details -->
-            <div class="ptab-panel" id="panel-bank">
-              <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-building-columns"></i></div><div><h3>Bank Details</h3><p>Manage your salary and loan disbursement bank account details.</p></div></div>
-                <div class="sec-body">
-                  <div class="form-grid">
-                    <div class="form-group full"><label>Account Holder Name</label><input type="text" id="b-holder" placeholder="Enter the name exactly as printed on your bank passbook or account statement." /></div>
-                    <div class="form-group"><label>Bank Name</label><input type="text" id="b-bank" placeholder="e.g., State Bank of India" /></div>
-                    <div class="form-group"><label>IFSC Code</label><input type="text" id="b-ifsc" placeholder="SBIN0001234" style="text-transform:uppercase;" /></div>
-                    <div class="form-group"><label>Enter your account number</label><input type="text" id="b-account" placeholder="Enter your account number" /></div>
-                    <div class="form-group"><label>Branch Name</label><input type="text" id="b-branch" placeholder="Enter the branch name" /></div>
-                  </div>
-                  <div class="form-actions">
-                    <button class="btn btn-secondary" onclick="loadProfile()"><i class="fas fa-xmark" style="margin-right:4px;"></i> Cancel</button>
-                    <button class="btn btn-primary" onclick="saveBankDetails()"><i class="fas fa-check" style="margin-right:4px;"></i> Save Bank Details</button>
+          <!-- Panel 3: Bank Details -->
+          <div class="tab-content-panel" id="panel-bank">
+            <div class="panel-card">
+              <div class="panel-card-header">
+                <div class="panel-card-header-left">
+                  <div class="panel-header-icon"><i class="fas fa-building-columns"></i></div>
+                  <div>
+                    <h3>Bank Details</h3>
+                    <p>Manage your salary and loan disbursement bank account details.</p>
                   </div>
                 </div>
               </div>
-            </div>
+              <div class="panel-card-body">
+                <form id="form-bank" onsubmit="event.preventDefault(); saveBankDetails();">
+                  <div class="form-grid-2col">
+                    <div class="form-field">
+                      <label for="b-holder"><i class="fas fa-user-tag"></i> Account Holder Name</label>
+                      <input type="text" id="b-holder" placeholder="Name as per passbook or statement" />
+                    </div>
 
-            <!-- Emergency Contact -->
-            <div class="ptab-panel" id="panel-emergency">
-              <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-triangle-exclamation"></i></div><div><h3>Emergency Contact</h3><p>Primary contact person in case of an emergency</p></div></div>
-                <div class="sec-body">
-                  <div class="form-grid">
-                    <div class="form-group"><label>Contact Name</label><input type="text" id="e-name" placeholder="Enter the full name" /></div>
-                    <div class="form-group"><label>Relationship</label>
+                    <div class="form-field">
+                      <label for="b-bank"><i class="fas fa-building-columns"></i> Bank Name</label>
+                      <input type="text" id="b-bank" placeholder="e.g. State Bank of India, HDFC Bank" />
+                    </div>
+
+                    <div class="form-field">
+                      <label for="b-ifsc"><i class="fas fa-barcode"></i> IFSC Code</label>
+                      <input type="text" id="b-ifsc" placeholder="SBIN0001234" style="text-transform:uppercase;" maxlength="11" />
+                    </div>
+
+                    <div class="form-field">
+                      <label for="b-account"><i class="fas fa-credit-card"></i> Account Number</label>
+                      <input type="text" id="b-account" placeholder="Enter bank account number" />
+                    </div>
+
+                    <div class="form-field form-group-full">
+                      <label for="b-branch"><i class="fas fa-map-pin"></i> Branch Name / Location</label>
+                      <input type="text" id="b-branch" placeholder="Branch address / locality" />
+                    </div>
+                  </div>
+
+                  <div class="form-actions-bar">
+                    <button type="button" class="btn-action-secondary" onclick="resetFormToLoaded('bank')">
+                      <i class="fas fa-xmark"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn-action-primary" id="btn-save-bank">
+                      <i class="fas fa-check"></i> <span>Save Bank Details</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 4: Emergency Contact -->
+          <div class="tab-content-panel" id="panel-emergency">
+            <div class="panel-card">
+              <div class="panel-card-header">
+                <div class="panel-card-header-left">
+                  <div class="panel-header-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                  <div>
+                    <h3>Emergency Contact</h3>
+                    <p>Primary contact person to reach in the event of an urgent emergency.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-card-body">
+                <form id="form-emergency" onsubmit="event.preventDefault(); saveEmergencyContact();">
+                  <div class="form-grid-2col">
+                    <div class="form-field">
+                      <label for="e-name"><i class="fas fa-user"></i> Contact Name</label>
+                      <input type="text" id="e-name" placeholder="Full name of emergency contact" />
+                    </div>
+
+                    <div class="form-field">
+                      <label for="e-relation"><i class="fas fa-people-arrows"></i> Relationship</label>
                       <select id="e-relation">
                         <option value="">Select a relationship</option>
                         <option value="Spouse">Spouse</option>
@@ -359,277 +1528,985 @@
                         <option value="Other">Other</option>
                       </select>
                     </div>
-                    <div class="form-group"><label>Primary Mobile Number</label><input type="tel" id="e-mobile" placeholder="+91 XXXXX XXXXX" /></div>
-                    <div class="form-group"><label>Alternate Mobile Number</label><input type="tel" id="e-alt" placeholder="+91 XXXXX XXXXX" /></div>
+
+                    <div class="form-field">
+                      <label for="e-mobile"><i class="fas fa-phone"></i> Primary Mobile Number</label>
+                      <input type="tel" id="e-mobile" placeholder="+91 XXXXX XXXXX" />
+                    </div>
+
+                    <div class="form-field">
+                      <label for="e-alt"><i class="fas fa-phone-flip"></i> Alternate Mobile Number</label>
+                      <input type="tel" id="e-alt" placeholder="+91 XXXXX XXXXX" />
+                    </div>
                   </div>
-                  <div class="form-actions">
-                    <button class="btn btn-secondary" onclick="loadProfile()"><i class="fas fa-xmark" style="margin-right:4px;"></i> Cancel</button>
-                    <button class="btn btn-primary" onclick="saveEmergencyContact()"><i class="fas fa-check" style="margin-right:4px;"></i> Save Emergency Contact</button>
+
+                  <div class="form-actions-bar">
+                    <button type="button" class="btn-action-secondary" onclick="resetFormToLoaded('emergency')">
+                      <i class="fas fa-xmark"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn-action-primary" id="btn-save-emergency">
+                      <i class="fas fa-check"></i> <span>Save Emergency Contact</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 5: Security -->
+          <div class="tab-content-panel" id="panel-security">
+            <div class="panel-card">
+              <div class="panel-card-header">
+                <div class="panel-card-header-left">
+                  <div class="panel-header-icon"><i class="fas fa-shield-halved"></i></div>
+                  <div>
+                    <h3>Security &amp; Password</h3>
+                    <p>Update your account password securely.</p>
                   </div>
                 </div>
               </div>
-            </div>
+              <div class="panel-card-body">
+                <div class="security-notice-box">
+                  <i class="fas fa-shield-halved"></i>
+                  <div>
+                    <strong>Keep your account secure:</strong> Choose a strong password containing at least 8 characters, with a mix of uppercase letters, numbers, and symbols. Passwords are never saved or displayed in plaintext.
+                  </div>
+                </div>
 
-            <!-- Security -->
-            <div class="ptab-panel" id="panel-security">
-              <div class="sec-card">
-                <div class="sec-head"><div class="sec-head-icon"><i class="fas fa-key"></i></div><div><h3>Change Password</h3><p>Update your account password securely</p></div></div>
-                <div class="sec-body">
-                  <div class="form-grid">
-                    <div class="form-group full"><label>Current Password</label>
-                      <div class="pw-toggle"><input type="password" id="pw-current" placeholder="Current password" /><i class="fas fa-eye pw-eye" onclick="togglePw('pw-current',this)"></i></div>
+                <form id="form-security" onsubmit="event.preventDefault(); changePassword();" autocomplete="off">
+                  <div class="form-grid-2col">
+                    <div class="form-field form-group-full">
+                      <label for="pw-current"><i class="fas fa-key"></i> Current Password</label>
+                      <div class="pw-input-wrapper">
+                        <input type="password" id="pw-current" placeholder="Enter your current password" autocomplete="off" />
+                        <button type="button" class="pw-eye-btn" onclick="togglePasswordVisibility('pw-current', this)" aria-label="Toggle password view">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </div>
                     </div>
-                    <div class="form-group"><label>New Password</label>
-                      <div class="pw-toggle"><input type="password" id="pw-new" placeholder="Min 8 characters" oninput="checkPwStrength()" /><i class="fas fa-eye pw-eye" onclick="togglePw('pw-new',this)"></i></div>
-                      <div class="pw-strength"><div class="pw-strength-bar"><div class="pw-strength-fill" id="pw-fill"></div></div><div class="pw-strength-label" id="pw-label"></div></div>
+
+                    <div class="form-field">
+                      <label for="pw-new"><i class="fas fa-lock"></i> New Password</label>
+                      <div class="pw-input-wrapper">
+                        <input type="password" id="pw-new" placeholder="Min 8 characters" oninput="checkPasswordStrength()" autocomplete="new-password" />
+                        <button type="button" class="pw-eye-btn" onclick="togglePasswordVisibility('pw-new', this)" aria-label="Toggle password view">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </div>
+                      <div class="pw-meter">
+                        <div class="pw-meter-bar">
+                          <div class="pw-meter-fill" id="pw-meter-fill"></div>
+                        </div>
+                        <span class="pw-meter-text" id="pw-meter-label"></span>
+                      </div>
                     </div>
-                    <div class="form-group"><label>Confirm New Password</label>
-                      <div class="pw-toggle"><input type="password" id="pw-confirm" placeholder="Re-enter new password" /><i class="fas fa-eye pw-eye" onclick="togglePw('pw-confirm',this)"></i></div>
+
+                    <div class="form-field">
+                      <label for="pw-confirm"><i class="fas fa-circle-check"></i> Confirm New Password</label>
+                      <div class="pw-input-wrapper">
+                        <input type="password" id="pw-confirm" placeholder="Re-enter your new password" autocomplete="new-password" />
+                        <button type="button" class="pw-eye-btn" onclick="togglePasswordVisibility('pw-confirm', this)" aria-label="Toggle password view">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div class="form-actions"><button class="btn btn-primary" onclick="changePassword()"><i class="fas fa-lock" style="margin-right:4px;"></i> Update Password</button></div>
-                </div>
+
+                  <div class="form-actions-bar">
+                    <button type="submit" class="btn-action-primary" id="btn-save-password">
+                      <i class="fas fa-lock"></i> <span>Update Password</span>
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
+          </div>
 
-          </div><!-- /right -->
-        </div><!-- /profile-grid -->
-      </div>
-    </div>
+        </div><!-- /profile-container -->
+
+      </div><!-- /profile-workspace -->
+    </div><!-- /page-content -->
   </main>
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20260705d"></script>
 <script>
-  const user = requireRole('employee');
-  if (user) { renderSidebarUser(); loadProfile(); }
+  'use strict';
 
-  let profileData = null;
-
-  function switchTab(name) {
-    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.ptab-panel').forEach(p => p.classList.remove('active'));
-    const btn = document.querySelector(`.ptab[onclick="switchTab('${name}')"]`);
-    if (btn) btn.classList.add('active');
-    const panel = document.getElementById(`panel-${name}`);
-    if (panel) panel.classList.add('active');
+  // ── Authentication Check ──
+  const currentUser = requireRole('employee');
+  if (currentUser) {
+    renderSidebarUser();
   }
 
-  async function loadProfile() {
-    const res = await api.get('/profile');
-    if (!res?.ok) return showAlert('page-alert', 'Failed to load profile.', 'error');
-    profileData = res.data.data;
-    const u = profileData.user;
+  // ── State Management ──
+  let profileData = null;
+  let isSaving = false;
+  let activeTabName = 'personal';
+
+  // Format date helper
+  function formatDisplayDate(dateStr) {
+    if (!dateStr) return '—';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
+  // ── Unsaved Changes Check ──
+  function hasUnsavedChanges(tab) {
+    if (!profileData) return false;
+    const u = profileData.user || {};
     const b = profileData.bank || {};
     const e = profileData.emergency || {};
 
-    // Overview
-    document.getElementById('ov-name').textContent  = u.name;
-    document.getElementById('ov-role').textContent  = u.designation || 'Loan Executive';
-    document.getElementById('ov-email').textContent = u.email;
-    document.getElementById('ov-phone').textContent = u.phone || '—';
-    document.getElementById('ov-dept').textContent  = u.department || '—';
-    document.getElementById('ov-joined').textContent = u.joining_date ? `Joined: ${formatDate(u.joining_date)}` : '—';
+    if (tab === 'personal') {
+      const dob = u.date_of_birth ? u.date_of_birth.slice(0, 10) : '';
+      if ((document.getElementById('pi-dob')?.value || '') !== dob) return true;
+      if ((document.getElementById('pi-gender')?.value || '') !== (u.gender || '')) return true;
+      if ((document.getElementById('pi-city')?.value.trim() || '') !== (u.city || '')) return true;
+      if ((document.getElementById('pi-address')?.value.trim() || '') !== (u.address || '')) return true;
+      if ((document.getElementById('pi-perm-address')?.value.trim() || '') !== (u.permanent_address || '')) return true;
+      if ((document.getElementById('pi-state')?.value.trim() || '') !== (u.state || '')) return true;
+      if ((document.getElementById('pi-country')?.value.trim() || '') !== (u.country || '')) return true;
+      if ((document.getElementById('pi-postal')?.value.trim() || '') !== (u.postal_code || '')) return true;
+    } else if (tab === 'bank') {
+      if ((document.getElementById('b-holder')?.value.trim() || '') !== (b.account_holder_name || '')) return true;
+      if ((document.getElementById('b-bank')?.value.trim() || '') !== (b.bank_name || '')) return true;
+      if ((document.getElementById('b-ifsc')?.value.trim().toUpperCase() || '') !== (b.ifsc_code || '')) return true;
+      if ((document.getElementById('b-account')?.value.trim() || '') !== (b.account_number || '')) return true;
+      if ((document.getElementById('b-branch')?.value.trim() || '') !== (b.branch_name || '')) return true;
+    } else if (tab === 'emergency') {
+      if ((document.getElementById('e-name')?.value.trim() || '') !== (e.contact_name || '')) return true;
+      if ((document.getElementById('e-relation')?.value || '') !== (e.relationship || '')) return true;
+      if ((document.getElementById('e-mobile')?.value.trim() || '') !== (e.mobile_number || '')) return true;
+      if ((document.getElementById('e-alt')?.value.trim() || '') !== (e.alternate_number || '')) return true;
+    } else if (tab === 'kyc') {
+      if ((document.getElementById('aadhaar-number')?.value.trim() || '') !== (u.aadhaar_number || '')) return true;
+      if ((document.getElementById('pan-number')?.value.trim() || '') !== (u.pan_number || '')) return true;
+      if (document.getElementById('aadhaar-doc-password')?.value) return true;
+      if (document.getElementById('pan-doc-password')?.value) return true;
+      if (document.getElementById('clear-aadhaar-pw')?.checked) return true;
+      if (document.getElementById('clear-pan-pw')?.checked) return true;
+    } else if (tab === 'security') {
+      if (document.getElementById('pw-current')?.value || document.getElementById('pw-new')?.value || document.getElementById('pw-confirm')?.value) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-    // Avatar
-    const bigAvatar = document.getElementById('big-avatar');
-    if (u.profile_picture) {
-      bigAvatar.innerHTML = `<img src="${u.profile_picture}" alt="avatar" />`;
-    } else {
-      bigAvatar.textContent = (u.name || 'E').charAt(0).toUpperCase();
+  // ── Tab Switching ──
+  function switchTab(tabName) {
+    if (activeTabName === tabName) return;
+
+    if (hasUnsavedChanges(activeTabName)) {
+      if (!confirm('You have unsaved changes in this section. Discard changes and switch tabs?')) {
+        return;
+      }
+      resetFormToLoaded(activeTabName);
     }
 
-    // KYC Status
-    const kvsMap = { Pending: 'kyc-pending', Approved: 'kyc-approved', Rejected: 'kyc-rejected' };
-    const kvsIcon = { Pending: 'fas fa-clock-rotate-left', Approved: 'fas fa-circle-check', Rejected: 'fas fa-circle-xmark' };
-    const kvsText  = { Pending: 'Your documents have been submitted and are awaiting administrator review.', Approved: 'Your KYC documents have been verified.', Rejected: 'Documents rejected. Please re-upload.' };
+    // Clear password inputs when navigating away from or into security tab
+    clearPasswordInputs();
+
+    activeTabName = tabName;
+
+    // Update active tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+
+    // Update active panels
+    document.querySelectorAll('.tab-content-panel').forEach(panel => {
+      panel.classList.toggle('active', panel.id === `panel-${tabName}`);
+    });
+  }
+
+  function clearPasswordInputs() {
+    ['pw-current', 'pw-new', 'pw-confirm'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const fill = document.getElementById('pw-meter-fill');
+    const label = document.getElementById('pw-meter-label');
+    if (fill) fill.style.width = '0%';
+    if (label) label.textContent = '';
+  }
+
+  // ── Profile Loader ──
+  async function loadProfile() {
+    try {
+      const res = await api.get('/profile');
+      if (!res?.ok || !res.data?.success) {
+        showAlert('page-alert', res?.data?.message || 'Failed to load profile.', 'error');
+        document.getElementById('profile-loading').innerHTML = `
+          <div style="color:var(--danger); text-align:center;">
+            <i class="fas fa-circle-exclamation" style="font-size:2rem; margin-bottom:8px;"></i>
+            <p>Unable to load profile information.</p>
+            <button class="btn btn-secondary btn-sm" onclick="loadProfile()" style="margin-top:10px;">
+              <i class="fas fa-rotate-left"></i> Try Again
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      profileData = res.data.data;
+      const u = profileData.user || {};
+      const b = profileData.bank || {};
+      const e = profileData.emergency || {};
+
+      // Hide loading, show content
+      document.getElementById('profile-loading').style.display = 'none';
+      const container = document.getElementById('profile-container');
+      container.style.display = 'flex';
+
+      // ── Populate Hero Overview ──
+      document.getElementById('hero-name').textContent = u.name || 'Employee';
+      document.getElementById('hero-role').innerHTML = `<i class="fas fa-briefcase"></i> ${escapeHtml(u.designation || 'Loan Executive')}`;
+      document.getElementById('hero-id').textContent = u.id ? `#EMP-${String(u.id).padStart(3, '0')}` : '—';
+      document.getElementById('hero-email').textContent = u.email || '—';
+      document.getElementById('hero-phone').textContent = u.phone || '—';
+      document.getElementById('hero-joined').textContent = u.joining_date ? `Joined: ${formatDisplayDate(u.joining_date)}` : 'Joined: 16 May 2026';
+
+      // Account Status
+      const statusEl = document.getElementById('hero-account-status');
+      if (u.is_active === 0) {
+        statusEl.className = 'status-badge-inactive';
+        statusEl.innerHTML = `<i class="fas fa-circle-xmark"></i> Inactive`;
+      } else {
+        statusEl.className = 'status-badge-active';
+        statusEl.innerHTML = `<i class="fas fa-circle-check"></i> Active`;
+      }
+
+      // Hero Avatar
+      const heroAvatar = document.getElementById('hero-avatar');
+      const btnRemovePhoto = document.getElementById('btn-remove-photo');
+      if (u.profile_picture) {
+        heroAvatar.innerHTML = `<img src="${u.profile_picture}" alt="${escapeHtml(u.name || 'Avatar')}" />`;
+        btnRemovePhoto.style.display = 'inline-flex';
+      } else {
+        heroAvatar.innerHTML = '';
+        heroAvatar.textContent = (u.name || 'E').charAt(0).toUpperCase();
+        btnRemovePhoto.style.display = 'none';
+      }
+
+      // KYC Status
+      renderKYCStatus(u);
+
+      // Existing Document Previews
+      renderDocPreview('aadhaar-front-preview', u.aadhaar_front, 'aadhaar-front-upload-label', 'Front Side');
+      renderDocPreview('aadhaar-back-preview', u.aadhaar_back, 'aadhaar-back-upload-label', 'Back Side');
+      renderDocPreview('pan-preview', u.pan_card, 'pan-upload-label', 'PAN Card');
+      document.getElementById('aadhaar-number').value = u.aadhaar_number || '';
+      document.getElementById('pan-number').value = u.pan_number || '';
+
+      // Populate Form Fields
+      populateFormFields(u, b, e);
+
+      // Update Completion Bar & Status Summary Cards
+      updateCompletionMetrics(u, b, e);
+
+      // Check if user must change their temporary onboarding password
+      checkForcePasswordChange();
+    } catch (err) {
+      console.error('[Profile] loadProfile error:', err);
+      showAlert('page-alert', 'An error occurred while loading profile.', 'error');
+    }
+  }
+
+  // ── KYC Status Render ──
+  function renderKYCStatus(u) {
     const kvs = u.verification_status || 'Pending';
-    const statusBadge = document.getElementById('kyc-status-badge');
-    statusBadge.innerHTML = `<span class="kyc-status ${kvsMap[kvs]}"><i class="${kvsIcon[kvs]}"></i> ${kvs}</span>`;
-    document.getElementById('kyc-status-text').textContent = kvsText[kvs] || '';
-    document.getElementById('kyc-status-row').innerHTML = `<i class="fas fa-id-card"></i><span class="kyc-status ${kvsMap[kvs]}" style="font-size:10.5px; padding:2px 8px;"><i class="${kvsIcon[kvs]}"></i> KYC: ${kvs}</span>`;
+    const isApproved = (kvs === 'Approved');
+    const kvsMap = {
+      Pending: { cls: 'kyc-pending', icon: 'fas fa-clock-rotate-left', text: 'Your documents have been submitted and are awaiting administrator review.' },
+      Approved: { cls: 'kyc-approved', icon: 'fas fa-circle-check', text: 'Your KYC documents have been successfully verified and approved.' },
+      Rejected: { cls: 'kyc-rejected', icon: 'fas fa-circle-xmark', text: 'KYC documents were rejected. Please review administrator remarks and re-upload.' }
+    };
+    const info = kvsMap[kvs] || kvsMap.Pending;
+
+    // Hero KYC Badge
+    document.getElementById('hero-kyc-chip-wrap').innerHTML = `
+      <span class="kyc-chip ${info.cls}"><i class="${info.icon}"></i> KYC: ${kvs}</span>
+    `;
+
+    // KYC Panel Status
+    const bannerBadge = document.getElementById('kyc-banner-badge');
+    bannerBadge.className = `kyc-chip ${info.cls}`;
+    bannerBadge.innerHTML = `<i class="${info.icon}"></i> ${kvs}`;
+    document.getElementById('kyc-banner-text').textContent = info.text;
 
     // Remarks
-    const remarksBox = document.getElementById('kyc-remarks-box');
+    const remarksContainer = document.getElementById('kyc-remarks-container');
     if (u.verification_remarks && kvs === 'Rejected') {
-      remarksBox.innerHTML = `<div class="remarks-box"><strong><i class="fas fa-triangle-exclamation"></i> Admin Remarks:</strong>${u.verification_remarks}</div>`;
-    } else { remarksBox.innerHTML = ''; }
-
-    // Existing doc previews
-    renderDocPreview('aadhaar-front-preview', u.aadhaar_front);
-    renderDocPreview('aadhaar-back-preview',  u.aadhaar_back);
-    renderDocPreview('pan-preview', u.pan_card);
-    document.getElementById('aadhaar-number').value = u.aadhaar_number || '';
-    document.getElementById('pan-number').value     = u.pan_number || '';
-
-    // Personal Info
-    document.getElementById('pi-name').value         = u.name;
-    document.getElementById('pi-phone').value        = u.phone || '';
-    document.getElementById('pi-email').value        = u.email;
-    document.getElementById('pi-dob').value          = u.date_of_birth ? u.date_of_birth.slice(0,10) : '';
-    document.getElementById('pi-gender').value       = u.gender || '';
-    document.getElementById('pi-address').value      = u.address || '';
-    document.getElementById('pi-perm-address').value = u.permanent_address || '';
-    document.getElementById('pi-city').value         = u.city || '';
-    document.getElementById('pi-state').value        = u.state || '';
-    document.getElementById('pi-country').value      = u.country || '';
-    document.getElementById('pi-postal').value       = u.postal_code || '';
-
-    // Bank
-    document.getElementById('b-holder').value  = b.account_holder_name || '';
-    document.getElementById('b-bank').value    = b.bank_name || '';
-    document.getElementById('b-ifsc').value    = b.ifsc_code || '';
-    document.getElementById('b-account').value = b.account_number || '';
-    document.getElementById('b-branch').value  = b.branch_name || '';
-
-    // Emergency
-    document.getElementById('e-name').value     = e.contact_name || '';
-    document.getElementById('e-relation').value = e.relationship || '';
-    document.getElementById('e-mobile').value   = e.mobile_number || '';
-    document.getElementById('e-alt').value      = e.alternate_number || '';
-
-    // Completion
-    updateCompletion(u, b, e);
-  }
-
-  function renderDocPreview(containerId, filePath) {
-    const container = document.getElementById(containerId);
-    if (!filePath) { container.innerHTML = ''; return; }
-    const ext = filePath.split('.').pop().toLowerCase();
-    if (ext === 'pdf') {
-      container.innerHTML = `<div class="doc-preview-pdf"><i class="fas fa-file-pdf" style="color:#ef4444; font-size:16px;"></i> <a href="${filePath}" target="_blank" style="color:var(--accent-secondary); text-decoration:none;">View Uploaded Document</a></div>`;
+      remarksContainer.style.display = 'block';
+      remarksContainer.innerHTML = `
+        <div class="kyc-remarks-box">
+          <strong><i class="fas fa-triangle-exclamation"></i> Administrator Remarks:</strong>
+          <span>${escapeHtml(u.verification_remarks)}</span>
+        </div>
+      `;
     } else {
-      container.innerHTML = `<img src="${filePath}" class="doc-preview" alt="Document Preview" />`;
+      remarksContainer.style.display = 'none';
+      remarksContainer.innerHTML = '';
+    }
+
+    // Locked Banner & Field Controls
+    const lockedBanner = document.getElementById('kyc-locked-banner');
+    const aadhNum = document.getElementById('aadhaar-number');
+    const aadhPw = document.getElementById('aadhaar-doc-password');
+    const panNum = document.getElementById('pan-number');
+    const panPw = document.getElementById('pan-doc-password');
+    const aadhBadge = document.getElementById('aadhaar-pw-badge');
+    const panBadge = document.getElementById('pan-pw-badge');
+    const clearAadhWrap = document.getElementById('clear-aadhaar-pw-wrap');
+    const clearPanWrap = document.getElementById('clear-pan-pw-wrap');
+    const eyeAadh = document.getElementById('btn-eye-aadhaar');
+    const eyePan = document.getElementById('btn-eye-pan');
+    const frontUploadBox = document.getElementById('aadhaar-front-upload-box');
+    const backUploadBox = document.getElementById('aadhaar-back-upload-box');
+    const panUploadBox = document.getElementById('pan-upload-box');
+    const kycActionsBar = document.getElementById('kyc-actions-bar');
+
+    if (isApproved) {
+      if (lockedBanner) lockedBanner.style.display = 'flex';
+
+      if (aadhNum) {
+        aadhNum.readOnly = true;
+        aadhNum.classList.add('field-readonly');
+      }
+      if (aadhPw) {
+        aadhPw.readOnly = true;
+        aadhPw.classList.add('field-readonly');
+        aadhPw.type = 'password';
+        aadhPw.value = '';
+        aadhPw.placeholder = u.aadhaar_password_configured ? '•••••••• (Protected & Verified)' : 'Not configured (Locked)';
+      }
+      if (eyeAadh) eyeAadh.style.display = 'none';
+
+      if (panNum) {
+        panNum.readOnly = true;
+        panNum.classList.add('field-readonly');
+      }
+      if (panPw) {
+        panPw.readOnly = true;
+        panPw.classList.add('field-readonly');
+        panPw.type = 'password';
+        panPw.value = '';
+        panPw.placeholder = u.pan_password_configured ? '•••••••• (Protected & Verified)' : 'Not configured (Locked)';
+      }
+      if (eyePan) eyePan.style.display = 'none';
+
+      if (aadhBadge) {
+        if (u.aadhaar_password_configured) {
+          aadhBadge.className = 'badge-pw-status badge-pw-configured';
+          aadhBadge.innerHTML = '<i class="fas fa-lock"></i> Configured &amp; Verified';
+        } else {
+          aadhBadge.className = 'badge-pw-status badge-pw-none';
+          aadhBadge.textContent = 'None';
+        }
+      }
+      if (panBadge) {
+        if (u.pan_password_configured) {
+          panBadge.className = 'badge-pw-status badge-pw-configured';
+          panBadge.innerHTML = '<i class="fas fa-lock"></i> Configured &amp; Verified';
+        } else {
+          panBadge.className = 'badge-pw-status badge-pw-none';
+          panBadge.textContent = 'None';
+        }
+      }
+
+      if (clearAadhWrap) clearAadhWrap.style.display = 'none';
+      if (clearPanWrap) clearPanWrap.style.display = 'none';
+
+      if (frontUploadBox) frontUploadBox.style.display = 'none';
+      if (backUploadBox) backUploadBox.style.display = 'none';
+      if (panUploadBox) panUploadBox.style.display = 'none';
+      if (kycActionsBar) kycActionsBar.style.display = 'none';
+    } else {
+      if (lockedBanner) lockedBanner.style.display = 'none';
+
+      if (aadhNum) {
+        aadhNum.readOnly = false;
+        aadhNum.classList.remove('field-readonly');
+      }
+      if (aadhPw) {
+        aadhPw.readOnly = false;
+        aadhPw.classList.remove('field-readonly');
+        aadhPw.type = 'password';
+        aadhPw.value = '';
+        aadhPw.placeholder = u.aadhaar_password_configured ? 'Enter new password to change (or leave blank)' : 'e.g. NAME1990';
+      }
+      if (eyeAadh) eyeAadh.style.display = 'flex';
+
+      if (panNum) {
+        panNum.readOnly = false;
+        panNum.classList.remove('field-readonly');
+      }
+      if (panPw) {
+        panPw.readOnly = false;
+        panPw.classList.remove('field-readonly');
+        panPw.type = 'password';
+        panPw.value = '';
+        panPw.placeholder = u.pan_password_configured ? 'Enter new password to change (or leave blank)' : 'e.g. DDMMYYYY';
+      }
+      if (eyePan) eyePan.style.display = 'flex';
+
+      if (aadhBadge) {
+        if (u.aadhaar_password_configured) {
+          aadhBadge.className = 'badge-pw-status badge-pw-configured';
+          aadhBadge.innerHTML = '<i class="fas fa-check-circle"></i> Password Configured ✓';
+          if (clearAadhWrap) clearAadhWrap.style.display = 'inline-flex';
+        } else {
+          aadhBadge.className = 'badge-pw-status badge-pw-none';
+          aadhBadge.textContent = 'Not Configured';
+          if (clearAadhWrap) clearAadhWrap.style.display = 'none';
+        }
+      }
+      if (panBadge) {
+        if (u.pan_password_configured) {
+          panBadge.className = 'badge-pw-status badge-pw-configured';
+          panBadge.innerHTML = '<i class="fas fa-check-circle"></i> Password Configured ✓';
+          if (clearPanWrap) clearPanWrap.style.display = 'inline-flex';
+        } else {
+          panBadge.className = 'badge-pw-status badge-pw-none';
+          panBadge.textContent = 'Not Configured';
+          if (clearPanWrap) clearPanWrap.style.display = 'none';
+        }
+      }
+
+      if (frontUploadBox) frontUploadBox.style.display = 'block';
+      if (backUploadBox) backUploadBox.style.display = 'block';
+      if (panUploadBox) panUploadBox.style.display = 'block';
+      if (kycActionsBar) kycActionsBar.style.display = 'flex';
     }
   }
 
-  function updateCompletion(u, b, e) {
-    const checks = [
-      { label: 'Personal Information', done: !!(u.address && u.city && u.date_of_birth), icon: 'fas fa-user' },
-      { label: 'Profile Picture',       done: !!u.profile_picture, icon: 'fas fa-camera' },
-      { label: 'Aadhaar Uploaded',      done: !!(u.aadhaar_front && u.aadhaar_back), icon: 'fas fa-id-card' },
-      { label: 'PAN Uploaded',          done: !!u.pan_card, icon: 'fas fa-file-invoice' },
-      { label: 'Bank Details Added',    done: !!(b.bank_name && b.account_number), icon: 'fas fa-building-columns' },
-      { label: 'Emergency Contact',     done: !!(e.contact_name && e.mobile_number), icon: 'fas fa-phone-volume' }
-    ];
-    const done  = checks.filter(c => c.done).length;
-    const total = checks.length;
-    const pct   = Math.round((done / total) * 100);
-    document.getElementById('comp-pct').textContent = pct + '%';
-    document.getElementById('comp-bar').style.width = pct + '%';
-    document.getElementById('comp-items').innerHTML = checks.map(c =>
-      `<div class="ci"><div class="ck ${c.done?'done':'todo'}"><i class="${c.done?'fas fa-check':'far fa-circle'}"></i></div><span>${c.label}</span></div>`
-    ).join('');
+  // ── Document Preview Helper ──
+  function renderDocPreview(containerId, filePath, labelId, docTitle) {
+    const container = document.getElementById(containerId);
+    const labelEl = labelId ? document.getElementById(labelId) : null;
+    if (!container) return;
+
+    if (!filePath) {
+      container.innerHTML = '';
+      if (labelEl) labelEl.textContent = `Click to upload ${docTitle}`;
+      return;
+    }
+
+    if (labelEl) labelEl.textContent = `Click to replace ${docTitle}`;
+
+    const ext = filePath.split('.').pop().toLowerCase();
+    if (ext === 'pdf') {
+      container.innerHTML = `
+        <div class="doc-pdf-preview">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-file-pdf" style="color:#ef4444; font-size:18px;"></i>
+            <span>${escapeHtml(docTitle)} (PDF Document)</span>
+          </div>
+          <a href="${filePath}" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-arrow-up-right-from-square"></i> View Document
+          </a>
+        </div>
+      `;
+    } else {
+      container.innerHTML = `
+        <img src="${filePath}" class="doc-img-preview" alt="${escapeHtml(docTitle)} Preview" />
+      `;
+    }
   }
 
-  // Avatar upload
+  // ── Populate Inputs ──
+  function populateFormFields(u, b, e) {
+    // Personal Info
+    document.getElementById('pi-name').value = u.name || '';
+    document.getElementById('pi-phone').value = u.phone || '';
+    document.getElementById('pi-email').value = u.email || '';
+    document.getElementById('pi-dob').value = u.date_of_birth ? u.date_of_birth.slice(0, 10) : '';
+    document.getElementById('pi-gender').value = u.gender || '';
+    document.getElementById('pi-city').value = u.city || '';
+    document.getElementById('pi-address').value = u.address || '';
+    document.getElementById('pi-perm-address').value = u.permanent_address || '';
+    document.getElementById('pi-state').value = u.state || '';
+    document.getElementById('pi-country').value = u.country || '';
+    document.getElementById('pi-postal').value = u.postal_code || '';
+
+    // Bank
+    document.getElementById('b-holder').value = b.account_holder_name || '';
+    document.getElementById('b-bank').value = b.bank_name || '';
+    document.getElementById('b-ifsc').value = b.ifsc_code || '';
+    document.getElementById('b-account').value = b.account_number || '';
+    document.getElementById('b-branch').value = b.branch_name || '';
+
+    // Emergency
+    document.getElementById('e-name').value = e.contact_name || '';
+    document.getElementById('e-relation').value = e.relationship || '';
+    document.getElementById('e-mobile').value = e.mobile_number || '';
+    document.getElementById('e-alt').value = e.alternate_number || '';
+  }
+
+  // ── Reset Form from In-Memory State ──
+  function resetFormToLoaded(section) {
+    if (!profileData) return;
+    const u = profileData.user || {};
+    const b = profileData.bank || {};
+    const e = profileData.emergency || {};
+
+    if (section === 'personal') {
+      document.getElementById('pi-dob').value = u.date_of_birth ? u.date_of_birth.slice(0, 10) : '';
+      document.getElementById('pi-gender').value = u.gender || '';
+      document.getElementById('pi-city').value = u.city || '';
+      document.getElementById('pi-address').value = u.address || '';
+      document.getElementById('pi-perm-address').value = u.permanent_address || '';
+      document.getElementById('pi-state').value = u.state || '';
+      document.getElementById('pi-country').value = u.country || '';
+      document.getElementById('pi-postal').value = u.postal_code || '';
+      showAlert('page-alert', 'Personal information reverted.', 'success');
+    } else if (section === 'bank') {
+      document.getElementById('b-holder').value = b.account_holder_name || '';
+      document.getElementById('b-bank').value = b.bank_name || '';
+      document.getElementById('b-ifsc').value = b.ifsc_code || '';
+      document.getElementById('b-account').value = b.account_number || '';
+      document.getElementById('b-branch').value = b.branch_name || '';
+      showAlert('page-alert', 'Bank details reverted.', 'success');
+    } else if (section === 'emergency') {
+      document.getElementById('e-name').value = e.contact_name || '';
+      document.getElementById('e-relation').value = e.relationship || '';
+      document.getElementById('e-mobile').value = e.mobile_number || '';
+      document.getElementById('e-alt').value = e.alternate_number || '';
+      showAlert('page-alert', 'Emergency contact reverted.', 'success');
+    } else if (section === 'kyc') {
+      document.getElementById('aadhaar-number').value = u.aadhaar_number || '';
+      document.getElementById('pan-number').value = u.pan_number || '';
+      document.getElementById('aadhaar-doc-password').value = '';
+      document.getElementById('pan-doc-password').value = '';
+      if (document.getElementById('clear-aadhaar-pw')) document.getElementById('clear-aadhaar-pw').checked = false;
+      if (document.getElementById('clear-pan-pw')) document.getElementById('clear-pan-pw').checked = false;
+      showAlert('page-alert', 'KYC details reverted.', 'success');
+    }
+  }
+
+  // ── Profile Completion & Status Cards Calculation ──
+  function updateCompletionMetrics(u, b, e) {
+    const isPersonalDone = !!(u.address && u.city && u.date_of_birth);
+    const isPhotoDone = !!u.profile_picture;
+    const isAadhaarDone = !!(u.aadhaar_front && u.aadhaar_back);
+    const isPanDone = !!u.pan_card;
+    const isBankDone = !!(b.bank_name && b.account_number);
+    const isEmergencyDone = !!(e.contact_name && e.mobile_number);
+
+    const items = [
+      { key: 'personal', done: isPersonalDone, labelDone: 'Complete', labelTodo: 'Pending' },
+      { key: 'photo', done: isPhotoDone, labelDone: 'Added', labelTodo: 'Not Added' },
+      { key: 'aadhaar', done: isAadhaarDone, labelDone: 'Uploaded', labelTodo: (u.aadhaar_front || u.aadhaar_back) ? 'Partial' : 'Pending' },
+      { key: 'pan', done: isPanDone, labelDone: 'Uploaded', labelTodo: 'Pending' },
+      { key: 'bank', done: isBankDone, labelDone: 'Added', labelTodo: 'Not Added' },
+      { key: 'emergency', done: isEmergencyDone, labelDone: 'Added', labelTodo: 'Not Added' }
+    ];
+
+    const completedCount = items.filter(i => i.done).length;
+    const totalCount = items.length;
+    const pct = Math.round((completedCount / totalCount) * 100);
+
+    // Update Hero Completion Widget
+    document.getElementById('hero-comp-pct').textContent = `${pct}%`;
+    document.getElementById('hero-comp-bar').style.width = `${pct}%`;
+    document.getElementById('hero-comp-count').textContent = `${completedCount} of ${totalCount}`;
+
+    // Update 6 Status Summary Cards
+    items.forEach(item => {
+      const badgeEl = document.getElementById(`sc-badge-${item.key}`);
+      const valEl = document.getElementById(`sc-val-${item.key}`);
+      if (badgeEl && valEl) {
+        if (item.done) {
+          badgeEl.className = 'status-indicator-badge done';
+          badgeEl.innerHTML = '<i class="fas fa-check"></i>';
+          valEl.textContent = item.labelDone;
+          valEl.style.color = '#10b981';
+        } else {
+          badgeEl.className = 'status-indicator-badge todo';
+          badgeEl.innerHTML = '<i class="far fa-circle"></i>';
+          valEl.textContent = item.labelTodo;
+          valEl.style.color = 'var(--text-muted)';
+        }
+      }
+    });
+  }
+
+  // ── Avatar Upload & Remove ──
   async function handleAvatarUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    if (file.size > 5*1024*1024) return showAlert('page-alert','File too large. Max 5MB.','error');
-    const fd = new FormData(); fd.append('avatar', file);
-    const res = await apiPostForm('/profile/upload-avatar', fd);
-    if (res?.ok) { showAlert('page-alert','Profile picture updated!','success'); loadProfile(); refreshSidebarAvatar(res.data.profile_picture || null); }
-    else showAlert('page-alert', res?.data?.message || 'Upload failed.', 'error');
-  }
 
-  async function removeAvatar() {
-    if (!confirm('Remove your profile picture?')) return;
-    const res = await api.delete('/profile/avatar');
-    if (res?.ok) { showAlert('page-alert', 'Profile picture removed.', 'success'); refreshSidebarAvatar(null); loadProfile(); }
-    else showAlert('page-alert', 'Failed to remove picture.', 'error');
-  }
+    if (file.size > 5 * 1024 * 1024) {
+      showAlert('page-alert', 'File size exceeds 5MB limit.', 'error');
+      event.target.value = '';
+      return;
+    }
 
-  // KYC Upload
-  async function uploadKYC(event, docType) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (file.size > 5*1024*1024) return showAlert('page-alert','File too large. Max 5MB.','error');
     const fd = new FormData();
-    fd.append('document', file);
-    fd.append('doc_type', docType);
-    if (docType !== 'pan_card') fd.append('aadhaar_number', document.getElementById('aadhaar-number').value || '');
-    else fd.append('pan_number', document.getElementById('pan-number').value || '');
-    const res = await apiPostForm('/profile/upload-kyc', fd);
-    if (res?.ok) { showAlert('page-alert', res.data.message, 'success'); loadProfile(); }
-    else showAlert('page-alert', res?.data?.message || 'Upload failed.', 'error');
-  }
+    fd.append('avatar', file);
 
-  // Save Personal Info
-  async function savePersonalInfo() {
-    const res = await api.put('/profile/personal-info', {
-      date_of_birth:    document.getElementById('pi-dob').value || null,
-      gender:           document.getElementById('pi-gender').value || null,
-      address:          document.getElementById('pi-address').value || null,
-      permanent_address:document.getElementById('pi-perm-address').value || null,
-      city:             document.getElementById('pi-city').value || null,
-      state:            document.getElementById('pi-state').value || null,
-      country:          document.getElementById('pi-country').value || null,
-      postal_code:      document.getElementById('pi-postal').value || null
-    });
-    if (res?.ok) { showAlert('page-alert','Personal information saved!','success'); loadProfile(); }
-    else showAlert('page-alert', res?.data?.message || 'Save failed.', 'error');
-  }
+    const btn = document.querySelector('.hero-avatar-upload-btn');
+    if (btn) btn.style.pointerEvents = 'none';
 
-  // Save Bank
-  async function saveBankDetails() {
-    const res = await api.put('/profile/bank-details', {
-      account_holder_name: document.getElementById('b-holder').value.trim(),
-      bank_name:           document.getElementById('b-bank').value.trim(),
-      account_number:      document.getElementById('b-account').value.trim(),
-      ifsc_code:           document.getElementById('b-ifsc').value.trim().toUpperCase(),
-      branch_name:         document.getElementById('b-branch').value.trim()
-    });
-    if (res?.ok) { showAlert('page-alert','Bank details saved!','success'); loadProfile(); }
-    else showAlert('page-alert', res?.data?.message || 'Save failed.', 'error');
-  }
+    showAlert('page-alert', 'Uploading profile picture...', 'info');
+    const res = await apiPostForm('/profile/upload-avatar', fd);
 
-  // Save Emergency
-  async function saveEmergencyContact() {
-    const res = await api.put('/profile/emergency-contact', {
-      contact_name:     document.getElementById('e-name').value.trim(),
-      relationship:     document.getElementById('e-relation').value,
-      mobile_number:    document.getElementById('e-mobile').value.trim(),
-      alternate_number: document.getElementById('e-alt').value.trim()
-    });
-    if (res?.ok) { showAlert('page-alert','Emergency contact saved!','success'); loadProfile(); }
-    else showAlert('page-alert', res?.data?.message || 'Save failed.', 'error');
-  }
+    if (btn) btn.style.pointerEvents = 'auto';
+    event.target.value = '';
 
-  // Password
-  function togglePw(id, iconElem) {
-    const inp = document.getElementById(id);
-    if (inp.type === 'password') {
-      inp.type = 'text';
-      iconElem.classList.remove('fa-eye');
-      iconElem.classList.add('fa-eye-slash');
+    if (res?.ok) {
+      showAlert('page-alert', 'Profile picture updated successfully!', 'success');
+      await loadProfile();
+      if (typeof refreshSidebarAvatar === 'function') {
+        refreshSidebarAvatar(res.data?.profile_picture || null);
+      }
     } else {
-      inp.type = 'password';
-      iconElem.classList.remove('fa-eye-slash');
-      iconElem.classList.add('fa-eye');
+      showAlert('page-alert', res?.data?.message || 'Failed to upload profile picture.', 'error');
     }
   }
 
-  function checkPwStrength() {
+  async function removeAvatar() {
+    if (!confirm('Are you sure you want to remove your profile picture?')) return;
+
+    const res = await api.delete('/profile/avatar');
+    if (res?.ok) {
+      showAlert('page-alert', 'Profile picture removed.', 'success');
+      if (typeof refreshSidebarAvatar === 'function') {
+        refreshSidebarAvatar(null);
+      }
+      await loadProfile();
+    } else {
+      showAlert('page-alert', res?.data?.message || 'Failed to remove profile picture.', 'error');
+    }
+  }
+
+  // ── KYC Document Upload ──
+  async function uploadKYC(event, docType) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showAlert('page-alert', 'File too large. Maximum size allowed is 5MB.', 'error');
+      event.target.value = '';
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append('document', file);
+    fd.append('doc_type', docType);
+
+    if (docType === 'pan_card') {
+      fd.append('pan_number', document.getElementById('pan-number').value.trim());
+      const panPw = document.getElementById('pan-doc-password')?.value.trim();
+      if (panPw) fd.append('pan_document_password', panPw);
+    } else {
+      fd.append('aadhaar_number', document.getElementById('aadhaar-number').value.trim());
+      const aadhPw = document.getElementById('aadhaar-doc-password')?.value.trim();
+      if (aadhPw) fd.append('aadhaar_document_password', aadhPw);
+    }
+
+    showAlert('page-alert', 'Uploading document, please wait...', 'info');
+    const res = await apiPostForm('/profile/upload-kyc', fd);
+    event.target.value = '';
+
+    if (res?.ok) {
+      showAlert('page-alert', res.data?.message || 'Document uploaded successfully.', 'success');
+      document.getElementById('aadhaar-doc-password').value = '';
+      document.getElementById('pan-doc-password').value = '';
+      await loadProfile();
+    } else {
+      showAlert('page-alert', res?.data?.message || 'Failed to upload document.', 'error');
+    }
+  }
+
+  // ── Save KYC Details & Document Passwords ──
+  async function saveKYCDetails() {
+    if (isSaving) return;
+    const btn = document.getElementById('btn-save-kyc');
+    setButtonLoading(btn, true, 'Saving KYC Details...');
+
+    try {
+      const payload = {
+        aadhaar_number: document.getElementById('aadhaar-number').value.trim(),
+        pan_number: document.getElementById('pan-number').value.trim()
+      };
+
+      const aadhPw = document.getElementById('aadhaar-doc-password')?.value.trim();
+      if (aadhPw) {
+        payload.aadhaar_document_password = aadhPw;
+      }
+      if (document.getElementById('clear-aadhaar-pw')?.checked) {
+        payload.clear_aadhaar_password = true;
+      }
+
+      const panPw = document.getElementById('pan-doc-password')?.value.trim();
+      if (panPw) {
+        payload.pan_document_password = panPw;
+      }
+      if (document.getElementById('clear-pan-pw')?.checked) {
+        payload.clear_pan_password = true;
+      }
+
+      const res = await api.put('/profile/kyc-details', payload);
+      if (res?.ok) {
+        showAlert('page-alert', res.data?.message || 'KYC details updated successfully!', 'success');
+        document.getElementById('aadhaar-doc-password').value = '';
+        document.getElementById('pan-doc-password').value = '';
+        if (document.getElementById('clear-aadhaar-pw')) document.getElementById('clear-aadhaar-pw').checked = false;
+        if (document.getElementById('clear-pan-pw')) document.getElementById('clear-pan-pw').checked = false;
+        await loadProfile();
+      } else {
+        showAlert('page-alert', res?.data?.message || 'Failed to update KYC details.', 'error');
+      }
+    } catch (err) {
+      showAlert('page-alert', 'Network error. Could not update KYC details.', 'error');
+    } finally {
+      setButtonLoading(btn, false, 'Save KYC Details');
+    }
+  }
+
+  // ── Save Personal Information ──
+  async function savePersonalInfo() {
+    if (isSaving) return;
+    const btn = document.getElementById('btn-save-personal');
+    setButtonLoading(btn, true, 'Saving...');
+
+    try {
+      const payload = {
+        date_of_birth:     document.getElementById('pi-dob').value || null,
+        gender:            document.getElementById('pi-gender').value || null,
+        address:           document.getElementById('pi-address').value.trim() || null,
+        permanent_address: document.getElementById('pi-perm-address').value.trim() || null,
+        city:              document.getElementById('pi-city').value.trim() || null,
+        state:             document.getElementById('pi-state').value.trim() || null,
+        country:           document.getElementById('pi-country').value.trim() || null,
+        postal_code:       document.getElementById('pi-postal').value.trim() || null
+      };
+
+      const res = await api.put('/profile/personal-info', payload);
+      if (res?.ok) {
+        showAlert('page-alert', 'Personal information saved successfully!', 'success');
+        await loadProfile();
+      } else {
+        showAlert('page-alert', res?.data?.message || 'Failed to save personal information.', 'error');
+      }
+    } catch (err) {
+      showAlert('page-alert', 'Network error. Could not save personal information.', 'error');
+    } finally {
+      setButtonLoading(btn, false, 'Save Changes');
+    }
+  }
+
+  // ── Save Bank Details ──
+  async function saveBankDetails() {
+    if (isSaving) return;
+    const btn = document.getElementById('btn-save-bank');
+    setButtonLoading(btn, true, 'Saving...');
+
+    try {
+      const payload = {
+        account_holder_name: document.getElementById('b-holder').value.trim(),
+        bank_name:           document.getElementById('b-bank').value.trim(),
+        account_number:      document.getElementById('b-account').value.trim(),
+        ifsc_code:           document.getElementById('b-ifsc').value.trim().toUpperCase(),
+        branch_name:         document.getElementById('b-branch').value.trim()
+      };
+
+      const res = await api.put('/profile/bank-details', payload);
+      if (res?.ok) {
+        showAlert('page-alert', 'Bank details saved successfully!', 'success');
+        await loadProfile();
+      } else {
+        showAlert('page-alert', res?.data?.message || 'Failed to save bank details.', 'error');
+      }
+    } catch (err) {
+      showAlert('page-alert', 'Network error. Could not save bank details.', 'error');
+    } finally {
+      setButtonLoading(btn, false, 'Save Bank Details');
+    }
+  }
+
+  // ── Save Emergency Contact ──
+  async function saveEmergencyContact() {
+    if (isSaving) return;
+    const btn = document.getElementById('btn-save-emergency');
+    setButtonLoading(btn, true, 'Saving...');
+
+    try {
+      const payload = {
+        contact_name:     document.getElementById('e-name').value.trim(),
+        relationship:     document.getElementById('e-relation').value,
+        mobile_number:    document.getElementById('e-mobile').value.trim(),
+        alternate_number: document.getElementById('e-alt').value.trim()
+      };
+
+      const res = await api.put('/profile/emergency-contact', payload);
+      if (res?.ok) {
+        showAlert('page-alert', 'Emergency contact saved successfully!', 'success');
+        await loadProfile();
+      } else {
+        showAlert('page-alert', res?.data?.message || 'Failed to save emergency contact.', 'error');
+      }
+    } catch (err) {
+      showAlert('page-alert', 'Network error. Could not save emergency contact.', 'error');
+    } finally {
+      setButtonLoading(btn, false, 'Save Emergency Contact');
+    }
+  }
+
+  // ── Security & Password Change ──
+  function togglePasswordVisibility(inputId, toggleBtn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const icon = toggleBtn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      if (icon) {
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      }
+    } else {
+      input.type = 'password';
+      if (icon) {
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+  }
+
+  function checkPasswordStrength() {
     const pw = document.getElementById('pw-new').value;
-    const fill = document.getElementById('pw-fill'); const label = document.getElementById('pw-label');
-    let s = 0;
-    if (pw.length>=8) s++; if (/[A-Z]/.test(pw)) s++; if (/[0-9]/.test(pw)) s++; if (/[^A-Za-z0-9]/.test(pw)) s++;
-    const m = {0:['0%','#ef4444',''],1:['25%','#ef4444','Weak'],2:['50%','#f59e0b','Fair'],3:['75%','#3b82f6','Good'],4:['100%','#10b981','Strong']};
-    const [w,c,t] = m[s]; fill.style.width=w; fill.style.background=c; label.textContent=t; label.style.color=c;
+    const fill = document.getElementById('pw-meter-fill');
+    const label = document.getElementById('pw-meter-label');
+    if (!fill || !label) return;
+
+    if (!pw) {
+      fill.style.width = '0%';
+      label.textContent = '';
+      return;
+    }
+
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+    const config = {
+      1: { w: '25%', c: '#ef4444', text: 'Weak' },
+      2: { w: '50%', c: '#f59e0b', text: 'Fair' },
+      3: { w: '75%', c: '#3b82f6', text: 'Good' },
+      4: { w: '100%', c: '#10b981', text: 'Strong' }
+    };
+
+    const cfg = config[score] || { w: '15%', c: '#ef4444', text: 'Too Weak' };
+    fill.style.width = cfg.w;
+    fill.style.background = cfg.c;
+    label.textContent = cfg.text;
+    label.style.color = cfg.c;
   }
 
   async function changePassword() {
-    const c = document.getElementById('pw-current').value;
-    const n = document.getElementById('pw-new').value;
-    const cf = document.getElementById('pw-confirm').value;
-    if (!c||!n||!cf) return showAlert('page-alert','All fields required.','error');
-    if (n!==cf) return showAlert('page-alert','Passwords do not match.','error');
-    if (n.length<8) return showAlert('page-alert','Min 8 characters required.','error');
-    const res = await api.put('/profile/change-password', { currentPassword:c, newPassword:n, confirmPassword:cf });
-    if (res?.ok) { showAlert('page-alert','Password changed!','success'); ['pw-current','pw-new','pw-confirm'].forEach(id=>document.getElementById(id).value=''); }
-    else showAlert('page-alert', res?.data?.message || 'Change failed.', 'error');
+    if (isSaving) return;
+
+    const currentPassword = document.getElementById('pw-current').value;
+    const newPassword = document.getElementById('pw-new').value;
+    const confirmPassword = document.getElementById('pw-confirm').value;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showAlert('page-alert', 'All password fields are required.', 'error');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      showAlert('page-alert', 'New passwords do not match.', 'error');
+      return;
+    }
+    if (newPassword.length < 8) {
+      showAlert('page-alert', 'New password must be at least 8 characters long.', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('btn-save-password');
+    setButtonLoading(btn, true, 'Updating Password...');
+
+    try {
+      const res = await api.put('/profile/change-password', {
+        currentPassword,
+        newPassword,
+        confirmPassword
+      });
+
+      if (res?.ok) {
+        const u = getUser() || {};
+        u.must_change_password = false;
+        setSession(res.data?.token || getToken(), u, Boolean(localStorage.getItem('cln_token')));
+
+        showAlert('page-alert', 'Password updated successfully! Your account is now fully unlocked.', 'success');
+        clearPasswordInputs();
+        const forceBanner = document.getElementById('force-password-banner');
+        if (forceBanner) forceBanner.style.display = 'none';
+      } else {
+        showAlert('page-alert', res?.data?.message || 'Failed to update password.', 'error');
+      }
+    } catch (err) {
+      showAlert('page-alert', 'Network error. Could not update password.', 'error');
+    } finally {
+      setButtonLoading(btn, false, 'Update Password');
+    }
+  }
+
+  function checkForcePasswordChange() {
+    const params = new URLSearchParams(window.location.search);
+    const u = getUser();
+    if (params.get('force_password_change') === '1' || u?.must_change_password) {
+      const banner = document.getElementById('force-password-banner');
+      if (banner) banner.style.display = 'flex';
+      focusChangePasswordCard();
+    }
+  }
+
+  function focusChangePasswordCard() {
+    const input = document.getElementById('pw-current');
+    if (input) {
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      input.focus();
+    }
+  }
+
+  // ── Button Loading Helper ──
+  function setButtonLoading(btn, loading, text) {
+    if (!btn) return;
+    isSaving = loading;
+    btn.disabled = loading;
+    const span = btn.querySelector('span');
+    const icon = btn.querySelector('i');
+    if (loading) {
+      if (span) span.textContent = text;
+      if (icon) icon.className = 'fas fa-spinner fa-spin';
+    } else {
+      if (span) span.textContent = text;
+      if (icon) {
+        if (btn.id === 'btn-save-password') icon.className = 'fas fa-lock';
+        else icon.className = 'fas fa-check';
+      }
+    }
+  }
+
+  // ── Auto-start on load ──
+  if (currentUser) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadProfile);
+    } else {
+      loadProfile();
+    }
   }
 </script>
 </body>

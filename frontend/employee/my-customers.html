@@ -23,15 +23,820 @@
     })();
   </script>
   <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
+    /* ── Main Customer Directory Card ── */
+    .customer-directory-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      margin-bottom: 24px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    :root[data-theme='dark'] .customer-directory-card {
+      background: rgba(10, 19, 32, 0.72);
+      border-color: rgba(151, 176, 210, 0.14);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+    }
+    /* ── Main Customer Directory Card Header ── */
+    .customer-directory-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(247,250,255,0.4) 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    :root[data-theme='dark'] .customer-directory-header {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(10,19,32,0.4) 100%);
+      border-bottom-color: rgba(151, 176, 210, 0.12);
+    }
+    .customer-directory-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .customer-directory-header-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+    .customer-directory-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid var(--border);
+      font-size: 19px;
+    }
+    :root[data-theme='dark'] .customer-directory-icon {
+      background: rgba(139, 180, 255, 0.12);
+      border-color: rgba(139, 180, 255, 0.2);
+      color: #8bb4ff;
+    }
+    .customer-directory-heading {
+      min-width: 0;
+    }
+    .customer-directory-heading h3 {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin: 0;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+    .customer-directory-heading p {
+      margin: 4px 0 0;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    /* Subbar with 23 Customers pill on left and Buttons on right */
+    .customer-directory-subbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .customer-count-pill {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid var(--border);
+      font-feature-settings: "tnum";
+      white-space: nowrap;
+      user-select: none;
+    }
+    :root[data-theme='dark'] .customer-count-pill {
+      background: rgba(139, 180, 255, 0.12);
+      color: #8bb4ff;
+      border-color: rgba(139, 180, 255, 0.25);
+    }
+    .customer-directory-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+    .customer-directory-actions .btn {
+      width: auto !important;
+      white-space: nowrap !important;
+      height: 38px !important;
+      padding: 0 16px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      font-size: 13px !important;
+      font-weight: 650 !important;
+      border-radius: var(--radius-sm, 8px) !important;
+      box-sizing: border-box !important;
+      line-height: 1 !important;
+      transition: all 0.2s ease !important;
+      cursor: pointer;
+    }
+    .customer-directory-actions .btn i {
+      font-size: 13px;
+      line-height: 1;
+    }
+    .customer-directory-actions .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .customer-directory-actions .btn-secondary:hover {
+      background: var(--bg-card-hover, rgba(15, 39, 71, 0.05));
+      border-color: var(--border-strong, var(--border));
+    }
+    :root[data-theme='dark'] .customer-directory-actions .btn-secondary {
+      background: rgba(10, 19, 32, 0.6);
+      border-color: rgba(151, 176, 210, 0.16);
+      color: var(--text-primary);
+    }
+    :root[data-theme='dark'] .customer-directory-actions .btn-secondary:hover {
+      background: rgba(14, 24, 41, 0.85);
+      border-color: rgba(151, 176, 210, 0.28);
+    }
+    .customer-directory-actions .btn-secondary.active {
+      background: rgba(239, 68, 68, 0.1) !important;
+      color: #ef4444 !important;
+      border-color: rgba(239, 68, 68, 0.35) !important;
+    }
+    :root[data-theme='dark'] .customer-directory-actions .btn-secondary.active {
+      background: rgba(239, 68, 68, 0.18) !important;
+      color: #f87171 !important;
+      border-color: rgba(239, 68, 68, 0.4) !important;
+    }
+
+    /* ── Toolbar Row ── */
+    .customer-toolbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 24px;
+      background: linear-gradient(90deg, rgba(247, 250, 255, 0.95) 0%, rgba(240, 245, 252, 0.98) 100%);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    :root[data-theme='dark'] .customer-toolbar-row {
+      background: linear-gradient(90deg, rgba(10, 19, 32, 0.88) 0%, rgba(14, 24, 41, 0.94) 100%);
+      border-bottom-color: rgba(151, 176, 210, 0.12);
+    }
+    .customer-search-wrap {
+      position: relative;
+      flex: 1 1 280px;
+      min-width: 220px;
+    }
+    .search-field-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      font-size: 13px;
+    }
+    .customer-search-input {
+      width: 100%;
+      height: 38px;
+      padding: 8px 36px 8px 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .customer-search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--border-focus);
+    }
+    :root[data-theme='dark'] .customer-search-input:focus {
+      box-shadow: 0 0 0 3px rgba(139, 180, 255, 0.15);
+    }
+    .search-clear-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 12px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+    .search-clear-btn:hover {
+      color: var(--text-primary);
+      background: var(--border);
+    }
+    .customer-filters-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-control-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filter-field-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .filter-select {
+      height: 38px;
+      padding: 0 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      min-width: 130px;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .filter-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--border-focus);
+    }
+    .btn-clear-filters {
+      height: 38px;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .btn-clear-filters:hover {
+      background: var(--bg-card-hover);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    :root[data-theme='dark'] .btn-clear-filters {
+      background: rgba(10,19,32,0.6);
+      border-color: rgba(151,176,210,0.14);
+    }
+    :root[data-theme='dark'] .btn-clear-filters:hover {
+      background: rgba(14,24,41,0.8);
+      color: #8bb4ff;
+      border-color: #8bb4ff;
+    }
+
+    /* ── Custom Date Range Panel ── */
+    .custom-date-bar {
+      padding: 12px 24px;
+      background: rgba(47, 111, 237, 0.04);
+      border-bottom: 1px solid var(--border);
+    }
+    :root[data-theme='dark'] .custom-date-bar {
+      background: rgba(139, 180, 255, 0.03);
+      border-bottom-color: rgba(151, 176, 210, 0.1);
+    }
+    .custom-date-inputs {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .custom-date-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .custom-date-group label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+    .date-input {
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-family: inherit;
+      outline: none;
+    }
+    .date-input:focus {
+      border-color: var(--accent);
+    }
+
+    /* ── Bulk Action Floating / Sticky Bar ── */
+    .bulk-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 24px;
+      background: rgba(239, 68, 68, 0.08);
+      border-bottom: 1px solid rgba(239, 68, 68, 0.22);
+      flex-wrap: wrap;
+      animation: fadeInSlide 0.2s ease;
+    }
+    @keyframes fadeInSlide {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .bulk-action-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--danger, #ef4444);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .bulk-action-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ── Table Styling ── */
+    .customer-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 13.5px;
+    }
+    .customer-table th {
+      padding: 13px 18px;
+      font-size: 11px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      white-space: nowrap;
+      text-align: left;
+    }
+    :root[data-theme='dark'] .customer-table th {
+      background: rgba(10, 19, 32, 0.85);
+      border-bottom-color: rgba(151, 176, 210, 0.12);
+    }
+    .customer-table th.sortable-th {
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s ease;
+    }
+    .customer-table th.sortable-th:hover {
+      color: var(--accent);
+    }
+    .sort-indicator {
+      font-size: 10px;
+      margin-left: 4px;
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+    .sort-indicator.active {
+      color: var(--accent);
+      opacity: 1;
+    }
+    .customer-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+      transition: background 0.15s ease;
+    }
+    :root[data-theme='dark'] .customer-table td {
+      border-bottom-color: rgba(151, 176, 210, 0.08);
+    }
+    .customer-table tbody tr.customer-row:hover td {
+      background: var(--bg-card-hover, rgba(15, 39, 71, 0.03));
+    }
+    :root[data-theme='dark'] .customer-table tbody tr.customer-row:hover td {
+      background: rgba(255, 255, 255, 0.025);
+    }
+    .customer-table tbody tr.row-selected td {
+      background: rgba(47, 111, 237, 0.06);
+    }
+    :root[data-theme='dark'] .customer-table tbody tr.row-selected td {
+      background: rgba(139, 180, 255, 0.08);
+    }
+
+    .row-num-pill {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-feature-settings: "tnum";
+    }
+
+    /* Customer cell (Avatar + Name) */
+    .col-customer {
+      min-width: 190px;
+      max-width: 270px;
+    }
+    .customer-cell-main {
+      display: flex !important;
+      align-items: center !important;
+      gap: 11px !important;
+      min-width: 0 !important;
+      width: 100%;
+    }
+    .customer-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: rgba(47, 111, 237, 0.08) !important;
+      color: var(--accent, #2f6fed) !important;
+      border: 1px solid rgba(47, 111, 237, 0.2) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-weight: 750;
+      font-size: 12.5px;
+      letter-spacing: 0.5px;
+      flex-shrink: 0 !important;
+      user-select: none;
+    }
+    :root[data-theme='dark'] .customer-avatar {
+      background: rgba(139, 180, 255, 0.12) !important;
+      color: #8bb4ff !important;
+      border-color: rgba(139, 180, 255, 0.25) !important;
+    }
+    .customer-info-block {
+      min-width: 0 !important;
+      flex: 1 1 auto;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+    }
+    .customer-name-link {
+      display: block;
+      font-weight: 650;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      text-decoration: none;
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+    .customer-name-link:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+    .customer-phone-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: none;
+    }
+    .col-phone {
+      white-space: nowrap;
+      min-width: 130px;
+    }
+    .customer-phone-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: color 0.15s ease;
+      font-feature-settings: "tnum";
+      white-space: nowrap;
+    }
+    .customer-phone-link i {
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .customer-phone-link:hover {
+      color: var(--accent);
+    }
+    .col-city {
+      white-space: nowrap;
+      min-width: 110px;
+    }
+    .customer-city-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .customer-city-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(15, 39, 71, 0.05);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    :root[data-theme='dark'] .customer-city-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(151, 176, 210, 0.12);
+    }
+
+    .col-added {
+      white-space: nowrap;
+      min-width: 120px;
+    }
+    .customer-date-primary {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      font-feature-settings: "tnum";
+    }
+    .customer-date-time {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      margin-top: 1px;
+      font-feature-settings: "tnum";
+    }
+    .customer-date-time i {
+      font-size: 10.5px;
+      opacity: 0.8;
+    }
+
+    /* Documents Action */
+    .col-docs {
+      white-space: nowrap;
+      min-width: 130px;
+    }
+    .btn-docs,
+    .btn-docs-empty {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      height: 30px;
+      padding: 0 11px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+      font-family: inherit;
+      border: 1px solid transparent;
+      box-sizing: border-box;
+      line-height: 1;
+    }
+    .btn-docs {
+      background: rgba(47, 111, 237, 0.08);
+      color: var(--accent);
+      border-color: rgba(47, 111, 237, 0.25);
+    }
+    .btn-docs:hover {
+      background: rgba(47, 111, 237, 0.16);
+      border-color: var(--accent);
+    }
+    :root[data-theme='dark'] .btn-docs {
+      background: rgba(139, 180, 255, 0.1);
+      border-color: rgba(139, 180, 255, 0.25);
+      color: #8bb4ff;
+    }
+    :root[data-theme='dark'] .btn-docs:hover {
+      background: rgba(139, 180, 255, 0.18);
+      border-color: #8bb4ff;
+    }
+    .btn-docs-empty {
+      background: rgba(148, 163, 184, 0.07);
+      color: var(--text-muted);
+      border-color: var(--border);
+    }
+    .btn-docs-empty:hover {
+      background: rgba(148, 163, 184, 0.14);
+      color: var(--text-secondary);
+      border-color: var(--border-strong, var(--border));
+    }
+    :root[data-theme='dark'] .btn-docs-empty {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(151, 176, 210, 0.12);
+      color: var(--text-muted);
+    }
+    :root[data-theme='dark'] .btn-docs-empty:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-primary);
+    }
+    .doc-count-badge {
+      display: inline-block;
+      min-width: 17px;
+      height: 17px;
+      line-height: 17px;
+      text-align: center;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      background: var(--accent);
+      color: #fff;
+      padding: 0 4px;
+    }
+    :root[data-theme='dark'] .doc-count-badge {
+      background: #4f8df7;
+    }
+
+    /* Actions Column */
+    .col-actions {
+      text-align: right;
+      white-space: nowrap;
+      min-width: 140px;
+    }
+    .customer-row-actions {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .btn-new-loan {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 650;
+      height: 30px;
+      padding: 0 11px;
+      border-radius: 7px;
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+      box-sizing: border-box;
+      line-height: 1;
+    }
+    .btn-new-loan:hover {
+      background: #10b981;
+      color: #fff;
+      border-color: #10b981;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.28);
+    }
+    :root[data-theme='dark'] .btn-new-loan {
+      background: rgba(16, 185, 129, 0.14);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+    :root[data-theme='dark'] .btn-new-loan:hover {
+      background: #10b981;
+      color: #fff;
+    }
+    .btn-delete-row {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      background: rgba(239, 68, 68, 0.06);
+      color: #ef4444;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-size: 12px;
+      box-sizing: border-box;
+    }
+    .btn-delete-row:hover {
+      background: #ef4444;
+      color: #fff;
+      border-color: #ef4444;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.28);
+    }
+    :root[data-theme='dark'] .btn-delete-row {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.28);
+      color: #f87171;
+    }
+    :root[data-theme='dark'] .btn-delete-row:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    /* Empty State */
+    .empty-state-cell {
+      padding: 48px 20px !important;
+      text-align: center;
+    }
+    .customer-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+    .empty-state-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 14px;
+    }
+    :root[data-theme='dark'] .empty-state-icon {
+      background: rgba(139, 180, 255, 0.12);
+      color: #8bb4ff;
+    }
+    .customer-empty-state h4 {
+      font-size: 16px;
+      font-weight: 750;
+      color: var(--text-primary);
+      margin: 0 0 6px;
+    }
+    .customer-empty-state p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0 0 16px;
+      line-height: 1.45;
+    }
+
+    /* Skeleton Loading State */
+    .skeleton-box {
+      background: linear-gradient(90deg, rgba(151,176,210,0.12) 25%, rgba(151,176,210,0.22) 50%, rgba(151,176,210,0.12) 75%);
+      background-size: 200% 100%;
+      animation: skeletonPulse 1.5s infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeletonPulse {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
     /* ── Table Pagination ─────────────────────────────────────────────── */
     .tbl-pagination {
       display: flex;
       align-items: center;
       justify-content: flex-end;
       gap: 6px;
-      padding: 12px 16px 10px;
+      padding: 14px 24px;
       flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    :root[data-theme='dark'] .tbl-pagination {
+      background: rgba(10, 19, 32, 0.6);
+      border-top-color: rgba(151, 176, 210, 0.1);
     }
     .tbl-pg-btn {
       display: inline-flex;
@@ -57,7 +862,7 @@
       color: var(--accent);
     }
     .tbl-pg-btn.active {
-      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      background: var(--accent);
       border-color: var(--accent);
       color: #fff;
       box-shadow: 0 4px 12px rgba(15,39,71,0.22);
@@ -78,18 +883,62 @@
       color: #8bb4ff;
     }
     :root[data-theme='dark'] .tbl-pg-btn.active {
-      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      background: var(--accent);
       border-color: var(--accent);
       color: #fff;
     }
     .tbl-pg-info {
-      font-size: 12px;
+      font-size: 12.5px;
       color: var(--text-muted);
       margin-right: auto;
+      font-weight: 500;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 860px) {
+      .customer-directory-header {
+        padding: 16px 20px 14px;
+        gap: 14px;
+      }
+      .customer-directory-subbar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .customer-toolbar-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .customer-filters-group {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .filter-control-wrap {
+        flex: 1 1 140px;
+      }
+      .filter-select {
+        width: 100%;
+      }
+      .btn-clear-filters {
+        margin-left: auto;
+      }
     }
     @media (max-width: 600px) {
+      .customer-directory-subbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .customer-directory-actions {
+        width: 100%;
+      }
+      .customer-directory-actions .btn {
+        flex: 1 1 auto;
+      }
       .tbl-pagination { justify-content: center; }
-      .tbl-pg-info { width: 100%; text-align: center; margin-right: 0; }
+      .tbl-pg-info { width: 100%; text-align: center; margin-right: 0; margin-bottom: 6px; }
+      .customer-phone-sub { display: inline-flex; align-items: center; gap: 4px; }
+      .col-phone { display: none; }
     }
     /* ── Documents Modal ── */
     .docs-modal-overlay {
@@ -221,36 +1070,6 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
-
-    /* Docs button in table */
-    .btn-docs {
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 6px;
-      background: rgba(99,179,237,0.12);
-      color: #63b3ed;
-      border: 1px solid rgba(99,179,237,0.25);
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s;
-      white-space: nowrap;
-    }
-    .btn-docs:hover { background: rgba(99,179,237,0.22); border-color: rgba(99,179,237,0.45); }
-
-    /* Create Loan button in table */
-    .btn-new-loan {
-      display: inline-block;
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 6px;
-      background: rgba(104,211,145,0.12);
-      color: #68d391;
-      border: 1px solid rgba(104,211,145,0.25);
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.15s, border-color 0.15s;
-      white-space: nowrap;
-    }
-    .btn-new-loan:hover { background: rgba(104,211,145,0.22); border-color: rgba(104,211,145,0.45); }
 
     .docs-empty {
       text-align: center;
@@ -778,32 +1597,32 @@
   </style>
 </head>
 <body>
-<div class="app-layout">
+<div class="app-layout employee-page">
   <aside class="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
-        <div><h2><span class="emoji-sm">💼</span>CLN System</h2><span>Employee Portal</span></div>
+        <div><h2>CLN Lending Suite</h2><span>Employee Workspace</span></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-                        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span> Dashboard</a>
-        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon"><i class="fas fa-user-plus"></i></span> Add Customer</a>
-        <a href="/employee/my-customers.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-users"></i></span> My Customers</a>
-        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase"></i></span> My Loans</a>
-        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> My Assigned Records</a>
-        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line"></i></span> APR</a>
-</div>
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Add Customer</span></a>
+        <a href="/employee/my-customers.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>My Customers</span></a>
+        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>My Loans</span></a>
+        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>My Assigned Records</span></a>
+        <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="sidebar-user-avatar">E</div>
         <div class="user-details"><p id="sidebar-user-name">Employee</p><span id="sidebar-user-role">employee</span></div>
       </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
     </div>
   </aside>
 
@@ -812,42 +1631,170 @@
 
   <main class="main-content">
     <div class="topbar">
-      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
-      <div class="topbar-title"><h2><span class="emoji">👥</span>My Customers</h2><p>View, search and manage your registered customers</p></div>
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i> <span>Menu</span>
+      </button>
+      <div class="topbar-title">
+        <h2><i class="fas fa-users" aria-hidden="true"></i> <span>My Customers</span></h2>
+        <p>View, search, and manage customers assigned to you.</p>
+      </div>
+      <div class="topbar-actions">
+        <!-- Notification Bell -->
+        <div class="notif-bell-wrap" id="notif-bell-wrap">
+          <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifDropdown()" aria-label="Notifications" title="Notifications" tabindex="0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+              <path d="M10 21h4"/>
+            </svg>
+            <span id="notif-bell-badge" class="notif-badge" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown" id="notif-dropdown" role="region" aria-label="Notifications Panel">
+            <div class="notif-dd-header">
+              <div class="notif-dd-title-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+                <h4>Notifications</h4>
+              </div>
+              <button class="notif-dd-link" onclick="markAllRead()">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
+          </div>
+        </div>
+        <div class="topbar-date-badge">
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+          <span id="current-date">Today</span>
+        </div>
+      </div>
     </div>
     <div class="page-content">
       <div id="page-alert" class="alert"></div>
 
-      <div class="card full-table">
-        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-          <h3>My Customers</h3>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <input type="text" id="customer-search" class="form-control" placeholder="Search by name or phone..." style="width:220px;padding:6px 12px;font-size:13px;" oninput="filterCustomers()" />
-            <button class="btn btn-danger btn-sm" id="delete-mode-btn" onclick="toggleDeleteMode()" style="display:none;">Delete</button>
-            <button class="btn btn-secondary btn-sm" id="cancel-delete-btn" onclick="cancelDeleteMode()" style="display:none;">Cancel</button>
+      <div class="customer-directory-card">
+        <!-- Card Header with Title, Count & Top Actions -->
+        <div class="customer-directory-header">
+          <div class="customer-directory-header-top">
+            <div class="customer-directory-header-title-wrap">
+              <div class="customer-directory-icon">
+                <i class="fas fa-address-book" aria-hidden="true"></i>
+              </div>
+              <div class="customer-directory-heading">
+                <h3>Customer Directory</h3>
+                <p>Manage borrower profiles, verify uploaded documents, and originate loans</p>
+              </div>
+            </div>
+          </div>
+          <div class="customer-directory-subbar">
+            <span class="customer-count-pill" id="customer-total-count">0 Customers</span>
+            <div class="customer-directory-actions">
+              <button type="button" class="btn btn-secondary" id="btn-toggle-select" onclick="toggleDeleteMode()" title="Toggle selection mode for bulk deletion">
+                <i class="fas fa-check-square" aria-hidden="true"></i> <span>Select</span>
+              </button>
+              <a href="/employee/add-customer.html" class="btn btn-primary" title="Register a new customer">
+                <i class="fas fa-user-plus" aria-hidden="true"></i> <span>Add Customer</span>
+              </a>
+            </div>
           </div>
         </div>
+
+        <!-- Customer Toolbar (Search, City Filter, Date Filter, Clear) -->
+        <div class="customer-toolbar-row">
+          <div class="customer-search-wrap">
+            <i class="fas fa-search search-field-icon" aria-hidden="true"></i>
+            <input type="text" id="customer-search" class="customer-search-input" placeholder="Search customers by name, phone, or city..." oninput="onSearchInput()" autocomplete="off" />
+            <button type="button" class="search-clear-btn" id="search-clear-btn" onclick="clearSearch()" style="display:none;" title="Clear search">
+              <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="customer-filters-group">
+            <div class="filter-control-wrap">
+              <label for="city-filter" class="filter-field-label">
+                <i class="fas fa-city" aria-hidden="true"></i> <span>City</span>
+              </label>
+              <select id="city-filter" class="filter-select" onchange="onCityFilterChange()">
+                <option value="">All Cities</option>
+              </select>
+            </div>
+
+            <div class="filter-control-wrap">
+              <label for="date-filter" class="filter-field-label">
+                <i class="fas fa-calendar-alt" aria-hidden="true"></i> <span>Date</span>
+              </label>
+              <select id="date-filter" class="filter-select" onchange="onDateFilterChange()">
+                <option value="all">All Dates</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+                <option value="custom">Custom Range...</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn-clear-filters" id="btn-clear-filters" onclick="clearAllFilters()" title="Reset all filters and search">
+              <i class="fas fa-rotate-left" aria-hidden="true"></i> <span>Clear</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsible Custom Date Range Picker -->
+        <div class="custom-date-bar" id="custom-date-bar" style="display:none;">
+          <div class="custom-date-inputs">
+            <div class="custom-date-group">
+              <label for="custom-date-from">From</label>
+              <input type="date" id="custom-date-from" class="date-input" onchange="onCustomDateInputChange()" />
+            </div>
+            <div class="custom-date-group">
+              <label for="custom-date-to">To</label>
+              <input type="date" id="custom-date-to" class="date-input" onchange="onCustomDateInputChange()" />
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" onclick="applyCustomDateRange()">Apply</button>
+          </div>
+        </div>
+
+        <!-- Bulk Action Floating Bar -->
+        <div id="delete-action-bar" class="bulk-action-bar" style="display:none;">
+          <div class="bulk-action-info">
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
+            <span id="selected-count">0 selected</span>
+          </div>
+          <div class="bulk-action-btns">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="cancelDeleteMode()">Cancel</button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDeleteSelected()">
+              <i class="fas fa-trash-alt" aria-hidden="true"></i> <span>Delete Selected</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Table Wrapper -->
         <div class="table-wrapper">
-          <table>
-            <thead><tr>
-              <th id="checkbox-header" style="display:none;width:40px;"><input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()" /></th>
-              <th>#</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>City</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Documents</th>
-              <th>New Loan</th>
-            </tr></thead>
-            <tbody id="my-customers-tbody"><tr><td colspan="9" class="text-center text-muted">Loading...</td></tr></tbody>
+          <table class="customer-table" id="customer-table">
+            <thead>
+              <tr>
+                <th id="checkbox-header" class="col-checkbox" style="display:none;width:44px;text-align:center;">
+                  <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()" aria-label="Select all customers" />
+                </th>
+                <th class="col-num" style="width:54px;">#</th>
+                <th class="col-customer sortable-th" onclick="handleSort('name')">
+                  <span>Customer</span> <i class="fas fa-sort sort-indicator" id="sort-name-icon"></i>
+                </th>
+                <th class="col-phone">Phone</th>
+                <th class="col-city sortable-th" onclick="handleSort('area')">
+                  <span>City</span> <i class="fas fa-sort sort-indicator" id="sort-area-icon"></i>
+                </th>
+                <th class="col-added sortable-th" onclick="handleSort('created_at')">
+                  <span>Added</span> <i class="fas fa-sort sort-indicator" id="sort-created_at-icon"></i>
+                </th>
+                <th class="col-docs">Documents</th>
+                <th class="col-actions" style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="my-customers-tbody">
+              <!-- Rendered via JavaScript -->
+            </tbody>
           </table>
         </div>
+
+        <!-- Pagination Section -->
         <div id="customers-pagination"></div>
-        <div id="delete-action-bar" style="display:none;padding:12px 16px;background:rgba(239,68,68,0.1);border-top:1px solid var(--border);flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">
-          <p id="selected-count" style="font-size:13px;color:var(--text-secondary);">0 selected</p>
-          <button class="btn btn-danger" onclick="confirmDeleteSelected()">Delete Selected</button>
-        </div>
       </div>
     </div>
   </main>
@@ -879,21 +1826,21 @@
   <div class="docs-modal-overlay" id="docs-modal" onclick="if(event.target.id==='docs-modal') closeDocsModal()">
     <div class="docs-modal" onclick="event.stopPropagation()">
       <div class="docs-modal-header">
-        <h3 id="docs-modal-title">📄 Documents</h3>
-        <button class="docs-modal-close" onclick="closeDocsModal()" title="Close">✕</button>
+        <h3 id="docs-modal-title"><i class="fas fa-file-lines" style="color:var(--accent);"></i> <span id="docs-modal-customer-name">Documents</span></h3>
+        <button class="docs-modal-close" onclick="closeDocsModal()" title="Close" aria-label="Close documents modal"><i class="fas fa-times" aria-hidden="true"></i></button>
       </div>
       <div class="docs-modal-body">
 
         <!-- Existing docs list -->
         <div class="docs-section-title">Uploaded Documents</div>
         <div id="docs-list-container">
-          <div class="docs-empty"><div class="docs-empty-icon">📂</div>Loading...</div>
+          <div class="docs-empty"><i class="fas fa-inbox" style="font-size:36px;opacity:0.35;margin-bottom:8px;display:block;"></i>Loading...</div>
         </div>
 
         <div class="docs-divider"></div>
 
         <!-- Add document form -->
-        <div class="docs-section-title">➕ Add New Document</div>
+        <div class="docs-section-title"><i class="fas fa-plus-circle" style="color:var(--accent);margin-right:4px;"></i> Add New Document</div>
         <div class="docs-upload-form">
           <div class="form-group">
             <label>Document Type</label>
@@ -921,10 +1868,10 @@
           </div>
           <div class="form-group">
             <label>Document Password (optional)</label>
-            <input type="password" id="modal-doc-password" class="form-control" placeholder="Enter document password if any" autocomplete="off" />
+            <input type="password" id="modal-doc-password" name="modal_doc_password_protection_no_autofill" class="form-control" placeholder="Enter document password if any" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" />
           </div>
           <button class="btn btn-primary" id="modal-upload-btn" onclick="uploadDocModal()">
-            <span class="emoji-sm">📤</span> Upload Document
+            <i class="fas fa-arrow-up-from-bracket" aria-hidden="true"></i> <span>Upload Document</span>
           </button>
           <div id="modal-upload-alert" style="margin-top:10px;font-size:13px;"></div>
         </div>
@@ -933,57 +1880,453 @@
     </div>
   </div>
 
+  <!-- ══ Single Customer Delete Confirmation Modal ════════════════ -->
+  <div class="modal-overlay" id="single-delete-modal" onclick="if (event.target.id==='single-delete-modal') closeSingleDeleteModal()">
+    <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;padding:26px 24px 22px;border-radius:16px;">
+      <div style="width:52px;height:52px;border-radius:14px;background:rgba(239,68,68,0.12);color:#ef4444;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;">
+        <i class="fas fa-trash-alt" aria-hidden="true"></i>
+      </div>
+      <h3 style="font-size:18px;font-weight:750;color:var(--text-primary);margin:0 0 8px;text-align:center;">Delete Customer?</h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);margin:0 0 16px;line-height:1.5;text-align:center;">
+        Are you sure you want to delete <strong id="single-delete-name" style="color:var(--text-primary);"></strong>?
+      </p>
+      <div style="padding:11px 14px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:10px;font-size:12px;color:var(--text-secondary);margin-bottom:20px;line-height:1.45;">
+        <i class="fas fa-exclamation-triangle" style="color:#ef4444;margin-right:6px;" aria-hidden="true"></i>
+        <span>This customer and their uploaded document files will be permanently deleted. Customers with active loan applications cannot be deleted.</span>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeSingleDeleteModal()" style="flex:1;justify-content:center;">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm-single-delete-btn" onclick="executeSingleDelete()" style="flex:1;justify-content:center;">
+          <i class="fas fa-trash-alt" aria-hidden="true"></i> <span>Delete Customer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20260705d"></script>
+<script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
-  const user = requireRole('employee');
-  if (user) {
-    renderSidebarUser();
-    loadMyCustomers();
-    document.getElementById('delete-mode-btn').style.display = 'inline-block';
-  }
-
+  // ── State Management ─────────────────────────────────────────
   let allCustomers = [];
+  let allFilteredCustomers = [];
   let deleteMode = false;
   const selectedCustomers = new Set();
   
   let customersPage = 1;
   const EMP_CUSTOMERS_PER_PAGE = 20;
-  let allFilteredCustomers = [];
 
-  // ── Active docs modal customer ──────────────────────────────
+  let searchQuery = '';
+  let selectedCity = '';
+  let selectedDateFilter = 'all';
+  let customDateFrom = '';
+  let customDateTo = '';
+  let sortColumn = 'created_at';
+  let sortDirection = 'desc';
+
+  let singleDeleteCustomerId = null;
   let activeDocsCustomerId = null;
 
-  async function loadMyCustomers() {
-    const res = await api.get('/employee/customers');
-    if (!res?.ok) return;
-    allCustomers = res.data.data;
-    customersPage = 1;
-    filterCustomers();
+  const user = requireRole('employee');
+  if (user) {
+    renderSidebarUser();
+    updateTopbarDate();
+    loadMyCustomers();
   }
 
-  function filterCustomers() {
-    const q = document.getElementById('customer-search').value.trim().toLowerCase();
-    let list = allCustomers;
-    if (q) {
-      list = allCustomers.filter(c =>
-        c.name.toLowerCase().includes(q) || c.phone.includes(q)
-      );
+  function updateTopbarDate() {
+    const dateEl = document.getElementById('current-date');
+    if (dateEl) {
+      dateEl.textContent = formatDate(new Date());
     }
+  }
+
+  // ── Init & Data Fetching ──────────────────────────────────────
+  async function loadMyCustomers() {
+    renderTableSkeleton();
+    const res = await api.get('/employee/customers');
+    if (!res?.ok) {
+      renderTableError(res?.data?.message || 'Failed to load customers');
+      return;
+    }
+    allCustomers = Array.isArray(res.data?.data) ? res.data.data : [];
+    populateCityDropdown();
+    applyCustomerFilters();
+  }
+
+  function renderTableSkeleton() {
+    const tbody = document.getElementById('my-customers-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = Array.from({ length: 6 }).map((_, i) => `
+      <tr class="skeleton-row">
+        <td class="checkbox-cell" style="display:${deleteMode ? 'table-cell' : 'none'};"><div class="skeleton-box" style="width:18px;height:18px;border-radius:4px;margin:0 auto;"></div></td>
+        <td style="color:var(--text-muted);"><div class="skeleton-box" style="width:24px;height:16px;"></div></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="skeleton-box" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"></div>
+            <div style="display:flex;flex-direction:column;gap:6px;width:130px;">
+              <div class="skeleton-box" style="width:100%;height:14px;border-radius:4px;"></div>
+              <div class="skeleton-box" style="width:65%;height:10px;border-radius:4px;"></div>
+            </div>
+          </div>
+        </td>
+        <td><div class="skeleton-box" style="width:90px;height:14px;border-radius:4px;"></div></td>
+        <td><div class="skeleton-box" style="width:75px;height:14px;border-radius:4px;"></div></td>
+        <td>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div class="skeleton-box" style="width:80px;height:13px;border-radius:4px;"></div>
+            <div class="skeleton-box" style="width:50px;height:11px;border-radius:4px;"></div>
+          </div>
+        </td>
+        <td><div class="skeleton-box" style="width:95px;height:24px;border-radius:6px;"></div></td>
+        <td style="text-align:right;">
+          <div style="display:inline-flex;gap:6px;">
+            <div class="skeleton-box" style="width:84px;height:26px;border-radius:6px;"></div>
+            <div class="skeleton-box" style="width:28px;height:26px;border-radius:6px;"></div>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+    const pagEl = document.getElementById('customers-pagination');
+    if (pagEl) pagEl.innerHTML = '';
+  }
+
+  function renderTableError(msg) {
+    const tbody = document.getElementById('my-customers-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center;padding:48px 16px;">
+          <div style="display:inline-flex;flex-direction:column;align-items:center;gap:12px;max-width:380px;">
+            <div style="width:48px;height:48px;border-radius:12px;background:rgba(239,68,68,0.12);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:22px;">
+              <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+            </div>
+            <h4 style="font-size:16px;font-weight:700;color:var(--text-primary);margin:0;">Failed to Load Customers</h4>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0;line-height:1.45;">${escapeHtml(msg || 'An error occurred while fetching your customer directory.')}</p>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadMyCustomers()" style="margin-top:6px;">
+              <i class="fas fa-rotate-right" aria-hidden="true"></i> <span>Retry</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+    const pagEl = document.getElementById('customers-pagination');
+    if (pagEl) pagEl.innerHTML = '';
+    const countEl = document.getElementById('customer-total-count');
+    if (countEl) countEl.textContent = '0 Customers';
+  }
+
+  // ── City Formatting & Dropdown ───────────────────────────────
+  function formatCityDisplay(str) {
+    if (!str) return '—';
+    return String(str)
+      .trim()
+      .split(/\s+/)
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  function populateCityDropdown() {
+    const citySelect = document.getElementById('city-filter');
+    if (!citySelect) return;
+    const currentVal = selectedCity;
     
-    // Reset page if search changes
-    if (typeof filterCustomers.lastQ === 'undefined') {
-      filterCustomers.lastQ = '';
+    // Group cities by normalized capitalized name
+    const cityMap = new Map();
+    allCustomers.forEach(c => {
+      const raw = String(c.area || '').trim();
+      if (!raw) return;
+      const formatted = formatCityDisplay(raw);
+      if (!cityMap.has(formatted)) {
+        cityMap.set(formatted, raw);
+      }
+    });
+    
+    const sortedCities = Array.from(cityMap.keys()).sort((a, b) => a.localeCompare(b));
+    
+    let html = '<option value="">All Cities</option>';
+    sortedCities.forEach(city => {
+      const isSelected = city.toLowerCase() === currentVal.toLowerCase() ? 'selected' : '';
+      html += `<option value="${escapeHtml(city)}" ${isSelected}>${escapeHtml(city)}</option>`;
+    });
+    citySelect.innerHTML = html;
+  }
+
+  // ── Customer Initials Helper ─────────────────────────────────
+  function getCustomerAvatarInfo(customer) {
+    const name = String(customer?.name || '').trim();
+    const parts = name.split(/\s+/).filter(Boolean);
+    let initials = 'C';
+    if (parts.length >= 2) {
+      initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    } else if (parts.length === 1 && parts[0].length > 0) {
+      initials = parts[0].substring(0, Math.min(2, parts[0].length)).toUpperCase();
     }
-    if (filterCustomers.lastQ !== q) {
-      customersPage = 1;
-      filterCustomers.lastQ = q;
+    return { initials };
+  }
+
+  // ── Date Parts Helper (Asia/Kolkata) ──────────────────────────
+  function getKolkataDateParts(d) {
+    if (!d) return null;
+    try {
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      const parts = formatter.formatToParts(d);
+      const y = parts.find(p => p.type === 'year')?.value;
+      const m = parts.find(p => p.type === 'month')?.value;
+      const day = parts.find(p => p.type === 'day')?.value;
+      return { year: parseInt(y, 10), month: parseInt(m, 10), day: parseInt(day, 10), ymd: `${y}-${m}-${day}` };
+    } catch (err) {
+      return null;
     }
+  }
+
+  // ── Filtering, Sorting & Count Pill ──────────────────────────
+  function applyCustomerFilters() {
+    const q = searchQuery.trim().toLowerCase();
+    const now = new Date();
+    const nowParts = getKolkataDateParts(now);
+    
+    let list = allCustomers.filter(c => {
+      // 1. Search Query (name, phone, area)
+      if (q) {
+        const name = String(c.name || '').toLowerCase();
+        const phone = String(c.phone || '').toLowerCase();
+        const area = String(c.area || '').toLowerCase();
+        if (!name.includes(q) && !phone.includes(q) && !area.includes(q)) {
+          return false;
+        }
+      }
+      
+      // 2. City Filter
+      if (selectedCity) {
+        const cityFormatted = formatCityDisplay(c.area);
+        if (cityFormatted.toLowerCase() !== selectedCity.toLowerCase()) {
+          return false;
+        }
+      }
+      
+      // 3. Date Filter
+      if (selectedDateFilter && selectedDateFilter !== 'all') {
+        const cDate = parseDisplayDate(c.created_at);
+        if (!cDate) return false;
+        const cParts = getKolkataDateParts(cDate);
+        if (!cParts || !nowParts) return false;
+        
+        if (selectedDateFilter === 'today') {
+          if (cParts.ymd !== nowParts.ymd) return false;
+        } else if (selectedDateFilter === 'week') {
+          // Calendar week (Monday to Sunday in Kolkata)
+          const nowKolkata = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+          const dayOfWeek = (nowKolkata.getDay() + 6) % 7; // 0=Mon, 6=Sun
+          const startOfWeek = new Date(nowKolkata);
+          startOfWeek.setDate(nowKolkata.getDate() - dayOfWeek);
+          startOfWeek.setHours(0, 0, 0, 0);
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate() + 6);
+          endOfWeek.setHours(23, 59, 59, 999);
+          
+          const cKolkata = new Date(cDate.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+          if (cKolkata < startOfWeek || cKolkata > endOfWeek) return false;
+        } else if (selectedDateFilter === 'month') {
+          if (cParts.year !== nowParts.year || cParts.month !== nowParts.month) return false;
+        } else if (selectedDateFilter === 'year') {
+          if (cParts.year !== nowParts.year) return false;
+        } else if (selectedDateFilter === 'custom') {
+          if (customDateFrom && cParts.ymd < customDateFrom) return false;
+          if (customDateTo && cParts.ymd > customDateTo) return false;
+        }
+      }
+      
+      return true;
+    });
+    
+    // Sort
+    list.sort((a, b) => {
+      let valA = a[sortColumn];
+      let valB = b[sortColumn];
+      
+      if (sortColumn === 'name') {
+        valA = String(valA || '').toLowerCase();
+        valB = String(valB || '').toLowerCase();
+        const cmp = valA.localeCompare(valB);
+        return sortDirection === 'asc' ? cmp : -cmp;
+      }
+      if (sortColumn === 'area') {
+        valA = formatCityDisplay(valA).toLowerCase();
+        valB = formatCityDisplay(valB).toLowerCase();
+        const cmp = valA.localeCompare(valB);
+        return sortDirection === 'asc' ? cmp : -cmp;
+      }
+      if (sortColumn === 'created_at') {
+        const dateA = parseDisplayDate(valA)?.getTime() || 0;
+        const dateB = parseDisplayDate(valB)?.getTime() || 0;
+        return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+      return 0;
+    });
     
     allFilteredCustomers = list;
+    
+    updateCustomerCountPill();
+    updateClearFiltersButton();
+    
+    const totalPages = Math.ceil(allFilteredCustomers.length / EMP_CUSTOMERS_PER_PAGE) || 1;
+    if (customersPage > totalPages) customersPage = 1;
+    
     renderCustomersPage();
   }
 
+  function updateCustomerCountPill() {
+    const pill = document.getElementById('customer-total-count');
+    if (!pill) return;
+    const filtered = allFilteredCustomers.length;
+    const total = allCustomers.length;
+    
+    if (isFilterActive()) {
+      pill.textContent = `${filtered} of ${total} Customer${total === 1 ? '' : 's'}`;
+    } else {
+      pill.textContent = `${total} Customer${total === 1 ? '' : 's'}`;
+    }
+  }
+
+  function isFilterActive() {
+    return Boolean(
+      searchQuery.trim() ||
+      selectedCity ||
+      (selectedDateFilter && selectedDateFilter !== 'all')
+    );
+  }
+
+  function updateClearFiltersButton() {
+    const btn = document.getElementById('btn-clear-filters');
+    if (!btn) return;
+    if (isFilterActive()) {
+      btn.classList.add('has-active-filters');
+    } else {
+      btn.classList.remove('has-active-filters');
+    }
+  }
+
+  // ── Toolbar Event Handlers ───────────────────────────────────
+  function onSearchInput() {
+    const input = document.getElementById('customer-search');
+    searchQuery = input ? input.value : '';
+    const clearBtn = document.getElementById('search-clear-btn');
+    if (clearBtn) {
+      clearBtn.style.display = searchQuery ? 'block' : 'none';
+    }
+    customersPage = 1;
+    applyCustomerFilters();
+  }
+
+  function clearSearch() {
+    const input = document.getElementById('customer-search');
+    if (input) input.value = '';
+    searchQuery = '';
+    const clearBtn = document.getElementById('search-clear-btn');
+    if (clearBtn) clearBtn.style.display = 'none';
+    customersPage = 1;
+    applyCustomerFilters();
+    if (input) input.focus();
+  }
+
+  function onCityFilterChange() {
+    const select = document.getElementById('city-filter');
+    selectedCity = select ? select.value : '';
+    customersPage = 1;
+    applyCustomerFilters();
+  }
+
+  function onDateFilterChange() {
+    const select = document.getElementById('date-filter');
+    selectedDateFilter = select ? select.value : 'all';
+    const customBar = document.getElementById('custom-date-bar');
+    if (selectedDateFilter === 'custom') {
+      if (customBar) customBar.style.display = 'block';
+    } else {
+      if (customBar) customBar.style.display = 'none';
+      customDateFrom = '';
+      customDateTo = '';
+      const fromInput = document.getElementById('custom-date-from');
+      const toInput = document.getElementById('custom-date-to');
+      if (fromInput) fromInput.value = '';
+      if (toInput) toInput.value = '';
+      customersPage = 1;
+      applyCustomerFilters();
+    }
+  }
+
+  function onCustomDateInputChange() {
+    customDateFrom = document.getElementById('custom-date-from')?.value || '';
+    customDateTo = document.getElementById('custom-date-to')?.value || '';
+  }
+
+  function applyCustomDateRange() {
+    customDateFrom = document.getElementById('custom-date-from')?.value || '';
+    customDateTo = document.getElementById('custom-date-to')?.value || '';
+    customersPage = 1;
+    applyCustomerFilters();
+  }
+
+  function clearAllFilters() {
+    searchQuery = '';
+    selectedCity = '';
+    selectedDateFilter = 'all';
+    customDateFrom = '';
+    customDateTo = '';
+    customersPage = 1;
+    
+    const searchInput = document.getElementById('customer-search');
+    if (searchInput) searchInput.value = '';
+    const clearBtn = document.getElementById('search-clear-btn');
+    if (clearBtn) clearBtn.style.display = 'none';
+    
+    const citySelect = document.getElementById('city-filter');
+    if (citySelect) citySelect.value = '';
+    
+    const dateSelect = document.getElementById('date-filter');
+    if (dateSelect) dateSelect.value = 'all';
+    
+    const customBar = document.getElementById('custom-date-bar');
+    if (customBar) customBar.style.display = 'none';
+    const fromInput = document.getElementById('custom-date-from');
+    const toInput = document.getElementById('custom-date-to');
+    if (fromInput) fromInput.value = '';
+    if (toInput) toInput.value = '';
+    
+    applyCustomerFilters();
+  }
+
+  // ── Column Sorting ───────────────────────────────────────────
+  function handleSort(col) {
+    if (sortColumn === col) {
+      sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortColumn = col;
+      sortDirection = (col === 'created_at') ? 'desc' : 'asc';
+    }
+    updateSortIndicators();
+    applyCustomerFilters();
+  }
+
+  function updateSortIndicators() {
+    ['name', 'area', 'created_at'].forEach(c => {
+      const icon = document.getElementById(`sort-${c}-icon`);
+      if (!icon) return;
+      if (sortColumn === c) {
+        icon.className = `fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} sort-indicator active`;
+      } else {
+        icon.className = 'fas fa-sort sort-indicator';
+      }
+    });
+  }
+
+  // ── Table Rendering ──────────────────────────────────────────
   function renderCustomersPage() {
     const list = allFilteredCustomers;
     const total = list.length;
@@ -992,34 +2335,117 @@
     const end = Math.min(start + EMP_CUSTOMERS_PER_PAGE, total);
     const pageItems = list.slice(start, end);
     const tbody = document.getElementById('my-customers-tbody');
-
-    if (!total) {
-      tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No customers found.</td></tr>';
-      document.getElementById('customers-pagination').innerHTML = '';
+    
+    if (!tbody) return;
+    
+    if (total === 0) {
+      if (allCustomers.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align:center;padding:56px 16px;">
+              <div style="display:inline-flex;flex-direction:column;align-items:center;gap:12px;max-width:380px;">
+                <div style="width:52px;height:52px;border-radius:14px;background:rgba(47,111,237,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;">
+                  <i class="fas fa-users-slash" aria-hidden="true"></i>
+                </div>
+                <h4 style="font-size:16px;font-weight:750;color:var(--text-primary);margin:0;">No Customers Registered</h4>
+                <p style="font-size:13px;color:var(--text-secondary);margin:0;line-height:1.5;">You haven't added any customers yet. Add your first customer to get started.</p>
+                <a href="/employee/add-customer.html" class="btn btn-primary btn-sm" style="margin-top:6px;">
+                  <i class="fas fa-user-plus" aria-hidden="true"></i> <span>Add Customer</span>
+                </a>
+              </div>
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align:center;padding:56px 16px;">
+              <div style="display:inline-flex;flex-direction:column;align-items:center;gap:12px;max-width:380px;">
+                <div style="width:52px;height:52px;border-radius:14px;background:rgba(151,176,210,0.14);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-size:24px;">
+                  <i class="fas fa-search" aria-hidden="true"></i>
+                </div>
+                <h4 style="font-size:16px;font-weight:750;color:var(--text-primary);margin:0;">No Customers Found</h4>
+                <p style="font-size:13px;color:var(--text-secondary);margin:0;line-height:1.5;">No customers match your active search or filters. Try adjusting your search query or reset the filters.</p>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="clearAllFilters()" style="margin-top:6px;">
+                  <i class="fas fa-rotate-left" aria-hidden="true"></i> <span>Clear Filters</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+      const pagEl = document.getElementById('customers-pagination');
+      if (pagEl) pagEl.innerHTML = '';
       return;
     }
+    
+    tbody.innerHTML = pageItems.map((c, i) => renderCustomerRow(c, start + i + 1)).join('');
+    
+    syncCheckboxes();
+    
+    const pagEl = document.getElementById('customers-pagination');
+    if (pagEl) pagEl.innerHTML = buildCustomersPagination(total, customersPage, totalPages);
+  }
 
-    tbody.innerHTML = pageItems.map((c, i) => `
-      <tr>
-        <td class="checkbox-cell" style="display:none;width:40px;"><input type="checkbox" class="customer-checkbox" value="${c.id}" onchange="updateSelectedCount()" /></td>
-        <td>${start + i + 1}</td>
-        <td><span style="cursor:pointer;color:var(--color-primary);text-decoration:underline;" onclick="openCustomerDetail(${c.id})">${escapeHtml(c.name)}</span></td>
-        <td>${escapeHtml(c.phone)}</td>
-        <td>${escapeHtml(c.area)}</td>
-        <td>${formatDate(c.created_at)}</td>
-        <td>${formatTime(c.created_at)}</td>
-        <td><button class="btn-docs" onclick="openDocsModal(${c.id})">View Docs</button></td>
-        <td><a href="/employee/loans.html?customer_id=${c.id}" class="btn-new-loan">Create Loan</a></td>
+  function renderCustomerRow(c, index) {
+    const { initials } = getCustomerAvatarInfo(c);
+    const docCount = Number(c.document_count || 0);
+    const isSelected = selectedCustomers.has(c.id);
+    const fullName = escapeHtml(c.name || 'Unnamed Customer');
+    
+    return `
+      <tr class="${isSelected ? 'row-selected' : ''}" data-customer-id="${c.id}">
+        <td class="checkbox-cell" style="display:${deleteMode ? 'table-cell' : 'none'};width:44px;text-align:center;">
+          <input type="checkbox" class="customer-checkbox" value="${c.id}" ${isSelected ? 'checked' : ''} onchange="onCheckboxChange(${c.id}, this)" aria-label="Select ${fullName}" />
+        </td>
+        <td class="col-num">${index}</td>
+        <td class="col-customer">
+          <div class="customer-cell-main">
+            <div class="customer-avatar" aria-hidden="true">${initials}</div>
+            <div class="customer-info-block">
+              <a href="javascript:void(0)" class="customer-name-link" onclick="openCustomerDetail(${c.id})" title="${fullName}">${fullName}</a>
+              <span class="customer-phone-sub">
+                <i class="fas fa-phone" aria-hidden="true"></i>
+                <a href="tel:${escapeHtml(c.phone)}" class="customer-phone-link" onclick="event.stopPropagation()">${escapeHtml(c.phone)}</a>
+              </span>
+            </div>
+          </div>
+        </td>
+        <td class="col-phone">
+          <a href="tel:${escapeHtml(c.phone)}" class="customer-phone-link" onclick="event.stopPropagation()">
+            <i class="fas fa-phone" aria-hidden="true"></i> <span>${escapeHtml(c.phone)}</span>
+          </a>
+        </td>
+        <td class="col-city">
+          <span class="customer-city-text">${escapeHtml(formatCityDisplay(c.area))}</span>
+        </td>
+        <td class="col-added">
+          <div class="customer-date-primary">${formatDate(c.created_at)}</div>
+          <div class="customer-date-time"><i class="far fa-clock" aria-hidden="true"></i> <span>${formatTime(c.created_at)}</span></div>
+        </td>
+        <td class="col-docs">
+          ${docCount > 0 ? `
+            <button type="button" class="btn-docs" onclick="openDocsModal(${c.id})" title="View ${docCount} uploaded document(s)">
+              <i class="fas fa-file-lines" aria-hidden="true"></i> <span>View Docs (${docCount})</span>
+            </button>
+          ` : `
+            <button type="button" class="btn-docs-empty" onclick="openDocsModal(${c.id})" title="No documents attached — click to upload">
+              <i class="fas fa-folder-open" aria-hidden="true"></i> <span>No documents</span>
+            </button>
+          `}
+        </td>
+        <td class="col-actions" style="text-align:right;">
+          <div class="customer-row-actions">
+            <a href="/employee/loans.html?customer_id=${c.id}" class="btn-new-loan" title="Create loan application for ${fullName}">
+              <i class="fas fa-plus" aria-hidden="true"></i> <span>Create Loan</span>
+            </a>
+            <button type="button" class="btn-delete-row" onclick="openSingleDeleteModal(${c.id})" title="Delete customer ${fullName}" aria-label="Delete customer ${fullName}">
+              <i class="fas fa-trash-alt" aria-hidden="true"></i>
+            </button>
+          </div>
+        </td>
       </tr>
-    `).join('');
-
-    // Restore checkbox visibility when in delete mode
-    if (deleteMode) {
-      document.querySelectorAll('.checkbox-cell').forEach(cell => cell.style.display = 'table-cell');
-      document.getElementById('checkbox-header').style.display = 'table-cell';
-    }
-
-    document.getElementById('customers-pagination').innerHTML = buildCustomersPagination(total, customersPage, totalPages);
+    `;
   }
 
   function buildCustomersPagination(total, current, totalPages) {
@@ -1027,13 +2453,13 @@
     const start = (current - 1) * EMP_CUSTOMERS_PER_PAGE + 1;
     const end = Math.min(current * EMP_CUSTOMERS_PER_PAGE, total);
     let html = `<div class="tbl-pagination"><span class="tbl-pg-info">Showing ${start}–${end} of ${total} customers</span>`;
-    html += `<button class="tbl-pg-btn" ${current===1?'disabled':''} onclick="goCustomerPage(${current-1})">← Prev</button>`;
+    html += `<button type="button" class="tbl-pg-btn" ${current===1?'disabled':''} onclick="goCustomerPage(${current-1})"><i class="fas fa-chevron-left" aria-hidden="true"></i> Prev</button>`;
     const pages = getPagPages(current, totalPages);
     for (const p of pages) {
       if (p === '...') html += `<span class="tbl-pg-btn" style="cursor:default;pointer-events:none;">…</span>`;
-      else html += `<button class="tbl-pg-btn${p===current?' active':''}" onclick="goCustomerPage(${p})">${p}</button>`;
+      else html += `<button type="button" class="tbl-pg-btn${p===current?' active':''}" onclick="goCustomerPage(${p})">${p}</button>`;
     }
-    html += `<button class="tbl-pg-btn" ${current===totalPages?'disabled':''} onclick="goCustomerPage(${current+1})">Next →</button>`;
+    html += `<button type="button" class="tbl-pg-btn" ${current===totalPages?'disabled':''} onclick="goCustomerPage(${current+1})">Next <i class="fas fa-chevron-right" aria-hidden="true"></i></button>`;
     html += '</div>';
     return html;
   }
@@ -1041,7 +2467,8 @@
   function goCustomerPage(p) {
     customersPage = p;
     renderCustomersPage();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const card = document.querySelector('.customer-directory-card');
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function getPagPages(current, total) {
@@ -1074,20 +2501,81 @@
     return base ? base + filePath : filePath;
   }
 
-  // ── Documents Modal ──────────────────────────────────────────
+  // ── Single Customer Delete Modal ─────────────────────────────
+  function openSingleDeleteModal(id) {
+    const customer = allCustomers.find(c => c.id === id);
+    if (!customer) return;
+    singleDeleteCustomerId = id;
+    const nameEl = document.getElementById('single-delete-name');
+    if (nameEl) nameEl.textContent = customer.name;
+    
+    const modal = document.getElementById('single-delete-modal');
+    if (modal) modal.classList.add('show');
+    document.addEventListener('keydown', singleDeleteModalEsc);
+  }
+
+  function closeSingleDeleteModal() {
+    singleDeleteCustomerId = null;
+    const modal = document.getElementById('single-delete-modal');
+    if (modal) modal.classList.remove('show');
+    document.removeEventListener('keydown', singleDeleteModalEsc);
+    const btn = document.getElementById('confirm-single-delete-btn');
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-trash-alt" aria-hidden="true"></i> <span>Delete Customer</span>';
+    }
+  }
+
+  function singleDeleteModalEsc(e) {
+    if (e.key === 'Escape') closeSingleDeleteModal();
+  }
+
+  async function executeSingleDelete() {
+    if (!singleDeleteCustomerId) return;
+    const btn = document.getElementById('confirm-single-delete-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> <span>Deleting...</span>';
+    }
+    
+    const res = await api.delete(`/employee/customers/${singleDeleteCustomerId}`);
+    
+    if (!res?.ok) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-trash-alt" aria-hidden="true"></i> <span>Delete Customer</span>';
+      }
+      showAlert('page-alert', res?.data?.message || 'Failed to delete customer.', 'error');
+      closeSingleDeleteModal();
+      return;
+    }
+    
+    showAlert('page-alert', 'Customer deleted successfully.', 'success');
+    closeSingleDeleteModal();
+    allCustomers = allCustomers.filter(c => c.id !== singleDeleteCustomerId);
+    selectedCustomers.delete(singleDeleteCustomerId);
+    populateCityDropdown();
+    applyCustomerFilters();
+  }
+
+  // ── Documents Modal (Zero Emojis, FontAwesome Icons) ─────────
   function openDocsModal(customerId) {
     activeDocsCustomerId = customerId;
     const customer = allCustomers.find(c => c.id === customerId);
-    // .textContent is safe regardless of what the name contains
-    document.getElementById('docs-modal-title').textContent = `📄 Documents — ${customer ? customer.name : ''}`;
+    const nameEl = document.getElementById('docs-modal-customer-name');
+    if (nameEl) {
+      nameEl.textContent = customer ? `Documents — ${customer.name}` : 'Documents';
+    }
     resetDocsUploadForm();
-    document.getElementById('docs-modal').classList.add('show');
+    const modal = document.getElementById('docs-modal');
+    if (modal) modal.classList.add('show');
     document.addEventListener('keydown', docsModalEsc);
     loadDocsForModal(customerId);
   }
 
   function closeDocsModal() {
-    document.getElementById('docs-modal').classList.remove('show');
+    const modal = document.getElementById('docs-modal');
+    if (modal) modal.classList.remove('show');
     document.removeEventListener('keydown', docsModalEsc);
     activeDocsCustomerId = null;
   }
@@ -1097,22 +2585,25 @@
   }
 
   async function loadDocsForModal(customerId) {
-    document.getElementById('docs-list-container').innerHTML = '<div class="docs-empty"><div class="docs-empty-icon">📂</div>Loading...</div>';
+    const container = document.getElementById('docs-list-container');
+    if (!container) return;
+    container.innerHTML = '<div class="docs-empty"><i class="fas fa-spinner fa-spin" style="font-size:24px;opacity:0.6;margin-bottom:8px;display:block;"></i>Loading documents...</div>';
     const res = await api.get(`/employee/customers/${customerId}`);
     if (!res?.ok) {
-      document.getElementById('docs-list-container').innerHTML = `<div class="docs-empty" style="color:#fc8181;">Failed to load documents.</div>`;
+      container.innerHTML = `<div class="docs-empty" style="color:var(--danger, #ef4444);"><i class="fas fa-circle-exclamation" style="font-size:24px;margin-bottom:6px;display:block;"></i>Failed to load documents.</div>`;
       return;
     }
-    const docs = res.data.data.documents || [];
+    const docs = res.data?.data?.documents || [];
     renderDocsInModal(docs);
   }
 
   function renderDocsInModal(docs) {
     const container = document.getElementById('docs-list-container');
+    if (!container) return;
     if (!docs.length) {
       container.innerHTML = `
         <div class="docs-empty">
-          <div class="docs-empty-icon">📭</div>
+          <i class="fas fa-folder-open" style="font-size:36px;opacity:0.35;margin-bottom:8px;display:block;"></i>
           <p>No documents uploaded yet.</p>
         </div>`;
       return;
@@ -1120,12 +2611,12 @@
     container.innerHTML = docs.map(d => `
       <div class="doc-item" id="doc-item-${d.id}">
         <div class="doc-item-info">
-          <div class="doc-item-name">📎 ${escapeHtml(d.doc_type)} — ${escapeHtml(d.file_name)}</div>
-          <div class="doc-item-meta">${d.document_password ? `🔒 Password: ${escapeHtml(d.document_password)}` : 'No password'}</div>
+          <div class="doc-item-name"><i class="fas fa-paperclip" style="color:var(--accent);margin-right:6px;" aria-hidden="true"></i>${escapeHtml(d.doc_type)} — ${escapeHtml(d.file_name)}</div>
+          <div class="doc-item-meta">${d.document_password ? `<i class="fas fa-lock" style="font-size:10px;margin-right:4px;" aria-hidden="true"></i> Password: ${escapeHtml(d.document_password)}` : 'No password'}</div>
         </div>
         <div class="doc-item-actions">
           <a href="#" onclick="openSecureDocument(${d.id}); return false;" class="btn btn-secondary btn-sm" style="font-size:11px;padding:4px 10px;">View</a>
-          <button class="btn btn-danger btn-sm" style="font-size:11px;padding:4px 10px;" onclick="deleteDocFromModal(${d.id}, this)">Delete</button>
+          <button type="button" class="btn btn-danger btn-sm" style="font-size:11px;padding:4px 10px;" onclick="deleteDocFromModal(${d.id}, this)">Delete</button>
         </div>
       </div>
     `).join('');
@@ -1144,10 +2635,19 @@
     }
     const row = document.getElementById(`doc-item-${id}`);
     if (row) row.remove();
-    // If no more items, show empty state
+    
+    // Decrement customer document_count
+    if (activeDocsCustomerId) {
+      const c = allCustomers.find(item => item.id === activeDocsCustomerId);
+      if (c && Number(c.document_count) > 0) {
+        c.document_count = Number(c.document_count) - 1;
+        renderCustomersPage();
+      }
+    }
+
     const container = document.getElementById('docs-list-container');
-    if (!container.querySelector('.doc-item')) {
-      container.innerHTML = `<div class="docs-empty"><div class="docs-empty-icon">📭</div><p>No documents uploaded yet.</p></div>`;
+    if (container && !container.querySelector('.doc-item')) {
+      container.innerHTML = `<div class="docs-empty"><i class="fas fa-folder-open" style="font-size:36px;opacity:0.35;margin-bottom:8px;display:block;"></i><p>No documents uploaded yet.</p></div>`;
     }
   }
 
@@ -1158,19 +2658,26 @@
   }
 
   function resetDocsUploadForm() {
-    document.getElementById('modal-doc-type').value = 'Aadhaar Card';
-    document.getElementById('modal-other-doc-type').value = '';
-    document.getElementById('modal-other-doc-type-group').style.display = 'none';
-    document.getElementById('modal-doc-file').value = '';
-    document.getElementById('modal-doc-password').value = '';
-    document.getElementById('modal-upload-alert').innerHTML = '';
+    const docTypeEl = document.getElementById('modal-doc-type');
+    if (docTypeEl) docTypeEl.value = 'Aadhaar Card';
+    const otherEl = document.getElementById('modal-other-doc-type');
+    if (otherEl) otherEl.value = '';
+    const otherGroup = document.getElementById('modal-other-doc-type-group');
+    if (otherGroup) otherGroup.style.display = 'none';
+    const fileEl = document.getElementById('modal-doc-file');
+    if (fileEl) fileEl.value = '';
+    const passEl = document.getElementById('modal-doc-password');
+    if (passEl) passEl.value = '';
+    const alertEl = document.getElementById('modal-upload-alert');
+    if (alertEl) alertEl.innerHTML = '';
   }
 
   function showModalAlert(msg, type) {
     const el = document.getElementById('modal-upload-alert');
-    const color = type === 'error' ? '#fc8181' : type === 'success' ? '#68d391' : '#fbd38d';
-    el.innerHTML = `<span style="color:${color};">${escapeHtml(msg)}</span>`;
-    setTimeout(() => { el.innerHTML = ''; }, 4000);
+    if (!el) return;
+    const color = type === 'error' ? 'var(--danger, #ef4444)' : type === 'success' ? 'var(--success, #10b981)' : '#f59e0b';
+    el.innerHTML = `<span style="color:${color};font-weight:600;">${escapeHtml(msg)}</span>`;
+    setTimeout(() => { if (el) el.innerHTML = ''; }, 4000);
   }
 
   async function uploadDocModal() {
@@ -1192,13 +2699,17 @@
     if (password) form.append('document_password', password);
 
     const btn = document.getElementById('modal-upload-btn');
-    btn.disabled = true;
-    btn.textContent = 'Uploading…';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> <span>Uploading…</span>';
+    }
 
     const res = await api.upload(`/employee/documents/${activeDocsCustomerId}`, form);
 
-    btn.disabled = false;
-    btn.innerHTML = '<span class="emoji-sm">📤</span> Upload Document';
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-arrow-up-from-bracket" aria-hidden="true"></i> <span>Upload Document</span>';
+    }
 
     if (!res?.ok) {
       showModalAlert(res?.data?.message || 'Upload failed.', 'error');
@@ -1207,6 +2718,14 @@
 
     showModalAlert(`${files.length} document${files.length > 1 ? 's' : ''} uploaded successfully!`, 'success');
     resetDocsUploadForm();
+    
+    // Increment customer document_count
+    const c = allCustomers.find(item => item.id === activeDocsCustomerId);
+    if (c) {
+      c.document_count = (Number(c.document_count) || 0) + files.length;
+      renderCustomersPage();
+    }
+    
     // Reload docs list
     loadDocsForModal(activeDocsCustomerId);
   }
@@ -1748,7 +3267,8 @@
     } else {
       allCustomers.unshift(updatedCustomer);
     }
-    filterCustomers();
+    populateCityDropdown();
+    applyCustomerFilters();
   }
 
   async function saveCustomerChanges() {
@@ -1799,6 +3319,17 @@
     }
     const docRow = btn.closest('.doc-row');
     if (docRow) docRow.remove();
+    
+    // Decrement customer document_count in main list
+    const custId = activeCustomerDetailState?.customerId || activeCustomerDetailState?.customer?.id;
+    if (custId) {
+      const c = allCustomers.find(item => String(item.id) === String(custId));
+      if (c && Number(c.document_count) > 0) {
+        c.document_count = Number(c.document_count) - 1;
+        renderCustomersPage();
+      }
+    }
+
     const docList = document.getElementById('customer-detail-doc-list');
     const countEl = document.getElementById('customer-detail-doc-count');
     const totalEl = document.getElementById('customer-detail-doc-total');
@@ -1816,23 +3347,26 @@
     }
   }
 
-  // ── Delete Mode ────────────────────────────────────────────
+  // ── Delete Mode & Bulk Selection ────────────────────────────
   function toggleDeleteMode() {
     deleteMode = !deleteMode;
     const checkboxHeader = document.getElementById('checkbox-header');
-    const deleteBtn = document.getElementById('delete-mode-btn');
-    const cancelBtn = document.getElementById('cancel-delete-btn');
+    const deleteBtn = document.getElementById('btn-toggle-select');
     const deleteBar = document.getElementById('delete-action-bar');
     const checkboxCells = document.querySelectorAll('.checkbox-cell');
 
     if (deleteMode) {
-      checkboxHeader.style.display = 'table-cell';
-      deleteBar.style.display = 'flex';
-      deleteBtn.style.display = 'none';
-      cancelBtn.style.display = 'inline-block';
+      if (checkboxHeader) checkboxHeader.style.display = 'table-cell';
+      if (deleteBar) deleteBar.style.display = 'flex';
+      if (deleteBtn) {
+        deleteBtn.classList.add('active');
+        deleteBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i> <span>Cancel</span>';
+      }
       checkboxCells.forEach(cell => cell.style.display = 'table-cell');
       selectedCustomers.clear();
-      document.getElementById('select-all-checkbox').checked = false;
+      const selectAllCb = document.getElementById('select-all-checkbox');
+      if (selectAllCb) selectAllCb.checked = false;
+      updateSelectedCount();
     } else {
       cancelDeleteMode();
     }
@@ -1842,40 +3376,78 @@
     deleteMode = false;
     selectedCustomers.clear();
     const checkboxHeader = document.getElementById('checkbox-header');
-    const deleteBtn = document.getElementById('delete-mode-btn');
-    const cancelBtn = document.getElementById('cancel-delete-btn');
+    const deleteBtn = document.getElementById('btn-toggle-select');
     const deleteBar = document.getElementById('delete-action-bar');
     const checkboxCells = document.querySelectorAll('.checkbox-cell');
     const allCheckboxes = document.querySelectorAll('.customer-checkbox');
 
-    checkboxHeader.style.display = 'none';
-    deleteBar.style.display = 'none';
-    deleteBtn.style.display = 'inline-block';
-    cancelBtn.style.display = 'none';
+    if (checkboxHeader) checkboxHeader.style.display = 'none';
+    if (deleteBar) deleteBar.style.display = 'none';
+    if (deleteBtn) {
+      deleteBtn.classList.remove('active');
+      deleteBtn.innerHTML = '<i class="fas fa-check-square" aria-hidden="true"></i> <span>Select</span>';
+    }
     checkboxCells.forEach(cell => cell.style.display = 'none');
     allCheckboxes.forEach(cb => cb.checked = false);
-    document.getElementById('select-all-checkbox').checked = false;
+    const selectAllCb = document.getElementById('select-all-checkbox');
+    if (selectAllCb) selectAllCb.checked = false;
+    document.querySelectorAll('#my-customers-tbody tr.row-selected').forEach(r => r.classList.remove('row-selected'));
+  }
+
+  function onCheckboxChange(id, cb) {
+    if (cb.checked) {
+      selectedCustomers.add(id);
+      cb.closest('tr')?.classList.add('row-selected');
+    } else {
+      selectedCustomers.delete(id);
+      cb.closest('tr')?.classList.remove('row-selected');
+    }
+    updateSelectAllCheckboxState();
+    updateSelectedCount();
   }
 
   function toggleSelectAll() {
-    const isChecked = document.getElementById('select-all-checkbox').checked;
-    const checkboxes = document.querySelectorAll('.customer-checkbox');
-    checkboxes.forEach(cb => {
+    const selectAllCb = document.getElementById('select-all-checkbox');
+    const isChecked = selectAllCb?.checked || false;
+    const visibleCheckboxes = document.querySelectorAll('.customer-checkbox');
+    
+    visibleCheckboxes.forEach(cb => {
       cb.checked = isChecked;
+      const id = parseInt(cb.value, 10);
+      const row = cb.closest('tr');
       if (isChecked) {
-        selectedCustomers.add(parseInt(cb.value));
+        selectedCustomers.add(id);
+        row?.classList.add('row-selected');
       } else {
-        selectedCustomers.delete(parseInt(cb.value));
+        selectedCustomers.delete(id);
+        row?.classList.remove('row-selected');
       }
     });
     updateSelectedCount();
   }
 
+  function updateSelectAllCheckboxState() {
+    const visibleCheckboxes = document.querySelectorAll('.customer-checkbox');
+    const selectAllCb = document.getElementById('select-all-checkbox');
+    if (!selectAllCb || visibleCheckboxes.length === 0) return;
+    
+    const allChecked = Array.from(visibleCheckboxes).every(cb => cb.checked);
+    const someChecked = Array.from(visibleCheckboxes).some(cb => cb.checked);
+    selectAllCb.checked = allChecked;
+    selectAllCb.indeterminate = !allChecked && someChecked;
+  }
+
+  function syncCheckboxes() {
+    const checkboxHeader = document.getElementById('checkbox-header');
+    if (checkboxHeader) checkboxHeader.style.display = deleteMode ? 'table-cell' : 'none';
+    const checkboxCells = document.querySelectorAll('.checkbox-cell');
+    checkboxCells.forEach(cell => cell.style.display = deleteMode ? 'table-cell' : 'none');
+    updateSelectAllCheckboxState();
+  }
+
   function updateSelectedCount() {
-    selectedCustomers.clear();
-    const checkboxes = document.querySelectorAll('.customer-checkbox:checked');
-    checkboxes.forEach(cb => selectedCustomers.add(parseInt(cb.value)));
-    document.getElementById('selected-count').textContent = `${selectedCustomers.size} selected`;
+    const countEl = document.getElementById('selected-count');
+    if (countEl) countEl.textContent = `${selectedCustomers.size} selected`;
   }
 
   async function confirmDeleteSelected() {
@@ -1902,7 +3474,7 @@
     }
 
     if (succeeded.length > 0) {
-      showAlert('page-alert', `${succeeded.length} customer(s) deleted.`, 'success');
+      showAlert('page-alert', `${succeeded.length} customer(s) deleted successfully.`, 'success');
     }
 
     cancelDeleteMode();

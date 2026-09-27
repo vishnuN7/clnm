@@ -4,20 +4,55 @@ const CustomerModel = require('../models/customerModel');
 const LoanModel = require('../models/loanModel');
 const DocumentModel = require('../models/documentModel');
 const db = require('../config/db');
+const employeeCreationService = require('../services/employeeCreationService');
 
 const adminController = {
   // ── Dashboard ───────────────────────────────────────────────
   async getDashboard(req, res) {
     try {
-      const loanStats = await LoanModel.getDashboardStats();
-      const [customers] = [await CustomerModel.getAll()];
+      const period = ['monthly', 'yearly', 'alltime', 'custom'].includes(req.query.period) ? req.query.period : 'monthly';
+      const startDate = req.query.startDate || null;
+      const endDate = req.query.endDate || null;
+      const loanStats = await LoanModel.getDashboardStats(period, startDate, endDate);
+
+      // Period-filtered customer count
+      let custDateFilter = '';
+      const custParams = [];
+      if (period === 'monthly') {
+        custDateFilter = 'WHERE YEAR(created_at) = YEAR(NOW()) AND MONTH(created_at) = MONTH(NOW())';
+      } else if (period === 'yearly') {
+        custDateFilter = 'WHERE YEAR(created_at) = YEAR(NOW())';
+      } else if (period === 'custom' && startDate && endDate) {
+        custDateFilter = 'WHERE created_at >= ? AND created_at <= ?';
+        custParams.push(startDate.includes(' ') ? startDate : `${startDate} 00:00:00`);
+        custParams.push(endDate.includes(' ') ? endDate : `${endDate} 23:59:59`);
+      }
+      const [customerCountRows] = await db.query(`SELECT COUNT(*) AS count FROM customers ${custDateFilter}`, custParams);
+      const periodCustomers = Number(customerCountRows[0]?.count || 0);
+
       const employees = await UserModel.getAll('employee');
+
+      // Status map for the selected period (NOT all-time)
+      const periodStatusMap = {};
+      (loanStats.statusBreakdown || []).forEach(s => {
+        periodStatusMap[s.status] = Number(s.count || 0);
+      });
+
+      // Period total loans
+      const periodTotalLoans = Number(loanStats.periodTotal || 0);
 
       return res.json({
         success: true,
         data: {
-          totalCustomers: customers.length,
+          period,
+          totalCustomers: periodCustomers,
           totalEmployees: employees.length,
+          totalLoans: periodTotalLoans,
+          allTimeTotalLoans: Number(loanStats.total || 0),
+          pendingLoans: periodStatusMap['Pending'] || 0,
+          approvedLoans: periodStatusMap['Approved'] || 0,
+          disbursedLoans: periodStatusMap['Loan Disbursed'] || 0,
+          statusCounts: periodStatusMap,
           loans: loanStats
         }
       });
@@ -190,23 +225,101 @@ const adminController = {
 
   async addEmployee(req, res) {
     try {
-      const { name, email, password, phone, department } = req.body;
+      const { name, email, password, phone, designation, username } = req.body;
       if (!name || !email || !password) {
         return res.status(400).json({ success: false, message: 'Name, email, and password are required.' });
       }
 
-      const existing = await UserModel.findByEmail(email);
-      if (existing) {
-        return res.status(409).json({ success: false, message: 'An account with this email already exists.' });
-      }
+      const newEmployee = await employeeCreationService.createEmployee({
+        name: String(name).trim(),
+        email: String(email).trim().toLowerCase(),
+        password: String(password),
+        phone: phone ? String(phone).trim() : null,
+        designation: designation ? String(designation).trim() : 'Loan Executive',
+        username: username ? String(username).trim().toLowerCase() : null,
+        must_change_password: 0 // Admin created with explicit custom password
+      });
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const id = await UserModel.create({ name, email: email.toLowerCase(), password: hashedPassword, role: 'employee', phone, department });
+      await employeeCreationService.logActivity(
+        req.user.id,
+        `Created employee: ${newEmployee.name} (${newEmployee.email})`,
+        req
+      );
 
-      return res.status(201).json({ success: true, message: 'Employee created successfully.', id });
+      return res.status(201).json({ success: true, message: 'Employee created successfully.', id: newEmployee.id });
     } catch (err) {
       console.error('[Admin] Add employee error:', err);
-      return res.status(500).json({ success: false, message: 'Failed to create employee.' });
+      const isConflict = err.message && (err.message.includes('already exists') || err.message.includes('already taken'));
+      const status = isConflict ? 409 : 400;
+      return res.status(status).json({ success: false, message: err.message || 'Failed to create employee.' });
+    }
+  },
+
+  downloadEmployeeTemplate(req, res) {
+    try {
+      const buffer = employeeCreationService.generateExcelTemplate();
+      res.setHeader('Content-Disposition', 'attachment; filename="employee_bulk_import_template.xlsx"');
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      return res.send(buffer);
+    } catch (err) {
+      console.error('[Admin] Download template error:', err);
+      return res.status(500).json({ success: false, message: 'Failed to generate Excel template.' });
+    }
+  },
+
+  async validateEmployeeImport(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: 'Please select an Excel file (.xlsx) to upload.' });
+      }
+
+      const result = await employeeCreationService.parseAndValidateWorkbook(req.file.buffer);
+      return res.json({ success: true, ...result });
+    } catch (err) {
+      console.error('[Admin] Validate import error:', err);
+      return res.status(400).json({ success: false, message: err.message || 'Validation failed.' });
+    }
+  },
+
+  async confirmEmployeeImport(req, res) {
+    try {
+      const { employees, mode } = req.body;
+      if (!Array.isArray(employees) || employees.length === 0) {
+        return res.status(400).json({ success: false, message: 'No employee records provided for import.' });
+      }
+
+      const result = await employeeCreationService.executeBulkImport({
+        rows: employees,
+        adminUserId: req.user.id,
+        req,
+        mode: mode || 'atomic'
+      });
+
+      return res.json({ success: true, ...result });
+    } catch (err) {
+      console.error('[Admin] Confirm import error:', err);
+      return res.status(400).json({ success: false, message: err.message || 'Bulk import failed.' });
+    }
+  },
+
+  async bulkImportEmployees(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: 'Please select an Excel file (.xlsx) to upload.' });
+      }
+
+      const validation = await employeeCreationService.parseAndValidateWorkbook(req.file.buffer);
+      const result = await employeeCreationService.executeBulkImport({
+        rows: validation.rows,
+        adminUserId: req.user.id,
+        req,
+        mode: req.body?.mode || 'atomic'
+      });
+
+      return res.json({ success: true, ...result, validation });
+    } catch (err) {
+      console.error('[Admin] Bulk import direct error:', err);
+      return res.status(400).json({ success: false, message: err.message || 'Bulk import failed.' });
     }
   },
 

@@ -41,7 +41,11 @@ router.post('/upload-kyc', requireAuth, (req, res, next) => {
 }, profileController.uploadKYCDoc);
 
 // Admin-only employee view
-router.get('/admin/employees/:id',          requireAdmin, profileController.adminGetEmployeeProfile);
-router.put('/admin/employees/:id/verify',   requireAdmin, profileController.adminVerifyEmployeeKYC);
+router.get('/admin/employees/:id',                      requireAdmin, profileController.adminGetEmployeeProfile);
+router.put('/admin/employees/:id/verify',               requireAdmin, profileController.adminVerifyEmployeeKYC);
+router.get('/admin/employees/:id/kyc-password/:docType', requireAdmin, profileController.adminGetEmployeeKYCPassword);
+
+// KYC details & document passwords update (employee)
+router.put('/kyc-details',                              requireAuth, profileController.updateKYCDetails);
 
 module.exports = router;

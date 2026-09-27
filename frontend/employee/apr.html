@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CLN Lending Suite — Employee APR</title>
+  <meta name="description" content="Attendance, Productivity & Break Management Dashboard for Employees" />
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="/manifest.json" />
@@ -22,218 +23,963 @@
     })();
   </script>
   <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
-  <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <style>
-    /* ═══ Scoped styles for Employee APR ════════════════════════════════════ */
-    .emp-apr-container {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 24px;
+    /* ═══ Scoped Styles: Employee APR Dashboard ═══════════════════════════ */
+    .apr-page-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
     }
-    @media (max-width: 900px) {
-      .emp-apr-container {
+
+    /* ── Section Card Container ── */
+    .apr-section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-soft);
+      padding: 24px;
+      position: relative;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .apr-section-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .apr-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .apr-header-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .apr-header-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    :root[data-theme='dark'] .apr-header-icon {
+      background: rgba(139, 180, 255, 0.12);
+      color: #8bb4ff;
+    }
+
+    .apr-header-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+    }
+
+    .apr-section-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .apr-section-subtitle {
+      margin: 3px 0 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ── Live Sync Badge ── */
+    .apr-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #059669;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    :root[data-theme='dark'] .apr-live-badge {
+      color: #34d399;
+    }
+
+    .apr-live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+      animation: aprPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes aprPulse {
+      0%, 100% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+
+    /* ── Section 1: KPI Overview Grid (4 Cards) ── */
+    .apr-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 1024px) {
+      .apr-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 580px) {
+      .apr-kpi-grid {
         grid-template-columns: 1fr;
       }
     }
 
-    /* KPI Cards */
-    .emp-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-    .emp-stat-card {
-      background: var(--bg-card);
+    .apr-kpi-card {
+      background: var(--bg-body, var(--bg-primary));
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow-soft);
+      border-radius: var(--radius-sm);
+      padding: 18px 16px;
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      align-items: flex-start;
+      gap: 14px;
+      transition: all 0.2s ease;
       position: relative;
     }
-    .emp-stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: var(--accent);
-      border-radius: var(--radius) var(--radius) 0 0;
-    }
-    .emp-stat-val {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--text-primary);
-    }
-    .emp-stat-lbl {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
+
+    .apr-kpi-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-soft);
     }
 
-    /* Break Controls */
-    .break-control-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow-medium);
+    .apr-kpi-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
       display: flex;
-      flex-direction: column;
-      gap: 18px;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
     }
-    .break-types-grid {
+
+    .apr-kpi-icon-wrap svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+
+    .apr-kpi-icon-wrap.theme-status {
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+    }
+    .apr-kpi-icon-wrap.theme-status.on-break {
+      background: rgba(245, 158, 11, 0.14);
+      color: #f59e0b;
+    }
+    .apr-kpi-icon-wrap.theme-status.logged-out {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+    }
+    .apr-kpi-icon-wrap.theme-status.not-logged {
+      background: rgba(100, 116, 139, 0.12);
+      color: #64748b;
+    }
+
+    .apr-kpi-icon-wrap.theme-login {
+      background: rgba(59, 130, 246, 0.12);
+      color: #3b82f6;
+    }
+
+    .apr-kpi-icon-wrap.theme-session {
+      background: rgba(139, 92, 246, 0.12);
+      color: #8b5cf6;
+    }
+
+    .apr-kpi-icon-wrap.theme-working {
+      background: rgba(15, 39, 71, 0.08);
+      color: var(--accent);
+    }
+    :root[data-theme='dark'] .apr-kpi-icon-wrap.theme-working {
+      background: rgba(139, 180, 255, 0.14);
+      color: #8bb4ff;
+    }
+
+    .apr-kpi-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .apr-kpi-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .apr-kpi-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    .apr-kpi-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 5px;
+      display: block;
+    }
+
+    /* ── Status Pills ── */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      line-height: 1.2;
+    }
+
+    .status-pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-pill.working {
+      background: rgba(16, 185, 129, 0.14);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.28);
+    }
+    :root[data-theme='dark'] .status-pill.working { color: #34d399; }
+    .status-pill.working .status-pill-dot {
+      background: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+      animation: aprPulse 1.8s infinite;
+    }
+
+    .status-pill.on-break {
+      background: rgba(245, 158, 11, 0.14);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    :root[data-theme='dark'] .status-pill.on-break { color: #fbbf24; }
+    .status-pill.on-break .status-pill-dot {
+      background: #f59e0b;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+      animation: aprPulse 1.3s infinite;
+    }
+
+    .status-pill.logged-out {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+    :root[data-theme='dark'] .status-pill.logged-out { color: #f87171; }
+    .status-pill.logged-out .status-pill-dot {
+      background: #ef4444;
+    }
+
+    .status-pill.not-logged {
+      background: rgba(100, 116, 139, 0.12);
+      color: #475569;
+      border: 1px solid rgba(100, 116, 139, 0.22);
+    }
+    :root[data-theme='dark'] .status-pill.not-logged { color: #94a3b8; }
+    .status-pill.not-logged .status-pill-dot {
+      background: #64748b;
+    }
+
+    /* ── Section 2: Break Category Selection Grid ── */
+    .break-selection-section {
+      transition: all 0.2s ease;
+    }
+
+    .break-categories-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
     }
-    .break-type-btn {
-      padding: 14px 10px;
+
+    @media (max-width: 900px) {
+      .break-categories-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 580px) {
+      .break-categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 380px) {
+      .break-categories-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .break-category-card {
+      padding: 16px 12px;
       border: 1.5px solid var(--border);
-      background: var(--bg-body);
+      background: var(--bg-body, var(--bg-primary));
       color: var(--text-secondary);
       border-radius: var(--radius);
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      transition: all 0.22s ease;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       font-family: inherit;
       font-weight: 600;
-      font-size: 12px;
+      font-size: 13px;
+      position: relative;
+      outline: none;
+      user-select: none;
+      text-align: center;
+      min-height: 98px;
     }
-    .break-type-btn i {
-      font-size: 18px;
-      color: var(--text-muted);
-      transition: color 0.22s;
-    }
-    .break-type-btn:hover {
+
+    .break-category-card:hover {
       border-color: var(--accent);
       background: var(--accent-soft);
-      color: var(--accent);
-    }
-    .break-type-btn:hover i {
-      color: var(--accent);
-    }
-    .break-type-btn.active {
-      border-color: var(--accent);
-      background: linear-gradient(135deg, var(--accent) 0%, #173b6b 100%);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(15, 39, 71, 0.18);
-    }
-    .break-type-btn.active i {
-      color: #fff;
-    }
-
-    .reason-textarea {
-      width: 100%;
-      min-height: 80px;
-      padding: 10px 12px;
-      border: 1.5px solid var(--border);
-      background: var(--bg-body);
       color: var(--text-primary);
-      border-radius: var(--radius);
-      outline: none;
-      font-family: inherit;
-      font-size: 13px;
-      resize: vertical;
-      box-sizing: border-box;
-      transition: border-color 0.2s;
-    }
-    .reason-textarea:focus {
-      border-color: var(--accent);
+      transform: translateY(-2px);
     }
 
-    .break-action-btns {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+    .break-category-card:focus-visible {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.3);
     }
-    .btn-break-control {
-      padding: 12px;
-      border: none;
-      border-radius: var(--radius);
-      font-weight: 700;
-      font-family: inherit;
-      cursor: pointer;
+
+    .break-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      font-size: 14px;
-      transition: all 0.2s;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
     }
+
+    .break-card-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+    }
+
+    .break-category-card:hover .break-card-icon {
+      color: var(--accent);
+      border-color: var(--border-strong);
+    }
+
+    /* Selected state */
+    .break-category-card.selected {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, var(--accent) 0%, #173b6b 100%);
+      color: #ffffff;
+      box-shadow: 0 6px 18px rgba(15, 39, 71, 0.22);
+      transform: translateY(-2px);
+    }
+
+    :root[data-theme='dark'] .break-category-card.selected {
+      background: linear-gradient(135deg, #1d3b66 0%, #13243f 100%);
+      border-color: #3b82f6;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .break-category-card.selected .break-card-icon {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+    }
+
+    .break-check-indicator {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: var(--accent);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    :root[data-theme='dark'] .break-check-indicator {
+      background: #3b82f6;
+      color: #ffffff;
+    }
+
+    .break-check-indicator svg {
+      width: 11px;
+      height: 11px;
+      stroke-width: 3;
+      stroke: currentColor;
+    }
+
+    .break-category-card.selected .break-check-indicator {
+      display: flex;
+    }
+
+    /* ── Reason Container (Only for Other Break) ── */
+    .break-reason-wrapper {
+      margin-bottom: 18px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      animation: aprFadeIn 0.22s ease-out;
+    }
+
+    @keyframes aprFadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .break-reason-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .required-star {
+      color: var(--danger);
+      font-weight: 800;
+    }
+
+    .break-reason-textarea {
+      width: 100%;
+      min-height: 86px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-body, var(--bg-primary));
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      outline: none;
+      font-family: inherit;
+      font-size: 13px;
+      line-height: 1.5;
+      resize: vertical;
+      box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .break-reason-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.16);
+    }
+
+    .break-reason-textarea.has-error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+    }
+
+    .break-inline-error {
+      font-size: 12px;
+      color: var(--danger);
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .break-inline-error svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* ── Action Buttons ── */
+    .break-action-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .btn-break-act {
+      padding: 12px 26px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition: all 0.2s ease;
+      outline: none;
+      min-width: 150px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .btn-break-act:focus-visible {
+      box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.4);
+    }
+
     .btn-start-break {
       background: #f59e0b;
-      color: #fff;
+      color: #ffffff;
     }
+
     .btn-start-break:hover:not(:disabled) {
       background: #d97706;
-      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+      transform: translateY(-1px);
     }
+
     .btn-end-break {
-      background: #22c55e;
-      color: #fff;
+      background: #10b981;
+      color: #ffffff;
     }
+
     .btn-end-break:hover:not(:disabled) {
-      background: #16a34a;
-      box-shadow: 0 4px 10px rgba(34, 197, 94, 0.25);
+      background: #059669;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      transform: translateY(-1px);
     }
-    .btn-break-control:disabled {
+
+    .btn-break-act:disabled {
       background: var(--border);
       color: var(--text-muted);
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      opacity: 0.7;
     }
 
-    /* Active Break Banner */
-    .active-break-banner {
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+    .btn-break-act svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+
+    /* ── Section 2B: Active Break Experience (Visible during active break) ── */
+    .active-break-container {
+      display: none;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.03) 100%);
+      border: 1.5px solid rgba(245, 158, 11, 0.35);
       border-radius: var(--radius);
-      padding: 14px 16px;
+      padding: 22px;
+      flex-direction: column;
+      gap: 20px;
+      animation: aprFadeIn 0.3s ease-out;
+    }
+
+    .active-break-header-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      color: #d97706;
-      font-weight: 600;
-      font-size: 13px;
-      margin-bottom: 16px;
-      animation: pulseBanner 2s infinite ease-in-out;
-    }
-    @keyframes pulseBanner {
-      0%, 100% { opacity: 0.95; }
-      50% { opacity: 0.8; }
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    /* Badges */
-    .status-badge {
+    .active-break-tag {
       display: inline-flex;
       align-items: center;
-      padding: 4px 10px;
-      border-radius: 20px;
+      gap: 8px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #b45309;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    :root[data-theme='dark'] .active-break-tag {
+      color: #fbbf24;
+    }
+
+    .active-break-pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+      animation: aprPulse 1.2s infinite;
+    }
+
+    .active-break-timer-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: #b45309;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      padding: 6px 16px;
+      border-radius: 8px;
+    }
+
+    :root[data-theme='dark'] .active-break-timer-wrap {
+      color: #fbbf24;
+    }
+
+    .active-break-info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .active-break-info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .active-info-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .active-info-lbl {
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
     }
-    .status-badge.working { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
-    .status-badge.on-break { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
-    .status-badge.logged-out { background: rgba(244, 63, 94, 0.12); color: #f43f5e; }
+
+    .active-info-val {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .active-info-val svg {
+      width: 18px;
+      height: 18px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── Section 3: Break History Table ── */
+    .history-card-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-history-refresh {
+      background: var(--bg-body, var(--bg-primary));
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-history-refresh:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .btn-history-refresh svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+
+    .table-scroll-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      -webkit-overflow-scrolling: touch;
+      background: var(--bg-card);
+    }
+
+    .apr-data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+      min-width: 650px;
+    }
+
+    .apr-data-table thead th {
+      background: var(--bg-body, var(--bg-primary));
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .apr-data-table tbody td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--table-row-border, var(--border));
+      color: var(--text-primary);
+      vertical-align: middle;
+      font-size: 13px;
+    }
+
+    .apr-data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .apr-data-table tbody tr:hover td {
+      background: var(--table-row-hover, rgba(0, 0, 0, 0.02));
+    }
+
+    /* History Break Badges */
+    .history-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .history-type-badge svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+    }
+
+    .history-type-badge.tea {
+      background: rgba(245, 158, 11, 0.12);
+      color: #b45309;
+    }
+    :root[data-theme='dark'] .history-type-badge.tea { color: #fbbf24; }
+
+    .history-type-badge.lunch {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+    }
+    :root[data-theme='dark'] .history-type-badge.lunch { color: #34d399; }
+
+    .history-type-badge.personal {
+      background: rgba(59, 130, 246, 0.12);
+      color: #2563eb;
+    }
+    :root[data-theme='dark'] .history-type-badge.personal { color: #60a5fa; }
+
+    .history-type-badge.meeting {
+      background: rgba(139, 92, 246, 0.12);
+      color: #7c3aed;
+    }
+    :root[data-theme='dark'] .history-type-badge.meeting { color: #a78bfa; }
+
+    .history-type-badge.other {
+      background: rgba(100, 116, 139, 0.12);
+      color: #475569;
+    }
+    :root[data-theme='dark'] .history-type-badge.other { color: #94a3b8; }
+
+    /* ── Empty State ── */
+    .apr-empty-state-box {
+      padding: 46px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .apr-empty-icon-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--bg-body, var(--bg-primary));
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .apr-empty-icon-circle svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+    }
+
+    .apr-empty-heading {
+      margin: 0 0 5px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .apr-empty-text {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      max-width: 340px;
+      line-height: 1.4;
+    }
+
+    /* ── Error State ── */
+    .apr-error-state-box {
+      padding: 36px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .apr-error-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .apr-error-icon-circle svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+
+    .apr-error-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .btn-apr-retry {
+      padding: 8px 18px;
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.2s;
+    }
+
+    .btn-apr-retry:hover {
+      opacity: 0.9;
+    }
+
+    .btn-apr-retry svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+
+    /* ── Loading Skeleton / Spinner ── */
+    .apr-loading-skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px;
+    }
+
+    .skeleton-bar {
+      height: 28px;
+      background: linear-gradient(90deg, var(--border) 25%, var(--accent-soft) 50%, var(--border) 75%);
+      background-size: 200% 100%;
+      animation: aprShimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+
+    @keyframes aprShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .spin-animation {
+      animation: aprSpin 0.9s linear infinite;
+    }
+
+    @keyframes aprSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-<div class="app-layout">
+<div class="app-layout employee-page">
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo">
+      <div class="sidebar-logo">
         <div class="logo-icon">CLN</div>
         <div><h2>CLN Lending Suite</h2><span>Employee Workspace</span></div>
       </div>
@@ -241,21 +987,21 @@
     <nav class="sidebar-nav">
       <div class="nav-section">
         <div class="nav-section-title">Main</div>
-                        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span> Dashboard</a>
-        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon"><i class="fas fa-user-plus"></i></span> Add Customer</a>
-        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users"></i></span> My Customers</a>
-        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase"></i></span> My Loans</a>
-        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span> EMI Calculator</a>
-        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span> My Assigned Records</a>
-        <a href="/employee/apr.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-chart-line"></i></span> APR</a>
-</div>
+        <a href="/employee/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+        <a href="/employee/add-customer.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Add Customer</span></a>
+        <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>My Customers</span></a>
+        <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>My Loans</span></a>
+        <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+        <a href="/employee/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>My Assigned Records</span></a>
+        <a href="/employee/apr.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="sidebar-user-avatar">E</div>
         <div class="user-details"><p id="sidebar-user-name">Employee</p><span id="sidebar-user-role">employee</span></div>
       </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
     </div>
   </aside>
 
@@ -265,112 +1011,341 @@
   <!-- Main Content -->
   <main class="main-content">
     <div class="topbar">
-      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Toggle menu">Menu</button>
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i> <span>Menu</span>
+      </button>
       <div class="topbar-title">
-        <h2>Attendance & Performance</h2>
-        <p>Manage your attendance, break sessions, and login activity</p>
+        <h2><i class="fas fa-chart-line" aria-hidden="true"></i> <span>APR Dashboard</span></h2>
+        <p>Monitor attendance, working hours, breaks, and daily performance.</p>
+      </div>
+      <div class="topbar-actions">
+        <!-- Notification Bell -->
+        <div class="notif-bell-wrap" id="notif-bell-wrap">
+          <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifDropdown()" aria-label="Notifications" title="Notifications" tabindex="0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+              <path d="M10 21h4"/>
+            </svg>
+            <span id="notif-bell-badge" class="notif-badge" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown" id="notif-dropdown" role="region" aria-label="Notifications Panel">
+            <div class="notif-dd-header">
+              <div class="notif-dd-title-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+                <h4>Notifications</h4>
+              </div>
+              <button class="notif-dd-link" onclick="markAllRead()">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
+          </div>
+        </div>
+        <div class="topbar-date-badge">
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+          <span id="current-date">Today</span>
+        </div>
       </div>
     </div>
 
     <div class="page-content">
       <div id="page-alert" class="alert" style="display:none;margin-bottom:16px;"></div>
 
-      <div class="emp-apr-container">
-        
-        <!-- Left Side: Status & Controls -->
-        <div>
-          <!-- Active Break timer notification banner -->
-          <div id="active-break-banner" class="active-break-banner" style="display:none;">
-            <span><i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Active Break: <strong id="active-break-type-lbl">Tea Break</strong></span>
-            <span id="active-break-timer" style="font-family:monospace;font-size:14px;background:rgba(0,0,0,0.1);padding:3px 8px;border-radius:4px;">00:00</span>
-          </div>
+      <div class="apr-page-wrapper">
 
-          <!-- Employee APR Dashboard widgets -->
-          <div class="emp-stats-grid">
-            <div class="emp-stat-card">
-              <span class="emp-stat-lbl">Current Status</span>
-              <div class="emp-stat-val" id="stat-status" style="font-size:18px;margin-top:6px;"><span class="status-badge working">Working</span></div>
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- CARD 1: Attendance Status Overview                          -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <section class="apr-section-card" id="section-status-overview" aria-label="Attendance Status Overview">
+          <div class="apr-section-header">
+            <div class="apr-header-info">
+              <div class="apr-header-icon" id="header-icon-overview">
+                <!-- Clock icon -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <h3 class="apr-section-title">Attendance Status</h3>
+                <p class="apr-section-subtitle">Real-time attendance overview for today</p>
+              </div>
             </div>
-            <div class="emp-stat-card">
-              <span class="emp-stat-lbl">Login Time</span>
-              <div class="emp-stat-val" id="stat-login-time" style="font-size:18px;margin-top:6px;">—</div>
-            </div>
-            <div class="emp-stat-card">
-              <span class="emp-stat-lbl">Session Duration</span>
-              <div class="emp-stat-val" id="stat-session" style="font-size:18px;margin-top:6px;">0 mins</div>
-            </div>
-            <div class="emp-stat-card">
-              <span class="emp-stat-lbl">Total Working Hours Today</span>
-              <div class="emp-stat-val" id="stat-work-hours" style="font-size:18px;margin-top:6px;">0.00 hrs</div>
+            <div class="apr-live-badge" title="Live real-time monitoring">
+              <span class="apr-live-dot"></span>
+              <span>Live</span>
             </div>
           </div>
 
-          <!-- Break controller card -->
-          <div class="break-control-card">
-            <h3 style="margin:0;"><i class="fas fa-mug-hot" style="margin-right:8px;color:var(--accent);"></i>Take a Break</h3>
-            <p style="color:var(--text-secondary);font-size:12px;margin:0 0 10px;">Select a break category below. If you choose "Other Break," you must enter a reason.</p>
+          <!-- 4 KPI Cards -->
+          <div class="apr-kpi-grid">
+            <!-- Card 1: Current Status -->
+            <div class="apr-kpi-card" id="kpi-card-status">
+              <div class="apr-kpi-icon-wrap theme-status" id="kpi-icon-status">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="apr-kpi-info">
+                <span class="apr-kpi-lbl">Current Status</span>
+                <div class="apr-kpi-val" id="stat-status">
+                  <span class="status-pill working"><span class="status-pill-dot"></span> Working</span>
+                </div>
+                <span class="apr-kpi-sub" id="stat-status-hint">Active attendance</span>
+              </div>
+            </div>
 
-            <div class="break-types-grid">
-              <button class="break-type-btn" id="btn-type-tea" onclick="selectBreakType('Tea Break')">
-                <i class="fas fa-coffee"></i> Tea Break
+            <!-- Card 2: Login Time -->
+            <div class="apr-kpi-card" id="kpi-card-login">
+              <div class="apr-kpi-icon-wrap theme-login">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              </div>
+              <div class="apr-kpi-info">
+                <span class="apr-kpi-lbl">Login Time</span>
+                <div class="apr-kpi-val" id="stat-login-time">—</div>
+                <span class="apr-kpi-sub">Asia/Kolkata (IST)</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Session Duration -->
+            <div class="apr-kpi-card" id="kpi-card-session">
+              <div class="apr-kpi-icon-wrap theme-session">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="apr-kpi-info">
+                <span class="apr-kpi-lbl">Session Duration</span>
+                <div class="apr-kpi-val" id="stat-session">0 mins</div>
+                <span class="apr-kpi-sub">Current active session</span>
+              </div>
+            </div>
+
+            <!-- Card 4: Total Working Hours Today -->
+            <div class="apr-kpi-card" id="kpi-card-working">
+              <div class="apr-kpi-icon-wrap theme-working">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              </div>
+              <div class="apr-kpi-info">
+                <span class="apr-kpi-lbl">Total Working Hours Today</span>
+                <div class="apr-kpi-val" id="stat-work-hours">0 mins</div>
+                <span class="apr-kpi-sub">Net time (excluding breaks)</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- CARD 2: Take a Break / Active Break Management              -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <section class="apr-section-card" id="section-break-control" aria-label="Break Management">
+          
+          <!-- STATE A: Normal "Take a Break" Selector -->
+          <div id="break-selection-view" class="break-selection-section">
+            <div class="apr-section-header">
+              <div class="apr-header-info">
+                <div class="apr-header-icon">
+                  <!-- Coffee/Tea icon -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                </div>
+                <div>
+                  <h3 class="apr-section-title">Take a Break</h3>
+                  <p class="apr-section-subtitle">Select a break category below. If you choose "Other Break", you must enter a reason.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5 Selectable Break Categories -->
+            <div class="break-categories-grid" role="radiogroup" aria-label="Select break category">
+              
+              <!-- 1. Tea Break -->
+              <button type="button" class="break-category-card" id="btn-cat-tea" role="radio" aria-checked="false" onclick="handleCategorySelect('Tea Break')">
+                <div class="break-check-indicator" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="break-card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                </div>
+                <span>Tea Break</span>
               </button>
-              <button class="break-type-btn" id="btn-type-lunch" onclick="selectBreakType('Lunch Break')">
-                <i class="fas fa-utensils"></i> Lunch Break
+
+              <!-- 2. Lunch Break -->
+              <button type="button" class="break-category-card" id="btn-cat-lunch" role="radio" aria-checked="false" onclick="handleCategorySelect('Lunch Break')">
+                <div class="break-check-indicator" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="break-card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/><path d="M15 11v11"/><path d="M5 2v4a3 3 0 0 0 3 3 3 3 0 0 0 3-3V2"/><path d="M8 9v13"/></svg>
+                </div>
+                <span>Lunch Break</span>
               </button>
-              <button class="break-type-btn" id="btn-type-personal" onclick="selectBreakType('Personal Break')">
-                <i class="fas fa-user-clock"></i> Personal Break
+
+              <!-- 3. Personal Break -->
+              <button type="button" class="break-category-card" id="btn-cat-personal" role="radio" aria-checked="false" onclick="handleCategorySelect('Personal Break')">
+                <div class="break-check-indicator" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="break-card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4"/><circle cx="17" cy="17" r="4"/><polyline points="17 15 17 17 19 17"/></svg>
+                </div>
+                <span>Personal Break</span>
               </button>
-              <button class="break-type-btn" id="btn-type-meeting" onclick="selectBreakType('Meeting Break')">
-                <i class="fas fa-users"></i> Meeting Break
+
+              <!-- 4. Meeting Break -->
+              <button type="button" class="break-category-card" id="btn-cat-meeting" role="radio" aria-checked="false" onclick="handleCategorySelect('Meeting Break')">
+                <div class="break-check-indicator" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="break-card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <span>Meeting Break</span>
               </button>
-              <button class="break-type-btn" id="btn-type-other" onclick="selectBreakType('Other Break')">
-                <i class="fas fa-ellipsis-h"></i> Other Break
+
+              <!-- 5. Other Break -->
+              <button type="button" class="break-category-card" id="btn-cat-other" role="radio" aria-checked="false" onclick="handleCategorySelect('Other Break')">
+                <div class="break-check-indicator" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="break-card-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+                </div>
+                <span>Other Break</span>
               </button>
             </div>
 
-            <!-- Custom Reason (Only for Other Break) -->
-            <div id="reason-container" style="display:none; flex-direction:column; gap:6px;">
-              <label class="emp-stat-lbl">Reason for Break <span style="color:var(--danger);">*</span></label>
-              <textarea id="break-reason" class="reason-textarea" placeholder="Please enter the reason for taking this break..."></textarea>
+            <!-- Other Break Reason Input -->
+            <div id="break-reason-wrapper" class="break-reason-wrapper">
+              <label for="break-reason-input" class="break-reason-label">
+                <span>Reason for Break</span>
+                <span class="required-star">*</span>
+              </label>
+              <textarea
+                id="break-reason-input"
+                class="break-reason-textarea"
+                placeholder="Enter reason for this break..."
+                aria-required="true"
+                aria-describedby="break-reason-error"
+                oninput="handleReasonInput()"
+              ></textarea>
+              <div id="break-reason-error" class="break-inline-error" role="alert">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>Please enter a reason for taking Other Break.</span>
+              </div>
             </div>
 
-            <!-- Controls -->
-            <div class="break-action-btns">
-              <button class="btn-break-control btn-start-break" id="btn-start" onclick="startBreak()">
-                <i class="fas fa-play"></i> Start Break
-              </button>
-              <button class="btn-break-control btn-end-break" id="btn-end" onclick="endBreak()">
-                <i class="fas fa-stop"></i> End Break
+            <!-- Start Break Button Area -->
+            <div class="break-action-row">
+              <button
+                type="button"
+                class="btn-break-act btn-start-break"
+                id="btn-start-break"
+                onclick="handleStartBreakClick()"
+                aria-label="Start Break"
+              >
+                <span id="btn-start-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </span>
+                <span id="btn-start-text">Start Break</span>
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Right Side: Break History -->
-        <div>
-          <div class="card full-table" style="height: 100%; box-sizing: border-box;">
-            <div class="card-header">
-              <h3><i class="fas fa-history" style="margin-right:8px;color:var(--accent);"></i>Break History (Last 24 Hours)</h3>
+          <!-- STATE B: Active Break Card (Dedicated View when employee is On Break) -->
+          <div id="active-break-view" class="active-break-container" role="region" aria-label="Active Break Status">
+            <div class="active-break-header-row">
+              <div class="active-break-tag">
+                <span class="active-break-pulse-dot"></span>
+                <span>Currently On Break</span>
+              </div>
+              <div class="active-break-timer-wrap" id="active-break-timer-box" title="Break Duration Timer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span id="active-break-live-timer">00:00</span>
+              </div>
             </div>
-            <div class="table-wrapper" style="max-height: 480px; overflow-y: auto;">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Break Type</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Duration</th>
-                    <th>Remarks</th>
-                  </tr>
-                </thead>
-                <tbody id="history-tbody">
-                  <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No breaks in the last 24 hours.</td></tr>
-                </tbody>
-              </table>
+
+            <div class="active-break-info-grid">
+              <!-- Active Break Type -->
+              <div class="active-info-box">
+                <span class="active-info-lbl">Break Type</span>
+                <div class="active-info-val">
+                  <span id="active-break-category-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                  </span>
+                  <span id="active-break-type-text">Tea Break</span>
+                </div>
+              </div>
+
+              <!-- Break Started At -->
+              <div class="active-info-box">
+                <span class="active-info-lbl">Started</span>
+                <div class="active-info-val">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span id="active-break-started-text">—</span>
+                </div>
+              </div>
+
+              <!-- Break Duration -->
+              <div class="active-info-box">
+                <span class="active-info-lbl">Break Duration</span>
+                <div class="active-info-val">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span id="active-break-duration-text">0 mins</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- End Break Action Row -->
+            <div class="break-action-row">
+              <button
+                type="button"
+                class="btn-break-act btn-end-break"
+                id="btn-end-break"
+                onclick="handleEndBreakClick()"
+                aria-label="End Break"
+              >
+                <span id="btn-end-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+                </span>
+                <span id="btn-end-text">End Break</span>
+              </button>
             </div>
           </div>
-        </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- CARD 3: Break History (Last 24 Hours)                       -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <section class="apr-section-card" id="section-break-history" aria-label="Break History">
+          <div class="apr-section-header">
+            <div class="apr-header-info">
+              <div class="apr-header-icon">
+                <!-- History icon -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <h3 class="apr-section-title">Break History</h3>
+                <p class="apr-section-subtitle">Last 24 Hours</p>
+              </div>
+            </div>
+            <div class="history-card-header-actions">
+              <button type="button" class="btn-history-refresh" id="btn-refresh-history" onclick="refreshBreakHistory()" title="Refresh Break History">
+                <svg id="history-refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M21 21v-5h-5"/></svg>
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="table-scroll-wrapper" id="history-table-container">
+            <table class="apr-data-table" aria-label="Break History Table">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Break Type</th>
+                  <th scope="col">Start Time</th>
+                  <th scope="col">End Time</th>
+                  <th scope="col">Duration</th>
+                  <th scope="col">Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <!-- Dynamically populated or filled with empty/loading state -->
+              </tbody>
+            </table>
+          </div>
+        </section>
 
       </div>
     </div>
@@ -379,147 +1354,464 @@
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20260705d"></script>
+<script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
-  const user = requireRole('employee');
-  if (user) {
+  /**
+   * ══════════════════════════════════════════════════════════════════════
+   * CLN Lending Suite — Employee APR Controller
+   * Attendance, Productivity & Break Management
+   * ══════════════════════════════════════════════════════════════════════
+   */
+  'use strict';
+
+  // ── Authentication Guard ─────────────────────────────────────────────
+  const currentUser = requireRole('employee');
+  if (currentUser) {
     renderSidebarUser();
-    initEmployeeAPR();
   }
 
+  // ── SVG Icon Registry (Consistent, scalable, no external CDN needed) ──
+  const ICONS = {
+    tea: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>',
+    lunch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/><path d="M15 11v11"/><path d="M5 2v4a3 3 0 0 0 3 3 3 3 0 0 0 3-3V2"/><path d="M8 9v13"/></svg>',
+    personal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4"/><circle cx="17" cy="17" r="4"/><polyline points="17 15 17 17 19 17"/></svg>',
+    meeting: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    other: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+    stop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
+    spinner: '<svg class="spin-animation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+    statusShield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M21 21v-5h-5"/></svg>'
+  };
+
+  // ── Global State ─────────────────────────────────────────────────────
+  let dashboardData = null;
   let selectedBreakType = null;
+  let isStartingBreak = false;
+  let isEndingBreak = false;
   let activeBreakTimerId = null;
-  let activeBreakStartTime = null;
+  let liveTickTimerId = null;
+  let dashboardPollId = null;
+  let isInitialized = false;
 
-  function initEmployeeAPR() {
-    refreshDashboard();
-    // Refresh stats every 10 seconds silently
-    setInterval(refreshDashboard, 10000);
+  // ── Timezone Safe Helpers (Asia/Kolkata) ──────────────────────────────
+  const TIMEZONE_IST = 'Asia/Kolkata';
+
+  function safeFormatTime(val) {
+    if (!val) return '—';
+    try {
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return '—';
+      return d.toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: TIMEZONE_IST
+      });
+    } catch (e) {
+      return '—';
+    }
   }
 
+  function safeFormatDate(val) {
+    if (!val) return '—';
+    try {
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return '—';
+      return d.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        timeZone: TIMEZONE_IST
+      });
+    } catch (e) {
+      return '—';
+    }
+  }
+
+  function formatDurationReadable(minutes) {
+    if (minutes === null || minutes === undefined || isNaN(minutes) || minutes < 0) return '0 mins';
+    const totalMins = Math.floor(minutes);
+    if (totalMins < 1) return '0 mins';
+    const hrs = Math.floor(totalMins / 60);
+    const mins = totalMins % 60;
+    if (hrs === 0) return `${mins} min${mins === 1 ? '' : 's'}`;
+    if (mins === 0) return `${hrs} hr${hrs === 1 ? '' : 's'}`;
+    return `${hrs} hr${hrs === 1 ? '' : 's'} ${mins} min${mins === 1 ? '' : 's'}`;
+  }
+
+  function formatBreakDurationSec(seconds) {
+    if (seconds === null || seconds === undefined || isNaN(seconds) || seconds < 0) return '0s';
+    const totalSecs = Math.floor(seconds);
+    if (totalSecs < 60) return `${totalSecs}s`;
+    const mins = Math.floor(totalSecs / 60);
+    const secs = totalSecs % 60;
+    if (mins < 60) {
+      return secs > 0 ? `${mins}m ${secs}s` : `${mins} min${mins === 1 ? '' : 's'}`;
+    }
+    const hrs = Math.floor(mins / 60);
+    const remMins = mins % 60;
+    return remMins > 0 ? `${hrs}h ${remMins}m` : `${hrs} hr${hrs === 1 ? '' : 's'}`;
+  }
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // ── Alert Banner Notification ────────────────────────────────────────
+  let alertTimer = null;
   function showAlert(msg, type = 'error') {
     const alertEl = document.getElementById('page-alert');
+    if (!alertEl) return;
+    if (alertTimer) clearTimeout(alertTimer);
+
     alertEl.textContent = msg;
     alertEl.className = `alert alert-${type} show`;
     alertEl.style.display = 'block';
-    setTimeout(() => {
+
+    alertTimer = setTimeout(() => {
       alertEl.style.display = 'none';
-    }, 6000);
+      alertTimer = null;
+    }, 5500);
   }
 
-  function selectBreakType(type) {
-    selectedBreakType = type;
-    document.querySelectorAll('.break-type-btn').forEach(btn => {
-      const match = btn.getAttribute('onclick').match(/'([^']+)'/);
-      btn.classList.toggle('active', match && match[1] === type);
+  // ── Initialization (Guarded against duplication) ─────────────────────
+  function initEmployeeAPR() {
+    if (isInitialized) return;
+    isInitialized = true;
+
+    setupCategoryKeyboardNav();
+
+    // Initial data load
+    loadDashboard();
+    loadBreakHistory();
+
+    // Setup live timers
+    setupTimers();
+
+    // Setup visibility & focus synchronization
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        loadDashboard({ silent: true });
+        loadBreakHistory({ silent: true });
+      }
     });
-    document.getElementById('reason-container').style.display = type === 'Other Break' ? 'flex' : 'none';
+
+    window.addEventListener('focus', () => {
+      loadDashboard({ silent: true });
+    });
   }
 
-  async function refreshDashboard() {
+  function setupTimers() {
+    // Clear any existing intervals
+    if (dashboardPollId) clearInterval(dashboardPollId);
+    if (liveTickTimerId) clearInterval(liveTickTimerId);
+
+    // Silent dashboard API sync every 45 seconds
+    dashboardPollId = setInterval(() => {
+      loadDashboard({ silent: true });
+    }, 45000);
+
+    // Local ticking updates every 15 seconds for session duration & working hours
+    liveTickTimerId = setInterval(() => {
+      updateLiveKPIsLocally();
+    }, 15000);
+  }
+
+  // ── Category Selection ───────────────────────────────────────────────
+  const CATEGORY_MAP = {
+    'Tea Break': 'btn-cat-tea',
+    'Lunch Break': 'btn-cat-lunch',
+    'Personal Break': 'btn-cat-personal',
+    'Meeting Break': 'btn-cat-meeting',
+    'Other Break': 'btn-cat-other'
+  };
+
+  function handleCategorySelect(type) {
+    if (dashboardData?.activeBreak) return; // Disallow selecting during active break
+
+    selectedBreakType = type;
+
+    // Update active visual state & ARIA on cards
+    Object.entries(CATEGORY_MAP).forEach(([catName, btnId]) => {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      const isSelected = (catName === type);
+      btn.classList.toggle('selected', isSelected);
+      btn.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+    });
+
+    const reasonWrap = document.getElementById('break-reason-wrapper');
+    const reasonInput = document.getElementById('break-reason-input');
+    const reasonError = document.getElementById('break-reason-error');
+
+    if (type === 'Other Break') {
+      reasonWrap.style.display = 'flex';
+      setTimeout(() => { reasonInput?.focus(); }, 50);
+    } else {
+      reasonWrap.style.display = 'none';
+      if (reasonInput) {
+        reasonInput.value = '';
+        reasonInput.classList.remove('has-error');
+      }
+      if (reasonError) reasonError.style.display = 'none';
+    }
+  }
+
+  function handleReasonInput() {
+    const input = document.getElementById('break-reason-input');
+    const errorEl = document.getElementById('break-reason-error');
+    if (input && input.value.trim().length > 0) {
+      input.classList.remove('has-error');
+      if (errorEl) errorEl.style.display = 'none';
+    }
+  }
+
+  function setupCategoryKeyboardNav() {
+    Object.values(CATEGORY_MAP).forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    });
+  }
+
+  // ── Dashboard Data Loader ────────────────────────────────────────────
+  async function loadDashboard(options = {}) {
     try {
       const res = await api.get('/apr/employee/dashboard');
-      if (!res?.ok) return;
-      const d = res.data.data;
-
-      // Update widget stats
-      const statusEl = document.getElementById('stat-status');
-      let statusBadge = '';
-      if (d.currentStatus === 'Available' || d.currentStatus === 'Idle' || d.currentStatus === 'Working') {
-        statusBadge = '<span class="status-badge working">Working</span>';
-      } else if (d.currentStatus === 'On Break') {
-        statusBadge = '<span class="status-badge on-break">On Break</span>';
-      } else {
-        statusBadge = `<span class="status-badge logged-out">${d.currentStatus}</span>`;
-      }
-      statusEl.innerHTML = statusBadge;
-
-      const fmtT = t => t ? new Date(t).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : '—';
-      document.getElementById('stat-login-time').textContent = fmtT(d.loginTime);
-      document.getElementById('stat-session').textContent = `${d.sessionDuration || 0} mins`;
-      document.getElementById('stat-work-hours').textContent = `${Number(d.totalWorkingHours).toFixed(2)} hrs`;
-
-      // Handle active break states
-      const startBtn = document.getElementById('btn-start');
-      const endBtn = document.getElementById('btn-end');
-      const banner = document.getElementById('active-break-banner');
-
-      if (d.activeBreak) {
-        startBtn.disabled = true;
-        endBtn.disabled = false;
-        banner.style.display = 'flex';
-        document.getElementById('active-break-type-lbl').textContent = d.activeBreak.break_type;
-        
-        activeBreakStartTime = new Date(d.activeBreak.start_time).getTime();
-        
-        // start visual ticking timer
-        if (!activeBreakTimerId) {
-          updateTimerUI();
-          activeBreakTimerId = setInterval(updateTimerUI, 1000);
+      if (!res?.ok) {
+        if (!options.silent && !dashboardData) {
+          showDashboardErrorState();
         }
+        return;
+      }
+
+      dashboardData = res.data.data;
+      renderAttendanceOverview(dashboardData);
+      renderBreakManagement(dashboardData);
+    } catch (err) {
+      console.error('[Employee APR] loadDashboard error:', err);
+      if (!options.silent && !dashboardData) {
+        showDashboardErrorState();
+      }
+    }
+  }
+
+  function showDashboardErrorState() {
+    const statStatus = document.getElementById('stat-status');
+    if (statStatus) {
+      statStatus.innerHTML = '<span class="status-pill not-logged"><span class="status-pill-dot"></span> Offline</span>';
+    }
+    showAlert('Unable to load attendance information. Please check your connection.', 'error');
+  }
+
+  // ── Render Card 1: Attendance Status Overview ────────────────────────
+  function renderAttendanceOverview(d) {
+    if (!d) return;
+
+    // 1. Current Status Pill & KPI Icon Treatment
+    const statusEl = document.getElementById('stat-status');
+    const statusIconWrap = document.getElementById('kpi-icon-status');
+    const statusHint = document.getElementById('stat-status-hint');
+
+    let badgeHtml = '';
+    let iconClass = 'theme-status';
+    let hintText = 'Active attendance';
+
+    const normalizedStatus = (d.currentStatus || '').trim();
+
+    if (normalizedStatus === 'Working') {
+      badgeHtml = '<span class="status-pill working"><span class="status-pill-dot"></span> Working</span>';
+      iconClass = 'theme-status';
+      hintText = 'Actively clocked in';
+    } else if (normalizedStatus === 'On Break') {
+      badgeHtml = '<span class="status-pill on-break"><span class="status-pill-dot"></span> On Break</span>';
+      iconClass = 'theme-status on-break';
+      hintText = d.activeBreak ? `On ${d.activeBreak.break_type}` : 'Currently on break';
+    } else if (normalizedStatus === 'Logged Out') {
+      badgeHtml = '<span class="status-pill logged-out"><span class="status-pill-dot"></span> Logged Out</span>';
+      iconClass = 'theme-status logged-out';
+      hintText = 'Shift completed today';
+    } else {
+      badgeHtml = '<span class="status-pill not-logged"><span class="status-pill-dot"></span> Not Logged In</span>';
+      iconClass = 'theme-status not-logged';
+      hintText = 'No session started today';
+    }
+
+    if (statusEl) statusEl.innerHTML = badgeHtml;
+    if (statusIconWrap) statusIconWrap.className = `apr-kpi-icon-wrap ${iconClass}`;
+    if (statusHint) statusHint.textContent = hintText;
+
+    // 2. Login Time
+    const loginTimeEl = document.getElementById('stat-login-time');
+    if (loginTimeEl) {
+      loginTimeEl.textContent = safeFormatTime(d.loginTime);
+    }
+
+    // 3. Session Duration
+    const sessionEl = document.getElementById('stat-session');
+    if (sessionEl) {
+      if (d.loginTime && d.hasActiveSession) {
+        const elapsedMins = Math.max(0, Math.floor((Date.now() - new Date(d.loginTime).getTime()) / 60000));
+        sessionEl.textContent = formatDurationReadable(elapsedMins);
       } else {
+        sessionEl.textContent = '0 mins';
+      }
+    }
+
+    // 4. Total Working Hours Today
+    const workHoursEl = document.getElementById('stat-work-hours');
+    if (workHoursEl) {
+      const netWorkingMins = Math.floor((d.totalWorkingSeconds || 0) / 60);
+      workHoursEl.textContent = formatDurationReadable(netWorkingMins);
+    }
+  }
+
+  // ── Local Live KPI Updater (smooth updates between API polls) ────────
+  function updateLiveKPIsLocally() {
+    if (!dashboardData) return;
+
+    // Update session duration if currently working
+    if (dashboardData.hasActiveSession && dashboardData.loginTime) {
+      const elapsedMins = Math.max(0, Math.floor((Date.now() - new Date(dashboardData.loginTime).getTime()) / 60000));
+      const sessionEl = document.getElementById('stat-session');
+      if (sessionEl) sessionEl.textContent = formatDurationReadable(elapsedMins);
+    }
+
+    // Update working hours if working (not on break)
+    if (dashboardData.hasActiveSession && !dashboardData.activeBreak && dashboardData.totalWorkingSeconds !== undefined) {
+      // Add local incremental seconds since last fetch
+      if (dashboardData.serverTime) {
+        const secSinceServer = Math.max(0, Math.floor((Date.now() - new Date(dashboardData.serverTime).getTime()) / 1000));
+        const estimatedNetSec = dashboardData.totalWorkingSeconds + secSinceServer;
+        const workHoursEl = document.getElementById('stat-work-hours');
+        if (workHoursEl) workHoursEl.textContent = formatDurationReadable(Math.floor(estimatedNetSec / 60));
+      }
+    }
+  }
+
+  // ── Render Card 2: Break Management (Selector vs Active State) ───────
+  function renderBreakManagement(d) {
+    const selectionView = document.getElementById('break-selection-view');
+    const activeView = document.getElementById('active-break-view');
+    const startBtn = document.getElementById('btn-start-break');
+
+    if (d?.activeBreak) {
+      // Show Active Break Experience
+      if (selectionView) selectionView.style.display = 'none';
+      if (activeView) activeView.style.display = 'flex';
+
+      const typeText = document.getElementById('active-break-type-text');
+      const typeIcon = document.getElementById('active-break-category-icon');
+      const startedText = document.getElementById('active-break-started-text');
+
+      if (typeText) typeText.textContent = d.activeBreak.break_type;
+      if (startedText) startedText.textContent = safeFormatTime(d.activeBreak.start_time);
+
+      // Icon for active break
+      if (typeIcon) {
+        const bt = d.activeBreak.break_type;
+        if (bt === 'Tea Break') typeIcon.innerHTML = ICONS.tea;
+        else if (bt === 'Lunch Break') typeIcon.innerHTML = ICONS.lunch;
+        else if (bt === 'Personal Break') typeIcon.innerHTML = ICONS.personal;
+        else if (bt === 'Meeting Break') typeIcon.innerHTML = ICONS.meeting;
+        else typeIcon.innerHTML = ICONS.other;
+      }
+
+      startActiveBreakLiveTicker(d.activeBreak.start_time);
+    } else {
+      // Show Normal Break Selector Experience
+      if (selectionView) selectionView.style.display = 'block';
+      if (activeView) activeView.style.display = 'none';
+
+      stopActiveBreakLiveTicker();
+
+      if (startBtn) {
         startBtn.disabled = false;
-        endBtn.disabled = true;
-        banner.style.display = 'none';
-        
-        if (activeBreakTimerId) {
-          clearInterval(activeBreakTimerId);
-          activeBreakTimerId = null;
-        }
       }
-
-      await loadHistoryTable();
-    } catch (e) {
-      console.error(e);
     }
   }
 
-  function updateTimerUI() {
-    if (!activeBreakStartTime) return;
-    const elapsedSec = Math.floor((Date.now() - activeBreakStartTime) / 1000);
-    const mm = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
-    const ss = String(elapsedSec % 60).padStart(2, '0');
-    document.getElementById('active-break-timer').textContent = `${mm}:${ss}`;
-  }
+  // ── Live Active Break Timer Ticker ───────────────────────────────────
+  function startActiveBreakLiveTicker(startTimeIso) {
+    stopActiveBreakLiveTicker();
 
-  async function loadHistoryTable() {
-    const res = await api.get('/apr/employee/break/history');
-    if (!res?.ok) return;
-    
-    const tbody = document.getElementById('history-tbody');
-    if (res.data.data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No breaks in the last 24 hours.</td></tr>`;
-      return;
+    function tick() {
+      if (!startTimeIso) return;
+      const startMs = new Date(startTimeIso).getTime();
+      const elapsedSec = Math.max(0, Math.floor((Date.now() - startMs) / 1000));
+
+      const mm = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+      const ss = String(elapsedSec % 60).padStart(2, '0');
+      const timerEl = document.getElementById('active-break-live-timer');
+      if (timerEl) timerEl.textContent = `${mm}:${ss}`;
+
+      const durTextEl = document.getElementById('active-break-duration-text');
+      if (durTextEl) {
+        durTextEl.textContent = formatBreakDurationSec(elapsedSec);
+      }
     }
 
-    const fmtT = t => t ? new Date(t).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : '—';
-    const fmtD = d => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-
-    tbody.innerHTML = res.data.data.map(r => `
-      <tr>
-        <td>${fmtD(r.date)}</td>
-        <td><strong>${escapeHtml(r.break_type)}</strong></td>
-        <td>${fmtT(r.start_time)}</td>
-        <td>${fmtT(r.end_time)}</td>
-        <td>${r.duration}</td>
-        <td><span style="font-size:11px;color:var(--text-secondary);">${escapeHtml(r.remarks)}</span></td>
-      </tr>
-    `).join('');
+    tick();
+    activeBreakTimerId = setInterval(tick, 1000);
   }
 
-  async function startBreak() {
+  function stopActiveBreakLiveTicker() {
+    if (activeBreakTimerId) {
+      clearInterval(activeBreakTimerId);
+      activeBreakTimerId = null;
+    }
+  }
+
+  // ── Start Break Action ───────────────────────────────────────────────
+  async function handleStartBreakClick() {
+    if (isStartingBreak) return;
+
     if (!selectedBreakType) {
-      showAlert('Please select a break type first.');
+      showAlert('Please select a break category first.');
+      const firstBtn = document.getElementById('btn-cat-tea');
+      firstBtn?.focus();
       return;
     }
 
     let reason = '';
     if (selectedBreakType === 'Other Break') {
-      reason = document.getElementById('break-reason').value.trim();
+      const reasonInput = document.getElementById('break-reason-input');
+      const reasonError = document.getElementById('break-reason-error');
+      reason = reasonInput ? reasonInput.value.trim() : '';
+
       if (!reason) {
-        showAlert('Reason is mandatory for "Other Break".');
+        if (reasonInput) {
+          reasonInput.classList.add('has-error');
+          reasonInput.focus();
+        }
+        if (reasonError) reasonError.style.display = 'flex';
+        showAlert('Please enter a reason for taking Other Break.');
         return;
       }
     }
+
+    isStartingBreak = true;
+    const btn = document.getElementById('btn-start-break');
+    const iconSpan = document.getElementById('btn-start-icon');
+    const textSpan = document.getElementById('btn-start-text');
+
+    if (btn) btn.disabled = true;
+    if (iconSpan) iconSpan.innerHTML = ICONS.spinner;
+    if (textSpan) textSpan.textContent = 'Starting Break…';
 
     try {
       const res = await api.post('/break-time/start', {
@@ -529,30 +1821,211 @@
 
       if (res?.ok) {
         showAlert('Break started successfully.', 'success');
-        document.getElementById('break-reason').value = '';
+
+        // Reset inputs & selection
         selectedBreakType = null;
-        document.querySelectorAll('.break-type-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('reason-container').style.display = 'none';
-        refreshDashboard();
+        Object.values(CATEGORY_MAP).forEach(btnId => {
+          const b = document.getElementById(btnId);
+          b?.classList.remove('selected');
+          b?.setAttribute('aria-checked', 'false');
+        });
+
+        const reasonWrap = document.getElementById('break-reason-wrapper');
+        const reasonInput = document.getElementById('break-reason-input');
+        if (reasonWrap) reasonWrap.style.display = 'none';
+        if (reasonInput) {
+          reasonInput.value = '';
+          reasonInput.classList.remove('has-error');
+        }
+
+        // Re-sync dashboard and break history immediately
+        await Promise.all([loadDashboard(), loadBreakHistory()]);
       } else {
-        showAlert(res?.data?.message || 'Failed to start break.');
+        const errorMsg = res?.data?.message || 'Failed to start break. Please try again.';
+        showAlert(errorMsg, 'error');
       }
-    } catch (e) {
-      showAlert('Network error occurred.');
+    } catch (err) {
+      console.error('[Employee APR] startBreak error:', err);
+      showAlert('A network error occurred while starting your break.', 'error');
+    } finally {
+      isStartingBreak = false;
+      if (btn) btn.disabled = false;
+      if (iconSpan) iconSpan.innerHTML = ICONS.play;
+      if (textSpan) textSpan.textContent = 'Start Break';
     }
   }
 
-  async function endBreak() {
+  // ── End Break Action ─────────────────────────────────────────────────
+  async function handleEndBreakClick() {
+    if (isEndingBreak) return;
+
+    isEndingBreak = true;
+    const btn = document.getElementById('btn-end-break');
+    const iconSpan = document.getElementById('btn-end-icon');
+    const textSpan = document.getElementById('btn-end-text');
+
+    if (btn) btn.disabled = true;
+    if (iconSpan) iconSpan.innerHTML = ICONS.spinner;
+    if (textSpan) textSpan.textContent = 'Ending Break…';
+
     try {
       const res = await api.post('/break-time/end');
+
       if (res?.ok) {
         showAlert('Welcome back! Break ended successfully.', 'success');
-        refreshDashboard();
+        stopActiveBreakLiveTicker();
+
+        // Re-sync dashboard and break history immediately
+        await Promise.all([loadDashboard(), loadBreakHistory()]);
       } else {
-        showAlert(res?.data?.message || 'Failed to end break.');
+        const errorMsg = res?.data?.message || 'Failed to end break. Please try again.';
+        showAlert(errorMsg, 'error');
       }
-    } catch (e) {
-      showAlert('Network error occurred.');
+    } catch (err) {
+      console.error('[Employee APR] endBreak error:', err);
+      showAlert('A network error occurred while ending your break.', 'error');
+    } finally {
+      isEndingBreak = false;
+      if (btn) btn.disabled = false;
+      if (iconSpan) iconSpan.innerHTML = ICONS.stop;
+      if (textSpan) textSpan.textContent = 'End Break';
+    }
+  }
+
+  // ── Break History Loader & Renderer ──────────────────────────────────
+  async function loadBreakHistory(options = {}) {
+    const tbody = document.getElementById('history-tbody');
+    if (!tbody) return;
+
+    if (!options.silent) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="padding: 24px; text-align: center;">
+            <div class="apr-loading-skeleton">
+              <div class="skeleton-bar" style="width:100%;"></div>
+              <div class="skeleton-bar" style="width:85%;"></div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    try {
+      const res = await api.get('/apr/employee/break/history');
+      if (!res?.ok) {
+        showHistoryErrorState();
+        return;
+      }
+
+      const records = res.data.data || [];
+      renderBreakHistoryRows(records);
+    } catch (err) {
+      console.error('[Employee APR] loadBreakHistory error:', err);
+      showHistoryErrorState();
+    }
+  }
+
+  function renderBreakHistoryRows(records) {
+    const tbody = document.getElementById('history-tbody');
+    if (!tbody) return;
+
+    if (!records || records.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="padding: 0;">
+            <div class="apr-empty-state-box">
+              <div class="apr-empty-icon-circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+              </div>
+              <h4 class="apr-empty-heading">No breaks in the last 24 hours</h4>
+              <p class="apr-empty-text">Your recent break activity will appear here.</p>
+            </div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = records.map(r => {
+      const dateStr = safeFormatDate(r.start_time || r.date);
+      const startStr = safeFormatTime(r.start_time);
+      const endStr = r.end_time ? safeFormatTime(r.end_time) : '<span style="color:#d97706;font-weight:700;">In Progress</span>';
+      const durationStr = r.duration || (r.end_time ? '—' : '<span style="color:#d97706;font-weight:700;">In Progress</span>');
+      const remarksStr = r.remarks && r.remarks.trim() && r.remarks.trim() !== 'N/A' ? escapeHtml(r.remarks.trim()) : '—';
+
+      // Badge style & icon per category
+      let badgeClass = 'other';
+      let badgeIcon = ICONS.other;
+      const bt = (r.break_type || '').trim();
+
+      if (bt === 'Tea Break') {
+        badgeClass = 'tea';
+        badgeIcon = ICONS.tea;
+      } else if (bt === 'Lunch Break') {
+        badgeClass = 'lunch';
+        badgeIcon = ICONS.lunch;
+      } else if (bt === 'Personal Break') {
+        badgeClass = 'personal';
+        badgeIcon = ICONS.personal;
+      } else if (bt === 'Meeting Break') {
+        badgeClass = 'meeting';
+        badgeIcon = ICONS.meeting;
+      }
+
+      return `
+        <tr>
+          <td><span style="font-weight:600;">${dateStr}</span></td>
+          <td>
+            <span class="history-type-badge ${badgeClass}">
+              ${badgeIcon}
+              <span>${escapeHtml(bt)}</span>
+            </span>
+          </td>
+          <td>${startStr}</td>
+          <td>${endStr}</td>
+          <td><strong>${durationStr}</strong></td>
+          <td><span style="color:var(--text-secondary);">${remarksStr}</span></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function showHistoryErrorState() {
+    const tbody = document.getElementById('history-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="padding: 0;">
+          <div class="apr-error-state-box">
+            <div class="apr-error-icon-circle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <p class="apr-error-text">Unable to load break history.</p>
+            <button type="button" class="btn-apr-retry" onclick="loadBreakHistory()">
+              ${ICONS.refresh}
+              <span>Retry</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
+  async function refreshBreakHistory() {
+    const icon = document.getElementById('history-refresh-icon');
+    if (icon) icon.classList.add('spin-animation');
+    await loadBreakHistory();
+    if (icon) {
+      setTimeout(() => { icon.classList.remove('spin-animation'); }, 600);
+    }
+  }
+
+  // ── Auto-Run Controlled Initialization ───────────────────────────────
+  if (currentUser) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initEmployeeAPR);
+    } else {
+      initEmployeeAPR();
     }
   }
 </script>
