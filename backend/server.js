@@ -781,6 +781,7 @@ async function ensureExcelModule() {
         phone_number VARCHAR(30) NOT NULL,
         disposition VARCHAR(100) NULL,
         sub_disposition VARCHAR(200) NULL,
+        notes TEXT NULL,
         updated_by INT NULL,
         status VARCHAR(30) NOT NULL DEFAULT 'Pending',
         updated_at TIMESTAMP NULL,
@@ -841,6 +842,12 @@ async function ensureExcelModule() {
         FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+    // Add notes column to excel_records if missing (for existing databases)
+    const [notesCol] = await db.query("SHOW COLUMNS FROM excel_records LIKE 'notes'");
+    if (!notesCol.length) {
+      await db.query('ALTER TABLE excel_records ADD COLUMN notes TEXT NULL AFTER sub_disposition');
+      console.log("Added 'notes' column to 'excel_records' table.");
+    }
     console.log('Excel module tables initialized successfully.');
   } catch (err) {
     console.error('Failed to initialize Excel module tables:', err.message);
