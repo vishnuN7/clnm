@@ -4574,8 +4574,7 @@
         document.getElementById('prof-b-holder').textContent = profileValue(b.account_holder_name, '—');
         document.getElementById('prof-b-bank').textContent = profileValue(b.bank_name, '—');
         document.getElementById('prof-b-ifsc').textContent = profileValue(b.ifsc_code, '—');
-        const acctStr = profileValue(b.account_number, '');
-        document.getElementById('prof-b-account').textContent = acctStr ? (acctStr.length > 4 ? `••••••••${acctStr.slice(-4)}` : acctStr) : '—';
+        document.getElementById('prof-b-account').textContent = profileValue(b.account_number, '—');
         document.getElementById('prof-b-branch').textContent = profileValue(b.branch_name, '—');
       } else {
         if (bankGrid) bankGrid.style.display = 'none';
