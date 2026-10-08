@@ -1,5 +1,0 @@
-The string is missing the terminator: ".
-    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRe 
-   cordException
-    + FullyQualifiedErrorId : TerminatorExpectedAtEndOfString
- 

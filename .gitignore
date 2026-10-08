@@ -22,6 +22,7 @@ uploads/
 # IDE
 .vscode/
 .idea/
+.kilo/
 *.swp
 *.swo
 *~
