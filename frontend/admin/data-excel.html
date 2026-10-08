@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — Data Excel Document</title>
+  <title>Dixit Lending Solution — Data Excel Document</title>
   <meta name="description" content="Admin Data Excel Document — Upload, assign, monitor and export Excel task sheets." />
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -23,7 +24,7 @@
     })();
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
@@ -327,16 +328,20 @@
       z-index: 1;
       white-space: nowrap;
     }
-    #files-table th:nth-child(1) { min-width: 200px; }
-    #files-table th:nth-child(2) { min-width: 110px; }
-    #files-table th:nth-child(3) { min-width: 110px; }
-    #files-table th:nth-child(4) { min-width: 100px; }
-    #files-table th:nth-child(5) { min-width: 150px; }
-    #files-table th:nth-child(6) { min-width: 90px; }
-    #files-table th:nth-child(7) { min-width: 90px; }
-    #files-table th:nth-child(8) { min-width: 120px; }
-    #files-table th:nth-child(9) { min-width: 110px; }
-    #files-table th:nth-child(10) { min-width: 260px; }
+    #files-table th:nth-child(1) { min-width: 150px; max-width: 175px; }
+    #files-table th:nth-child(2) { min-width: 80px; }
+    #files-table th:nth-child(3) { min-width: 85px; }
+    #files-table th:nth-child(4) { min-width: 65px; text-align: center; }
+    #files-table th:nth-child(5) { min-width: 110px; }
+    #files-table th:nth-child(6) { min-width: 60px; text-align: center; }
+    #files-table th:nth-child(7) { min-width: 55px; text-align: center; }
+    #files-table th:nth-child(8) { min-width: 85px; }
+    #files-table th:nth-child(9) { min-width: 95px; text-align: center; }
+    #files-table th:nth-child(10) { min-width: 185px; }
+
+    #files-table th {
+      padding: 10px 8px;
+    }
 
     .table-wrap tbody tr {
       transition: background .15s ease;
@@ -345,7 +350,7 @@
       background: var(--bg-secondary);
     }
     .table-wrap tbody td {
-      padding: 12px 14px;
+      padding: 9px 8px;
       border-bottom: 1px solid var(--border);
       color: var(--text-primary);
       vertical-align: middle;
@@ -463,12 +468,13 @@
     .prog-wrap {
       display: flex;
       align-items: center;
-      gap: 8px;
-      min-width: 120px;
+      gap: 6px;
+      min-width: 75px;
+      max-width: 90px;
     }
     .prog-bar {
       flex: 1;
-      height: 7px;
+      height: 6px;
       border-radius: 999px;
       background: var(--bg-secondary);
       overflow: hidden;
@@ -481,19 +487,21 @@
       transition: width .5s ease;
     }
     .prog-pct {
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--text-secondary);
-      min-width: 32px;
+      min-width: 28px;
       text-align: right;
     }
 
     /* ── Action Buttons Cell ── */
     .actions-cell {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
+      gap: 4px;
+      flex-wrap: nowrap;
+      min-width: 175px;
+      white-space: nowrap;
     }
     .btn-xs {
       display: inline-flex;
@@ -881,8 +889,8 @@
       flex-direction: column;
     }
     :root[data-theme='dark'] .modal {
-      background: linear-gradient(135deg, #0f1c2e 0%, #0a1320 100%) !important;
-      border-color: rgba(148, 163, 184, 0.22) !important;
+      background: linear-gradient(135deg, rgba(16, 23, 33, 0.98) 0%, rgba(12, 18, 25, 0.98) 100%) !important;
+      border-color: rgba(123, 192, 67, 0.18) !important;
     }
     .modal-sm { max-width: 500px; }
     .modal-actions {
@@ -923,6 +931,547 @@
     .toast-error   { background: linear-gradient(135deg, #dc2626, #b91c1c); }
     .toast-info    { background: linear-gradient(135deg, var(--accent), #1d4ed8); }
     @keyframes toastIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+    /* ── Master Record Allocation Wizard ── */
+    .wizard-stepper-wrap {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+    }
+    .wizard-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .wstep {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      opacity: 0.55;
+      transition: all .2s ease;
+      user-select: none;
+    }
+    .wstep.active, .wstep.completed {
+      opacity: 1;
+    }
+    .wstep-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--border-strong);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s ease;
+      flex-shrink: 0;
+    }
+    .wstep.active .wstep-circle {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+    }
+    .wstep.completed .wstep-circle {
+      background: #10b981;
+      border-color: #10b981;
+      color: #fff;
+    }
+    .wstep-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .wstep-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      margin: 0 4px;
+      transition: background .2s ease;
+    }
+    .wstep-line.completed {
+      background: #10b981;
+    }
+    @media (max-width: 640px) {
+      .wstep-title { display: none; }
+    }
+
+    /* ── Allocation Summary Banner ── */
+    .alloc-summary-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .alloc-stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .alloc-stat-lbl {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      color: var(--text-secondary);
+    }
+    .alloc-stat-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .alloc-stat-val.val-green { color: #059669; }
+    .alloc-stat-val.val-blue  { color: #2563eb; }
+    .alloc-stat-val.val-amber { color: #d97706; }
+    .alloc-stat-val.val-red   { color: #dc2626; }
+
+    /* ── Allocation Mode Selector ── */
+    .alloc-modes-wrap {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .alloc-mode-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    .alloc-mode-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .alloc-mode-btn.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Allocation Row Cards ── */
+    .alloc-rows-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .alloc-row-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      flex-wrap: wrap;
+    }
+    .alloc-row-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .alloc-row-remove {
+      padding: 6px 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all .2s;
+    }
+    .alloc-row-remove:hover {
+      background: rgba(239,68,68,0.12);
+      color: #dc2626;
+    }
+    .alloc-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: var(--accent-soft);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    /* ── Compact Modal Preview Table ── */
+    .modal-preview-table-wrap {
+      max-height: 220px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-top: 12px;
+      background: var(--bg-card);
+    }
+    .modal-preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .modal-preview-table th {
+      position: sticky;
+      top: 0;
+      background: var(--bg-secondary);
+      padding: 8px 10px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: 10.5px;
+      letter-spacing: .4px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .modal-preview-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+    .emp-tag-multi {
+      background: rgba(37,99,235,0.14);
+      color: #2563eb;
+      font-weight: 700;
+    }
+
+    /* ── Employee Allocation Breakdown Modal ── */
+    #allocation-detail-modal .modal {
+      width: min(1100px, calc(100vw - 48px)) !important;
+      max-width: 1100px !important;
+    }
+
+    /* Metric Strip */
+    .alloc-metric-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .alloc-metric-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .alloc-metric-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .alloc-metric-value {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .alloc-metric-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+    }
+    @media (max-width: 640px) {
+      .alloc-metric-divider {
+        display: none;
+      }
+    }
+
+    /* Desktop Table */
+    .alloc-detail-table-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      overflow-x: hidden;
+    }
+    .alloc-detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      table-layout: fixed;
+    }
+    .alloc-detail-table th {
+      background: var(--bg-secondary);
+      padding: 10px 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: 10.5px;
+      letter-spacing: .4px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .alloc-detail-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .alloc-detail-table tr:last-child td {
+      border-bottom: none;
+    }
+    .alloc-detail-table tr:hover td {
+      background: var(--table-row-hover, rgba(0,0,0,0.02));
+    }
+
+    /* Column Widths */
+    .alloc-detail-table th:nth-child(1), .alloc-detail-table td:nth-child(1) { width: 28%; }
+    .alloc-detail-table th:nth-child(2), .alloc-detail-table td:nth-child(2) { width: 18%; }
+    .alloc-detail-table th:nth-child(3), .alloc-detail-table td:nth-child(3) { width: 14%; }
+    .alloc-detail-table th:nth-child(4), .alloc-detail-table td:nth-child(4) { width: 18%; }
+    .alloc-detail-table th:nth-child(5), .alloc-detail-table td:nth-child(5) { width: 11%; }
+    .alloc-detail-table th:nth-child(6), .alloc-detail-table td:nth-child(6) { width: 11%; }
+
+    /* Employee Cell */
+    .alloc-detail-emp-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .emp-avatar-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent, #2563eb), #1d4ed8);
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      letter-spacing: .2px;
+    }
+    .alloc-detail-emp-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+      gap: 2px;
+    }
+    .alloc-detail-emp-name {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 13px;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .alloc-detail-emp-email {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Allocation Method + Row Range */
+    .alloc-method-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+    .alloc-method-badge {
+      font-size: 11px !important;
+      padding: 2px 7px !important;
+      font-weight: 700 !important;
+      background: rgba(37,99,235,0.12) !important;
+      color: #2563eb !important;
+      border: 1px solid rgba(37,99,235,0.25) !important;
+      border-radius: 4px !important;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .alloc-range-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Records */
+    .alloc-records-cell {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .alloc-records-count {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .alloc-records-unit {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Progress Cell */
+    .alloc-progress-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .alloc-progress-fraction {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .prog-bar-mini {
+      width: 100%;
+      height: 5px;
+      background: var(--border, #e2e8f0);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .prog-fill-mini {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #059669);
+      border-radius: 999px;
+      transition: width .3s ease;
+    }
+    .alloc-progress-pct {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent, #2563eb);
+      white-space: nowrap;
+    }
+
+    /* Lifespan */
+    .lifespan-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .badge-expired {
+      background: rgba(239,68,68,0.12) !important;
+      color: #dc2626 !important;
+      border: 1px solid rgba(239,68,68,0.25) !important;
+    }
+
+    /* Mobile Stacked Card View */
+    .alloc-detail-cards-wrap {
+      display: none;
+    }
+    .alloc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .alloc-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .alloc-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .alloc-card-progress {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .alloc-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 6px;
+      border-top: 1px dashed var(--border);
+      font-size: 11.5px;
+    }
+
+    @media (max-width: 768px) {
+      .alloc-detail-table-wrap {
+        display: none !important;
+      }
+      .alloc-detail-cards-wrap {
+        display: flex !important;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    /* Dark Theme Specific Adjustments */
+    :root[data-theme='dark'] .emp-avatar-sm {
+      background: linear-gradient(135deg, #1e3a5f, #2563eb);
+    }
+    :root[data-theme='dark'] .alloc-method-badge {
+      background: rgba(37,99,235,0.2) !important;
+      color: #60a5fa !important;
+      border-color: rgba(37,99,235,0.4) !important;
+    }
+    :root[data-theme='dark'] .alloc-metric-strip,
+    :root[data-theme='dark'] .lifespan-badge {
+      background: rgba(15, 23, 42, 0.6) !important;
+      border-color: rgba(148, 163, 184, 0.18) !important;
+    }
+    :root[data-theme='dark'] .alloc-progress-pct {
+      color: #60a5fa !important;
+    }
+    :root[data-theme='dark'] .prog-bar-mini {
+      background: rgba(255,255,255,0.1);
+    }
   </style>
 </head>
 <body>
@@ -931,10 +1480,17 @@
   <!-- ═══ SIDEBAR ═══ -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div><h2>CLN Lending Suite</h2><span>Admin Console</span></div>
-      </div>
+      <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
+        </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Admin Console</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -998,7 +1554,7 @@
         <div class="kpi-card kpi-amber">
           <div class="kpi-header">
             <span class="kpi-lbl">In Progress</span>
-            <div class="kpi-icon-wrap"><i class="fas fa-spinner fa-spin-pulse"></i></div>
+            <div class="kpi-icon-wrap"><i class="fas fa-clock"></i></div>
           </div>
           <div class="kpi-val" id="kpi-in-progress">—</div>
         </div>
@@ -1133,8 +1689,11 @@
               <h3 style="margin:0; font-size:16px;">Live Workforce Monitoring</h3>
             </div>
             <div class="filter-toolbar">
-              <select id="monitor-file-select" class="filter-control" style="min-width:280px; max-width:440px;" onchange="loadMonitorData()">
-                <option value="">Select a file to monitor...</option>
+              <select id="monitor-file-select" class="filter-control" style="min-width:240px; max-width:380px;" onchange="handleMonitorFileChange()">
+                <option value="">Select a master file to monitor...</option>
+              </select>
+              <select id="monitor-asgn-select" class="filter-control" style="min-width:200px; max-width:320px;" onchange="filterMonitorTable()">
+                <option value="">All Employee Assignments</option>
               </select>
               <span id="monitor-poll-badge" class="live-status-badge">
                 <i class="fas fa-satellite-dish"></i> Auto-refresh: 5s
@@ -1185,6 +1744,7 @@
                   <th>Assigned Employee</th>
                   <th>Disposition</th>
                   <th>Sub Disposition</th>
+                  <th>Call Notes</th>
                   <th>Status</th>
                   <th>Last Updated</th>
                 </tr>
@@ -1335,87 +1895,419 @@
 <!-- ═══ TOAST WRAPPER ═══ -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
-<!-- ═══ MODAL: Upload Excel ═══ -->
+<!-- ═══ MODAL: Upload Master Excel Wizard ═══ -->
 <div class="modal-overlay" id="upload-modal">
-  <div class="modal" style="max-width:700px;">
-    <div class="modal-header">
-      <h3><i class="fas fa-cloud-upload-alt" style="margin-right:8px; color:var(--accent);"></i> Upload &amp; Assign Excel File</h3>
+  <div class="modal" style="max-width:880px; width:95%; max-height:92vh; display:flex; flex-direction:column; padding:0 !important; overflow:hidden;">
+    <div class="modal-header" style="padding:18px 24px; border-bottom:1px solid var(--border); flex-shrink:0;">
+      <div>
+        <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="fas fa-file-excel" style="color:var(--accent);"></i>
+          <span>Master Workbook &amp; Record Allocation</span>
+        </h3>
+        <p style="margin:4px 0 0; font-size:12px; color:var(--text-secondary);">
+          Upload ONE master workbook and allocate record ranges to multiple employees without duplicating files.
+        </p>
+      </div>
       <button class="modal-close" onclick="closeModal('upload-modal')">Close</button>
     </div>
-    <div class="modal-body-scroll" style="overflow-y:auto; flex:1 1 auto; padding:8px 4px 10px 0;">
-      <!-- Upload Zone -->
-      <div id="upload-zone" class="upload-zone" onclick="document.getElementById('file-input').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-        <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none;" onchange="handleFileSelect(event)" />
-        <div class="upload-icon-wrap">
-          <i class="fas fa-file-excel"></i>
-        </div>
-        <div class="upload-title">Drop your Excel file here or click to browse</div>
-        <div class="upload-hint">Supported formats: Microsoft Excel (.xlsx, .xls). Max file size 20MB.</div>
-        <div class="upload-formats">
-          <span class="fmt-badge"><i class="fas fa-check"></i> .xlsx</span>
-          <span class="fmt-badge"><i class="fas fa-check"></i> .xls</span>
-        </div>
-        <div id="selected-file-name" style="margin-top:14px; font-size:13.5px; font-weight:700; color:var(--accent); display:none;"></div>
-      </div>
 
-      <!-- Assign Employees -->
-      <div id="assign-section" style="margin-top:20px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-          <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary);">
-            Assign To Employees <span style="color:#dc2626;">*</span>
-          </label>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-secondary btn-sm" onclick="selectAllEmployees()">Select All</button>
-            <button class="btn btn-secondary btn-sm" onclick="clearAllEmployees()">Clear</button>
-          </div>
+    <!-- Stepper bar -->
+    <div class="wizard-stepper-wrap" style="flex-shrink:0;">
+      <div class="wizard-stepper">
+        <div class="wstep active" id="ws-step-1" onclick="wizardGoToStep(1)">
+          <div class="wstep-circle">1</div>
+          <span class="wstep-title">Upload Master</span>
         </div>
-        <div class="emp-search-box" style="margin-bottom:8px;">
-          <input id="emp-search" type="text" placeholder="Search employees by name or email..." class="filter-control" style="width:100%; box-sizing:border-box;" oninput="filterEmployees()" />
+        <div class="wstep-line" id="ws-line-1"></div>
+        <div class="wstep" id="ws-step-2" onclick="wizardGoToStep(2)">
+          <div class="wstep-circle">2</div>
+          <span class="wstep-title">Validate Workbook</span>
         </div>
-        <div class="emp-grid" id="emp-grid">
-          <div class="skeleton" style="height:48px;"></div>
-          <div class="skeleton" style="height:48px;"></div>
-          <div class="skeleton" style="height:48px;"></div>
+        <div class="wstep-line" id="ws-line-2"></div>
+        <div class="wstep" id="ws-step-3" onclick="wizardGoToStep(3)">
+          <div class="wstep-circle">3</div>
+          <span class="wstep-title">Allocate Records</span>
         </div>
-        <div style="margin-top:8px; font-size:12px; font-weight:600; color:var(--text-secondary);" id="selected-emp-count">0 employees selected</div>
+        <div class="wstep-line" id="ws-line-3"></div>
+        <div class="wstep" id="ws-step-4" onclick="wizardGoToStep(4)">
+          <div class="wstep-circle">4</div>
+          <span class="wstep-title">Confirm Allocation</span>
+        </div>
       </div>
     </div>
-    <div class="modal-actions" style="margin-top:12px; padding-top:12px; flex-shrink:0;">
-      <button class="btn btn-secondary" onclick="closeModal('upload-modal')">Cancel</button>
-      <button class="btn btn-primary" id="btn-do-upload" onclick="doUpload()" disabled>
-        <i class="fas fa-upload" style="margin-right:6px;"></i>
-        <span>Upload &amp; Assign</span>
+
+    <!-- Scrollable Body with Panels -->
+    <div class="modal-body-scroll" style="overflow-y:auto; flex:1 1 auto; padding:20px 24px;">
+      <!-- STEP 1: Upload File Zone -->
+      <div class="wizard-panel" id="wpanel-1">
+        <div id="upload-zone" class="upload-zone" onclick="document.getElementById('file-input').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+          <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none;" onchange="handleFileSelect(event)" />
+          <div class="upload-icon-wrap">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <div class="upload-title">Drop your Master Excel workbook here or click to browse</div>
+          <div class="upload-hint">Supported formats: Microsoft Excel (.xlsx, .xls). Max file size 20MB.</div>
+          <div class="upload-formats">
+            <span class="fmt-badge"><i class="fas fa-check"></i> .xlsx</span>
+            <span class="fmt-badge"><i class="fas fa-check"></i> .xls</span>
+          </div>
+          <div id="selected-file-name" style="margin-top:14px; font-size:13.5px; font-weight:700; color:var(--accent); display:none;"></div>
+        </div>
+
+        <div style="margin-top:16px; padding:12px 16px; background:var(--bg-secondary); border-radius:var(--radius-sm); border:1px solid var(--border); font-size:12.5px; color:var(--text-secondary); line-height:1.5;">
+          <strong style="color:var(--text-primary);"><i class="fas fa-circle-info" style="color:var(--accent); margin-right:6px;"></i> How Master Allocation Works:</strong>
+          <ul style="margin:6px 0 0 18px; padding:0;">
+            <li>The uploaded file is stored as a <strong>single Master Dataset</strong>.</li>
+            <li>Historical completed rows (e.g. Akane, Status = Completed) remain <strong>preserved</strong>.</li>
+            <li>Available records can be allocated by <strong>Equal Split</strong>, <strong>Row Range</strong>, <strong>Record Count</strong>, or <strong>Selection</strong>.</li>
+            <li>Each employee only accesses their authorized record assignments in their CRM portal.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 2: Server-Side Validation State & Dataset Preview -->
+      <div class="wizard-panel" id="wpanel-2" style="display:none;">
+        <!-- Loading State -->
+        <div id="wval-loading" style="text-align:center; padding:36px 16px; display:none;">
+          <div style="font-size:36px; color:var(--accent); margin-bottom:16px;">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </div>
+          <h4 style="font-size:16px; margin:0 0 8px; color:var(--text-primary);">Validating Master Workbook Structure...</h4>
+          <p style="font-size:13px; color:var(--text-secondary); max-width:440px; margin:0 auto;">
+            Analyzing sheets, columns, phone numbers, and historical dispositions on the server.
+          </p>
+        </div>
+
+        <!-- Error State -->
+        <div id="wval-error" style="display:none; margin:16px auto 0; max-width:540px; text-align:left; background:rgba(239,68,68,0.1); border:1.5px solid #dc2626; border-radius:var(--radius-sm); padding:16px; color:#dc2626; font-size:13px;">
+          <div style="font-weight:700; margin-bottom:6px; font-size:14px;"><i class="fas fa-triangle-exclamation" style="margin-right:6px;"></i> Validation Error</div>
+          <div id="wval-error-msg" style="white-space:pre-wrap; margin-bottom:12px; color:var(--text-primary);"></div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="wizardGoToStep(1)">
+            <i class="fas fa-arrow-left" style="margin-right:6px;"></i> Select Another File
+          </button>
+        </div>
+
+        <!-- Validated Success & Preview State -->
+        <div id="wval-content" style="display:none;">
+          <div class="alloc-summary-bar">
+            <div class="alloc-stat-item">
+              <span class="alloc-stat-lbl">Master File</span>
+              <span class="alloc-stat-val" id="wp2-file-name" style="font-size:13px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">-</span>
+            </div>
+            <div class="alloc-stat-item">
+              <span class="alloc-stat-lbl">Target Sheet</span>
+              <span class="alloc-stat-val" id="wp2-sheet-name" style="font-size:13px;">-</span>
+            </div>
+            <div class="alloc-stat-item">
+              <span class="alloc-stat-lbl">Total Records</span>
+              <span class="alloc-stat-val" id="wp2-total-records">0</span>
+            </div>
+            <div class="alloc-stat-item">
+              <span class="alloc-stat-lbl">Completed (Historical)</span>
+              <span class="alloc-stat-val val-green" id="wp2-completed-records">0</span>
+            </div>
+            <div class="alloc-stat-item">
+              <span class="alloc-stat-lbl">Available to Allocate</span>
+              <span class="alloc-stat-val val-blue" id="wp2-available-records">0</span>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <div style="font-size:13px; font-weight:700; color:var(--text-primary);">
+              <i class="fas fa-table" style="color:var(--accent); margin-right:6px;"></i> First 15 Records Preview
+            </div>
+            <span style="font-size:11.5px; color:var(--text-secondary);">Showing initial workbook rows verified from server</span>
+          </div>
+
+          <div class="modal-preview-table-wrap">
+            <table class="modal-preview-table">
+              <thead>
+                <tr>
+                  <th style="width:50px;">#Row</th>
+                  <th>Phone Number</th>
+                  <th>Disposition</th>
+                  <th>Sub Disposition</th>
+                  <th>Employee (Historical)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="wp2-preview-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Record Allocation Workspace -->
+      <div class="wizard-panel" id="wpanel-3" style="display:none;">
+        <div class="alloc-summary-bar">
+          <div class="alloc-stat-item">
+            <span class="alloc-stat-lbl">Total Records</span>
+            <span class="alloc-stat-val" id="wp3-total">0</span>
+          </div>
+          <div class="alloc-stat-item">
+            <span class="alloc-stat-lbl">Historical Work</span>
+            <span class="alloc-stat-val val-green" id="wp3-completed">0</span>
+          </div>
+          <div class="alloc-stat-item">
+            <span class="alloc-stat-lbl">Available</span>
+            <span class="alloc-stat-val val-blue" id="wp3-avail">0</span>
+          </div>
+          <div class="alloc-stat-item">
+            <span class="alloc-stat-lbl">Allocated</span>
+            <span class="alloc-stat-val" id="wp3-allocated">0</span>
+          </div>
+          <div class="alloc-stat-item">
+            <span class="alloc-stat-lbl">Remaining Unassigned</span>
+            <span class="alloc-stat-val" id="wp3-remaining">0</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary); display:block; margin-bottom:6px;">
+            Select Allocation Method
+          </label>
+          <div class="alloc-modes-wrap">
+            <button type="button" class="alloc-mode-btn active" id="amb-equal" onclick="setWizardAllocMode('equal_split')">
+              <i class="fas fa-layer-group"></i> Split Equally
+            </button>
+            <button type="button" class="alloc-mode-btn" id="amb-range" onclick="setWizardAllocMode('range')">
+              <i class="fas fa-arrows-left-right"></i> Record Range (From–To)
+            </button>
+            <button type="button" class="alloc-mode-btn" id="amb-count" onclick="setWizardAllocMode('count')">
+              <i class="fas fa-list-ol"></i> Record Count
+            </button>
+            <button type="button" class="alloc-mode-btn" id="amb-individual" onclick="setWizardAllocMode('individual')">
+              <i class="fas fa-list-check"></i> Individual Selection
+            </button>
+          </div>
+        </div>
+
+        <!-- Mode Containers -->
+        <div id="wmode-equal-container">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary);">
+              Select Employees for Equal Split <span style="color:#dc2626;">*</span>
+            </label>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllEqualEmployees()">Select All</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="clearAllEqualEmployees()">Clear</button>
+            </div>
+          </div>
+          <div class="emp-search-box" style="margin-bottom:8px;">
+            <input id="wmode-equal-search" type="text" placeholder="Search employees by name, email, or ID..." class="filter-control" style="width:100%; box-sizing:border-box;" oninput="filterEqualEmployees()" />
+          </div>
+          <div class="emp-grid" id="wmode-equal-grid" style="max-height:160px;"></div>
+          <div id="wmode-equal-calc" style="margin-top:10px; padding:10px 14px; background:var(--bg-secondary); border-radius:var(--radius-sm); border:1px solid var(--border); font-size:12.5px;"></div>
+        </div>
+
+        <div id="wmode-range-container" style="display:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary);">
+              Define Employee Row Ranges
+            </label>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="addRangeRow()">
+              <i class="fas fa-plus" style="margin-right:4px;"></i> Add Employee Range
+            </button>
+          </div>
+          <div class="alloc-rows-container" id="wmode-range-rows"></div>
+          <div id="wmode-range-feedback" style="font-size:12px; font-weight:600; margin-top:6px;"></div>
+        </div>
+
+        <div id="wmode-count-container" style="display:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary);">
+              Define Employee Record Counts
+            </label>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="addCountRow()">
+              <i class="fas fa-plus" style="margin-right:4px;"></i> Add Employee
+            </button>
+          </div>
+          <div class="alloc-rows-container" id="wmode-count-rows"></div>
+          <div id="wmode-count-feedback" style="font-size:12px; font-weight:600; margin-top:6px;"></div>
+        </div>
+
+        <div id="wmode-indiv-container" style="display:none;">
+          <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:200px;">
+              <select id="wmode-indiv-emp-select" class="filter-control" style="width:100%;" onchange="onIndivEmpSelectChange()">
+                <option value="">Choose Employee to Assign Selected Rows...</option>
+              </select>
+            </div>
+            <div style="flex:1; min-width:180px;">
+              <input id="wmode-indiv-search" type="text" placeholder="Filter phone number..." class="filter-control" style="width:100%;" oninput="filterIndivTable()" />
+            </div>
+          </div>
+          <div class="modal-preview-table-wrap" style="max-height:180px;">
+            <table class="modal-preview-table">
+              <thead>
+                <tr>
+                  <th style="width:36px;"><input type="checkbox" id="wmode-indiv-chk-all" onchange="toggleIndivSelectAll(this.checked)" /></th>
+                  <th style="width:60px;">#Row</th>
+                  <th>Phone Number</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="wmode-indiv-tbody"></tbody>
+            </table>
+          </div>
+          <div id="wmode-indiv-feedback" style="font-size:12px; font-weight:600; margin-top:6px; color:var(--text-secondary);"></div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Review & Confirm Allocation -->
+      <div class="wizard-panel" id="wpanel-4" style="display:none;">
+        <div style="margin-bottom:12px;">
+          <h4 style="margin:0 0 4px; font-size:15px; color:var(--text-primary);"><i class="fas fa-clipboard-check" style="color:#10b981; margin-right:6px;"></i> Review Record Allocation Plan</h4>
+          <p style="margin:0; font-size:12.5px; color:var(--text-secondary);">Verify the distribution before committing. Records will be assigned to employees atomically.</p>
+        </div>
+
+        <div class="modal-preview-table-wrap" style="max-height:240px; margin-bottom:14px;">
+          <table class="modal-preview-table">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Records</th>
+                <th>Range</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="wp4-review-tbody"></tbody>
+          </table>
+        </div>
+
+        <div id="wp4-review-notice" style="padding:10px 14px; border-radius:var(--radius-sm); font-size:12.5px; line-height:1.4;"></div>
+      </div>
+    </div>
+
+    <!-- Modal Footer Actions -->
+    <div class="modal-actions" style="padding:14px 24px; border-top:1px solid var(--border); margin:0; flex-shrink:0; display:flex; justify-content:space-between; align-items:center;">
+      <button type="button" class="btn btn-secondary" id="wizard-btn-back" onclick="wizardPrevStep()" style="visibility:hidden;">
+        <i class="fas fa-arrow-left" style="margin-right:6px;"></i> Back
+      </button>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('upload-modal')">Cancel</button>
+        <button type="button" class="btn btn-primary" id="wizard-btn-next" onclick="wizardNextStep()" disabled>
+          <span>Validate Workbook</span> <i class="fas fa-arrow-right" style="margin-left:6px;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Allocation Breakdown Details ═══ -->
+<div class="modal-overlay" id="allocation-detail-modal">
+  <div class="modal" style="width:min(1100px, calc(100vw - 48px)); max-width:1100px; max-height:88vh; display:flex; flex-direction:column; padding:0 !important; overflow:hidden;">
+    <div class="modal-header" style="padding:16px 22px; border-bottom:1px solid var(--border); flex-shrink:0;">
+      <div>
+        <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="fas fa-users-gear" style="color:var(--accent);"></i>
+          <span>Employee Allocation Breakdown</span>
+        </h3>
+        <p id="alloc-detail-subtitle" style="margin:4px 0 0; font-size:12.5px; color:var(--text-secondary);"></p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('allocation-detail-modal')" aria-label="Close" title="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body-scroll" style="overflow-y:auto; flex:1 1 auto; padding:18px 22px;">
+      <div id="alloc-detail-content"></div>
+    </div>
+    <div class="modal-actions" style="padding:14px 22px; border-top:1px solid var(--border); margin:0; flex-shrink:0; display:flex; justify-content:flex-end; align-items:center; gap:10px;">
+      <button type="button" class="btn btn-secondary" onclick="closeModal('allocation-detail-modal')">
+        <i class="fas fa-times" style="margin-right:6px;"></i> Close
+      </button>
+      <button type="button" class="btn btn-primary" id="alloc-detail-btn-reassign" onclick="openReassignFromDetail()">
+        <i class="fas fa-user-gear" style="margin-right:6px;"></i> Edit Allocation
       </button>
     </div>
   </div>
 </div>
 
-<!-- ═══ MODAL: Reassign ═══ -->
+<!-- ═══ MODAL: Reassign / File Allocation ═══ -->
 <div class="modal-overlay" id="reassign-modal">
-  <div class="modal" style="max-width:620px;">
-    <div class="modal-header" style="flex-shrink:0;">
-      <h3><i class="fas fa-user-gear" style="margin-right:8px; color:var(--accent);"></i> Edit Employee Assignment</h3>
+  <div class="modal" style="max-width:800px; width:95%; max-height:90vh; display:flex; flex-direction:column; padding:0 !important; overflow:hidden;">
+    <div class="modal-header" style="padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0;">
+      <div>
+        <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="fas fa-user-gear" style="color:var(--accent);"></i>
+          <span>Edit Dataset Allocation</span>
+        </h3>
+        <p id="reassign-file-label" style="margin:4px 0 0; font-size:12px; color:var(--text-secondary);"></p>
+      </div>
       <button class="modal-close" onclick="closeModal('reassign-modal')">Close</button>
     </div>
-    <div class="modal-body-scroll" style="overflow-y:auto; flex:1 1 auto; padding:8px 4px 10px 0;">
-      <p id="reassign-file-label" style="font-size:13.5px; font-weight:600; color:var(--text-primary); margin-bottom:14px; padding:8px 12px; background:var(--bg-secondary); border-radius:var(--radius-sm); border:1px solid var(--border);"></p>
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-        <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary);">Assign To Employees</label>
-        <div style="display:flex; gap:6px;">
-          <button class="btn btn-secondary btn-sm" onclick="selectAllReassign()">Select All</button>
-          <button class="btn btn-secondary btn-sm" onclick="clearAllReassign()">Clear</button>
+    <div class="modal-body-scroll" style="overflow-y:auto; flex:1 1 auto; padding:16px 20px;">
+      <div id="reassign-summary-bar" class="alloc-summary-bar"></div>
+      
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary); display:block; margin-bottom:6px;">
+          Allocation Method
+        </label>
+        <div class="alloc-modes-wrap">
+          <button type="button" class="alloc-mode-btn active" id="ramb-equal" onclick="setReassignAllocMode('equal_split')">
+            <i class="fas fa-layer-group"></i> Split Equally
+          </button>
+          <button type="button" class="alloc-mode-btn" id="ramb-range" onclick="setReassignAllocMode('range')">
+            <i class="fas fa-arrows-left-right"></i> Record Range
+          </button>
+          <button type="button" class="alloc-mode-btn" id="ramb-count" onclick="setReassignAllocMode('count')">
+            <i class="fas fa-list-ol"></i> Record Count
+          </button>
         </div>
       </div>
-      <div class="emp-search-box" style="margin-bottom:8px;">
-        <input id="reassign-emp-search" type="text" placeholder="Search employees..." class="filter-control" style="width:100%; box-sizing:border-box;" oninput="filterReassignEmployees()" />
+
+      <div id="reassign-equal-container">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary);">
+            Assign To Employees
+          </label>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary btn-sm" onclick="selectAllReassign()">Select All</button>
+            <button class="btn btn-secondary btn-sm" onclick="clearAllReassign()">Clear</button>
+          </div>
+        </div>
+        <div class="emp-search-box" style="margin-bottom:8px;">
+          <input id="reassign-emp-search" type="text" placeholder="Search employees..." class="filter-control" style="width:100%; box-sizing:border-box;" oninput="filterReassignEmployees()" />
+        </div>
+        <div class="emp-grid" id="reassign-emp-grid" style="max-height:160px;"></div>
+        <div style="margin-top:8px; font-size:12px; font-weight:600; color:var(--text-secondary);" id="reassign-emp-count">0 employees selected</div>
       </div>
-      <div class="emp-grid" id="reassign-emp-grid"></div>
-      <div style="margin-top:8px; font-size:12px; font-weight:600; color:var(--text-secondary);" id="reassign-emp-count">0 employees selected</div>
+
+      <div id="reassign-range-container" style="display:none;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary);">
+            Row Ranges
+          </label>
+          <button class="btn btn-secondary btn-sm" onclick="addReassignRangeRow()">
+            <i class="fas fa-plus"></i> Add Range
+          </button>
+        </div>
+        <div class="alloc-rows-container" id="reassign-range-rows"></div>
+        <div id="reassign-range-feedback" style="font-size:12px; font-weight:600; margin-top:6px;"></div>
+      </div>
+
+      <div id="reassign-count-container" style="display:none;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <label style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-secondary);">
+            Record Counts
+          </label>
+          <button class="btn btn-secondary btn-sm" onclick="addReassignCountRow()">
+            <i class="fas fa-plus"></i> Add Employee
+          </button>
+        </div>
+        <div class="alloc-rows-container" id="reassign-count-rows"></div>
+        <div id="reassign-count-feedback" style="font-size:12px; font-weight:600; margin-top:6px;"></div>
+      </div>
+
+      <div style="margin-top:14px; padding:10px 14px; background:rgba(245,158,11,0.1); border:1px solid #f59e0b; border-radius:var(--radius-sm); font-size:12px; color:var(--text-primary);">
+        <i class="fas fa-shield-halved" style="color:#d97706; margin-right:6px;"></i>
+        <strong>Preservation Notice:</strong> Any previously completed records remain preserved and will not be overwritten.
+      </div>
     </div>
-    <div class="modal-actions" style="margin-top:12px; padding-top:12px; flex-shrink:0;">
+    <div class="modal-actions" style="padding:12px 20px; border-top:1px solid var(--border); margin:0; flex-shrink:0;">
       <button class="btn btn-secondary" onclick="closeModal('reassign-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="doReassign()">
-        <i class="fas fa-check" style="margin-right:6px;"></i> Save Assignment
+      <button class="btn btn-primary" id="btn-save-reassign" onclick="doReassign()">
+        <i class="fas fa-check" style="margin-right:6px;"></i> Save Allocation
       </button>
     </div>
   </div>
@@ -1461,8 +2353,29 @@
   </div>
 </div>
 
+<!-- ═══ MODAL: View Call Notes ═══ -->
+<div class="modal-overlay" id="admin-notes-modal">
+  <div class="modal modal-sm" style="max-width:480px;">
+    <div class="modal-header">
+      <h3><i class="fas fa-sticky-note" style="margin-right:8px; color:#d97706;"></i> Call Notes</h3>
+      <button class="modal-close" onclick="closeModal('admin-notes-modal')">Close</button>
+    </div>
+    <div style="padding:16px 0;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:12.5px; color:var(--text-secondary);">
+        <span>Record: <strong id="admin-notes-record-label" style="color:var(--text-primary); font-family:monospace;"></strong></span>
+        <span>Phone: <strong id="admin-notes-phone-label" style="color:var(--text-primary); font-family:monospace;"></strong></span>
+      </div>
+      <div id="admin-notes-content" style="padding:14px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px; line-height:1.6; color:var(--text-primary); white-space:pre-wrap; word-break:break-word; max-height:280px; overflow-y:auto;">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('admin-notes-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705c"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script>
 // ── Bootstrap ─────────────────────────────────────────────────────────────
 const user = requireRole('admin');
@@ -1592,6 +2505,28 @@ function resetFilesFilters() {
   renderFilesTable();
 }
 
+function toggleActionsDropdown(event, fileId) {
+  event.stopPropagation();
+  const menu = document.getElementById(`actions-dropdown-${fileId}`);
+  const isShown = menu && menu.classList.contains('show');
+  closeAllActionDropdowns();
+  if (menu && !isShown) {
+    menu.classList.add('show');
+  }
+}
+
+function closeAllActionDropdowns() {
+  document.querySelectorAll('.actions-dropdown-menu.show').forEach(m => m.classList.remove('show'));
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.actions-dropdown-wrap')) {
+    closeAllActionDropdowns();
+  }
+});
+window.addEventListener('resize', closeAllActionDropdowns);
+window.addEventListener('scroll', closeAllActionDropdowns, true);
+
 function renderFilesTable() {
   const search  = (document.getElementById('files-search').value || '').trim().toLowerCase();
   const statusF = document.getElementById('files-status-filter').value;
@@ -1646,43 +2581,48 @@ function renderFilesTable() {
 
   tbody.innerHTML = paginated.map(f => {
     const pct = f.completion_pct || 0;
-    const emps = f.assigned_employees || [];
+    const asgns = f.assignments || [];
     let empHtml = '';
-    if (emps.length === 0) {
+    if (asgns.length === 0) {
       empHtml = `<span class="badge badge-unassigned"><i class="fas fa-user-slash"></i> Unassigned</span>`;
-    } else if (emps.length === 1) {
-      empHtml = `<div class="emp-tags-wrap"><span class="emp-tag"><i class="fas fa-user"></i> ${escHtml(emps[0])}</span></div>`;
+    } else if (asgns.length === 1) {
+      const a = asgns[0];
+      const rangeTxt = (a.start_row && a.end_row) ? ` (R${a.start_row}–${a.end_row})` : ` (${a.assigned_count || f.total_records} recs)`;
+      empHtml = `<div class="emp-compact-col" onclick="showAssignmentDetailModal(${f.id})" style="cursor:pointer;" title="Click to view assignment breakdown">
+        <span class="emp-tag"><i class="fas fa-user"></i> ${escHtml(a.name)}</span>
+        <span class="emp-range-sub">${rangeTxt}</span>
+      </div>`;
     } else {
-      empHtml = `<div class="emp-tags-wrap">
-        <span class="emp-tag"><i class="fas fa-user"></i> ${escHtml(emps[0])}</span>
-        <span class="emp-tag-more" title="${escHtml(emps.join(', '))}"><i class="fas fa-users"></i> +${emps.length - 1}</span>
+      empHtml = `<div class="emp-compact-col" onclick="showAssignmentDetailModal(${f.id})" style="cursor:pointer;" title="Click to view breakdown of ${asgns.length} assignments">
+        <span class="emp-tag"><i class="fas fa-user"></i> ${escHtml(asgns[0].name)}</span>
+        <span class="emp-tag-more"><i class="fas fa-users"></i> +${asgns.length - 1} (${asgns.length} Staff)</span>
       </div>`;
     }
 
     return `<tr>
       <td>
         <div class="file-name-cell">
-          <span class="file-primary-name">${escHtml(f.original_name)}</span>
+          <span class="file-primary-name" title="${escHtml(f.original_name)}">${escHtml(f.original_name)}</span>
           <div class="file-meta-sub">
             <span class="file-id-tag">ID: #${f.id}</span>
             <span class="file-meta-dot">•</span>
-            <span>${(f.total_records || 0).toLocaleString('en-IN')} records</span>
+            <span>${(f.total_records || 0).toLocaleString('en-IN')} recs</span>
           </div>
         </div>
       </td>
       <td>${escHtml(f.uploaded_by_name || 'Admin')}</td>
       <td>${fmtDate(f.uploaded_at)}</td>
-      <td><strong>${(f.total_records || 0).toLocaleString('en-IN')}</strong></td>
+      <td style="text-align:center;"><strong>${(f.total_records || 0).toLocaleString('en-IN')}</strong></td>
       <td>${empHtml}</td>
-      <td><span class="count-pill count-completed">${(f.completed_count || 0).toLocaleString('en-IN')}</span></td>
-      <td><span class="count-pill count-pending">${(f.pending_count || 0).toLocaleString('en-IN')}</span></td>
+      <td style="text-align:center;"><span class="count-pill count-completed">${(f.completed_count || 0).toLocaleString('en-IN')}</span></td>
+      <td style="text-align:center;"><span class="count-pill count-pending">${(f.pending_count || 0).toLocaleString('en-IN')}</span></td>
       <td>
         <div class="prog-wrap">
           <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;"></div></div>
           <span class="prog-pct">${pct}%</span>
         </div>
       </td>
-      <td>${statusBadge(f.status)}</td>
+      <td style="text-align:center;">${statusBadge(f.status)}</td>
       <td>
         <div class="actions-cell">
           <button class="btn-xs btn-view" onclick="viewFileMonitor(${f.id})" title="View Live Monitor">
@@ -1691,20 +2631,28 @@ function renderFilesTable() {
           <button class="btn-xs btn-edit" onclick="openReassign(${f.id})" title="Edit Employee Assignment">
             <i class="fas fa-user-gear"></i> Assign
           </button>
-          <button class="btn-xs btn-dl" onclick="downloadFile(${f.id}, 'csv')" title="Download CSV">
-            <i class="fas fa-download"></i> CSV
-          </button>
-          <button class="btn-xs btn-dl" onclick="downloadFile(${f.id}, 'xlsx')" title="Download Excel">
-            <i class="fas fa-file-excel"></i> XLSX
-          </button>
-          ${f.status !== 'Closed' ? `
-            <button class="btn-xs btn-close-action" onclick="openClose(${f.id})" title="Close Dataset">
-              <i class="fas fa-lock"></i> Close
+          <div class="actions-dropdown-wrap">
+            <button class="btn-xs btn-more" onclick="toggleActionsDropdown(event, ${f.id})" title="More Actions">
+              <i class="fas fa-ellipsis-vertical"></i> <span>More</span> <i class="fas fa-chevron-down more-caret"></i>
             </button>
-          ` : ''}
-          <button class="btn-xs btn-del" onclick="openDelete(${f.id})" title="Delete File">
-            <i class="fas fa-trash-alt"></i> Delete
-          </button>
+            <div id="actions-dropdown-${f.id}" class="actions-dropdown-menu">
+              <button class="actions-dropdown-item" onclick="closeAllActionDropdowns(); downloadFile(${f.id}, 'csv')">
+                <i class="fas fa-file-csv"></i> Download CSV
+              </button>
+              <button class="actions-dropdown-item" onclick="closeAllActionDropdowns(); downloadFile(${f.id}, 'xlsx')">
+                <i class="fas fa-file-excel"></i> Download Excel
+              </button>
+              ${f.status !== 'Closed' ? `
+                <button class="actions-dropdown-item" onclick="closeAllActionDropdowns(); openClose(${f.id})">
+                  <i class="fas fa-lock"></i> Close Dataset
+                </button>
+              ` : ''}
+              <div class="actions-dropdown-divider"></div>
+              <button class="actions-dropdown-item text-danger" onclick="closeAllActionDropdowns(); openDelete(${f.id})">
+                <i class="fas fa-trash-alt"></i> Delete File
+              </button>
+            </div>
+          </div>
         </div>
       </td>
     </tr>`;
@@ -1723,7 +2671,12 @@ function goFilesPage(p) {
 async function loadEmployees() {
   try {
     const res = await apiFetch('/excel/employees-list');
-    allEmployees = res.employees || [];
+    const seen = new Set();
+    allEmployees = (res.employees || []).filter(e => {
+      if (seen.has(e.id)) return false;
+      seen.add(e.id);
+      return true;
+    });
     renderEmpGrid('emp-grid', 'selected-emp-count');
     populateEmployeeFilters();
   } catch(e) {
@@ -1735,7 +2688,18 @@ function populateEmployeeFilters() {
   const fFilter = document.getElementById('files-emp-filter');
   const aFilter = document.getElementById('audit-emp-filter');
   
-  const options = '<option value="">All Employees</option>' + allEmployees.map(e =>
+  // Deduplicate by employee name so each unique employee appears once
+  const seenNames = new Set();
+  const uniqueEmps = [];
+  for (const e of allEmployees) {
+    const key = (e.name || '').trim().toLowerCase();
+    if (!key || seenNames.has(key)) continue;
+    seenNames.add(key);
+    uniqueEmps.push(e);
+  }
+  uniqueEmps.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+  const options = '<option value="">All Employees</option>' + uniqueEmps.map(e =>
     `<option value="${escHtml(e.name)}">${escHtml(e.name)}</option>`
   ).join('');
 
@@ -1746,7 +2710,7 @@ function populateEmployeeFilters() {
   }
   if (aFilter) {
     const curA = aFilter.value;
-    aFilter.innerHTML = '<option value="">All Employees</option>' + allEmployees.map(e =>
+    aFilter.innerHTML = '<option value="">All Employees</option>' + uniqueEmps.map(e =>
       `<option value="${e.id}">${escHtml(e.name)}</option>`
     ).join('');
     aFilter.value = curA;
@@ -1756,18 +2720,22 @@ function populateEmployeeFilters() {
 function renderEmpGrid(gridId, countId, selectedIds = [], search = '') {
   const grid = document.getElementById(gridId);
   if (!grid) return;
+  const safeSelected = Array.isArray(selectedIds)
+    ? selectedIds
+    : (selectedIds instanceof Set ? Array.from(selectedIds) : []);
+
   const filtered = allEmployees.filter(e =>
-    !search || e.name.toLowerCase().includes(search.toLowerCase()) || e.email.toLowerCase().includes(search.toLowerCase())
+    !search || e.name.toLowerCase().includes(search.toLowerCase()) || e.email.toLowerCase().includes(search.toLowerCase()) || String(e.id).includes(search)
   );
   grid.innerHTML = filtered.length === 0
     ? '<p style="color:var(--text-muted);font-size:13px;padding:12px;grid-column:1/-1;text-align:center;">No employees found.</p>'
     : filtered.map(e => {
-        const checked = selectedIds.includes(e.id);
+        const checked = safeSelected.includes(e.id);
         return `<label class="emp-chip ${checked ? 'selected' : ''}">
           <input type="checkbox" value="${e.id}" ${checked ? 'checked' : ''} onchange="updateEmpCount('${gridId}','${countId}')" />
           <div class="emp-avatar">${(e.name || '?')[0].toUpperCase()}</div>
           <div class="emp-info">
-            <div class="emp-name">${escHtml(e.name)}</div>
+            <div class="emp-name">${escHtml(e.name)} <span class="file-id-tag" style="font-size:10px; margin-left:4px; padding:1px 5px;">#${e.id}</span></div>
             <div class="emp-email">${escHtml(e.email)}</div>
           </div>
         </label>`;
@@ -1777,7 +2745,7 @@ function renderEmpGrid(gridId, countId, selectedIds = [], search = '') {
 
 function updateEmpCount(gridId, countId) {
   const count = getCheckedEmpIds(gridId).length;
-  const el = document.getElementById(countId);
+  const el = countId ? document.getElementById(countId) : null;
   if (el) el.textContent = `${count} employee${count !== 1 ? 's' : ''} selected`;
   document.querySelectorAll(`#${gridId} .emp-chip`).forEach(chip => {
     chip.classList.toggle('selected', chip.querySelector('input[type="checkbox"]').checked);
@@ -1785,6 +2753,13 @@ function updateEmpCount(gridId, countId) {
   if (gridId === 'emp-grid') {
     const btn = document.getElementById('btn-do-upload');
     if (btn) btn.disabled = (!pendingUploadFile || count === 0);
+  }
+  if (gridId === 'wmode-equal-grid') {
+    allocationState.selectedEmployeeIds = getCheckedEmpIds('wmode-equal-grid');
+    if (typeof updateAllocSummary === 'function') updateAllocSummary();
+  }
+  if (gridId === 'wizard-emp-grid' || gridId === 'reassign-wizard-emp-grid') {
+    if (typeof updateAllocSummary === 'function') updateAllocSummary();
   }
 }
 
@@ -1809,15 +2784,78 @@ function filterReassignEmployees() {
   renderEmpGrid('reassign-emp-grid', 'reassign-emp-count', sel, search);
 }
 
-// ── Upload Modal ──────────────────────────────────────────────────────────
+// ── Master Record Allocation Wizard State ─────────────────────────────────
+let wizardCurrentStep = 1;
+let isValidating = false;
+let validationError = null;
+
+const allocationState = {
+  file: null,
+  fileName: '',
+  fileSize: 0,
+  sheetName: '',
+  totalRecords: 0,
+  completedRecords: 0,
+  availableRecords: 0,
+  preview: [],
+  method: 'equal_split',
+  selectedEmployeeIds: [],
+  rangeRows: [],
+  countRows: [],
+  individualSelections: new Set(),
+  individualEmployeeId: '',
+  plannedAllocations: []
+};
+
+// Legacy compatibility aliases
+let wizardPendingFile = null;
+let wizardValidationData = null;
+let wizardAllocMode = 'equal_split';
+let wizardRangeRows = [];
+let wizardCountRows = [];
+let wizardIndivSelectedIds = new Set();
+
+function resetAllocationState() {
+  allocationState.file = null;
+  allocationState.fileName = '';
+  allocationState.fileSize = 0;
+  allocationState.sheetName = '';
+  allocationState.totalRecords = 0;
+  allocationState.completedRecords = 0;
+  allocationState.availableRecords = 0;
+  allocationState.preview = [];
+  allocationState.method = 'equal_split';
+  allocationState.selectedEmployeeIds = [];
+  allocationState.rangeRows = [];
+  allocationState.countRows = [];
+  allocationState.individualSelections = new Set();
+  allocationState.individualEmployeeId = '';
+  allocationState.plannedAllocations = [];
+
+  wizardPendingFile = null;
+  wizardValidationData = null;
+  wizardAllocMode = 'equal_split';
+  wizardRangeRows = [];
+  wizardCountRows = [];
+  wizardIndivSelectedIds.clear();
+}
+
 function openUploadModal() {
-  pendingUploadFile = null;
-  document.getElementById('file-input').value = '';
+  wizardCurrentStep = 1;
+  isValidating = false;
+  validationError = null;
+  resetAllocationState();
+
+  const fileInput = document.getElementById('file-input');
+  if (fileInput) fileInput.value = '';
+
   const selName = document.getElementById('selected-file-name');
-  if (selName) selName.style.display = 'none';
-  document.getElementById('btn-do-upload').disabled = true;
-  document.getElementById('emp-search').value = '';
-  renderEmpGrid('emp-grid', 'selected-emp-count');
+  if (selName) {
+    selName.style.display = 'none';
+    selName.innerHTML = '';
+  }
+
+  updateWizardUI();
   openModal('upload-modal');
 }
 
@@ -1837,42 +2875,825 @@ function processFile(file) {
     showToast('Only .xlsx and .xls files are supported.', 'error');
     return;
   }
-  pendingUploadFile = file;
+  allocationState.file = file;
+  allocationState.fileName = file.name;
+  allocationState.fileSize = file.size;
+  wizardPendingFile = file;
+
   const nameEl = document.getElementById('selected-file-name');
-  nameEl.innerHTML = `<i class="fas fa-file-excel" style="margin-right:6px;"></i> ${escHtml(file.name)} (${(file.size / 1024).toFixed(1)} KB)`;
-  nameEl.style.display = 'block';
-  const count = getCheckedEmpIds('emp-grid').length;
-  document.getElementById('btn-do-upload').disabled = (count === 0);
+  if (nameEl) {
+    nameEl.innerHTML = `<i class="fas fa-file-excel" style="margin-right:6px;"></i> ${escHtml(file.name)} (${(file.size / 1024).toFixed(1)} KB)`;
+    nameEl.style.display = 'block';
+  }
+
+  const nextBtn = document.getElementById('wizard-btn-next');
+  if (nextBtn) nextBtn.disabled = false;
 }
 
-async function doUpload() {
-  if (!pendingUploadFile) { showToast('Please select an Excel file to upload.', 'error'); return; }
-  const empIds = getCheckedEmpIds('emp-grid');
-  if (empIds.length === 0) { showToast('Please select at least one employee for assignment.', 'error'); return; }
+function updateWizardUI() {
+  for (let s = 1; s <= 4; s++) {
+    const stepEl = document.getElementById(`ws-step-${s}`);
+    const lineEl = document.getElementById(`ws-line-${s}`);
+    const panelEl = document.getElementById(`wpanel-${s}`);
 
-  const btn = document.getElementById('btn-do-upload');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Validating &amp; Uploading...';
-
-  // Client-side schema verification using SheetJS
-  try {
-    const validationError = await validateExcelFile(pendingUploadFile);
-    if (validationError) {
-      showToast(validationError, 'error');
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i> Upload &amp; Assign';
-      return;
+    if (stepEl) {
+      stepEl.classList.remove('active', 'completed');
+      if (s === wizardCurrentStep) stepEl.classList.add('active');
+      else if (s < wizardCurrentStep) stepEl.classList.add('completed');
     }
-  } catch (e) {
-    showToast('Could not parse the Excel file. Please ensure it is not corrupt or password-protected.', 'error');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i> Upload &amp; Assign';
+    if (lineEl) {
+      lineEl.classList.toggle('completed', s < wizardCurrentStep);
+    }
+    if (panelEl) {
+      panelEl.style.display = (s === wizardCurrentStep) ? 'block' : 'none';
+    }
+  }
+
+  const backBtn = document.getElementById('wizard-btn-back');
+  const nextBtn = document.getElementById('wizard-btn-next');
+
+  if (backBtn) {
+    backBtn.style.visibility = (wizardCurrentStep > 1 && !isValidating) ? 'visible' : 'hidden';
+  }
+
+  if (nextBtn) {
+    if (wizardCurrentStep === 1) {
+      nextBtn.disabled = !allocationState.file;
+      nextBtn.innerHTML = `<span>Validate Workbook</span> <i class="fas fa-arrow-right" style="margin-left:6px;"></i>`;
+    } else if (wizardCurrentStep === 2) {
+      if (isValidating) {
+        nextBtn.disabled = true;
+        nextBtn.innerHTML = `<span>Validating...</span> <i class="fas fa-spinner fa-spin" style="margin-left:6px;"></i>`;
+      } else if (validationError) {
+        nextBtn.disabled = true;
+        nextBtn.innerHTML = `<span>Validation Failed</span> <i class="fas fa-triangle-exclamation" style="margin-left:6px;"></i>`;
+      } else {
+        nextBtn.disabled = false;
+        nextBtn.innerHTML = `<span>Proceed to Allocation</span> <i class="fas fa-arrow-right" style="margin-left:6px;"></i>`;
+      }
+    } else if (wizardCurrentStep === 3) {
+      nextBtn.disabled = false;
+      nextBtn.innerHTML = `<span>Review Summary</span> <i class="fas fa-arrow-right" style="margin-left:6px;"></i>`;
+    } else if (wizardCurrentStep === 4) {
+      nextBtn.disabled = false;
+      nextBtn.innerHTML = `<i class="fas fa-check" style="margin-right:6px;"></i> <span>Confirm Allocation</span>`;
+    }
+  }
+}
+
+function wizardGoToStep(targetStep) {
+  if (targetStep === 1) {
+    wizardCurrentStep = 1;
+    updateWizardUI();
     return;
   }
+  if (!allocationState.totalRecords && targetStep > 1) {
+    return;
+  }
+  if (targetStep === 2) {
+    wizardCurrentStep = 2;
+    updateWizardUI();
+    return;
+  }
+  if (targetStep === 3) {
+    wizardCurrentStep = 3;
+    initAllocWorkspace();
+    updateWizardUI();
+    return;
+  }
+  if (targetStep === 4) {
+    if (!validateAllocationStep()) return;
+    renderConfirmReview();
+    wizardCurrentStep = 4;
+    updateWizardUI();
+    return;
+  }
+}
+
+function wizardPrevStep() {
+  if (wizardCurrentStep > 1 && !isValidating) {
+    wizardCurrentStep--;
+    updateWizardUI();
+  }
+}
+
+async function wizardNextStep() {
+  if (wizardCurrentStep === 1) {
+    if (!allocationState.file) return;
+    await validateMasterWorkbook(allocationState.file);
+  } else if (wizardCurrentStep === 2) {
+    // Proceed to Allocation: Advance to Step 3 directly without validating employees!
+    wizardCurrentStep = 3;
+    initAllocWorkspace();
+    updateWizardUI();
+  } else if (wizardCurrentStep === 3) {
+    // Review Summary: Validate allocation step and advance to Step 4
+    if (!validateAllocationStep()) return;
+    renderConfirmReview();
+    wizardCurrentStep = 4;
+    updateWizardUI();
+  } else if (wizardCurrentStep === 4) {
+    // Confirm Allocation: commit upload and record assignments
+    await doConfirmAllocation();
+  }
+}
+
+async function validateMasterWorkbook(file) {
+  isValidating = true;
+  validationError = null;
+  wizardCurrentStep = 2;
+  updateWizardUI();
+
+  const loadingEl = document.getElementById('wval-loading');
+  const errEl = document.getElementById('wval-error');
+  const contentEl = document.getElementById('wval-content');
+
+  if (loadingEl) loadingEl.style.display = 'block';
+  if (errEl) errEl.style.display = 'none';
+  if (contentEl) contentEl.style.display = 'none';
 
   try {
     const formData = new FormData();
-    formData.append('excelFile', pendingUploadFile);
+    formData.append('excelFile', file);
+    const token = getToken();
+    const res = await fetch(`${API_BASE}/excel/validate-file`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Validation failed.');
+
+    allocationState.fileName = data.fileName;
+    allocationState.fileSize = data.fileSize || file.size;
+    allocationState.sheetName = data.sheetName;
+    allocationState.totalRecords = data.totalRecords;
+    allocationState.completedRecords = data.completedRecords;
+    allocationState.availableRecords = data.availableRecords;
+    allocationState.preview = data.preview || [];
+
+    // Sync legacy reference
+    wizardValidationData = data;
+
+    renderStep2ValidatedContent();
+
+    isValidating = false;
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (contentEl) contentEl.style.display = 'block';
+    updateWizardUI();
+  } catch (err) {
+    isValidating = false;
+    validationError = err.message || 'Validation failed.';
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (errEl) {
+      errEl.style.display = 'block';
+      const msgEl = document.getElementById('wval-error-msg');
+      if (msgEl) msgEl.textContent = validationError;
+    }
+    updateWizardUI();
+  }
+}
+
+function renderStep2ValidatedContent() {
+  const fnEl = document.getElementById('wp2-file-name');
+  const snEl = document.getElementById('wp2-sheet-name');
+  const trEl = document.getElementById('wp2-total-records');
+  const crEl = document.getElementById('wp2-completed-records');
+  const arEl = document.getElementById('wp2-available-records');
+
+  if (fnEl) fnEl.textContent = allocationState.fileName;
+  if (snEl) snEl.textContent = allocationState.sheetName;
+  if (trEl) trEl.textContent = Number(allocationState.totalRecords || 0).toLocaleString('en-IN');
+  if (crEl) crEl.textContent = Number(allocationState.completedRecords || 0).toLocaleString('en-IN');
+  if (arEl) arEl.textContent = Number(allocationState.availableRecords || 0).toLocaleString('en-IN');
+
+  const tbody = document.getElementById('wp2-preview-tbody');
+  if (!tbody) return;
+  const preview = allocationState.preview || [];
+  if (preview.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:16px; color:var(--text-secondary);">No preview rows available.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = preview.map(r => {
+    const isComp = r.status === 'Completed';
+    const statusHtml = isComp
+      ? `<span class="badge badge-completed"><i class="fas fa-check"></i> Completed</span>`
+      : `<span class="badge badge-pending"><i class="fas fa-clock"></i> Pending</span>`;
+    return `<tr>
+      <td style="color:var(--text-muted); font-weight:700;">#${r.rowIndex}</td>
+      <td style="font-weight:700;">${escHtml(r.phoneNumber)}</td>
+      <td>${escHtml(r.disposition || '-')}</td>
+      <td>${escHtml(r.subDisposition || '-')}</td>
+      <td>${r.employee && r.employee !== '-' ? `<span class="emp-tag"><i class="fas fa-user-check"></i> ${escHtml(r.employee)}</span>` : '<span style="color:var(--text-muted);">-</span>'}</td>
+      <td>${statusHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+function setWizardAllocMode(mode) {
+  allocationState.method = mode;
+  wizardAllocMode = mode;
+  ['equal', 'range', 'count', 'individual'].forEach(m => {
+    const btn = document.getElementById(`amb-${m}`);
+    if (btn) btn.classList.toggle('active', (m === 'equal' && mode === 'equal_split') || m === mode);
+  });
+
+  const eqEl = document.getElementById('wmode-equal-container');
+  const rgEl = document.getElementById('wmode-range-container');
+  const ctEl = document.getElementById('wmode-count-container');
+  const inEl = document.getElementById('wmode-indiv-container');
+
+  if (eqEl) eqEl.style.display = (mode === 'equal_split') ? 'block' : 'none';
+  if (rgEl) rgEl.style.display = (mode === 'range') ? 'block' : 'none';
+  if (ctEl) ctEl.style.display = (mode === 'count') ? 'block' : 'none';
+  if (inEl) inEl.style.display = (mode === 'individual') ? 'block' : 'none';
+
+  updateAllocSummary();
+}
+
+function initAllocWorkspace() {
+  const totEl = document.getElementById('wp3-total');
+  const compEl = document.getElementById('wp3-completed');
+  const availEl = document.getElementById('wp3-avail');
+
+  if (totEl) totEl.textContent = Number(allocationState.totalRecords || 0).toLocaleString('en-IN');
+  if (compEl) compEl.textContent = Number(allocationState.completedRecords || 0).toLocaleString('en-IN');
+  if (availEl) availEl.textContent = Number(allocationState.availableRecords || 0).toLocaleString('en-IN');
+
+  // Populate employee checklist for equal split
+  renderEmpGrid('wmode-equal-grid', null, allocationState.selectedEmployeeIds || [], '');
+
+  // Populate indiv employee select
+  const indivEmpSel = document.getElementById('wmode-indiv-emp-select');
+  if (indivEmpSel) {
+    const currentVal = indivEmpSel.value || allocationState.individualEmployeeId || '';
+    indivEmpSel.innerHTML = '<option value="">Choose Employee to Assign Selected Rows...</option>' +
+      allEmployees.map(e => `<option value="${e.id}" ${e.id == currentVal ? 'selected' : ''}>${escHtml(e.name)} (ID: #${e.id}, ${escHtml(e.email)})</option>`).join('');
+  }
+
+  // Populate indiv table
+  renderIndivTable();
+
+  // If range rows empty, initialize with 1 row
+  if (!allocationState.rangeRows || allocationState.rangeRows.length === 0) {
+    allocationState.rangeRows = [{ employee_id: '', start_row: 1, end_row: allocationState.totalRecords || 100 }];
+  }
+  wizardRangeRows = allocationState.rangeRows;
+  renderRangeRows();
+
+  // If count rows empty, initialize with 1 row
+  if (!allocationState.countRows || allocationState.countRows.length === 0) {
+    allocationState.countRows = [{ employee_id: '', count: allocationState.availableRecords || 50 }];
+  }
+  wizardCountRows = allocationState.countRows;
+  renderCountRows();
+
+  setWizardAllocMode(allocationState.method || 'equal_split');
+}
+
+function updateAllocSummary() {
+  const available = Number(allocationState.availableRecords || 0);
+  let allocated = 0;
+
+  if (allocationState.method === 'equal_split') {
+    const selectedIds = getCheckedEmpIds('wmode-equal-grid');
+    allocationState.selectedEmployeeIds = selectedIds;
+    const calcEl = document.getElementById('wmode-equal-calc');
+    const n = selectedIds.length;
+    if (n === 0) {
+      if (calcEl) calcEl.innerHTML = `<span style="color:var(--text-secondary);"><i class="fas fa-circle-info"></i> Please select at least one employee from the list above.</span>`;
+      allocated = 0;
+    } else {
+      allocated = available;
+      const base = Math.floor(available / n);
+      const rem = available % n;
+      let breakdownHtml = `<div style="font-weight:700; color:var(--text-primary); margin-bottom:6px;">
+        <i class="fas fa-calculator" style="color:var(--accent); margin-right:6px;"></i>
+        ${available} available records split among ${n} employee${n > 1 ? 's' : ''}:
+      </div><div style="display:flex; flex-wrap:wrap; gap:8px;">`;
+      selectedIds.forEach((eid, idx) => {
+        const hasRem = idx < rem;
+        const count = base + (hasRem ? 1 : 0);
+        const emp = allEmployees.find(e => e.id === eid);
+        const remBadge = hasRem ? `<span style="font-size:10px; color:#d97706; margin-left:3px; font-weight:700;">(+1 rem)</span>` : '';
+        breakdownHtml += `<span class="fmt-badge" style="font-size:11.5px; padding:4px 10px;">
+          <i class="fas fa-user"></i> ${escHtml(emp ? emp.name : 'ID #' + eid)}: <strong>${count} records</strong>${remBadge}
+        </span>`;
+      });
+      breakdownHtml += `</div>`;
+      if (calcEl) calcEl.innerHTML = breakdownHtml;
+    }
+  } else if (allocationState.method === 'range') {
+    let sum = 0;
+    const feedbackEl = document.getElementById('wmode-range-feedback');
+    let hasOverlap = false;
+
+    for (let i = 0; i < allocationState.rangeRows.length; i++) {
+      const r = allocationState.rangeRows[i];
+      const s = parseInt(r.start_row, 10);
+      const e = parseInt(r.end_row, 10);
+      if (!isNaN(s) && !isNaN(e) && e >= s) {
+        sum += (e - s + 1);
+        for (let j = 0; j < i; j++) {
+          const prev = allocationState.rangeRows[j];
+          const ps = parseInt(prev.start_row, 10);
+          const pe = parseInt(prev.end_row, 10);
+          if (!(e < ps || s > pe)) {
+            hasOverlap = true;
+          }
+        }
+      }
+    }
+    allocated = sum;
+    if (feedbackEl) {
+      if (hasOverlap) {
+        feedbackEl.innerHTML = `<span style="color:#dc2626;"><i class="fas fa-triangle-exclamation"></i> Warning: Overlapping row ranges detected between employee allocations.</span>`;
+      } else {
+        feedbackEl.innerHTML = '';
+      }
+    }
+  } else if (allocationState.method === 'count') {
+    let sum = 0;
+    for (const r of allocationState.countRows) {
+      const c = parseInt(r.count, 10);
+      if (!isNaN(c) && c > 0) sum += c;
+    }
+    allocated = sum;
+    const feedbackEl = document.getElementById('wmode-count-feedback');
+    if (feedbackEl) {
+      if (allocated > available) {
+        feedbackEl.innerHTML = `<span style="color:#dc2626;"><i class="fas fa-triangle-exclamation"></i> Total count (${allocated}) exceeds available records (${available}).</span>`;
+      } else {
+        feedbackEl.innerHTML = '';
+      }
+    }
+  } else if (allocationState.method === 'individual') {
+    allocated = allocationState.individualSelections.size;
+    const feedbackEl = document.getElementById('wmode-indiv-feedback');
+    if (feedbackEl) {
+      feedbackEl.textContent = `${allocated} record${allocated !== 1 ? 's' : ''} selected`;
+    }
+  }
+
+  const remaining = Math.max(0, available - allocated);
+  const remEl = document.getElementById('wp3-remaining');
+  const allocEl = document.getElementById('wp3-allocated');
+
+  if (allocEl) allocEl.textContent = allocated.toLocaleString('en-IN');
+  if (remEl) {
+    remEl.textContent = remaining.toLocaleString('en-IN');
+    remEl.className = 'alloc-stat-val ' + (remaining === 0 ? 'val-green' : 'val-amber');
+  }
+}
+
+function filterEqualEmployees() {
+  const searchEl = document.getElementById('wmode-equal-search');
+  const search = searchEl ? searchEl.value : '';
+  const sel = getCheckedEmpIds('wmode-equal-grid');
+  allocationState.selectedEmployeeIds = sel;
+  renderEmpGrid('wmode-equal-grid', null, sel, search);
+  updateAllocSummary();
+}
+
+function selectAllEqualEmployees() {
+  const grid = document.getElementById('wmode-equal-grid');
+  if (!grid) return;
+  grid.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = true; });
+  grid.querySelectorAll('.emp-chip').forEach(ch => ch.classList.add('selected'));
+  allocationState.selectedEmployeeIds = getCheckedEmpIds('wmode-equal-grid');
+  updateAllocSummary();
+}
+
+function clearAllEqualEmployees() {
+  const grid = document.getElementById('wmode-equal-grid');
+  if (!grid) return;
+  grid.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = false; });
+  grid.querySelectorAll('.emp-chip').forEach(ch => ch.classList.remove('selected'));
+  allocationState.selectedEmployeeIds = [];
+  updateAllocSummary();
+}
+
+function addRangeRow() {
+  const total = allocationState.totalRecords || 100;
+  let nextStart = 1;
+  if (allocationState.rangeRows.length > 0) {
+    const last = allocationState.rangeRows[allocationState.rangeRows.length - 1];
+    nextStart = (parseInt(last.end_row, 10) || 0) + 1;
+  }
+  const nextEnd = Math.min(nextStart + 99, total);
+  allocationState.rangeRows.push({ employee_id: '', start_row: nextStart, end_row: nextEnd });
+  wizardRangeRows = allocationState.rangeRows;
+  renderRangeRows();
+  updateAllocSummary();
+}
+
+function removeRangeRow(idx) {
+  allocationState.rangeRows.splice(idx, 1);
+  if (allocationState.rangeRows.length === 0) {
+    allocationState.rangeRows.push({ employee_id: '', start_row: 1, end_row: 100 });
+  }
+  wizardRangeRows = allocationState.rangeRows;
+  renderRangeRows();
+  updateAllocSummary();
+}
+
+function updateRangeRow(idx, field, val) {
+  if (allocationState.rangeRows[idx]) {
+    allocationState.rangeRows[idx][field] = val;
+    const card = document.getElementById(`wrange-card-${idx}`);
+    if (card) {
+      const s = parseInt(allocationState.rangeRows[idx].start_row, 10);
+      const e = parseInt(allocationState.rangeRows[idx].end_row, 10);
+      const badge = card.querySelector('.alloc-count-badge');
+      if (badge && !isNaN(s) && !isNaN(e) && e >= s) {
+        badge.innerHTML = `<i class="fas fa-hashtag"></i> ${e - s + 1} recs`;
+      }
+    }
+    updateAllocSummary();
+  }
+}
+
+function renderRangeRows() {
+  const container = document.getElementById('wmode-range-rows');
+  if (!container) return;
+
+  container.innerHTML = allocationState.rangeRows.map((r, idx) => {
+    const s = parseInt(r.start_row, 10);
+    const e = parseInt(r.end_row, 10);
+    const count = (!isNaN(s) && !isNaN(e) && e >= s) ? (e - s + 1) : 0;
+    return `
+      <div class="alloc-row-card" id="wrange-card-${idx}">
+        <div class="alloc-row-num">${idx + 1}</div>
+        <div style="flex:2; min-width:220px;">
+          <select class="filter-control" style="width:100%;" onchange="updateRangeRow(${idx}, 'employee_id', this.value)">
+            <option value="">Select Employee...</option>
+            ${allEmployees.map(e => `<option value="${e.id}" ${e.id == r.employee_id ? 'selected' : ''}>${escHtml(e.name)} (ID: #${e.id})</option>`).join('')}
+          </select>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:180px;">
+          <input type="number" min="1" class="filter-control" style="width:80px;" placeholder="From" value="${r.start_row || ''}" oninput="updateRangeRow(${idx}, 'start_row', this.value)" />
+          <span style="color:var(--text-muted); font-size:12px;">to</span>
+          <input type="number" min="1" class="filter-control" style="width:80px;" placeholder="To" value="${r.end_row || ''}" oninput="updateRangeRow(${idx}, 'end_row', this.value)" />
+        </div>
+        <div class="alloc-count-badge">
+          <i class="fas fa-hashtag"></i> ${count} recs
+        </div>
+        <button type="button" class="alloc-row-remove" onclick="removeRangeRow(${idx})" title="Remove Range">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function addCountRow() {
+  allocationState.countRows.push({ employee_id: '', count: 50 });
+  wizardCountRows = allocationState.countRows;
+  renderCountRows();
+  updateAllocSummary();
+}
+
+function removeCountRow(idx) {
+  allocationState.countRows.splice(idx, 1);
+  if (allocationState.countRows.length === 0) {
+    allocationState.countRows.push({ employee_id: '', count: 50 });
+  }
+  wizardCountRows = allocationState.countRows;
+  renderCountRows();
+  updateAllocSummary();
+}
+
+function updateCountRow(idx, field, val) {
+  if (allocationState.countRows[idx]) {
+    allocationState.countRows[idx][field] = val;
+    updateAllocSummary();
+  }
+}
+
+function renderCountRows() {
+  const container = document.getElementById('wmode-count-rows');
+  if (!container) return;
+
+  container.innerHTML = allocationState.countRows.map((r, idx) => `
+    <div class="alloc-row-card">
+      <div class="alloc-row-num">${idx + 1}</div>
+      <div style="flex:2; min-width:220px;">
+        <select class="filter-control" style="width:100%;" onchange="updateCountRow(${idx}, 'employee_id', this.value)">
+          <option value="">Select Employee...</option>
+          ${allEmployees.map(e => `<option value="${e.id}" ${e.id == r.employee_id ? 'selected' : ''}>${escHtml(e.name)} (ID: #${e.id})</option>`).join('')}
+        </select>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:160px;">
+        <span style="font-size:12px; color:var(--text-secondary); font-weight:600;">Count:</span>
+        <input type="number" min="1" class="filter-control" style="width:100px;" placeholder="Count" value="${r.count || ''}" oninput="updateCountRow(${idx}, 'count', this.value)" />
+      </div>
+      <button type="button" class="alloc-row-remove" onclick="removeCountRow(${idx})" title="Remove Employee">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  `).join('');
+}
+
+function renderIndivTable(search = '') {
+  const tbody = document.getElementById('wmode-indiv-tbody');
+  if (!tbody) return;
+  const preview = allocationState.preview || [];
+  const pendingRows = preview.filter(r => r.status !== 'Completed');
+  const filtered = pendingRows.filter(r => !search || String(r.phoneNumber || '').includes(search));
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:12px; color:var(--text-secondary);">No pending records match.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(r => {
+    const checked = allocationState.individualSelections.has(r.rowIndex);
+    return `<tr>
+      <td><input type="checkbox" value="${r.rowIndex}" ${checked ? 'checked' : ''} onchange="toggleIndivRow(${r.rowIndex}, this.checked)" /></td>
+      <td><strong>#${r.rowIndex}</strong></td>
+      <td style="font-weight:600;">${escHtml(r.phoneNumber)}</td>
+      <td><span class="badge badge-pending">Pending</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterIndivTable() {
+  const search = document.getElementById('wmode-indiv-search')?.value || '';
+  renderIndivTable(search);
+}
+
+function toggleIndivRow(rowIdx, checked) {
+  if (checked) allocationState.individualSelections.add(rowIdx);
+  else allocationState.individualSelections.delete(rowIdx);
+  wizardIndivSelectedIds = allocationState.individualSelections;
+  updateAllocSummary();
+}
+
+function toggleIndivSelectAll(checked) {
+  const preview = allocationState.preview || [];
+  const pendingRows = preview.filter(r => r.status !== 'Completed');
+  pendingRows.forEach(r => {
+    if (checked) allocationState.individualSelections.add(r.rowIndex);
+    else allocationState.individualSelections.delete(r.rowIndex);
+  });
+  wizardIndivSelectedIds = allocationState.individualSelections;
+  renderIndivTable(document.getElementById('wmode-indiv-search')?.value || '');
+  updateAllocSummary();
+}
+
+function onIndivEmpSelectChange() {
+  const sel = document.getElementById('wmode-indiv-emp-select');
+  if (sel) allocationState.individualEmployeeId = sel.value;
+}
+
+function validateAllocationStep() {
+  const method = allocationState.method || 'equal_split';
+  const available = Number(allocationState.availableRecords || 0);
+
+  if (method === 'equal_split') {
+    const ids = getCheckedEmpIds('wmode-equal-grid');
+    if (ids.length === 0) {
+      showToast('Please select at least one employee for equal split allocation.', 'error');
+      return false;
+    }
+    allocationState.selectedEmployeeIds = ids;
+    return true;
+  }
+
+  if (method === 'range') {
+    if (!allocationState.rangeRows || allocationState.rangeRows.length === 0) {
+      showToast('Please add at least one employee row range.', 'error');
+      return false;
+    }
+    for (let i = 0; i < allocationState.rangeRows.length; i++) {
+      const r = allocationState.rangeRows[i];
+      if (!r.employee_id) {
+        showToast(`Please select an employee for row range #${i + 1}.`, 'error');
+        return false;
+      }
+      const s = parseInt(r.start_row, 10);
+      const e = parseInt(r.end_row, 10);
+      if (isNaN(s) || isNaN(e) || s < 1 || e < s) {
+        showToast(`Invalid row range (#${i + 1}): start must be >= 1 and end must be >= start.`, 'error');
+        return false;
+      }
+      if (e > allocationState.totalRecords) {
+        showToast(`Row range end (${e}) exceeds total records (${allocationState.totalRecords}).`, 'error');
+        return false;
+      }
+      for (let j = 0; j < i; j++) {
+        const prev = allocationState.rangeRows[j];
+        const ps = parseInt(prev.start_row, 10);
+        const pe = parseInt(prev.end_row, 10);
+        if (!(e < ps || s > pe)) {
+          showToast(`Overlapping range detected: Row #${i + 1} overlaps with Row #${j + 1}.`, 'error');
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  if (method === 'count') {
+    if (!allocationState.countRows || allocationState.countRows.length === 0) {
+      showToast('Please add at least one employee count allocation.', 'error');
+      return false;
+    }
+    let totalCount = 0;
+    for (let i = 0; i < allocationState.countRows.length; i++) {
+      const r = allocationState.countRows[i];
+      if (!r.employee_id) {
+        showToast(`Please select an employee for count row #${i + 1}.`, 'error');
+        return false;
+      }
+      const c = parseInt(r.count, 10);
+      if (isNaN(c) || c <= 0) {
+        showToast(`Please enter a valid count > 0 for employee #${i + 1}.`, 'error');
+        return false;
+      }
+      totalCount += c;
+    }
+    if (totalCount > available) {
+      showToast(`Total allocated count (${totalCount}) exceeds available records (${available}).`, 'error');
+      return false;
+    }
+    return true;
+  }
+
+  if (method === 'individual') {
+    const empSelect = document.getElementById('wmode-indiv-emp-select');
+    const empId = empSelect ? empSelect.value : '';
+    if (!empId) {
+      showToast('Please choose an employee to assign selected rows.', 'error');
+      return false;
+    }
+    if (allocationState.individualSelections.size === 0) {
+      showToast('Please select at least one record to assign.', 'error');
+      return false;
+    }
+    allocationState.individualEmployeeId = empId;
+    return true;
+  }
+
+  return true;
+}
+
+function renderConfirmReview() {
+  const method = allocationState.method || 'equal_split';
+  const available = Number(allocationState.availableRecords || 0);
+  const tbody = document.getElementById('wp4-review-tbody');
+  const noticeEl = document.getElementById('wp4-review-notice');
+  if (!tbody) return;
+
+  const planned = [];
+  let totalAllocated = 0;
+
+  if (method === 'equal_split') {
+    const ids = allocationState.selectedEmployeeIds;
+    const n = ids.length;
+    const base = Math.floor(available / n);
+    const rem = available % n;
+    let offset = 1;
+    ids.forEach((eid, idx) => {
+      const hasRem = idx < rem;
+      const count = base + (hasRem ? 1 : 0);
+      const emp = allEmployees.find(e => e.id === eid);
+      const startRow = offset;
+      const endRow = offset + count - 1;
+      offset += count;
+      totalAllocated += count;
+      const share = available > 0 ? ((count / available) * 100).toFixed(1) : '0';
+      planned.push({
+        employee_id: eid,
+        empName: emp ? emp.name : `Employee #${eid}`,
+        empEmail: emp ? emp.email : '',
+        count,
+        range: count > 0 ? `Rows ${startRow}–${endRow}` : 'None',
+        share,
+        status: 'Ready'
+      });
+    });
+  } else if (method === 'range') {
+    allocationState.rangeRows.forEach(r => {
+      const emp = allEmployees.find(e => e.id == r.employee_id);
+      const s = parseInt(r.start_row, 10);
+      const e = parseInt(r.end_row, 10);
+      const count = (e - s + 1);
+      totalAllocated += count;
+      const share = available > 0 ? ((count / available) * 100).toFixed(1) : '0';
+      planned.push({
+        employee_id: r.employee_id,
+        empName: emp ? emp.name : `Employee #${r.employee_id}`,
+        empEmail: emp ? emp.email : '',
+        count,
+        range: `Rows ${s}–${e}`,
+        share,
+        status: 'Ready'
+      });
+    });
+  } else if (method === 'count') {
+    let offset = 1;
+    allocationState.countRows.forEach(r => {
+      const emp = allEmployees.find(e => e.id == r.employee_id);
+      const count = parseInt(r.count, 10);
+      const startRow = offset;
+      const endRow = offset + count - 1;
+      offset += count;
+      totalAllocated += count;
+      const share = available > 0 ? ((count / available) * 100).toFixed(1) : '0';
+      planned.push({
+        employee_id: r.employee_id,
+        empName: emp ? emp.name : `Employee #${r.employee_id}`,
+        empEmail: emp ? emp.email : '',
+        count,
+        range: `Rows ${startRow}–${endRow}`,
+        share,
+        status: 'Ready'
+      });
+    });
+  } else if (method === 'individual') {
+    const empId = parseInt(allocationState.individualEmployeeId, 10);
+    const emp = allEmployees.find(e => e.id === empId);
+    const count = allocationState.individualSelections.size;
+    totalAllocated = count;
+    const share = available > 0 ? ((count / available) * 100).toFixed(1) : '0';
+    planned.push({
+      employee_id: empId,
+      empName: emp ? emp.name : `Employee #${empId}`,
+      empEmail: emp ? emp.email : '',
+      count,
+      range: `${count} Selected Rows`,
+      share,
+      status: 'Ready'
+    });
+  }
+
+  allocationState.plannedAllocations = planned;
+
+  tbody.innerHTML = planned.map(r => `<tr>
+    <td>
+      <div style="font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+        <span>${escHtml(r.empName)}</span>
+        <span class="file-id-tag" style="font-size:10px; padding:1px 5px;">#${r.employee_id}</span>
+      </div>
+      <div style="font-size:11px; color:var(--text-secondary);">${escHtml(r.empEmail)}</div>
+    </td>
+    <td>
+      <span class="count-pill count-completed">${r.count} records</span>
+      <span style="font-size:11px; color:var(--text-secondary); margin-left:4px;">(${r.share}%)</span>
+    </td>
+    <td><strong>${escHtml(r.range)}</strong></td>
+    <td>
+      <span class="badge" style="background:rgba(16,185,129,0.15); color:#059669; border:1px solid rgba(16,185,129,0.3); font-weight:700;">
+        <i class="fas fa-check-circle" style="margin-right:4px;"></i> Ready
+      </span>
+    </td>
+  </tr>`).join('');
+
+  if (noticeEl) {
+    const unassigned = Math.max(0, available - totalAllocated);
+    if (unassigned === 0) {
+      noticeEl.style.background = 'rgba(16,185,129,0.12)';
+      noticeEl.style.border = '1px solid #10b981';
+      noticeEl.style.color = '#047857';
+      noticeEl.innerHTML = `<i class="fas fa-check-circle" style="margin-right:6px;"></i> <strong>100% Allocated:</strong> All ${available} available records are mapped to employees.`;
+    } else {
+      noticeEl.style.background = 'rgba(245,158,11,0.12)';
+      noticeEl.style.border = '1px solid #f59e0b';
+      noticeEl.style.color = '#b45309';
+      noticeEl.innerHTML = `<i class="fas fa-circle-info" style="margin-right:6px;"></i> <strong>Notice:</strong> ${totalAllocated} records are allocated. <strong>${unassigned} records</strong> remain unallocated and can be assigned at any time.`;
+    }
+  }
+}
+
+async function doConfirmAllocation() {
+  if (!allocationState.file) return;
+
+  const btn = document.getElementById('wizard-btn-next');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Uploading &amp; Allocating...';
+
+  try {
+    const formData = new FormData();
+    formData.append('excelFile', allocationState.file);
+
+    const method = allocationState.method || 'equal_split';
+    formData.append('allocation_method', method);
+
+    if (method === 'equal_split') {
+      formData.append('employee_ids', JSON.stringify(allocationState.selectedEmployeeIds));
+    } else if (method === 'range') {
+      formData.append('allocations', JSON.stringify(allocationState.rangeRows));
+    } else if (method === 'count') {
+      formData.append('allocations', JSON.stringify(allocationState.countRows));
+    } else if (method === 'individual') {
+      formData.append('allocations', JSON.stringify([{
+        employee_id: allocationState.individualEmployeeId,
+        record_ids: Array.from(allocationState.individualSelections)
+      }]));
+    }
+
     const token = getToken();
     const res = await fetch(`${API_BASE}/excel/upload`, {
       method: 'POST',
@@ -1880,120 +3701,488 @@ async function doUpload() {
       body: formData
     });
     const data = await res.json();
-    if (!data.success) throw new Error(data.message || 'File upload failed.');
+    if (!data.success) throw new Error(data.message || 'Upload failed.');
 
-    // Assign employees
-    const fileId = data.file.id;
-    await apiFetch(`/excel/files/${fileId}/assign`, {
-      method: 'POST',
-      body: JSON.stringify({ employee_ids: empIds })
-    });
-
-    showToast(`Excel dataset uploaded and assigned to ${empIds.length} employee(s) successfully.`, 'success');
+    showToast(data.message || 'Dataset uploaded and allocated successfully.', 'success');
     closeModal('upload-modal');
     await loadFiles();
-  } catch(e) {
-    const msg = e.message || '';
-    if (msg.toLowerCase().includes('token') || msg.toLowerCase().includes('expired')) {
-      showToast('Your session has expired. Please sign in again.', 'error');
-      setTimeout(() => { clearSession(); window.location.href = '/index.html'; }, 2000);
-    } else {
-      showToast('Upload failed: ' + (msg || 'Please verify file format and try again.'), 'error');
-    }
+  } catch (err) {
+    showToast('Failed to allocate: ' + (err.message || 'Error occurred'), 'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i> Upload &amp; Assign';
+    btn.innerHTML = `<i class="fas fa-check" style="margin-right:6px;"></i> <span>Confirm Allocation</span>`;
   }
 }
 
-// ── Column Aliases for Flexible File Schema Matching ─────────────────────
-const COL_ALIASES = {
-  'phone number':   ['phone number','phone no','phone','mobile','mobile number','mobile no','contact','contact number','mob','mob no','phonenumber','mobilenumber'],
-  'disposition':    ['disposition','desposition','disp','dispo','call disposition','call status'],
-  'sub disposition':['sub disposition','sub desposition','sub disp','sub dispo','sub-disposition','sub-desposition','subdisposition','subdesposition','sub call status','sub status']
-};
+// ── Reassign / Existing File Allocation Workspace ─────────────────────────
+let reassignAllocMode = 'equal_split';
+let reassignRangeRows = [];
+let reassignCountRows = [];
 
-function matchCol(h) {
-  const hl = String(h || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
-  for (const [canon, aliases] of Object.entries(COL_ALIASES)) {
-    if (aliases.includes(hl)) return canon;
-  }
-  return null;
-}
-
-function validateExcelFile(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const data = new Uint8Array(e.target.result);
-        const wb   = XLSX.read(data, { type: 'array' });
-        const wsName = wb.SheetNames[0];
-        if (!wsName) { resolve('The Excel workbook contains no sheets.'); return; }
-        const ws = wb.Sheets[wsName];
-        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-        if (!rows || rows.length < 2) { resolve('The Excel sheet contains no data rows. Please ensure at least one phone number row exists.'); return; }
-
-        const headerRaw = rows[0].map(h => String(h).trim());
-        const matched   = headerRaw.map(h => matchCol(h));
-
-        const required = ['phone number', 'disposition', 'sub disposition'];
-        const missing  = required.filter(col => !matched.includes(col));
-        if (missing.length > 0) {
-          const missingLabels = missing.map(c => ({ 'phone number':'Phone Number','disposition':'Disposition','sub disposition':'Sub Disposition' }[c]));
-          resolve(
-            'Invalid Excel format. Required columns are missing:\n' +
-            missingLabels.map(l => '• ' + l).join('\n') +
-            '\n\nFound columns: ' + (headerRaw.join(', ') || '(none)')
-          );
-          return;
-        }
-
-        const phoneIdx = matched.indexOf('phone number');
-        const dataRows = rows.slice(1).filter(r => String(r[phoneIdx] || '').trim() !== '');
-        if (dataRows.length === 0) { resolve('No valid phone number rows found in the sheet. Please populate the Phone Number column.'); return; }
-        resolve(null);
-      } catch(err) {
-        reject(err);
-      }
-    };
-    reader.onerror = () => reject(new Error('File reading error.'));
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-// ── Reassign Modal ────────────────────────────────────────────────────────
 async function openReassign(fileId) {
   fileToReassign = fileId;
   const f = allFiles.find(x => x.id === fileId);
-  document.getElementById('reassign-file-label').innerHTML = f
-    ? `<i class="fas fa-file-excel" style="margin-right:6px; color:var(--accent);"></i> ${escHtml(f.original_name)} <span class="file-id-tag" style="margin-left:8px;">ID: #${f.id}</span>`
-    : '';
-  document.getElementById('reassign-emp-search').value = '';
+  const labelEl = document.getElementById('reassign-file-label');
+  if (labelEl) {
+    labelEl.innerHTML = f
+      ? `<i class="fas fa-file-excel" style="margin-right:6px; color:var(--accent);"></i> <strong>${escHtml(f.original_name)}</strong> <span class="file-id-tag" style="margin-left:8px;">ID: #${f.id}</span> (${f.total_records} total records)`
+      : '';
+  }
+
+  // Populate summary bar
+  const summaryEl = document.getElementById('reassign-summary-bar');
+  if (summaryEl && f) {
+    const comp = f.completed_count || 0;
+    const avail = Math.max(0, f.total_records - comp);
+    summaryEl.innerHTML = `
+      <div class="alloc-stat-item">
+        <span class="alloc-stat-lbl">Total Records</span>
+        <span class="alloc-stat-val">${(f.total_records || 0).toLocaleString('en-IN')}</span>
+      </div>
+      <div class="alloc-stat-item">
+        <span class="alloc-stat-lbl">Completed</span>
+        <span class="alloc-stat-val val-green">${comp.toLocaleString('en-IN')}</span>
+      </div>
+      <div class="alloc-stat-item">
+        <span class="alloc-stat-lbl">Available</span>
+        <span class="alloc-stat-val val-blue">${avail.toLocaleString('en-IN')}</span>
+      </div>
+    `;
+  }
+
   try {
     const res = await apiFetch(`/excel/files/${fileId}`);
-    const currentIds = (res.assignments || []).map(a => a.employee_id);
+    const currentAssignments = res.assignments || [];
+    const currentIds = currentAssignments.map(a => a.employee_id);
     renderEmpGrid('reassign-emp-grid', 'reassign-emp-count', currentIds);
-  } catch(e) {
+
+    if (currentAssignments.length > 0 && currentAssignments[0].start_row) {
+      reassignRangeRows = currentAssignments.map(a => ({
+        employee_id: a.employee_id,
+        start_row: a.start_row || 1,
+        end_row: a.end_row || f.total_records
+      }));
+    } else {
+      reassignRangeRows = [{ employee_id: '', start_row: 1, end_row: f.total_records }];
+    }
+    renderReassignRangeRows();
+
+    reassignCountRows = currentAssignments.map(a => ({
+      employee_id: a.employee_id,
+      count: a.assigned_count || Math.floor(f.total_records / Math.max(1, currentAssignments.length))
+    }));
+    if (reassignCountRows.length === 0) {
+      reassignCountRows = [{ employee_id: '', count: f.total_records }];
+    }
+    renderReassignCountRows();
+  } catch (e) {
     renderEmpGrid('reassign-emp-grid', 'reassign-emp-count');
   }
+
+  setReassignAllocMode('equal_split');
   openModal('reassign-modal');
 }
 
+function setReassignAllocMode(mode) {
+  reassignAllocMode = mode;
+  ['equal', 'range', 'count'].forEach(m => {
+    const btn = document.getElementById(`ramb-${m}`);
+    if (btn) btn.classList.toggle('active', (m === 'equal' && mode === 'equal_split') || m === mode);
+  });
+  document.getElementById('reassign-equal-container').style.display = (mode === 'equal_split') ? 'block' : 'none';
+  document.getElementById('reassign-range-container').style.display = (mode === 'range') ? 'block' : 'none';
+  document.getElementById('reassign-count-container').style.display = (mode === 'count') ? 'block' : 'none';
+}
+
+function filterReassignEmployees() {
+  const search = document.getElementById('reassign-emp-search').value;
+  const sel = getCheckedEmpIds('reassign-emp-grid');
+  renderEmpGrid('reassign-emp-grid', 'reassign-emp-count', sel, search);
+}
+
+function selectAllReassign() {
+  const grid = document.getElementById('reassign-emp-grid');
+  if (!grid) return;
+  grid.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = true; });
+  grid.querySelectorAll('.emp-chip').forEach(ch => ch.classList.add('selected'));
+  const countEl = document.getElementById('reassign-emp-count');
+  if (countEl) countEl.textContent = `${grid.querySelectorAll('input[type="checkbox"]').length} employees selected`;
+}
+
+function clearAllReassign() {
+  const grid = document.getElementById('reassign-emp-grid');
+  if (!grid) return;
+  grid.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = false; });
+  grid.querySelectorAll('.emp-chip').forEach(ch => ch.classList.remove('selected'));
+  const countEl = document.getElementById('reassign-emp-count');
+  if (countEl) countEl.textContent = `0 employees selected`;
+}
+
+function addReassignRangeRow() {
+  const f = allFiles.find(x => x.id === fileToReassign);
+  const total = f ? f.total_records : 100;
+  let nextStart = 1;
+  if (reassignRangeRows.length > 0) {
+    const last = reassignRangeRows[reassignRangeRows.length - 1];
+    nextStart = (parseInt(last.end_row, 10) || 0) + 1;
+  }
+  reassignRangeRows.push({ employee_id: '', start_row: nextStart, end_row: Math.min(nextStart + 99, total) });
+  renderReassignRangeRows();
+}
+
+function removeReassignRangeRow(idx) {
+  reassignRangeRows.splice(idx, 1);
+  if (reassignRangeRows.length === 0) reassignRangeRows.push({ employee_id: '', start_row: 1, end_row: 100 });
+  renderReassignRangeRows();
+}
+
+function updateReassignRangeRow(idx, field, val) {
+  if (reassignRangeRows[idx]) {
+    reassignRangeRows[idx][field] = val;
+    renderReassignRangeRows();
+  }
+}
+
+function renderReassignRangeRows() {
+  const container = document.getElementById('reassign-range-rows');
+  if (!container) return;
+  container.innerHTML = reassignRangeRows.map((r, idx) => {
+    const s = parseInt(r.start_row, 10);
+    const e = parseInt(r.end_row, 10);
+    const count = (!isNaN(s) && !isNaN(e) && e >= s) ? (e - s + 1) : 0;
+    return `
+      <div class="alloc-row-card">
+        <div class="alloc-row-num">${idx + 1}</div>
+        <div style="flex:2; min-width:200px;">
+          <select class="filter-control" style="width:100%;" onchange="updateReassignRangeRow(${idx}, 'employee_id', this.value)">
+            <option value="">Select Employee...</option>
+            ${allEmployees.map(e => `<option value="${e.id}" ${e.id == r.employee_id ? 'selected' : ''}>${escHtml(e.name)} (ID: #${e.id})</option>`).join('')}
+          </select>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:180px;">
+          <input type="number" min="1" class="filter-control" style="width:75px;" placeholder="From" value="${r.start_row || ''}" oninput="updateReassignRangeRow(${idx}, 'start_row', this.value)" />
+          <span style="color:var(--text-muted); font-size:12px;">to</span>
+          <input type="number" min="1" class="filter-control" style="width:75px;" placeholder="To" value="${r.end_row || ''}" oninput="updateReassignRangeRow(${idx}, 'end_row', this.value)" />
+        </div>
+        <div class="alloc-count-badge">${count} recs</div>
+        <button type="button" class="alloc-row-remove" onclick="removeReassignRangeRow(${idx})"><i class="fas fa-times"></i></button>
+      </div>
+    `;
+  }).join('');
+}
+
+function addReassignCountRow() {
+  reassignCountRows.push({ employee_id: '', count: 50 });
+  renderReassignCountRows();
+}
+
+function removeReassignCountRow(idx) {
+  reassignCountRows.splice(idx, 1);
+  if (reassignCountRows.length === 0) reassignCountRows.push({ employee_id: '', count: 50 });
+  renderReassignCountRows();
+}
+
+function updateReassignCountRow(idx, field, val) {
+  if (reassignCountRows[idx]) {
+    reassignCountRows[idx][field] = val;
+  }
+}
+
+function renderReassignCountRows() {
+  const container = document.getElementById('reassign-count-rows');
+  if (!container) return;
+  container.innerHTML = reassignCountRows.map((r, idx) => `
+    <div class="alloc-row-card">
+      <div class="alloc-row-num">${idx + 1}</div>
+      <div style="flex:2; min-width:200px;">
+        <select class="filter-control" style="width:100%;" onchange="updateReassignCountRow(${idx}, 'employee_id', this.value)">
+          <option value="">Select Employee...</option>
+          ${allEmployees.map(e => `<option value="${e.id}" ${e.id == r.employee_id ? 'selected' : ''}>${escHtml(e.name)} (ID: #${e.id})</option>`).join('')}
+        </select>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:140px;">
+        <span style="font-size:12px; color:var(--text-secondary); font-weight:600;">Count:</span>
+        <input type="number" min="1" class="filter-control" style="width:90px;" placeholder="Count" value="${r.count || ''}" oninput="updateReassignCountRow(${idx}, 'count', this.value)" />
+      </div>
+      <button type="button" class="alloc-row-remove" onclick="removeReassignCountRow(${idx})"><i class="fas fa-times"></i></button>
+    </div>
+  `).join('');
+}
+
 async function doReassign() {
-  const empIds = getCheckedEmpIds('reassign-emp-grid');
-  if (empIds.length === 0) { showToast('Select at least one employee to assign.', 'error'); return; }
+  if (!fileToReassign) return;
+  const btn = document.getElementById('btn-save-reassign');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Saving...';
+
   try {
-    await apiFetch(`/excel/files/${fileToReassign}/assign`, {
+    let payload = {};
+    if (reassignAllocMode === 'equal_split') {
+      const empIds = getCheckedEmpIds('reassign-emp-grid');
+      if (empIds.length === 0) { showToast('Select at least one employee.', 'error'); return; }
+      payload = { method: 'equal_split', employee_ids: empIds, force_reassign: true };
+    } else if (reassignAllocMode === 'range') {
+      for (const r of reassignRangeRows) {
+        if (!r.employee_id) { showToast('Please select an employee for each range.', 'error'); return; }
+      }
+      payload = { method: 'range', allocations: reassignRangeRows, force_reassign: true };
+    } else if (reassignAllocMode === 'count') {
+      for (const r of reassignCountRows) {
+        if (!r.employee_id) { showToast('Please select an employee for each count.', 'error'); return; }
+      }
+      payload = { method: 'count', allocations: reassignCountRows, force_reassign: true };
+    }
+
+    const res = await apiFetch(`/excel/files/${fileToReassign}/assign`, {
       method: 'POST',
-      body: JSON.stringify({ employee_ids: empIds })
+      body: JSON.stringify(payload)
     });
-    showToast('Assignment updated successfully.', 'success');
+    showToast(res.message || 'Dataset allocation saved successfully.', 'success');
     closeModal('reassign-modal');
     await loadFiles();
   } catch(e) {
-    showToast('Assignment update failed: ' + (e.message || 'Error'), 'error');
+    showToast('Allocation save failed: ' + (e.message || 'Error'), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check" style="margin-right:6px;"></i> Save Allocation';
   }
+}
+
+// ── Allocation Breakdown Detail Modal ─────────────────────────────────────
+let detailModalFileId = null;
+
+function getAllocInitials(name) {
+  if (!name) return 'EM';
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'EM';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function formatAllocMethod(m) {
+  if (!m) return 'Equal Split';
+  const s = String(m).toLowerCase().replace(/[_-]/g, ' ');
+  if (s.includes('equal')) return 'Equal Split';
+  if (s.includes('range')) return 'Row Range';
+  if (s.includes('count')) return 'Record Count';
+  if (s.includes('indiv') || s.includes('select')) return 'Selection';
+  return s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+function formatAllocLifespan(expiresAt) {
+  if (!expiresAt) return { text: '30 Days', isExpired: false };
+  const d = new Date(expiresAt);
+  if (isNaN(d.getTime())) return { text: '30 Days', isExpired: false };
+  const now = new Date();
+  const isExpired = d < now;
+  const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  return {
+    text: isExpired ? `Expired ${dateStr}` : `Expires ${dateStr}`,
+    isExpired
+  };
+}
+
+async function showAssignmentDetailModal(fileId) {
+  detailModalFileId = fileId;
+  const f = allFiles.find(x => x.id === fileId);
+  const subtitleEl = document.getElementById('alloc-detail-subtitle');
+  if (subtitleEl) {
+    subtitleEl.textContent = f
+      ? `${f.original_name} (ID: #${f.id}) — Total Records: ${(f.total_records || 0).toLocaleString('en-IN')}`
+      : `File #${fileId}`;
+  }
+
+  const contentEl = document.getElementById('alloc-detail-content');
+  contentEl.innerHTML = '<div class="skeleton" style="height:48px; border-radius:8px; margin-bottom:14px;"></div><div class="skeleton" style="height:160px; border-radius:8px;"></div>';
+  openModal('allocation-detail-modal');
+
+  try {
+    const res = await apiFetch(`/excel/files/${fileId}`);
+    const file = res.file || f || {};
+    const assignments = res.assignments || [];
+
+    if (subtitleEl && file.original_name) {
+      subtitleEl.textContent = `${file.original_name} (ID: #${file.id || fileId}) — Total Records: ${(file.total_records || 0).toLocaleString('en-IN')}`;
+    }
+
+    if (assignments.length === 0) {
+      contentEl.innerHTML = `
+        <div class="empty-state" style="padding:32px 20px; text-align:center;">
+          <i class="fas fa-users-slash" style="font-size:32px; color:var(--text-secondary); margin-bottom:10px;"></i>
+          <h4 style="margin:0 0 6px; font-size:15px; color:var(--text-primary);">No Employees Assigned</h4>
+          <p style="margin:0; font-size:12.5px; color:var(--text-secondary);">This master file currently has no employee record assignments.</p>
+        </div>`;
+      return;
+    }
+
+    const masterTotal = Number(file.total_records) || assignments.reduce((acc, a) => acc + (Number(a.assigned_count) || 0), 0);
+    const totalComp = file.completed_count !== undefined && file.completed_count !== null
+      ? Number(file.completed_count)
+      : assignments.reduce((acc, a) => acc + (Number(a.completed !== undefined ? a.completed : a.progress) || 0), 0);
+    const compPct = masterTotal > 0 ? Math.min(100, Math.round((totalComp / masterTotal) * 100)) : (file.completion_pct || 0);
+
+    let html = `
+      <div class="alloc-metric-strip">
+        <div class="alloc-metric-item">
+          <span class="alloc-metric-label">Master Records</span>
+          <span class="alloc-metric-value">${masterTotal.toLocaleString('en-IN')}</span>
+        </div>
+        <div class="alloc-metric-divider"></div>
+        <div class="alloc-metric-item">
+          <span class="alloc-metric-label">Completed</span>
+          <span class="alloc-metric-value" style="color:var(--success, #10b981);">${totalComp.toLocaleString('en-IN')}</span>
+        </div>
+        <div class="alloc-metric-divider"></div>
+        <div class="alloc-metric-item">
+          <span class="alloc-metric-label">Completion</span>
+          <span class="alloc-metric-value" style="color:var(--accent, #2563eb);">${compPct}%</span>
+        </div>
+        <div class="alloc-metric-divider"></div>
+        <div class="alloc-metric-item">
+          <span class="alloc-metric-label">Assigned Staff</span>
+          <span class="alloc-metric-value">${assignments.length} ${assignments.length === 1 ? 'Employee' : 'Employees'}</span>
+        </div>
+      </div>
+
+      <!-- Desktop Table -->
+      <div class="alloc-detail-table-wrap">
+        <table class="alloc-detail-table">
+          <thead>
+            <tr>
+              <th style="width:28%;">Employee</th>
+              <th style="width:20%;">Allocation</th>
+              <th style="width:12%;">Records</th>
+              <th style="width:18%;">Progress</th>
+              <th style="width:11%;">Status</th>
+              <th style="width:11%;">Lifespan</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    assignments.forEach(a => {
+      const empName = a.employee_name || a.name || 'Employee';
+      const empEmail = a.employee_email || a.email || '';
+      const initials = getAllocInitials(empName);
+      const methodLabel = formatAllocMethod(a.allocation_method);
+      const rangeText = (a.start_row && a.end_row) ? `Rows ${a.start_row}–${a.end_row}` : 'All Records';
+      const totRecs = Number(a.assigned_count) || 0;
+      const compRecs = Number(a.completed !== undefined ? a.completed : a.progress) || 0;
+      const pct = totRecs > 0 ? Math.min(100, Math.round((compRecs / totRecs) * 100)) : 0;
+      const lifespan = formatAllocLifespan(a.expires_at);
+
+      html += `
+        <tr>
+          <td>
+            <div class="alloc-detail-emp-cell" title="${escHtml(empName)} (${escHtml(empEmail)})">
+              <div class="emp-avatar-sm">${escHtml(initials)}</div>
+              <div class="alloc-detail-emp-info">
+                <div class="alloc-detail-emp-name">${escHtml(empName)}</div>
+                <div class="alloc-detail-emp-email" title="${escHtml(empEmail)}">${escHtml(empEmail || 'No email provided')}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="alloc-method-cell">
+              <span class="alloc-method-badge">${escHtml(methodLabel)}</span>
+              <div class="alloc-range-text">${escHtml(rangeText)}</div>
+            </div>
+          </td>
+          <td>
+            <div class="alloc-records-cell">
+              <span class="alloc-records-count">${totRecs.toLocaleString('en-IN')}</span>
+              <span class="alloc-records-unit">records</span>
+            </div>
+          </td>
+          <td>
+            <div class="alloc-progress-cell">
+              <div class="alloc-progress-fraction">${compRecs} / ${totRecs} done</div>
+              <div class="prog-bar-mini" title="${pct}% completed (${compRecs}/${totRecs})">
+                <div class="prog-fill-mini" style="width:${pct}%;"></div>
+              </div>
+              <div class="alloc-progress-pct">${pct}%</div>
+            </div>
+          </td>
+          <td>
+            <div class="alloc-status-cell">
+              ${statusBadge(a.status || 'Assigned')}
+            </div>
+          </td>
+          <td>
+            <div class="alloc-lifespan-cell">
+              <span class="lifespan-badge ${lifespan.isExpired ? 'badge-expired' : ''}" title="${lifespan.isExpired ? 'Expired assignment' : 'Allocation expiration date'}">
+                <i class="fas fa-clock" style="margin-right:4px; font-size:10px;"></i>${escHtml(lifespan.text)}
+              </span>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Stacked Cards -->
+      <div class="alloc-detail-cards-wrap">
+    `;
+
+    assignments.forEach(a => {
+      const empName = a.employee_name || a.name || 'Employee';
+      const empEmail = a.employee_email || a.email || '';
+      const initials = getAllocInitials(empName);
+      const methodLabel = formatAllocMethod(a.allocation_method);
+      const rangeText = (a.start_row && a.end_row) ? `Rows ${a.start_row}–${a.end_row}` : 'All Records';
+      const totRecs = Number(a.assigned_count) || 0;
+      const compRecs = Number(a.completed !== undefined ? a.completed : a.progress) || 0;
+      const pct = totRecs > 0 ? Math.min(100, Math.round((compRecs / totRecs) * 100)) : 0;
+      const lifespan = formatAllocLifespan(a.expires_at);
+
+      html += `
+        <div class="alloc-card">
+          <div class="alloc-card-top">
+            <div class="alloc-detail-emp-cell">
+              <div class="emp-avatar-sm">${escHtml(initials)}</div>
+              <div class="alloc-detail-emp-info">
+                <div class="alloc-detail-emp-name">${escHtml(empName)}</div>
+                <div class="alloc-detail-emp-email">${escHtml(empEmail || '')}</div>
+              </div>
+            </div>
+            <div>${statusBadge(a.status || 'Assigned')}</div>
+          </div>
+          <div class="alloc-card-meta">
+            <span class="alloc-method-badge">${escHtml(methodLabel)}</span>
+            <span class="alloc-range-text"><i class="fas fa-arrows-left-right" style="margin-right:4px;"></i>${escHtml(rangeText)}</span>
+            <span class="count-pill count-completed" style="margin-left:auto;">${totRecs} records</span>
+          </div>
+          <div class="alloc-card-progress">
+            <div class="alloc-progress-fraction">${compRecs} / ${totRecs} done</div>
+            <div class="prog-bar-mini">
+              <div class="prog-fill-mini" style="width:${pct}%;"></div>
+            </div>
+            <div class="alloc-progress-pct">${pct}%</div>
+          </div>
+          <div class="alloc-card-footer">
+            <span style="color:var(--text-secondary);"><i class="fas fa-hourglass-half" style="margin-right:4px;"></i> Lifespan</span>
+            <span class="lifespan-badge ${lifespan.isExpired ? 'badge-expired' : ''}">
+              <i class="fas fa-clock" style="margin-right:4px; font-size:10px;"></i>${escHtml(lifespan.text)}
+            </span>
+          </div>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+    contentEl.innerHTML = html;
+  } catch (err) {
+    contentEl.innerHTML = `<div style="color:var(--danger, #dc2626); padding:16px; background:rgba(239,68,68,0.08); border-radius:8px;">Failed to load allocation breakdown: ${escHtml(err.message)}</div>`;
+  }
+}
+
+function openReassignFromDetail() {
+  closeModal('allocation-detail-modal');
+  if (detailModalFileId) openReassign(detailModalFileId);
 }
 
 // ── Delete Dataset ────────────────────────────────────────────────────────
@@ -2085,12 +4274,35 @@ function populateFileSelects() {
 }
 
 // ── Monitor Tab ───────────────────────────────────────────────────────────
+function handleMonitorFileChange() {
+  const fileId = document.getElementById('monitor-file-select').value;
+  const asgnSel = document.getElementById('monitor-asgn-select');
+  if (asgnSel) {
+    if (!fileId) {
+      asgnSel.innerHTML = '<option value="">All Employee Assignments</option>';
+      asgnSel.disabled = true;
+    } else {
+      const f = allFiles.find(x => x.id == fileId);
+      const asgns = (f && f.assignments) ? f.assignments : [];
+      let optHtml = `<option value="">All Employee Assignments (${asgns.length})</option>`;
+      asgns.forEach(a => {
+        const rangeTxt = (a.start_row && a.end_row) ? ` [Rows ${a.start_row}–${a.end_row}]` : '';
+        optHtml += `<option value="${a.id}">${escHtml(a.name || 'Staff')}${rangeTxt} (${a.assigned_count || 0} recs)</option>`;
+      });
+      asgnSel.innerHTML = optHtml;
+      asgnSel.disabled = false;
+      asgnSel.value = '';
+    }
+  }
+  loadMonitorData();
+}
+
 function viewFileMonitor(fileId) {
   switchTab('tab-monitor');
   const sel = document.getElementById('monitor-file-select');
   if (sel) {
     sel.value = fileId;
-    loadMonitorData();
+    handleMonitorFileChange();
   }
 }
 
@@ -2170,23 +4382,33 @@ async function loadMonitorData() {
 function filterMonitorTable() {
   const search = (document.getElementById('monitor-search').value || '').trim().toLowerCase();
   const filter = document.getElementById('monitor-filter').value;
+  const asgnVal = (document.getElementById('monitor-asgn-select') ? document.getElementById('monitor-asgn-select').value : '');
   let records  = monitorAllRecords;
+
+  if (asgnVal) {
+    const asgnId = parseInt(asgnVal);
+    records = records.filter(r => r.assignment_id === asgnId);
+  }
 
   if (search) {
     records = records.filter(r =>
       String(r.phone_number || '').includes(search) ||
       (r.disposition || '').toLowerCase().includes(search) ||
       (r.sub_disposition || '').toLowerCase().includes(search) ||
-      (r.employee_name || '').toLowerCase().includes(search)
+      (r.assigned_to_name || '').toLowerCase().includes(search) ||
+      (r.source_employee_name || '').toLowerCase().includes(search) ||
+      (r.updated_by_name || '').toLowerCase().includes(search) ||
+      (r.notes || '').toLowerCase().includes(search)
     );
   }
   if (filter === 'completed') records = records.filter(r => r.status === 'Completed');
   if (filter === 'pending')   records = records.filter(r => r.status === 'Pending');
 
-  if (filterMonitorTable.lastSearch !== search || filterMonitorTable.lastFilter !== filter) {
+  if (filterMonitorTable.lastSearch !== search || filterMonitorTable.lastFilter !== filter || filterMonitorTable.lastAsgn !== asgnVal) {
     monitorPage = 1;
     filterMonitorTable.lastSearch = search;
     filterMonitorTable.lastFilter = filter;
+    filterMonitorTable.lastAsgn = asgnVal;
   }
 
   const loading = document.getElementById('monitor-loading');
@@ -2223,18 +4445,65 @@ function filterMonitorTable() {
   const end = Math.min(start + RECORDS_PER_PAGE, total);
   const paginated = records.slice(start, end);
 
-  tbody.innerHTML = paginated.map(r => `<tr>
-    <td style="color:var(--text-muted); font-size:11px; font-weight:700;">#${r.row_index}</td>
-    <td style="font-weight:700; font-size:13.5px;"><i class="fas fa-phone" style="font-size:11px; color:var(--text-muted); margin-right:6px;"></i>${escHtml(r.phone_number)}</td>
-    <td><span class="emp-tag"><i class="fas fa-user"></i> ${escHtml(r.employee_name || 'Unassigned')}</span></td>
-    <td>${r.disposition ? `<span style="font-weight:600; color:var(--accent);">${escHtml(r.disposition)}</span>` : '<em style="color:var(--text-muted);">Not Called</em>'}</td>
-    <td>${r.sub_disposition ? escHtml(r.sub_disposition) : '<em style="color:var(--text-muted);">—</em>'}</td>
-    <td>${statusBadge(r.status)}</td>
-    <td style="font-size:12px; color:var(--text-secondary);">${r.updated_at ? fmtDatetime(r.updated_at) : '—'}</td>
-  </tr>`).join('');
+  tbody.innerHTML = paginated.map(r => {
+    const assignedName = r.assigned_to_name || r.source_employee_name || 'Unassigned';
+    let rangeBadge = '';
+    if (r.assignment_start_row && r.assignment_end_row) {
+      rangeBadge = ` <span style="font-size:10px; color:var(--text-muted); font-weight:normal;">[R${r.assignment_start_row}–${r.assignment_end_row}]</span>`;
+    }
+    const isHistorical = !r.assigned_to_name && r.source_employee_name;
+    const empCell = `<span class="emp-tag" ${isHistorical ? 'style="border-color:rgba(16,185,129,0.4); background:rgba(16,185,129,0.08);"' : ''}>
+      <i class="fas ${isHistorical ? 'fa-history' : 'fa-user'}"></i> ${escHtml(assignedName)}${isHistorical ? ' (Source)' : ''}${rangeBadge}
+    </span>`;
+
+    return `<tr>
+      <td style="color:var(--text-muted); font-size:11px; font-weight:700;">#${r.row_index}</td>
+      <td style="font-weight:700; font-size:13.5px;"><i class="fas fa-phone" style="font-size:11px; color:var(--text-muted); margin-right:6px;"></i>${escHtml(r.phone_number)}</td>
+      <td>${empCell}</td>
+      <td>${r.disposition ? `<span style="font-weight:600; color:var(--accent);">${escHtml(r.disposition)}</span>` : '<em style="color:var(--text-muted);">Not Called</em>'}</td>
+      <td>${r.sub_disposition ? escHtml(r.sub_disposition) : '<em style="color:var(--text-muted);">—</em>'}</td>
+      <td>${renderAdminNotesCell(r)}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td style="font-size:12px; color:var(--text-secondary);">${r.updated_at ? fmtDatetime(r.updated_at) : '—'}</td>
+    </tr>`;
+  }).join('');
 
   document.getElementById('monitor-pag-info').textContent = `Showing ${start + 1}–${end} of ${total} records`;
   document.getElementById('monitor-pag-btns').innerHTML = buildPageBtns(monitorPage, totalPages, 'goMonitorPage');
+}
+
+function renderAdminNotesCell(r) {
+  const notes = r && r.notes;
+  if (!notes || !String(notes).trim()) {
+    return `<span style="color:var(--text-muted); font-size:12px;">—</span>`;
+  }
+  const cleanNotes = String(notes).trim();
+  const safeNotes = escHtml(cleanNotes);
+  const isLong = cleanNotes.length > 28;
+  const snippet = escHtml(isLong ? cleanNotes.slice(0, 26) + '…' : cleanNotes);
+
+  return `
+    <div class="admin-notes-badge" 
+         title="${safeNotes}" 
+         onclick="openAdminNotesModal(${r.id})"
+         style="display:inline-flex; align-items:center; gap:5px; max-width:180px; background:rgba(217, 119, 6, 0.08); border:1px solid rgba(217, 119, 6, 0.25); color:var(--text-primary); padding:3px 8px; border-radius:6px; font-size:12px; cursor:pointer; line-height:1.3;"
+         onmouseover="this.style.background='rgba(217, 119, 6, 0.16)'"
+         onmouseout="this.style.background='rgba(217, 119, 6, 0.08)'">
+      <i class="fas fa-sticky-note" style="color:#d97706; font-size:10.5px; flex-shrink:0;"></i>
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500;">${snippet}</span>
+      ${isLong ? `<i class="fas fa-expand-alt" style="font-size:9px; color:var(--text-muted); margin-left:auto; flex-shrink:0;"></i>` : ''}
+    </div>
+  `;
+}
+
+function openAdminNotesModal(recId) {
+  const rec = monitorAllRecords.find(x => x.id === recId);
+  const modal = document.getElementById('admin-notes-modal');
+  if (!modal) return;
+  document.getElementById('admin-notes-record-label').textContent = rec && rec.row_index ? `#${rec.row_index}` : '—';
+  document.getElementById('admin-notes-phone-label').textContent = rec && rec.phone_number ? rec.phone_number : '—';
+  document.getElementById('admin-notes-content').textContent = rec && rec.notes ? rec.notes : 'No notes entered.';
+  modal.classList.add('show');
 }
 
 function goMonitorPage(p) {
@@ -2415,12 +4684,13 @@ async function exportReportPDF(fileId) {
 
     doc.autoTable({
       startY: 28,
-      head: [['#', 'Phone Number', 'Disposition', 'Sub Disposition', 'Employee', 'Status', 'Last Updated']],
+      head: [['#', 'Phone Number', 'Disposition', 'Sub Disposition', 'Call Notes', 'Employee', 'Status', 'Last Updated']],
       body: records.map(r => [
         r.row_index,
         r.phone_number,
         r.disposition || '—',
         r.sub_disposition || '—',
+        r.notes || '—',
         r.employee_name || 'Unassigned',
         r.status,
         r.updated_at ? fmtDatetime(r.updated_at) : '—'
@@ -2502,7 +4772,8 @@ function statusBadge(s) {
     'In Progress': 'badge-inprogress',
     'Completed': 'badge-completed',
     'Closed': 'badge-closed',
-    'Pending': 'badge-pending'
+    'Pending': 'badge-pending',
+    'Expired': 'badge-expired'
   };
   return `<span class="badge ${map[s] || 'badge-assigned'}">${escHtml(s || 'Unknown')}</span>`;
 }

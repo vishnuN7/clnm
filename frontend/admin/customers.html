@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — Customers</title>
+  <title>Dixit Lending Solution — Customers</title>
   <meta name="theme-color" content="#0f2747" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -24,7 +25,7 @@
     })();
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <style>
     /* ── Topbar Centered Header ───────────────────────────────────────── */
     .admin-page .topbar {
@@ -41,8 +42,8 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     :root[data-theme='dark'] .admin-page .topbar {
-      background: linear-gradient(90deg, rgba(9, 17, 29, 0.95) 0%, rgba(12, 24, 41, 0.92) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      background: rgba(12, 18, 25, 0.95);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
     }
     .admin-page .topbar-title {
       position: absolute !important;
@@ -492,7 +493,7 @@
     }
     :root[data-theme='dark'] .custom-date-bar {
       background: rgba(139, 180, 255, 0.035);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .custom-date-content {
       display: flex;
@@ -558,8 +559,8 @@
       box-shadow: 0 0 0 3px var(--accent-soft);
     }
     :root[data-theme='dark'] .custom-date-input {
-      background: rgba(9, 17, 29, 0.65);
-      border-color: rgba(151, 176, 210, 0.22);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
       color: #e2e8f0;
       color-scheme: dark;
     }
@@ -618,13 +619,13 @@
       border-color: var(--text-muted);
     }
     :root[data-theme='dark'] .custom-date-cancel-btn {
-      background: rgba(9, 17, 29, 0.5);
-      border-color: rgba(151, 176, 210, 0.2);
-      color: #94a3b8 !important;
+      background: rgba(20, 29, 41, 0.9);
+      border-color: rgba(123, 192, 67, 0.16);
+      color: #82968a !important;
     }
     :root[data-theme='dark'] .custom-date-cancel-btn:hover {
-      background: rgba(15, 28, 48, 0.8);
-      border-color: rgba(151, 176, 210, 0.4);
+      background: rgba(0, 107, 60, 0.18);
+      border-color: var(--accent);
       color: #ffffff !important;
     }
     .custom-date-error {
@@ -717,7 +718,7 @@
     }
     :root[data-theme='dark'] .customer-table th {
       background: linear-gradient(90deg, rgba(12, 22, 36, 0.82) 0%, rgba(15, 28, 46, 0.92) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .customer-table th.th-index { text-align: center; }
     .customer-table th.th-name { text-align: left; }
@@ -726,7 +727,7 @@
     .customer-table th.th-address { text-align: left; }
     .customer-table th.th-added-by { text-align: center; }
     .customer-table th.th-date { text-align: center; }
-    .customer-table th.th-actions { text-align: center; }
+    .customer-table th.th-actions { text-align: center; min-width: 100px; }
 
     .customer-table td {
       padding: 12px 12px;
@@ -842,7 +843,7 @@
     }
     :root[data-theme='dark'] .badge-city {
       background: rgba(139, 180, 255, 0.1);
-      border-color: rgba(151, 176, 210, 0.15);
+      border-color: rgba(123, 192, 67, 0.16);
       color: #c5daf8;
     }
     .customer-address-cell {
@@ -884,6 +885,7 @@
     .customer-actions-cell {
       text-align: center;
       white-space: nowrap;
+      min-width: 100px;
     }
     .customer-action-btn {
       height: 30px;
@@ -1014,14 +1016,14 @@
       pointer-events: none;
     }
     :root[data-theme='dark'] .tbl-pg-btn {
-      background: rgba(9,17,29,0.58);
-      border-color: rgba(151,176,210,0.14);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.16);
       color: var(--text-secondary);
     }
     :root[data-theme='dark'] .tbl-pg-btn:hover:not(:disabled):not(.active) {
-      background: rgba(139,180,255,0.12);
-      border-color: rgba(139,180,255,0.4);
-      color: #8bb4ff;
+      background: rgba(0, 107, 60, 0.2);
+      border-color: var(--accent);
+      color: #6ee7b7;
     }
     :root[data-theme='dark'] .tbl-pg-btn.active {
       background: linear-gradient(135deg, var(--accent), #1d4ed8);
@@ -1052,7 +1054,8 @@
       border: 1px solid var(--border);
     }
     :root[data-theme='dark'] .customer-detail-modal {
-      background: linear-gradient(135deg, #0a1320 0%, #0f1c2e 100%);
+      background: linear-gradient(135deg, rgba(16, 23, 33, 0.98) 0%, rgba(12, 18, 25, 0.98) 100%);
+      border-color: rgba(123, 192, 67, 0.18);
     }
     .customer-detail-modal .modal-header {
       margin: 0;
@@ -1064,8 +1067,8 @@
       justify-content: space-between;
     }
     :root[data-theme='dark'] .customer-detail-modal .modal-header {
-      background: linear-gradient(90deg, rgba(12, 22, 36, 0.98) 0%, rgba(14, 28, 44, 0.98) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      background: linear-gradient(90deg, rgba(18, 26, 38, 0.98) 0%, rgba(14, 20, 30, 0.98) 100%);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
     }
     .customer-detail-modal .modal-header h3 {
       margin: 0;
@@ -1118,8 +1121,8 @@
     }
     :root[data-theme='dark'] .customer-detail-hero {
       background:
-        linear-gradient(135deg, rgba(139, 180, 255, 0.14) 0%, rgba(93, 212, 199, 0.08) 100%),
-        rgba(9, 17, 29, 0.92);
+        linear-gradient(135deg, rgba(0, 107, 60, 0.16) 0%, rgba(5, 150, 105, 0.08) 100%),
+        rgba(16, 23, 33, 0.94);
     }
     .customer-avatar-large {
       display: grid;
@@ -1175,7 +1178,8 @@
     }
     :root[data-theme='dark'] .customer-hero-meta span,
     :root[data-theme='dark'] .customer-id-pill {
-      background: rgba(9, 17, 29, 0.54);
+      background: rgba(20, 29, 41, 0.7);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .customer-id-pill {
       color: var(--accent);
@@ -1248,7 +1252,8 @@
       background: rgba(255, 255, 255, 0.54);
     }
     :root[data-theme='dark'] .customer-info-field {
-      background: rgba(9, 17, 29, 0.42);
+      background: rgba(20, 29, 41, 0.6);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .customer-info-field.full {
       grid-column: 1 / -1;
@@ -1378,13 +1383,17 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div>
-          <h2>CLN Lending Suite</h2>
-          <span>Admin Console</span>
+      <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
         </div>
-      </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Admin Console</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -1558,7 +1567,7 @@
               <col class="col-address" style="width: 23%;" />
               <col class="col-added-by" style="width: 11%;" />
               <col class="col-date" style="width: 9%;" />
-              <col class="col-actions" style="width: 9%;" />
+              <col class="col-actions" style="width: 9%; min-width: 100px;" />
             </colgroup>
             <thead>
               <tr>
@@ -1609,7 +1618,7 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705c"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script>
   let selectedPeriod = '';
   let customerPage = 1;

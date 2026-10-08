@@ -5,6 +5,7 @@ const LoanModel = require('../models/loanModel');
 const DocumentModel = require('../models/documentModel');
 const db = require('../config/db');
 const employeeCreationService = require('../services/employeeCreationService');
+const notifCtrl = require('./notificationController');
 
 const adminController = {
   // ── Dashboard ───────────────────────────────────────────────
@@ -515,8 +516,14 @@ const adminController = {
         return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long.' });
       }
 
+      const target = await UserModel.findById(id);
+      if (!target || target.role !== 'employee') {
+        return res.status(404).json({ success: false, message: 'Employee not found or unauthorized.' });
+      }
+
       const hashedPassword = await bcrypt.hash(password, 10);
       await UserModel.updatePassword(id, hashedPassword);
+      await db.query('UPDATE users SET token_version = token_version + 1 WHERE id = ?', [id]);
 
       return res.json({ success: true, message: 'Employee password updated successfully.' });
     } catch (err) {
@@ -789,6 +796,24 @@ const adminController = {
         } catch (wsErr) {
           console.error('[Admin] WhatsApp notification trigger error:', wsErr);
         }
+      }
+
+      // Notify the employee who applied for the loan
+      if (loan.applied_by) {
+        let notifPriority = 'normal';
+        if (['Approved', 'Loan Disbursed'].includes(status)) notifPriority = 'important';
+        if (['Documents Pending', 'Rejected'].includes(status)) notifPriority = 'urgent';
+        notifCtrl.createLoanNotification({
+          employeeId: loan.applied_by,
+          loanId: loan.id,
+          customerName: loan.customer_name,
+          status: status,
+          notes: notes,
+          type: 'loan',
+          title: `Loan ${status}`,
+          message: `Loan #LN-${loan.id} (${loan.customer_name}) status updated to ${status}.${notes ? ' Remark: ' + notes : ''}`,
+          priority: notifPriority
+        }).catch(err => console.error('[Admin] Loan status notification error:', err.message));
       }
 
       return res.json({ success: true, message: `Loan status updated to ${status}.` });

@@ -55,7 +55,7 @@ function setStoredTheme(theme) {
 function updateThemeColorMeta(theme) {
   const meta = document.querySelector('meta[name="theme-color"]');
   if (!meta) return;
-  meta.setAttribute('content', theme === 'dark' ? '#07111e' : '#0f2747');
+  meta.setAttribute('content', theme === 'dark' ? '#0c1219' : '#006b3c');
 }
 
 function runThemeChangeAnimation() {
@@ -125,8 +125,8 @@ function createOrbitThemeToggleMarkup() {
     </span>`;
 }
 
-function svgIcon(inner) {
-  return `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${inner}</svg>`;
+function svgIcon(inner, width = 16, height = 16) {
+  return `<svg viewBox="0 0 24 24" width="${width}" height="${height}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${inner}</svg>`;
 }
 
 const ICON_SVG = {
@@ -147,7 +147,7 @@ const ICON_SVG = {
   checkCircle: svgIcon('<circle cx="12" cy="12" r="9"/><path d="m8 12 2.8 2.8L16 9.5"/>'),
   xCircle: svgIcon('<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6"/><path d="m15 9-6 6"/>'),
   download: svgIcon('<path d="M12 3v10"/><path d="m8 10 4 4 4-4"/><path d="M5 20h14"/>'),
-  rotateLeft: svgIcon('<path d="M4 4v6h6"/><path d="M20 20a8.5 8.5 0 1 1 0-12"/>'),
+  rotateLeft: svgIcon('<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>'),
   logout: svgIcon('<path d="M10 17l5-5-5-5"/><path d="M15 12H4"/><path d="M20 4v16"/>'),
   bars: svgIcon('<path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>'),
   hourglass: svgIcon('<path d="M6 4h12"/><path d="M6 20h12"/><path d="M8 4c0 3 4 4 4 8s-4 5-4 8"/><path d="M16 4c0 3-4 4-4 8s4 5 4 8"/>'),
@@ -212,7 +212,10 @@ const ICON_SVG = {
   sort: svgIcon('<path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>'),
   sortUp: svgIcon('<path d="m7 14 5-5 5 5"/>'),
   sortDown: svgIcon('<path d="m7 10 5 5 5-5"/>'),
-  rotateRight: svgIcon('<path d="M20 4v6h-6"/><path d="M4 20a8.5 8.5 0 1 1 0-12"/>'),
+  rotateRight: svgIcon('<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>'),
+  spinner: svgIcon('<path d="M21 12a9 9 0 1 1-6.219-8.56"/>'),
+  database: svgIcon('<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/>'),
+  tableList: svgIcon('<path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9"/><path d="M3 9h18"/><path d="M9 21V9"/>'),
   arrowsUpDown: svgIcon('<polyline points="7 15 12 20 17 15"/><line x1="12" y1="4" x2="12" y2="20"/><polyline points="7 9 12 4 17 9"/>'),
   chevronLeft: svgIcon('<path d="m15 18-6-6 6-6"/>'),
   chevronRight: svgIcon('<path d="m9 18 6-6-6-6"/>'),
@@ -222,6 +225,10 @@ const ICON_SVG = {
   infinity: svgIcon('<path d="M18.178 8c5.096 0 5.096 8 0 8-2.612 0-3.52-1.996-5.178-4-1.658 2.004-2.566 4-5.178 4-5.096 0-5.096-8 0-8 2.612 0 3.52 1.996 5.178 4 1.658-2.004 2.566-4 5.178-4z"/>'),
   inbox: svgIcon('<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>')
 };
+
+if (typeof window !== 'undefined') {
+  window.ICON_SVG = ICON_SVG;
+}
 
 const LUCIDE_MAP = {
   chartColumn: 'layout-dashboard',
@@ -308,7 +315,7 @@ const FONT_AWESOME_ICON_MAP = new Map([
   ['fa-print', 'print'],
   ['fa-phone-volume', 'phone'],
   ['fa-circle', 'circle'],
-  ['fa-spinner', 'rotateLeft'],
+  ['fa-spinner', 'spinner'],
   ['fa-mug-hot', 'coffee'],
   ['fa-coffee', 'coffee'],
   ['fa-utensils', 'utensils'],
@@ -386,7 +393,13 @@ const FONT_AWESOME_ICON_MAP = new Map([
   ['fa-folder-closed', 'folder'],
   ['fa-filter', 'sliders'],
   ['fa-user-tie', 'user'],
-  ['fa-pen-to-square', 'fileLines']
+  ['fa-pen-to-square', 'fileLines'],
+  ['fa-download', 'download'],
+  ['fa-upload', 'upload'],
+  ['fa-database', 'database'],
+  ['fa-table-list', 'tableList'],
+  ['fa-satellite-dish', 'towerBroadcast'],
+  ['fa-pause', 'pauseCircle']
 ]);
 
 function resolveFontAwesomeIconName(el) {
@@ -409,7 +422,45 @@ function collectFontAwesomeIconElements(root) {
   return elements;
 }
 
+function isFontAwesomeAvailable() {
+  if (typeof window !== 'undefined' && window.__clnFontAwesomeAvailable !== undefined) {
+    return window.__clnFontAwesomeAvailable;
+  }
+  try {
+    if (document.fonts && document.fonts.check && (document.fonts.check('16px "Font Awesome 6 Free"') || document.fonts.check('900 16px "Font Awesome 6 Free"'))) {
+      if (typeof window !== 'undefined') window.__clnFontAwesomeAvailable = true;
+      return true;
+    }
+  } catch (e) {}
+
+  try {
+    for (let i = 0; i < document.styleSheets.length; i++) {
+      const href = document.styleSheets[i].href || '';
+      if (href.includes('font-awesome') || href.includes('fontawesome')) {
+        if (typeof window !== 'undefined') window.__clnFontAwesomeAvailable = true;
+        return true;
+      }
+    }
+  } catch (e) {}
+
+  const link = document.querySelector('link[href*="font-awesome"], link[href*="fontawesome"]');
+  if (link) {
+    if (typeof window !== 'undefined') window.__clnFontAwesomeAvailable = true;
+    return true;
+  }
+
+  if (typeof window !== 'undefined') window.__clnFontAwesomeAvailable = false;
+  return false;
+}
+if (typeof window !== 'undefined') {
+  window.isFontAwesomeAvailable = isFontAwesomeAvailable;
+}
+
 function applyFontAwesomeFallbackIcons(root = document) {
+  // If Font Awesome is loaded and available, let native Font Awesome vector font glyphs render.
+  // Do NOT overwrite with SVG fallbacks when Font Awesome is present.
+  if (isFontAwesomeAvailable()) return;
+
   collectFontAwesomeIconElements(root).forEach((el) => {
     if (el.matches('[data-lucide]')) return;
     const iconName = resolveFontAwesomeIconName(el);
@@ -1080,6 +1131,9 @@ function createThemeToggleButton() {
 }
 
 function mountThemeToggle() {
+  if (document.body && (document.body.classList.contains('login-page') || document.querySelector('#theme-toggle-btn'))) {
+    return;
+  }
   if (document.querySelector('.topbar')) {
     const topbar = document.querySelector('.topbar');
     let actions = topbar.querySelector('.topbar-actions');
@@ -1124,9 +1178,127 @@ function initTopbarDate() {
   } catch (e) {}
 }
 
+function mountAppBackgroundArt() {
+  if (
+    !document.body ||
+    document.querySelector('.app-bg-art') ||
+    document.body.classList.contains('login-page') ||
+    document.body.classList.contains('auth-page')
+  ) {
+    return;
+  }
+
+  const art = document.createElement('div');
+  art.className = 'app-bg-art';
+  art.setAttribute('aria-hidden', 'true');
+  art.innerHTML = `
+    <div class="app-glow-orb app-glow-tr"></div>
+    <div class="app-glow-orb app-glow-bl"></div>
+    <div class="app-ribbon-corner app-ribbon-tr">
+      <svg class="app-ribbon-svg" viewBox="0 0 840 660" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="appTrGrad1" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#004d2a" stop-opacity="0.32" />
+            <stop offset="50%" stop-color="#006b3c" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#059669" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="appTrGrad2" x1="100%" y1="0%" x2="10%" y2="90%">
+            <stop offset="0%" stop-color="#006b3c" stop-opacity="0.25" />
+            <stop offset="55%" stop-color="#059669" stop-opacity="0.12" />
+            <stop offset="100%" stop-color="#7bc043" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="appGoldTr" x1="100%" y1="0%" x2="0%" y2="80%">
+            <stop offset="0%" stop-color="#f5e197" stop-opacity="0.55" />
+            <stop offset="45%" stop-color="#d4af37" stop-opacity="0.6" />
+            <stop offset="100%" stop-color="#d4af37" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M 380 0 C 490 90, 660 260, 840 480 L 840 0 Z" fill="url(#appTrGrad1)" />
+        <path d="M 240 0 C 380 110, 580 300, 840 570 L 840 0 Z" fill="url(#appTrGrad2)" />
+        <path d="M 235 0 C 375 110, 575 300, 840 565" stroke="url(#appGoldTr)" stroke-width="1.5" stroke-linecap="round" />
+        <path d="M 375 0 C 485 90, 655 260, 840 475" stroke="url(#appGoldTr)" stroke-width="1.0" stroke-dasharray="8 6" opacity="0.6" />
+      </svg>
+    </div>
+    <div class="app-ribbon-corner app-ribbon-bl">
+      <svg class="app-ribbon-svg" viewBox="0 0 860 680" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="appBlGrad1" x1="0%" y1="100%" x2="90%" y2="10%">
+            <stop offset="0%" stop-color="#004d2a" stop-opacity="0.32" />
+            <stop offset="50%" stop-color="#006b3c" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#059669" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="appBlGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#006b3c" stop-opacity="0.25" />
+            <stop offset="55%" stop-color="#059669" stop-opacity="0.12" />
+            <stop offset="100%" stop-color="#7bc043" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="appGoldBl" x1="0%" y1="100%" x2="80%" y2="10%">
+            <stop offset="0%" stop-color="#f5e197" stop-opacity="0.55" />
+            <stop offset="40%" stop-color="#d4af37" stop-opacity="0.6" />
+            <stop offset="100%" stop-color="#d4af37" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M 0 350 C 180 390, 390 510, 560 680 L 0 680 Z" fill="url(#appBlGrad1)" />
+        <path d="M 0 220 C 220 270, 480 440, 720 680 L 0 680 Z" fill="url(#appBlGrad2)" />
+        <path d="M 0 215 C 220 265, 480 435, 720 675" stroke="url(#appGoldBl)" stroke-width="1.5" stroke-linecap="round" />
+        <path d="M 0 345 C 180 385, 390 505, 560 675" stroke="url(#appGoldBl)" stroke-width="1.0" stroke-dasharray="8 6" opacity="0.6" />
+      </svg>
+    </div>
+  `;
+  document.body.prepend(art);
+}
+
+function setPageTitle(pageName) {
+  const brandPrefix = 'Dixit Lending Solution';
+  if (!pageName) {
+    document.title = brandPrefix;
+    return;
+  }
+  const clean = String(pageName)
+    .replace(/^CLN\s*Lending\s*Suite\s*[—–-]\s*/i, '')
+    .replace(/^Dixit\s*Lending\s*Solution\s*[—–-]\s*/i, '')
+    .trim();
+  document.title = clean ? `${brandPrefix} — ${clean}` : brandPrefix;
+}
+
+function ensureBrandTabBranding() {
+  if (typeof document === 'undefined') return;
+  if (document.title) {
+    if (document.title.includes('CLN Lending Suite') || document.title.includes('CLN Employee')) {
+      const clean = document.title
+        .replace(/^CLN\s*Lending\s*Suite\s*[—–-]\s*/i, '')
+        .replace(/^CLN\s*Employee\s*[—–-]\s*/i, '')
+        .replace(/\s*[—–-]\s*CLN\s*Employee\s*$/i, '')
+        .trim();
+      document.title = `Dixit Lending Solution — ${clean}`;
+    } else if (!document.title.startsWith('Dixit Lending Solution')) {
+      document.title = `Dixit Lending Solution — ${document.title.trim()}`;
+    }
+  }
+
+  let iconLink = document.querySelector('link[rel="icon"]');
+  if (!iconLink) {
+    iconLink = document.createElement('link');
+    iconLink.rel = 'icon';
+    iconLink.type = 'image/png';
+    document.head.appendChild(iconLink);
+  }
+  iconLink.href = '/icons/dixit-official-logo.png';
+
+  let appleLink = document.querySelector('link[rel="apple-touch-icon"]');
+  if (!appleLink) {
+    appleLink = document.createElement('link');
+    appleLink.rel = 'apple-touch-icon';
+    document.head.appendChild(appleLink);
+  }
+  appleLink.href = '/icons/dixit-official-logo.png';
+}
+
 function initTheme() {
+  ensureBrandTabBranding();
   applyTheme(getResolvedTheme());
   mountThemeToggle();
+  mountAppBackgroundArt();
   initTopbarDate();
   applyIconography();
   applyFontAwesomeFallbackIcons();
@@ -1364,9 +1536,19 @@ function renderSidebarUser() {
     userInfoEl.dataset.profileLinked = '1';
     userInfoEl.style.cursor = 'pointer';
     userInfoEl.title = 'View Profile';
-    userInfoEl.addEventListener('click', () => {
+    userInfoEl.setAttribute('role', 'link');
+    userInfoEl.setAttribute('tabindex', '0');
+    userInfoEl.setAttribute('aria-label', 'View Profile');
+    const navigateToProfile = () => {
       const role = user.role;
       window.location.href = role === 'admin' ? '/admin/profile.html' : '/employee/profile.html';
+    };
+    userInfoEl.addEventListener('click', navigateToProfile);
+    userInfoEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        navigateToProfile();
+      }
     });
   }
 

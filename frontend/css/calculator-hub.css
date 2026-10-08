@@ -76,7 +76,7 @@
 
 :root[data-theme='dark'] .loan-hub-segmented-tabs {
   background: rgba(10, 19, 32, 0.7);
-  border-color: rgba(151, 176, 210, 0.16);
+  border-color: rgba(123, 192, 67, 0.16);
 }
 
 .hub-tab-btn {
@@ -573,7 +573,7 @@
 
 :root[data-theme='dark'] .amort-summary-bar {
   background: rgba(10, 19, 32, 0.7);
-  border-bottom-color: rgba(151, 176, 210, 0.14);
+  border-bottom-color: rgba(123, 192, 67, 0.12);
 }
 
 .amort-summary-item {
@@ -684,7 +684,7 @@
 
 :root[data-theme='dark'] .segmented-pills-group {
   background: rgba(10, 19, 32, 0.8);
-  border-color: rgba(151, 176, 210, 0.2);
+  border-color: rgba(123, 192, 67, 0.12);
 }
 
 .segmented-pill-btn {
@@ -757,7 +757,7 @@ td.td-left {
 
 :root[data-theme='dark'] .full-table table th {
   background: rgba(10, 19, 32, 0.85);
-  border-bottom-color: rgba(151, 176, 210, 0.18);
+  border-bottom-color: rgba(123, 192, 67, 0.16);
   color: #c0ccda;
 }
 
@@ -826,7 +826,87 @@ td.td-left {
   width: 100%;
 }
 
-/* ── Print Styling ── */
+
+/* ── Tenure input toggle group parity ── */
+.tenure-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.toggle-group {
+  display: flex;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 10px);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.toggle-btn {
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background: var(--accent-soft, rgba(47, 111, 237, 0.08));
+  color: var(--accent, #2f6fed);
+}
+
+.toggle-btn.active {
+  background: var(--accent, #2f6fed) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme='dark'] .toggle-btn.active {
+  background: var(--accent, #2f6fed) !important;
+  color: #ffffff !important;
+}
+
+/* ── Unified Lender Badges & Status Hints across all Hub Calculators ── */
+.lender-status-hint {
+  display: none;
+  font-size: 12px;
+  font-weight: 600;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.export-lender-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+:root[data-theme='dark'] .export-lender-indicator {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+:root[data-theme='dark'] .lender-status-hint {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
 @media print {
   body {
     background: #ffffff !important;

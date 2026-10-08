@@ -6,6 +6,7 @@ const PasswordResetModel = require('../models/passwordResetModel');
 const { sendPasswordResetEmail } = require('../utils/mailer');
 const db = require('../config/db');
 const { recordFailedLogin, recordSuccessfulLogin } = require('../middleware/rateLimit');
+const geolocationService = require('../services/geolocationService');
 
 const RESET_TOKEN_TTL_MS = 30 * 60 * 1000;
 
@@ -80,12 +81,25 @@ const authController = {
       }
 
       const normalized = normalizeEmail(email);
+
+      // Enforce Admin account restriction: only authorized Admin email is allowed
+      const AUTHORIZED_ADMIN_EMAIL = 'dixitlendingsolution@gmail.com';
+      if (role === 'admin' && normalized !== AUTHORIZED_ADMIN_EMAIL) {
+        recordFailedLogin(req.ip, normalized);
+        return res.status(403).json({ success: false, message: 'This account is not authorized for Admin access.' });
+      }
+
       const user = await UserModel.findByEmail(normalized);
 
       if (!user) {
         recordFailedLogin(req.ip, normalized);
         // Don't reveal if email exists or not (prevents user enumeration)
         return res.status(401).json({ success: false, message: 'Authentication failed. Please check your credentials.' });
+      }
+
+      if (user.role === 'admin' && normalized !== AUTHORIZED_ADMIN_EMAIL) {
+        recordFailedLogin(req.ip, normalized);
+        return res.status(403).json({ success: false, message: 'This account is not authorized for Admin access.' });
       }
 
       if (user.role === 'employee') {
@@ -155,8 +169,26 @@ const authController = {
         { expiresIn }
       );
 
-      const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || req.connection?.remoteAddress || null;
+      const ip = geolocationService.extractClientIp(req) || '::1';
       const device = req.headers['user-agent'] || null;
+
+      // Resolve IP geolocation
+      let geo = null;
+      try {
+        geo = await geolocationService.resolveIpLocation(ip);
+      } catch (geoErr) {
+        console.warn('[AuthController] IP location resolution error:', geoErr.message);
+        geo = {
+          city: null,
+          region: null,
+          country: null,
+          country_code: null,
+          isp: null,
+          latitude: null,
+          longitude: null,
+          source: 'error'
+        };
+      }
 
       // Attendance logs tracking for employees
       if (user.role === 'employee') {
@@ -176,10 +208,28 @@ const authController = {
         }
 
         const uaInfo = parseUA(device);
-        // Create new active session record
+        // Create new active session record with location
         await db.query(
-          'INSERT INTO attendance_logs (employee_id, employee_name, login_time, session_status, ip_address, device, browser, os) VALUES (?, ?, NOW(), "Active Session", ?, ?, ?, ?)',
-          [user.id, user.name, ip, uaInfo.device, uaInfo.browser, uaInfo.os]
+          `INSERT INTO attendance_logs 
+            (employee_id, employee_name, login_time, session_status, ip_address, device, browser, os,
+             location_city, location_region, location_country, location_country_code, location_isp, latitude, longitude, location_source, location_resolved_at) 
+           VALUES (?, ?, NOW(), "Active Session", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+          [
+            user.id,
+            user.name,
+            ip,
+            uaInfo.device,
+            uaInfo.browser,
+            uaInfo.os,
+            geo?.city || null,
+            geo?.region || null,
+            geo?.country || null,
+            geo?.country_code || null,
+            geo?.isp || null,
+            geo?.latitude != null ? geo.latitude : null,
+            geo?.longitude != null ? geo.longitude : null,
+            geo?.source || null
+          ]
         );
 
         // Update user status in DB
@@ -189,10 +239,26 @@ const authController = {
         );
       }
 
-      // Log login event in login_history (for all roles)
+      // Log login event in login_history (for all roles) with location
       await db.query(
-        'INSERT INTO login_history (user_id, login_time, ip_address, device, status) VALUES (?, NOW(), ?, ?, ?)',
-        [user.id, ip, device, 'Success']
+        `INSERT INTO login_history 
+          (user_id, login_time, ip_address, device, status,
+           location_city, location_region, location_country, location_country_code, location_isp, latitude, longitude, location_source, location_resolved_at) 
+         VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+        [
+          user.id,
+          ip,
+          device,
+          'Success',
+          geo?.city || null,
+          geo?.region || null,
+          geo?.country || null,
+          geo?.country_code || null,
+          geo?.isp || null,
+          geo?.latitude != null ? geo.latitude : null,
+          geo?.longitude != null ? geo.longitude : null,
+          geo?.source || null
+        ]
       ).catch(() => {}); // Non-blocking
       await db.query(
         'INSERT INTO user_activity_logs (user_id, activity, status, ip_address) VALUES (?, ?, ?, ?)',

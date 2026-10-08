@@ -6,6 +6,13 @@ const sslConfig = process.env.NODE_ENV === 'production'
   ? { rejectUnauthorized: false }
   : false;
 
+const dateTypeCast = (field, next) => {
+  if (field.type === 'DATE') {
+    return field.string();
+  }
+  return next();
+};
+
 const poolConfig = mysqlUrl
   ? {
       uri: mysqlUrl,
@@ -13,7 +20,9 @@ const poolConfig = mysqlUrl
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
-      timezone: '+05:30'
+      timezone: '+05:30',
+      dateStrings: ['DATE'],
+      typeCast: dateTypeCast
     }
   : {
       host:     process.env.DB_HOST     || process.env.MYSQLHOST     || 'localhost',
@@ -25,7 +34,9 @@ const poolConfig = mysqlUrl
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
-      timezone: '+05:30'
+      timezone: '+05:30',
+      dateStrings: ['DATE'],
+      typeCast: dateTypeCast
     };
 
 const pool = mysql.createPool(poolConfig);

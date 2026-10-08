@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — My Profile</title>
+  <title>Dixit Lending Solution — My Profile</title>
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <meta name="description" content="Employee Profile Workspace — manage personal info, KYC documents, bank details, and security." />
   <script>
     (function () {
@@ -18,7 +20,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -27,11 +29,30 @@
        MY PROFILE WORKSPACE — PRODUCTION FINTECH CRM DESIGN SYSTEM
        ========================================================================== */
 
+    /* ── Page Content Container ── */
+    .page-content {
+      padding: 24px;
+      flex: 1;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 900px) {
+      .page-content {
+        padding: 18px 16px;
+      }
+    }
+
+    @media (max-width: 440px) {
+      .page-content {
+        padding: 14px 12px;
+      }
+    }
+
     .profile-workspace {
       width: 100%;
-      max-width: 1200px;
       margin: 0 auto;
-      padding: 0 4px 40px;
+      padding-bottom: 40px;
       display: flex;
       flex-direction: column;
       gap: 24px;
@@ -56,13 +77,19 @@
     }
 
     .profile-hero-banner {
-      height: 110px;
-      background: linear-gradient(135deg, #0b2239 0%, #153e75 40%, #0f8b71 100%);
+      height: 150px;
       position: relative;
+      background-color: #f1f5f9;
+      background-image: url('/images/profile-banner-light.png');
+      background-repeat: no-repeat;
+      background-position: center center;
       background-size: cover;
+      overflow: hidden;
+      transition: background-image 0.25s ease, height 0.2s ease;
     }
     :root[data-theme='dark'] .profile-hero-banner {
-      background: linear-gradient(135deg, #071321 0%, #0d274c 50%, #095c4b 100%);
+      background-color: #07111e;
+      background-image: url('/images/profile-banner-dark.png');
     }
 
     .profile-hero-content {
@@ -821,23 +848,28 @@
       width: 100%;
     }
     .pw-input-wrapper input {
-      padding-right: 40px;
+      padding-right: 44px;
     }
     .pw-eye-btn {
       position: absolute;
-      right: 12px;
+      right: 8px;
       top: 50%;
       transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      min-height: 32px;
+      padding: 0;
       background: none;
       border: none;
       cursor: pointer;
       color: var(--text-muted);
       font-size: 14px;
-      padding: 4px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.2s ease;
+      border-radius: 6px;
+      transition: color 0.2s ease, background 0.2s ease;
     }
     .pw-eye-btn:hover {
       color: var(--text-primary);
@@ -916,6 +948,9 @@
       .status-summary-grid {
         grid-template-columns: repeat(3, 1fr);
       }
+      .profile-hero-banner {
+        height: 130px;
+      }
       .profile-hero-content {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -965,6 +1000,9 @@
     }
 
     @media (max-width: 480px) {
+      .profile-hero-banner {
+        height: 110px;
+      }
       .status-summary-grid {
         grid-template-columns: 1fr;
       }
@@ -983,13 +1021,17 @@
   <!-- ── Sidebar ── -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div>
-          <h2>CLN Lending Suite</h2>
-          <span>Employee Workspace</span>
+      <a href="/employee/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
         </div>
-      </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Employee Workspace</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -1028,6 +1070,26 @@
         <p>Manage your account information, security settings, and preferences.</p>
       </div>
       <div class="topbar-actions">
+        <!-- Notification Bell -->
+        <div class="notif-bell-wrap" id="notif-bell-wrap">
+          <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifDropdown()" aria-label="Notifications" title="Notifications" tabindex="0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+              <path d="M10 21h4"/>
+            </svg>
+            <span id="notif-bell-badge" class="notif-badge" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown" id="notif-dropdown" role="region" aria-label="Notifications Panel">
+            <div class="notif-dd-header">
+              <div class="notif-dd-title-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+                <h4>Notifications</h4>
+              </div>
+              <button class="notif-dd-link" id="notif-mark-all" onclick="markAllRead()">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
+          </div>
+        </div>
         <div class="topbar-date-badge">
           <i class="fas fa-calendar-alt" aria-hidden="true"></i>
           <span id="current-date">Today</span>
@@ -1035,7 +1097,9 @@
       </div>
     </div>
 
-    <!-- Page Content Container -->
+    <!-- ── Page Content Container ── -->
+    <div class="page-content">
+      <div class="profile-workspace">
         <div id="force-password-banner" class="alert alert-warning" style="display:none; align-items:center; gap:14px; margin-bottom:18px; padding:14px 18px; border-left:4px solid var(--warning, #f59e0b); background:rgba(245, 158, 11, 0.12); border-radius:10px;">
           <i class="fas fa-shield-halved" style="font-size:22px; color:var(--warning, #f59e0b); flex-shrink:0;"></i>
           <div style="flex:1;">
@@ -1630,7 +1694,8 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705d"></script>
+<script src="/js/api.js?v=20261008"></script>
+<script src="/js/employee-notifications.js?v=20261003"></script>
 <script>
   'use strict';
 
@@ -1645,9 +1710,32 @@
   let isSaving = false;
   let activeTabName = 'personal';
 
+  // Calendar Date helper (pure YYYY-MM-DD, no timezone shift)
+  function formatCalendarDateInput(dateVal) {
+    if (!dateVal) return '';
+    if (typeof dateVal === 'string') {
+      const match = dateVal.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (match) return `${match[1]}-${match[2]}-${match[3]}`;
+    }
+    return '';
+  }
+
   // Format date helper
   function formatDisplayDate(dateStr) {
     if (!dateStr) return '—';
+    if (typeof dateStr === 'string') {
+      const match = dateStr.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (match) {
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const day = parseInt(match[3], 10);
+        const month = months[parseInt(match[2], 10) - 1];
+        const year = match[1];
+        return `${day} ${month} ${year}`;
+      }
+    }
+    if (typeof formatDate === 'function') {
+      return formatDate(dateStr);
+    }
     try {
       const d = new Date(dateStr);
       if (isNaN(d.getTime())) return dateStr;
@@ -1665,7 +1753,7 @@
     const e = profileData.emergency || {};
 
     if (tab === 'personal') {
-      const dob = u.date_of_birth ? u.date_of_birth.slice(0, 10) : '';
+      const dob = formatCalendarDateInput(u.date_of_birth);
       if ((document.getElementById('pi-dob')?.value || '') !== dob) return true;
       if ((document.getElementById('pi-gender')?.value || '') !== (u.gender || '')) return true;
       if ((document.getElementById('pi-city')?.value.trim() || '') !== (u.city || '')) return true;
@@ -1961,7 +2049,7 @@
       if (aadhBadge) {
         if (u.aadhaar_password_configured) {
           aadhBadge.className = 'badge-pw-status badge-pw-configured';
-          aadhBadge.innerHTML = '<i class="fas fa-check-circle"></i> Password Configured ✓';
+          aadhBadge.innerHTML = '<i class="fas fa-check-circle"></i> Password Configured';
           if (clearAadhWrap) clearAadhWrap.style.display = 'inline-flex';
         } else {
           aadhBadge.className = 'badge-pw-status badge-pw-none';
@@ -1972,7 +2060,7 @@
       if (panBadge) {
         if (u.pan_password_configured) {
           panBadge.className = 'badge-pw-status badge-pw-configured';
-          panBadge.innerHTML = '<i class="fas fa-check-circle"></i> Password Configured ✓';
+          panBadge.innerHTML = '<i class="fas fa-check-circle"></i> Password Configured';
           if (clearPanWrap) clearPanWrap.style.display = 'inline-flex';
         } else {
           panBadge.className = 'badge-pw-status badge-pw-none';
@@ -2028,7 +2116,7 @@
     document.getElementById('pi-name').value = u.name || '';
     document.getElementById('pi-phone').value = u.phone || '';
     document.getElementById('pi-email').value = u.email || '';
-    document.getElementById('pi-dob').value = u.date_of_birth ? u.date_of_birth.slice(0, 10) : '';
+    document.getElementById('pi-dob').value = formatCalendarDateInput(u.date_of_birth);
     document.getElementById('pi-gender').value = u.gender || '';
     document.getElementById('pi-city').value = u.city || '';
     document.getElementById('pi-address').value = u.address || '';
@@ -2059,7 +2147,7 @@
     const e = profileData.emergency || {};
 
     if (section === 'personal') {
-      document.getElementById('pi-dob').value = u.date_of_birth ? u.date_of_birth.slice(0, 10) : '';
+      document.getElementById('pi-dob').value = formatCalendarDateInput(u.date_of_birth);
       document.getElementById('pi-gender').value = u.gender || '';
       document.getElementById('pi-city').value = u.city || '';
       document.getElementById('pi-address').value = u.address || '';

@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — Loan Applications</title>
+  <title>Dixit Lending Solution — Loan Applications</title>
   <meta name="theme-color" content="#0f2747" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -24,7 +25,7 @@
     })();
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <style>
     /* ── Topbar Centered Header ───────────────────────────────────────── */
     .admin-page .topbar {
@@ -41,8 +42,8 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     :root[data-theme='dark'] .admin-page .topbar {
-      background: linear-gradient(90deg, rgba(9, 17, 29, 0.96) 0%, rgba(12, 24, 41, 0.94) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.16);
+      background: rgba(12, 18, 25, 0.95);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
     }
     .admin-page .topbar-title {
       position: absolute !important;
@@ -93,8 +94,8 @@
       gap: 6px;
     }
     :root[data-theme='dark'] .topbar-date-badge {
-      background: #132237;
-      border-color: rgba(151, 176, 210, 0.2);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
       color: #cbd5e1;
     }
     .topbar-date-badge i {
@@ -102,7 +103,7 @@
       font-size: 11px;
     }
     :root[data-theme='dark'] .topbar-date-badge i {
-      color: #60a5fa;
+      color: var(--accent);
     }
     @media (max-width: 900px) {
       .admin-page .topbar {
@@ -152,9 +153,9 @@
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
     :root[data-theme='dark'] .loan-overview-card {
-      background: #0d1929;
-      border-color: rgba(151, 176, 210, 0.2);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      background: rgba(16, 23, 33, 0.94);
+      border-color: rgba(123, 192, 67, 0.14);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(0, 107, 60, 0.08);
     }
     .overview-header {
       display: flex;
@@ -167,7 +168,7 @@
       flex-wrap: wrap;
     }
     :root[data-theme='dark'] .overview-header {
-      border-bottom-color: rgba(151, 176, 210, 0.15);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .overview-title-group {
       display: flex;
@@ -224,8 +225,8 @@
       transition: all 0.2s ease;
     }
     :root[data-theme='dark'] .overview-total-box {
-      background: #132237;
-      border-color: rgba(151, 176, 210, 0.22);
+      background: rgba(20, 29, 41, 0.95);
+      border-color: rgba(123, 192, 67, 0.16);
     }
     .overview-total-box:hover {
       border-color: var(--accent);
@@ -233,8 +234,8 @@
       transform: translateY(-1px);
     }
     :root[data-theme='dark'] .overview-total-box:hover {
-      border-color: #60a5fa;
-      background: #1a2f4c;
+      border-color: var(--accent);
+      background: rgba(0, 107, 60, 0.18);
     }
     .overview-total-box.active {
       border-color: var(--accent);
@@ -242,9 +243,9 @@
       box-shadow: 0 0 0 1px var(--accent);
     }
     :root[data-theme='dark'] .overview-total-box.active {
-      border-color: #60a5fa;
-      background: #1a2f4c;
-      box-shadow: 0 0 0 1px #60a5fa;
+      border-color: var(--accent);
+      background: rgba(0, 107, 60, 0.22);
+      box-shadow: 0 0 0 1px var(--accent);
     }
     .overview-total-box .total-label {
       font-size: 11px;
@@ -263,7 +264,7 @@
       line-height: 1;
     }
     :root[data-theme='dark'] .overview-total-box .total-value {
-      color: #60a5fa;
+      color: var(--accent);
     }
 
     /* ── Compact Status Items Row ─────────────────────────────────────── */
@@ -296,8 +297,8 @@
       min-width: 0;
     }
     :root[data-theme='dark'] .overview-status-item {
-      background: #132237;
-      border-color: rgba(151, 176, 210, 0.2);
+      background: rgba(20, 29, 41, 0.95);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .overview-status-item:hover {
       border-color: var(--accent);
@@ -305,8 +306,8 @@
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
     }
     :root[data-theme='dark'] .overview-status-item:hover {
-      border-color: #60a5fa;
-      background: #1a2f4c;
+      border-color: var(--accent);
+      background: rgba(0, 107, 60, 0.16);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
     .overview-status-item.active {
@@ -315,9 +316,9 @@
       box-shadow: 0 0 0 1px var(--accent);
     }
     :root[data-theme='dark'] .overview-status-item.active {
-      border-color: #60a5fa;
-      background: #1a2f4c;
-      box-shadow: 0 0 0 1px #60a5fa;
+      border-color: var(--accent);
+      background: rgba(0, 107, 60, 0.2);
+      box-shadow: 0 0 0 1px var(--accent);
     }
     .status-item-header {
       display: flex;
@@ -370,9 +371,9 @@
       transition: all 0.2s ease;
     }
     :root[data-theme='dark'] .loan-filters-card {
-      background: #0d1929;
-      border: 1px solid rgba(151, 176, 210, 0.22);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      background: rgba(16, 23, 33, 0.94);
+      border: 1px solid rgba(123, 192, 67, 0.14);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(0, 107, 60, 0.08);
     }
     .filters-card-header {
       display: flex;
@@ -384,7 +385,7 @@
       border-bottom: 1px solid var(--border);
     }
     :root[data-theme='dark'] .filters-card-header {
-      border-bottom-color: rgba(151, 176, 210, 0.15);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .filters-card-title {
       font-size: 13px;
@@ -404,7 +405,7 @@
       font-size: 13px;
     }
     :root[data-theme='dark'] .filters-card-title i {
-      color: #60a5fa;
+      color: var(--accent);
     }
 
     .filters-active-indicator {
@@ -420,9 +421,9 @@
       border: 1px solid rgba(37, 99, 235, 0.2);
     }
     :root[data-theme='dark'] .filters-active-indicator {
-      background: rgba(96, 165, 250, 0.15);
-      color: #93c5fd;
-      border-color: rgba(96, 165, 250, 0.3);
+      background: rgba(0, 107, 60, 0.18);
+      color: #6ee7b7;
+      border-color: rgba(123, 192, 67, 0.28);
     }
 
     /* Search input row */
@@ -444,7 +445,7 @@
       transition: color 0.15s ease;
     }
     :root[data-theme='dark'] .search-box-icon {
-      color: #8bb4ff;
+      color: var(--accent);
     }
     .loan-search-input {
       width: 100%;
@@ -470,17 +471,17 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
     :root[data-theme='dark'] .loan-search-input {
-      background: #132237;
-      border-color: rgba(151, 176, 210, 0.28);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
       color: #f8fafc;
     }
     :root[data-theme='dark'] .loan-search-input::placeholder {
-      color: #64748b;
+      color: #82968a;
     }
     :root[data-theme='dark'] .loan-search-input:focus {
-      border-color: #60a5fa;
-      background: #16273e;
-      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22);
+      border-color: var(--accent);
+      background: rgba(22, 33, 46, 0.98);
+      box-shadow: 0 0 0 3px rgba(0, 107, 60, 0.2);
     }
 
     .search-clear-btn {
@@ -585,16 +586,16 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
     :root[data-theme='dark'] .filter-control-item select {
-      background-color: #132237;
-      border-color: rgba(151, 176, 210, 0.28);
+      background-color: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
       color: #f8fafc;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2.2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2382968a' stroke-width='2.2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
     }
     :root[data-theme='dark'] .filter-control-item select:focus {
-      border-color: #60a5fa;
-      background-color: #16273e;
+      border-color: var(--accent);
+      background-color: rgba(22, 33, 46, 0.98);
       color: #ffffff;
-      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22);
+      box-shadow: 0 0 0 3px rgba(0, 107, 60, 0.2);
     }
 
     /* Dropdown Options styling */
@@ -604,7 +605,7 @@
       padding: 8px 12px;
     }
     :root[data-theme='dark'] .filter-control-item select option {
-      background-color: #0d1929;
+      background-color: #0c1219;
       color: #f8fafc;
       padding: 8px 12px;
     }
@@ -613,7 +614,7 @@
       color: #ffffff;
     }
     :root[data-theme='dark'] .filter-control-item select option:checked {
-      background-color: #1d4ed8;
+      background-color: #006b3c;
       color: #ffffff;
     }
 
@@ -629,7 +630,7 @@
       flex-wrap: wrap;
     }
     :root[data-theme='dark'] .filters-bottom-row {
-      border-top-color: rgba(151, 176, 210, 0.15);
+      border-top-color: rgba(123, 192, 67, 0.12);
     }
     .filters-status-summary {
       font-size: 12px;
@@ -681,14 +682,14 @@
       transform: rotate(-45deg);
     }
     :root[data-theme='dark'] .filter-reset-btn {
-      background: #172a42;
-      border-color: rgba(151, 176, 210, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(123, 192, 67, 0.2);
       color: #e2e8f0;
     }
     :root[data-theme='dark'] .filter-reset-btn:hover {
-      background: #1e3656;
-      border-color: #60a5fa;
-      color: #ffffff;
+      background: rgba(0, 107, 60, 0.2);
+      border-color: var(--accent);
+      color: #6ee7b7;
     }
 
     /* Custom Date Range Collapsible */
@@ -700,8 +701,8 @@
       border: 1px dashed var(--border);
     }
     :root[data-theme='dark'] .custom-date-container {
-      background: #091321;
-      border-color: rgba(151, 176, 210, 0.22);
+      background: rgba(12, 18, 25, 0.7);
+      border-color: rgba(123, 192, 67, 0.16);
     }
     .custom-date-row {
       display: flex;
@@ -739,8 +740,8 @@
       color-scheme: light;
     }
     :root[data-theme='dark'] .date-pick-field input[type="date"] {
-      background: #132237;
-      border-color: rgba(151, 176, 210, 0.28);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
       color: #f8fafc;
       color-scheme: dark;
     }
@@ -775,8 +776,8 @@
       margin-bottom: 24px;
     }
     :root[data-theme='dark'] .loan-records-card {
-      background: #0d1929;
-      border-color: rgba(151, 176, 210, 0.2);
+      background: rgba(16, 23, 33, 0.94);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .loan-records-header {
       display: flex;
@@ -788,7 +789,7 @@
       flex-wrap: wrap;
     }
     :root[data-theme='dark'] .loan-records-header {
-      border-bottom-color: rgba(151, 176, 210, 0.15);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .loan-records-title-group {
       min-width: 0;
@@ -977,9 +978,9 @@
       user-select: none;
     }
     :root[data-theme='dark'] .loans-data-table thead th {
-      background: #0e1b2e;
-      border-bottom-color: rgba(151, 176, 210, 0.18);
-      color: #94a3b8;
+      background: rgba(12, 18, 25, 0.98);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
+      color: #82968a;
     }
     .loans-data-table tbody td {
       padding: 12px 10px;
@@ -990,7 +991,7 @@
       white-space: nowrap;
     }
     :root[data-theme='dark'] .loans-data-table tbody td {
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      border-bottom-color: rgba(123, 192, 67, 0.08);
       color: #cbd5e1;
     }
     .loans-data-table tbody tr {
@@ -1000,7 +1001,7 @@
       background: rgba(37, 99, 235, 0.03);
     }
     :root[data-theme='dark'] .loans-data-table tbody tr:hover {
-      background: rgba(139, 180, 255, 0.04);
+      background: rgba(123, 192, 67, 0.04);
     }
 
     /* Column Widths */
@@ -1017,7 +1018,7 @@
     .col-th-upload-date, .col-td-upload-date { width: 95px; text-align: center; }
     .col-th-disb-date, .col-td-disb-date { width: 100px; text-align: center; }
     .col-th-disb-amount, .col-td-disb-amount { width: 125px; text-align: right; }
-    .col-th-actions, .col-td-actions   { width: 95px;  text-align: center; }
+    .col-th-actions, .col-td-actions   { width: 120px; min-width: 120px; text-align: center; }
 
     /* Alignments */
     .text-center { text-align: center !important; }
@@ -1108,9 +1109,9 @@
       border: 1px solid #cbd5e1;
     }
     :root[data-theme='dark'] .badge-city-pill {
-      background: #172a42;
+      background: rgba(20, 29, 41, 0.96);
       color: #cbd5e1;
-      border-color: rgba(151, 176, 210, 0.25);
+      border-color: rgba(123, 192, 67, 0.16);
     }
 
     .badge-bank-pill {
@@ -1125,9 +1126,9 @@
       letter-spacing: 0.3px;
     }
     :root[data-theme='dark'] .badge-bank-pill {
-      background: #16273e;
+      background: rgba(20, 29, 41, 0.96);
       color: #f8fafc;
-      border-color: rgba(151, 176, 210, 0.25);
+      border-color: rgba(123, 192, 67, 0.16);
     }
 
     .amount-cell-val {
@@ -1307,9 +1308,9 @@
       white-space: nowrap;
     }
     :root[data-theme='dark'] .btn-update-action {
-      background: #172a42;
-      border-color: rgba(151, 176, 210, 0.28);
-      color: #8bb4ff;
+      background: rgba(0, 107, 60, 0.16);
+      border-color: rgba(123, 192, 67, 0.28);
+      color: #6ee7b7;
     }
     .btn-update-action:hover {
       background: #2563eb;
@@ -1382,7 +1383,7 @@
       border-top: 1px solid var(--border);
     }
     :root[data-theme='dark'] .tbl-pagination {
-      border-top-color: rgba(151, 176, 210, 0.15);
+      border-top-color: rgba(123, 192, 67, 0.12);
     }
     .tbl-pg-btn {
       display: inline-flex;
@@ -1403,8 +1404,8 @@
       font-family: inherit;
     }
     :root[data-theme='dark'] .tbl-pg-btn {
-      background: #132237;
-      border-color: rgba(151, 176, 210, 0.25);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.16);
       color: #cbd5e1;
     }
     .tbl-pg-btn:hover:not(:disabled):not(.active) {
@@ -1413,9 +1414,9 @@
       color: var(--accent);
     }
     :root[data-theme='dark'] .tbl-pg-btn:hover:not(:disabled):not(.active) {
-      background: #1d3354;
-      border-color: #60a5fa;
-      color: #93c5fd;
+      background: rgba(0, 107, 60, 0.2);
+      border-color: var(--accent);
+      color: #6ee7b7;
     }
     .tbl-pg-btn.active {
       background: var(--accent);
@@ -1578,8 +1579,8 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
     :root[data-theme='dark'] .drawer-panel {
-      background: #0d1929;
-      border-color: rgba(151, 176, 210, 0.2);
+      background: rgba(16, 23, 33, 0.96);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .drawer-panel-header {
       display: flex;
@@ -1607,8 +1608,8 @@
       flex-shrink: 0;
     }
     :root[data-theme='dark'] .drawer-panel-icon {
-      background: rgba(96, 165, 250, 0.15);
-      color: #93c5fd;
+      background: rgba(0, 107, 60, 0.2);
+      color: var(--accent);
     }
     .drawer-section-title {
       font-size: 10px;
@@ -1658,7 +1659,7 @@
       font-size: 11px;
     }
     :root[data-theme='dark'] .status-field label i {
-      color: #60a5fa;
+      color: var(--accent);
     }
     .status-drawer select.form-control,
     .status-drawer input.form-control,
@@ -1671,8 +1672,8 @@
     :root[data-theme='dark'] .status-drawer select.form-control,
     :root[data-theme='dark'] .status-drawer input.form-control,
     :root[data-theme='dark'] .status-drawer textarea.form-control {
-      background: #132237;
-      border-color: rgba(151, 176, 210, 0.28);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
       color: #f8fafc;
     }
     .date-fields-grid {
@@ -1690,8 +1691,8 @@
       background: #ffffff;
     }
     :root[data-theme='dark'] .date-field-card {
-      background: #132237;
-      border-color: rgba(151, 176, 210, 0.2);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .date-field-card label {
       font-size: 11px;
@@ -1710,7 +1711,7 @@
       font-size: 11px;
     }
     :root[data-theme='dark'] .date-field-card label i {
-      color: #60a5fa;
+      color: var(--accent);
     }
 
     /* History timeline in drawer */
@@ -1739,7 +1740,7 @@
       box-shadow: 0 0 0 3px var(--bg-card);
     }
     :root[data-theme='dark'] .history-dot {
-      box-shadow: 0 0 0 3px #0d1929;
+      box-shadow: 0 0 0 3px rgba(16, 23, 33, 0.96);
     }
     .history-card {
       flex: 1;
@@ -1750,8 +1751,8 @@
       background: #ffffff;
     }
     :root[data-theme='dark'] .history-card {
-      background: #132237;
-      border-color: rgba(151, 176, 210, 0.2);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .history-card-top {
       display: flex;
@@ -1774,7 +1775,7 @@
       color: var(--text-secondary);
     }
     :root[data-theme='dark'] .history-meta-box {
-      background: #0d1929;
+      background: rgba(12, 18, 25, 0.96);
       color: #cbd5e1;
     }
     .history-meta-box span {
@@ -1813,9 +1814,9 @@
       overflow-wrap: anywhere;
     }
     :root[data-theme='dark'] .history-note {
-      background: #0d1929;
+      background: rgba(12, 18, 25, 0.96);
       color: #e2e8f0;
-      border-left-color: #60a5fa;
+      border-left-color: var(--accent);
     }
     .history-updated-by {
       margin-top: 6px;
@@ -1842,8 +1843,8 @@
       flex-shrink: 0;
     }
     :root[data-theme='dark'] .drawer-footer {
-      background: #0d1929;
-      border-top-color: rgba(151, 176, 210, 0.15);
+      background: rgba(16, 23, 33, 0.96);
+      border-top-color: rgba(123, 192, 67, 0.14);
     }
   </style>
 </head>
@@ -1851,13 +1852,17 @@
 <div class="app-layout admin-page">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div>
-          <h2>CLN Lending Suite</h2>
-          <span>Admin Console</span>
+      <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
         </div>
-      </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Admin Console</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -2306,7 +2311,7 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705c"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script>
   let currentLoanId = null;
   let deleteMode = false;

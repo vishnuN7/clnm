@@ -146,7 +146,7 @@
   --bg-secondary: #0b1627;
   --bg-card: rgba(11, 20, 34, 0.88);
   --bg-card-hover: rgba(14, 24, 41, 0.96);
-  --border: rgba(151, 176, 210, 0.18);
+  --border: rgba(123, 192, 67, 0.16);
   --border-strong: rgba(165, 188, 219, 0.28);
   --border-focus: rgba(139, 180, 255, 0.28);
   --accent: #8bb4ff;
@@ -163,7 +163,7 @@
   --shadow-soft: 0 6px 20px rgba(0, 0, 0, 0.2);
   --shadow-medium: 0 18px 38px rgba(0, 0, 0, 0.32);
   --table-row-hover: rgba(255, 255, 255, 0.04);
-  --table-row-border: rgba(151, 176, 210, 0.14);
+  --table-row-border: rgba(123, 192, 67, 0.12);
 }
 
 *, *::before, *::after {
@@ -390,7 +390,7 @@ a:hover {
 
 :root[data-theme='dark'] .login-card {
   background: linear-gradient(135deg, rgba(11, 20, 34, 0.93) 0%, rgba(7, 14, 25, 0.95) 100%);
-  border-color: rgba(151, 176, 210, 0.15);
+  border-color: rgba(123, 192, 67, 0.16);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
@@ -546,7 +546,7 @@ a:hover {
 
 :root[data-theme='dark'] .form-control {
   background: rgba(9, 17, 29, 0.88);
-  border-color: rgba(151, 176, 210, 0.18);
+  border-color: rgba(123, 192, 67, 0.16);
   color: var(--text-primary);
 }
 
@@ -719,7 +719,7 @@ a:hover {
 
 :root[data-theme='dark'] .btn-secondary {
   background: linear-gradient(135deg, rgba(139, 180, 255, 0.09) 0%, rgba(93, 212, 199, 0.05) 100%);
-  border-color: rgba(151, 176, 210, 0.16);
+  border-color: rgba(123, 192, 67, 0.16);
   color: var(--text-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
@@ -896,7 +896,7 @@ input[type="file"].form-control::file-selector-button:hover {
 
 :root[data-theme='dark'] .social-icon {
   background: linear-gradient(135deg, rgba(9, 17, 29, 0.92) 0%, rgba(14, 24, 41, 0.94) 100%);
-  border-color: rgba(151, 176, 210, 0.16);
+  border-color: rgba(123, 192, 67, 0.16);
   color: var(--text-secondary);
 }
 
@@ -1191,7 +1191,7 @@ input[type="file"].form-control::file-selector-button:hover {
 
 :root[data-theme='dark'] .topbar {
   background: linear-gradient(90deg, rgba(9, 17, 29, 0.92) 0%, rgba(12, 24, 41, 0.88) 100%);
-  border-bottom-color: rgba(151, 176, 210, 0.12);
+  border-bottom-color: rgba(123, 192, 67, 0.12);
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.25);
 }
 
@@ -1280,7 +1280,7 @@ input[type="file"].form-control::file-selector-button:hover {
 
 :root[data-theme='dark'] .stat-card {
   background: linear-gradient(135deg, rgba(10, 19, 32, 0.92) 0%, rgba(14, 25, 42, 0.96) 100%);
-  border-color: rgba(151, 176, 210, 0.14);
+  border-color: rgba(123, 192, 67, 0.12);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
 }
 
@@ -1385,7 +1385,7 @@ a:hover .stat-card .stat-label::after {
 
 :root[data-theme='dark'] .card {
   background: linear-gradient(135deg, rgba(10, 19, 32, 0.94) 0%, rgba(14, 25, 42, 0.98) 100%);
-  border-color: rgba(151, 176, 210, 0.14);
+  border-color: rgba(123, 192, 67, 0.12);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
 }
 
@@ -1413,7 +1413,7 @@ a:hover .stat-card .stat-label::after {
 
 :root[data-theme='dark'] .card-header {
   background: linear-gradient(90deg, rgba(12, 22, 36, 0.96) 0%, rgba(15, 28, 46, 0.98) 100%);
-  border-bottom-color: rgba(151, 176, 210, 0.12);
+  border-bottom-color: rgba(123, 192, 67, 0.12);
 }
 
 .card-header h3 {
@@ -1451,7 +1451,7 @@ thead th {
 :root[data-theme='dark'] thead th {
   background: linear-gradient(90deg, rgba(12, 22, 36, 0.96) 0%, rgba(15, 28, 46, 0.98) 100%);
   color: rgba(192, 204, 218, 0.78);
-  border-bottom-color: rgba(151, 176, 210, 0.12);
+  border-bottom-color: rgba(123, 192, 67, 0.12);
 }
 
 tbody tr {
@@ -1484,7 +1484,7 @@ tbody td:first-child {
 
 :root[data-theme='dark'] tbody td {
   color: var(--text-secondary);
-  border-bottom-color: rgba(151, 176, 210, 0.1);
+  border-bottom-color: rgba(123, 192, 67, 0.12);
 }
 
 :root[data-theme='dark'] tbody td:first-child {
@@ -1671,7 +1671,7 @@ tbody td:first-child {
 
 :root[data-theme='dark'] .filters-bar {
   background: linear-gradient(90deg, rgba(10, 19, 32, 0.92) 0%, rgba(14, 24, 41, 0.96) 100%);
-  border-color: rgba(151, 176, 210, 0.14);
+  border-color: rgba(123, 192, 67, 0.12);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
 }
 
@@ -1797,7 +1797,7 @@ tbody td:first-child {
 
 :root[data-theme='dark'] .modal {
   background: linear-gradient(135deg, rgba(9, 17, 29, 0.98) 0%, rgba(14, 25, 42, 0.98) 100%);
-  border-color: rgba(151, 176, 210, 0.14);
+  border-color: rgba(123, 192, 67, 0.12);
   box-shadow: 0 24px 54px rgba(0, 0, 0, 0.42);
 }
 

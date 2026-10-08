@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const geolocationService = require('../services/geolocationService');
 
 // Helper to parse date filters
 function resolveDateRange(dateRange, startDate, endDate) {
@@ -442,6 +443,13 @@ const aprController = {
           al.browser,
           al.device,
           al.os,
+          al.location_city,
+          al.location_region,
+          al.location_country,
+          al.location_country_code,
+          al.location_isp,
+          al.latitude,
+          al.longitude,
           ROUND(
             CASE 
               WHEN al.logout_time IS NOT NULL THEN TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time)
@@ -463,12 +471,82 @@ const aprController = {
 
       const [rows] = await db.query(sql, params);
 
+      // Collect IPs that need geolocation resolution (legacy or missing location fields)
+      const ipsToResolve = [];
+      for (const r of rows) {
+        const ip = r.ip_address;
+        if (!ip) continue;
+        if (geolocationService.isLocalhost(ip) || geolocationService.isPrivateIp(ip)) continue;
+        if (!r.location_country && !r.location_city) {
+          ipsToResolve.push(ip);
+        }
+      }
+
+      // Batch resolve unpopulated IPs via cache & external provider
+      let resolvedIpsMap = new Map();
+      if (ipsToResolve.length > 0) {
+        try {
+          resolvedIpsMap = await geolocationService.resolveMultipleIps(ipsToResolve);
+
+          // Asynchronously backfill unpopulated rows in attendance_logs
+          for (const [ip, geo] of resolvedIpsMap.entries()) {
+            if (geo && (geo.city || geo.region || geo.country)) {
+              db.query(
+                `UPDATE attendance_logs 
+                 SET location_city = ?, location_region = ?, location_country = ?, location_country_code = ?, location_isp = ?, latitude = ?, longitude = ?, location_source = ?, location_resolved_at = NOW() 
+                 WHERE ip_address = ? AND location_country IS NULL`,
+                [geo.city || null, geo.region || null, geo.country || null, geo.country_code || null, geo.isp || null, geo.latitude, geo.longitude, geo.source || 'batch_backfill', ip]
+              ).catch(() => {});
+            }
+          }
+        } catch (batchErr) {
+          console.warn('[APR LoginHistory] Batch GeoIP resolution error:', batchErr.message);
+        }
+      }
+
+      const formattedRows = rows.map(r => {
+        const isLocal = geolocationService.isLocalhost(r.ip_address);
+        const isPriv = geolocationService.isPrivateIp(r.ip_address);
+
+        let locStr = null;
+        let isp = r.location_isp;
+        let lat = r.latitude != null ? Number(r.latitude) : null;
+        let lon = r.longitude != null ? Number(r.longitude) : null;
+
+        if (isLocal) {
+          locStr = 'Localhost / Development';
+        } else if (isPriv) {
+          locStr = 'Private Network / LAN';
+        } else if (r.location_country || r.location_city || r.location_region) {
+          locStr = geolocationService.formatLocationName({
+            city: r.location_city,
+            region: r.location_region,
+            country: r.location_country
+          });
+        } else if (r.ip_address && resolvedIpsMap.has(r.ip_address)) {
+          const resolved = resolvedIpsMap.get(r.ip_address);
+          locStr = resolved.location;
+          isp = resolved.isp || isp;
+          lat = resolved.latitude != null ? resolved.latitude : lat;
+          lon = resolved.longitude != null ? resolved.longitude : lon;
+        } else {
+          locStr = 'Location unavailable';
+        }
+
+        return {
+          ...r,
+          location: locStr,
+          location_isp: isp,
+          latitude: lat,
+          longitude: lon,
+          is_localhost: isLocal,
+          is_private: isPriv
+        };
+      });
+
       return res.json({
         success: true,
-        data: rows.map(r => ({
-          ...r,
-          location: 'N/A' // GeoIP lookup omitted for performance
-        }))
+        data: formattedRows
       });
     } catch (err) {
       console.error('[APR LoginHistory Error]:', err.message);

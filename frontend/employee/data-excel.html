@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — My Assigned Records</title>
+  <title>Dixit Lending Solution — My Assigned Records</title>
   <meta name="description" content="Employee assigned Excel sheets — Update disposition and sub-disposition for assigned phone numbers." />
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -22,7 +23,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <style>
@@ -56,54 +57,75 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px;
+      padding: 4.5px 12px;
       border-radius: 999px;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 700;
       letter-spacing: 0.3px;
       white-space: nowrap;
       line-height: 1.2;
     }
-    .crm-badge svg {
+    .crm-badge svg,
+    .crm-badge i {
       width: 12px;
       height: 12px;
+      font-size: 11px;
       stroke-width: 2.2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .crm-badge-assigned {
       background: rgba(59, 130, 246, 0.12);
-      border: 1px solid rgba(59, 130, 246, 0.25);
+      border: 1.5px solid rgba(59, 130, 246, 0.35);
       color: #2563eb;
     }
     :root[data-theme='dark'] .crm-badge-assigned {
       color: #60a5fa;
-      border-color: rgba(96, 165, 250, 0.3);
+      border-color: rgba(96, 165, 250, 0.4);
     }
     .crm-badge-inprogress {
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.25);
+      background: rgba(245, 158, 11, 0.14);
+      border: 1.5px solid rgba(245, 158, 11, 0.4);
       color: #d97706;
     }
     :root[data-theme='dark'] .crm-badge-inprogress {
       color: #fbbf24;
-      border-color: rgba(251, 191, 36, 0.3);
+      border-color: rgba(251, 191, 36, 0.45);
     }
     .crm-badge-completed {
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      color: #059669;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1.5px solid #059669;
+      color: #047857;
     }
     :root[data-theme='dark'] .crm-badge-completed {
-      color: #34d399;
-      border-color: rgba(52, 211, 153, 0.3);
+      color: #6ee7b7;
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.26);
     }
     .crm-badge-pending {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.25);
-      color: #dc2626;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1.5px solid #d97706;
+      color: #b45309;
     }
     :root[data-theme='dark'] .crm-badge-pending {
-      color: #f87171;
-      border-color: rgba(248, 113, 113, 0.3);
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.22);
+      border-color: #f59e0b;
+    }
+    .prog-stat-completed {
+      color: #059669;
+      font-weight: 700;
+    }
+    :root[data-theme='dark'] .prog-stat-completed {
+      color: #34d399;
+    }
+    .prog-stat-pending {
+      color: #d97706;
+      font-weight: 700;
+    }
+    :root[data-theme='dark'] .prog-stat-pending {
+      color: #fbbf24;
     }
     .crm-badge-id {
       background: var(--bg-secondary);
@@ -595,22 +617,149 @@
       top: 0;
       z-index: 2;
     }
+    /* ── CRM Table Rows (Pending vs Completed States) ─────────────────── */
     table.crm-table tbody tr {
       border-bottom: 1px solid var(--border);
-      transition: background 0.15s ease;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      position: relative;
     }
     table.crm-table tbody tr:last-child {
       border-bottom: none;
     }
-    table.crm-table tbody tr:hover {
-      background: var(--table-row-hover);
+
+    /* ── Pending Row: Neutral surface with prominent solid amber left accent ── */
+    table.crm-table tbody tr.is-pending,
+    table.crm-table tbody tr.record-row.is-pending,
+    .record-row.is-pending {
+      background-color: var(--bg-card, #ffffff);
+      border-bottom: 1px solid var(--border);
     }
-    table.crm-table tbody tr.is-completed {
-      background: rgba(16, 185, 129, 0.04);
+    table.crm-table tbody tr.is-pending td:first-child,
+    table.crm-table tbody tr.record-row.is-pending td:first-child,
+    .record-row.is-pending td:first-child {
+      border-left: 3.5px solid #d97706 !important;
+      box-shadow: none !important;
     }
-    table.crm-table tbody tr.is-dirty {
-      background: rgba(245, 158, 11, 0.04);
+    table.crm-table tbody tr.is-pending:hover,
+    table.crm-table tbody tr.record-row.is-pending:hover,
+    .record-row.is-pending:hover {
+      background-color: rgba(245, 158, 11, 0.05) !important;
     }
+    table.crm-table tbody tr.is-pending .crm-row-index,
+    .record-row.is-pending .crm-row-index {
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    /* Pending Row State in Dark Mode */
+    :root[data-theme='dark'] table.crm-table tbody tr.is-pending,
+    :root[data-theme='dark'] table.crm-table tbody tr.record-row.is-pending,
+    :root[data-theme='dark'] .record-row.is-pending {
+      background-color: transparent;
+      border-bottom: 1px solid var(--border);
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-pending td:first-child,
+    :root[data-theme='dark'] table.crm-table tbody tr.record-row.is-pending td:first-child,
+    :root[data-theme='dark'] .record-row.is-pending td:first-child {
+      border-left: 3.5px solid #f59e0b !important;
+      box-shadow: none !important;
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-pending:hover,
+    :root[data-theme='dark'] table.crm-table tbody tr.record-row.is-pending:hover,
+    :root[data-theme='dark'] .record-row.is-pending:hover {
+      background-color: rgba(245, 158, 11, 0.08) !important;
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-pending .crm-row-index,
+    :root[data-theme='dark'] .record-row.is-pending .crm-row-index {
+      color: #94a3b8;
+      font-weight: 700;
+    }
+
+    /* ── Completed Row: Clearly visible soft green surface + solid emerald left accent ── */
+    table.crm-table tbody tr.is-completed,
+    table.crm-table tbody tr.record-row.is-completed,
+    .record-row.is-completed {
+      background-color: rgba(16, 185, 129, 0.12) !important;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.3) !important;
+    }
+    table.crm-table tbody tr.is-completed td:first-child,
+    table.crm-table tbody tr.record-row.is-completed td:first-child,
+    .record-row.is-completed td:first-child {
+      border-left: 3.5px solid #059669 !important;
+      box-shadow: none !important;
+    }
+    table.crm-table tbody tr.is-completed:hover,
+    table.crm-table tbody tr.record-row.is-completed:hover,
+    .record-row.is-completed:hover {
+      background-color: rgba(16, 185, 129, 0.18) !important;
+    }
+    table.crm-table tbody tr.is-completed .crm-row-index,
+    .record-row.is-completed .crm-row-index {
+      color: #047857;
+      font-weight: 800;
+    }
+
+    /* Completed Row State in Dark Mode */
+    :root[data-theme='dark'] table.crm-table tbody tr.is-completed,
+    :root[data-theme='dark'] table.crm-table tbody tr.record-row.is-completed,
+    :root[data-theme='dark'] .record-row.is-completed {
+      background-color: rgba(16, 185, 129, 0.18) !important;
+      border-bottom: 1px solid rgba(52, 211, 153, 0.35) !important;
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-completed td:first-child,
+    :root[data-theme='dark'] table.crm-table tbody tr.record-row.is-completed td:first-child,
+    :root[data-theme='dark'] .record-row.is-completed td:first-child {
+      border-left: 3.5px solid #10b981 !important;
+      box-shadow: none !important;
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-completed:hover,
+    :root[data-theme='dark'] table.crm-table tbody tr.record-row.is-completed:hover,
+    :root[data-theme='dark'] .record-row.is-completed:hover {
+      background-color: rgba(16, 185, 129, 0.25) !important;
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-completed .crm-row-index,
+    :root[data-theme='dark'] .record-row.is-completed .crm-row-index {
+      color: #34d399;
+      font-weight: 800;
+    }
+
+    /* Completed row subtle input accent */
+    table.crm-table tbody tr.is-completed .crm-table-select,
+    table.crm-table tbody tr.is-completed .crm-notes-input {
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-completed .crm-table-select,
+    :root[data-theme='dark'] table.crm-table tbody tr.is-completed .crm-notes-input {
+      border-color: rgba(52, 211, 153, 0.35);
+      background-color: rgba(15, 23, 42, 0.55);
+    }
+
+    /* Unsaved changes (dirty) row tint overlay */
+    table.crm-table tbody tr.is-dirty.is-pending {
+      background-color: rgba(245, 158, 11, 0.08) !important;
+    }
+    table.crm-table tbody tr.is-dirty.is-pending:hover {
+      background-color: rgba(245, 158, 11, 0.12) !important;
+    }
+    table.crm-table tbody tr.is-dirty.is-completed {
+      background-color: rgba(16, 185, 129, 0.15) !important;
+    }
+    table.crm-table tbody tr.is-dirty.is-completed:hover {
+      background-color: rgba(16, 185, 129, 0.22) !important;
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-dirty.is-pending {
+      background-color: rgba(245, 158, 11, 0.10) !important;
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-dirty.is-pending:hover {
+      background-color: rgba(245, 158, 11, 0.15) !important;
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-dirty.is-completed {
+      background-color: rgba(16, 185, 129, 0.22) !important;
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.is-dirty.is-completed:hover {
+      background-color: rgba(16, 185, 129, 0.28) !important;
+    }
+
     table.crm-table tbody td {
       padding: 10px 14px;
       vertical-align: middle;
@@ -670,10 +819,15 @@
       background: var(--accent-soft);
       transform: translateY(-1px);
     }
-    .crm-icon-btn svg {
+    .crm-icon-btn svg,
+    .crm-icon-btn i {
       width: 13px;
       height: 13px;
+      font-size: 12px;
       stroke-width: 2.2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .crm-icon-btn.crm-btn-call {
       color: #2563eb;
@@ -784,7 +938,7 @@
       box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
     }
 
-    /* Row Status Column & Unsaved Indicator */
+    /* Row Status Column & Saved/Unsaved Indicators */
     .crm-status-wrap {
       display: flex;
       flex-direction: column;
@@ -793,19 +947,33 @@
     }
     .crm-row-tag {
       font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
       display: inline-flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
       line-height: 1;
+      padding-left: 2px;
+    }
+    .crm-row-tag svg,
+    .crm-row-tag i {
+      font-size: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .crm-row-tag.unsaved {
       color: #d97706;
+      font-weight: 700;
+    }
+    :root[data-theme='dark'] .crm-row-tag.unsaved {
+      color: #fbbf24;
     }
     .crm-row-tag.saved {
-      color: #059669;
+      color: var(--text-muted, #64748b);
+    }
+    :root[data-theme='dark'] .crm-row-tag.saved {
+      color: #94a3b8;
     }
 
     /* Row Save Action Button */
@@ -814,31 +982,46 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 7px 14px;
+      padding: 6px 12px;
       border-radius: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      border: none;
+      font-size: 11.5px;
+      font-weight: 600;
+      border: 1px solid transparent;
       cursor: pointer;
       transition: all 0.2s ease;
       white-space: nowrap;
-      min-width: 78px;
+      min-width: 72px;
     }
-    .crm-save-btn svg {
-      width: 13px;
-      height: 13px;
+    .crm-save-btn svg,
+    .crm-save-btn i {
+      width: 12px;
+      height: 12px;
+      font-size: 11px;
       stroke-width: 2.2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
+    /* Saved / Clean state: Quiet neutral secondary button, not green badge */
     .crm-save-btn.is-clean {
-      background: rgba(16, 185, 129, 0.1);
-      color: #059669;
-      border: 1px solid rgba(16, 185, 129, 0.25);
+      background: var(--bg-secondary, #f1f5f9);
+      color: var(--text-muted, #64748b);
+      border-color: var(--border);
       cursor: default;
+      opacity: 0.85;
+      box-shadow: none;
+    }
+    .crm-save-btn.is-clean i {
+      color: var(--text-muted, #64748b);
+      font-size: 9.5px;
     }
     :root[data-theme='dark'] .crm-save-btn.is-clean {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border-color: rgba(52, 211, 153, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+      color: #94a3b8;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    :root[data-theme='dark'] .crm-save-btn.is-clean i {
+      color: #94a3b8;
     }
     .crm-save-btn.is-dirty {
       background: linear-gradient(135deg, var(--accent), #2563eb);
@@ -1578,10 +1761,17 @@
   <!-- ═══ SIDEBAR ═══ -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div><h2>CLN Lending Suite</h2><span>Employee Workspace</span></div>
-      </div>
+      <a href="/employee/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
+        </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Employee Workspace</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -1632,7 +1822,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
                 <h4>Notifications</h4>
               </div>
-              <button class="notif-dd-link" onclick="markAllRead()">Mark all read</button>
+              <button class="notif-dd-link" id="notif-mark-all" onclick="markAllRead()">Mark all read</button>
             </div>
             <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
           </div>
@@ -1773,6 +1963,10 @@
               <div class="crm-title-row">
                 <h3 class="crm-sheet-title" id="sheet-title">export-145.xlsx</h3>
                 <span class="crm-badge crm-badge-id" id="sheet-id-badge">Assignment #6</span>
+                <span class="crm-badge" id="sheet-range-badge" style="display:none; background:rgba(37,99,235,0.1); color:#2563eb; border:1px solid rgba(37,99,235,0.25); font-weight:600;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:12px; height:12px; margin-right:4px;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                  <span id="sheet-range-text"></span>
+                </span>
                 <span id="sheet-status-badge"></span>
                 <span class="crm-badge crm-badge-time" id="sheet-expiry-badge">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -2055,7 +2249,7 @@
 <div id="notif-toast" style="position:fixed;bottom:24px;right:24px;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.2);z-index:9999;display:none;align-items:center;gap:8px;"></div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705d"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
 // ── Master Disposition & Dependent Sub-Disposition Data ───────────────────
@@ -2084,6 +2278,7 @@ const DISP_OPTIONS = [
   'Pending Verification',
   'Converted',
   'Rejected',
+  'Not Eligible',
   'Other'
 ];
 
@@ -2112,6 +2307,7 @@ const SUB_DISP_MAP = {
   'Pending Verification':   ['Address Check', 'KYC Check', 'Income Check', 'Other'],
   'Converted':              ['Loan Disbursed', 'Loan Approved', 'Application Submitted', 'Other'],
   'Rejected':               ['Low CIBIL', 'Insufficient Income', 'Document Issues', 'Other'],
+  'Not Eligible':           ['Low CIBIL', 'Low Income', 'Age / Employment Criteria', 'Out of Service Area', 'Document Criteria Not Met', 'Other'],
   'Other':                  ['Custom / General', 'Callback', 'Other'],
   'default':                ['General Follow Up', 'Not Applicable', 'Other']
 };
@@ -2208,6 +2404,49 @@ function populateDispositionFilter() {
     DISP_OPTIONS.map(d => `<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
 }
 
+// ── Assignment Workspace State Persistence ────────────────────────────────
+function getAssignmentStateStorageKey() {
+  const u = (typeof getUser === 'function' ? getUser() : null) || (typeof user !== 'undefined' ? user : null);
+  const uid = u?.id || 'default';
+  return `employee_${uid}_active_assignment_state`;
+}
+
+function saveActiveAssignmentState() {
+  if (!currentAssignment || !currentAssignment.id) return;
+  const sheetView = document.getElementById('view-sheet');
+  if (sheetView && sheetView.style.display !== 'block') return;
+
+  try {
+    const searchInp = document.getElementById('crm-search-input');
+    const state = {
+      assignmentId: currentAssignment.id,
+      search: searchInp ? searchInp.value : (searchFilterText || ''),
+      statusFilter: statusFilterVal || 'all',
+      dispFilter: dispFilterVal || 'all',
+      recPage: recPage || 1,
+      recPerPage: recPerPage || 100,
+      scrollY: window.scrollY || document.documentElement.scrollTop || 0,
+      updatedAt: Date.now()
+    };
+    localStorage.setItem(getAssignmentStateStorageKey(), JSON.stringify(state));
+  } catch (err) {}
+}
+
+function clearActiveAssignmentState() {
+  try {
+    localStorage.removeItem(getAssignmentStateStorageKey());
+  } catch (err) {}
+}
+
+function getSavedAssignmentState() {
+  try {
+    const raw = localStorage.getItem(getAssignmentStateStorageKey());
+    return raw ? JSON.parse(raw) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
 // ── Init & URL Query Parameter Handling ────────────────────────────────────
 async function init() {
   await loadAssignments();
@@ -2217,8 +2456,30 @@ async function init() {
   const targetPhone = urlParams.get('phone');
   const targetRecordId = parseInt(urlParams.get('recordId'), 10);
 
-  if (targetId) {
-    await openSheet(targetId);
+  const savedState = getSavedAssignmentState();
+
+  let targetAssignmentId = targetId;
+  let restoreState = null;
+
+  if (targetAssignmentId) {
+    if (savedState && savedState.assignmentId === targetAssignmentId && !targetRecordId && !targetPhone) {
+      restoreState = savedState;
+    }
+  } else if (savedState && savedState.assignmentId) {
+    const exists = allAssignments.some(a => a.id === savedState.assignmentId);
+    if (exists || allAssignments.length === 0) {
+      targetAssignmentId = savedState.assignmentId;
+      restoreState = savedState;
+      try {
+        history.replaceState(null, '', `/employee/data-excel.html?assignmentId=${targetAssignmentId}`);
+      } catch (err) {}
+    } else {
+      clearActiveAssignmentState();
+    }
+  }
+
+  if (targetAssignmentId) {
+    await openSheet(targetAssignmentId, restoreState);
     if (targetRecordId || targetPhone) {
       setTimeout(() => {
         focusRecordInSheet(targetRecordId || null, targetPhone || null);
@@ -2311,6 +2572,7 @@ function filterAssignmentCards(filter) {
             <div class="assign-card-meta">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
               <span>Assigned: ${fmtDate(a.assigned_at)}</span>
+              ${(a.start_row && a.end_row) ? `<span style="margin:0 4px; opacity:0.4;">•</span><span style="font-weight:600; color:var(--crm-primary);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:11px;height:11px;display:inline-block;vertical-align:-1px;margin-right:3px;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Rows ${a.start_row}–${a.end_row}</span>` : ''}
             </div>
           </div>
           <span class="crm-badge ${badgeCls}">${escHtml(a.status)}</span>
@@ -2472,10 +2734,10 @@ function renderGlobalSearchResults(records, queryPhone) {
     const phoneActionsHtml = rawPhone ? `
       <div class="crm-phone-actions" style="margin-left: 8px;">
         <a href="tel:${phoneDisplay}" class="crm-icon-btn crm-btn-call" title="Call ${phoneDisplay}" aria-label="Call ${phoneDisplay}" onclick="event.stopPropagation()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <i class="fas fa-phone-alt" aria-hidden="true"></i>
         </a>
         <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="crm-icon-btn crm-btn-whatsapp" title="Message customer on WhatsApp" aria-label="Message ${phoneDisplay} on WhatsApp" onclick="event.stopPropagation()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          <i class="fab fa-whatsapp" aria-hidden="true"></i>
         </a>
       </div>
     ` : '';
@@ -2548,16 +2810,21 @@ function focusRecordInSheet(recordId, phoneNumber) {
 
   let targetIdx = -1;
   if (recordId) {
-    targetIdx = allRecords.findIndex(r => r.id === recordId);
+    targetIdx = allRecords.findIndex(r => r.id == recordId || r.row_index == recordId);
   }
   if (targetIdx === -1 && phoneNumber) {
-    targetIdx = allRecords.findIndex(r => r.phone_number === phoneNumber);
+    const cleanP = String(phoneNumber).replace(/\D/g, '');
+    targetIdx = allRecords.findIndex(r => {
+      const p = String(r.phone_number || '').replace(/\D/g, '');
+      return p && (p === cleanP || p.endsWith(cleanP) || cleanP.endsWith(p));
+    });
   }
 
   if (targetIdx !== -1) {
     recPage = Math.floor(targetIdx / recPerPage) + 1;
     allFilteredRecords = allRecords;
     renderRecordsTable();
+    saveActiveAssignmentState();
 
     const actualId = allRecords[targetIdx].id;
     setTimeout(() => {
@@ -2567,16 +2834,25 @@ function focusRecordInSheet(recordId, phoneNumber) {
         row.classList.remove('row-focused-highlight');
         void row.offsetWidth;
         row.classList.add('row-focused-highlight');
+
+        // Focus disposition select
+        const dispSelect = row.querySelector('.crm-disp-select');
+        if (dispSelect) {
+          try { dispSelect.focus(); } catch (e) {}
+        }
+
         setTimeout(() => {
           row.classList.remove('row-focused-highlight');
         }, 5000);
       }
     }, 200);
+  } else {
+    showToast('Record could not be located. It may have been completed, removed, or is no longer available.', 'error');
   }
 }
 
 // ── Open Sheet Workspace ──────────────────────────────────────────────────
-async function openSheet(assignmentId) {
+async function openSheet(assignmentId, savedFilterState = null) {
   currentAssignment = allAssignments.find(a => a.id === assignmentId);
 
   if (!currentAssignment) {
@@ -2592,6 +2868,7 @@ async function openSheet(assignmentId) {
     } catch (err) {
       const msg = err.message || 'This assignment has expired or is not accessible.';
       showToast(msg, 'error');
+      clearActiveAssignmentState();
       try { history.replaceState(null, '', '/employee/data-excel.html'); } catch (e) {}
       goBackToList();
       return;
@@ -2600,6 +2877,7 @@ async function openSheet(assignmentId) {
 
   if (!currentAssignment) {
     showToast('This assignment has expired (30-day access period ended) or does not exist.', 'error');
+    clearActiveAssignmentState();
     try { history.replaceState(null, '', '/employee/data-excel.html'); } catch (e) {}
     goBackToList();
     return;
@@ -2607,7 +2885,7 @@ async function openSheet(assignmentId) {
 
   try {
     if (window.location.search !== `?assignmentId=${assignmentId}`) {
-      history.pushState(null, '', `/employee/data-excel.html?assignmentId=${assignmentId}`);
+      history.replaceState(null, '', `/employee/data-excel.html?assignmentId=${assignmentId}`);
     }
   } catch (err) {}
 
@@ -2625,23 +2903,64 @@ async function openSheet(assignmentId) {
   document.getElementById('sheet-status-badge').innerHTML = renderStatusBadge(currentAssignment.status);
   document.getElementById('sheet-assigned-date').textContent = `Assigned: ${fmtDate(currentAssignment.assigned_at)}`;
 
-  // Reset filters
-  searchFilterText = '';
-  statusFilterVal = 'all';
-  dispFilterVal = 'all';
-  recPage = 1;
+  const rangeBadge = document.getElementById('sheet-range-badge');
+  const rangeText = document.getElementById('sheet-range-text');
+  if (rangeBadge && rangeText) {
+    if (currentAssignment.start_row && currentAssignment.end_row) {
+      rangeText.textContent = `Rows ${currentAssignment.start_row}–${currentAssignment.end_row}`;
+      rangeBadge.style.display = 'inline-flex';
+    } else {
+      rangeBadge.style.display = 'none';
+    }
+  }
+
+  // Restore or Reset filters
+  const activeState = savedFilterState || (getSavedAssignmentState()?.assignmentId === assignmentId ? getSavedAssignmentState() : null);
+
+  if (activeState) {
+    searchFilterText = (activeState.search || '').trim().toLowerCase();
+    statusFilterVal = activeState.statusFilter || 'all';
+    dispFilterVal = activeState.dispFilter || 'all';
+    recPage = activeState.recPage || 1;
+    if (activeState.recPerPage) recPerPage = activeState.recPerPage;
+  } else {
+    searchFilterText = '';
+    statusFilterVal = 'all';
+    dispFilterVal = 'all';
+    recPage = 1;
+  }
 
   const searchInp = document.getElementById('crm-search-input');
-  if (searchInp) searchInp.value = '';
+  if (searchInp) searchInp.value = activeState ? (activeState.search || '') : '';
+  const searchClearBtn = document.getElementById('crm-search-clear');
+  if (searchClearBtn) searchClearBtn.style.display = searchFilterText ? 'block' : 'none';
+
   const statusSel = document.getElementById('crm-status-filter');
-  if (statusSel) statusSel.value = 'all';
+  if (statusSel) {
+    statusSel.value = statusFilterVal;
+    statusSel.classList.toggle('is-active', statusFilterVal !== 'all');
+  }
+
   const dispSel = document.getElementById('crm-disp-filter');
-  if (dispSel) dispSel.value = 'all';
+  if (dispSel) {
+    dispSel.value = dispFilterVal;
+    dispSel.classList.toggle('is-active', dispFilterVal !== 'all');
+  }
+
   const perPageSel = document.getElementById('crm-per-page-select');
   if (perPageSel) perPageSel.value = String(recPerPage);
+
   updateClearFiltersButtonState();
 
   await loadSheetRecords();
+
+  saveActiveAssignmentState();
+
+  if (activeState && typeof activeState.scrollY === 'number' && activeState.scrollY > 0) {
+    setTimeout(() => {
+      window.scrollTo({ top: activeState.scrollY, behavior: 'auto' });
+    }, 150);
+  }
 }
 
 // ── Load Records for Sheet Workspace ──────────────────────────────────────
@@ -2675,6 +2994,7 @@ async function loadSheetRecords() {
     const msg = e.message || 'Failed to load records.';
     showToast(msg, 'error');
     if (e.assignment_expired || msg.toLowerCase().includes('expired')) {
+      clearActiveAssignmentState();
       setTimeout(() => {
         goBackToList();
         try { history.replaceState(null, '', '/employee/data-excel.html'); } catch (err) {}
@@ -2688,7 +3008,7 @@ async function loadSheetRecords() {
 // ── Recalculate Sheet KPIs & Progress ──────────────────────────────────────
 function updateSheetKPIs() {
   const total = allRecords.length;
-  const completed = allRecords.filter(r => r.status === 'Completed').length;
+  const completed = allRecords.filter(r => String(r.status || '').toLowerCase() === 'completed').length;
   const pending = total - completed;
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
@@ -2713,7 +3033,9 @@ function updateSheetKPIs() {
   if (progFill) progFill.style.width = `${pct}%`;
 
   const progCounter = document.getElementById('progress-bar-counter');
-  if (progCounter) progCounter.textContent = `${completed} of ${total} records completed (${pct}%)`;
+  if (progCounter) {
+    progCounter.innerHTML = `<span class="prog-stat-completed">${completed} completed</span> • <span class="prog-stat-pending">${pending} pending</span> of ${total} records (${pct}%)`;
+  }
 
   // Submit Bar
   const submitDesc = document.getElementById('submit-summary-desc');
@@ -2721,9 +3043,9 @@ function updateSheetKPIs() {
 
   if (submitDesc) {
     if (completed === total && total > 0) {
-      submitDesc.textContent = `All ${total} records are completed and ready for submission.`;
+      submitDesc.innerHTML = `<span class="prog-stat-completed">All ${total} records completed</span> and ready for submission.`;
     } else {
-      submitDesc.textContent = `${completed} of ${total} records completed (${pending} pending).`;
+      submitDesc.innerHTML = `<span class="prog-stat-completed">${completed} completed</span> of ${total} records (<span class="prog-stat-pending">${pending} pending</span>).`;
     }
   }
 
@@ -2731,7 +3053,7 @@ function updateSheetKPIs() {
     const canSubmit = completed === total && total > 0 && !sheetLocked;
     submitBtn.disabled = !canSubmit;
     submitBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      <i class="fas fa-paper-plane" aria-hidden="true" style="margin-right:6px;"></i>
       <span>${canSubmit ? 'Submit Completed Work' : `Submit Completed Work (${pending} pending)`}</span>
     `;
   }
@@ -2745,6 +3067,7 @@ function handleTableSearchInput(val) {
   recPage = 1;
   updateClearFiltersButtonState();
   applyFiltersAndRender();
+  saveActiveAssignmentState();
 }
 
 function clearTableSearch() {
@@ -2763,6 +3086,7 @@ function handleStatusFilterChange(val) {
   recPage = 1;
   updateClearFiltersButtonState();
   applyFiltersAndRender();
+  saveActiveAssignmentState();
 }
 
 function handleDispFilterChange(val) {
@@ -2772,12 +3096,14 @@ function handleDispFilterChange(val) {
   recPage = 1;
   updateClearFiltersButtonState();
   applyFiltersAndRender();
+  saveActiveAssignmentState();
 }
 
 function handlePerPageChange(val) {
   recPerPage = parseInt(val, 10) || 100;
   recPage = 1;
   applyFiltersAndRender();
+  saveActiveAssignmentState();
 }
 
 function clearAllFilters() {
@@ -2805,6 +3131,7 @@ function clearAllFilters() {
   updateClearFiltersButtonState();
   recPage = 1;
   applyFiltersAndRender();
+  saveActiveAssignmentState();
 }
 
 function updateClearFiltersButtonState() {
@@ -2835,7 +3162,8 @@ function applyFiltersAndRender() {
 
   // Status filter
   if (statusFilterVal !== 'all') {
-    records = records.filter(r => r.status === statusFilterVal);
+    const fLower = statusFilterVal.toLowerCase();
+    records = records.filter(r => String(r.status || '').toLowerCase() === fLower);
   }
 
   // Disposition filter
@@ -2893,7 +3221,7 @@ function buildCrmRecordRow(r) {
   const notes = pending ? pending.notes : (r.notes || '');
 
   const hasPending = !!pending;
-  const isCompleted = r.status === 'Completed';
+  const isCompleted = String(r.status || '').toLowerCase() === 'completed';
   const isSaving = savingSet.has(r.id);
   const rowLocked = sheetLocked;
 
@@ -2904,10 +3232,16 @@ function buildCrmRecordRow(r) {
     ? [subDisp, ...subOptions]
     : subOptions;
 
-  // Row Classes
-  let rowClasses = [];
-  if (isCompleted) rowClasses.push('is-completed');
-  if (hasPending) rowClasses.push('is-dirty');
+  // Explicit Row Status Classes: is-completed or is-pending (source of truth is record.status)
+  const rowClasses = ['crm-record-row', 'record-row'];
+  if (isCompleted) {
+    rowClasses.push('is-completed');
+  } else {
+    rowClasses.push('is-pending');
+  }
+  if (hasPending) {
+    rowClasses.push('is-dirty');
+  }
 
   // Phone actions
   const rawPhone = r.phone_number ? String(r.phone_number).trim() : '';
@@ -2954,30 +3288,27 @@ function buildCrmRecordRow(r) {
   const statusBadgeHtml = renderStatusBadge(r.status);
   const tagHtml = hasPending
     ? `<span class="crm-row-tag unsaved" id="tag-${r.id}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+        <i class="fas fa-pen" aria-hidden="true"></i>
         Unsaved
        </span>`
-    : `<span class="crm-row-tag saved" id="tag-${r.id}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><polyline points="20 6 9 17 4 12"/></svg>
-        Saved
-       </span>`;
+    : `<span class="crm-row-tag saved" id="tag-${r.id}">Saved</span>`;
 
   // Action Button
   let btnClass = 'crm-save-btn is-clean';
   let btnText = 'Saved';
   let btnDisabled = true;
-  let btnIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>`;
+  let btnIcon = `<i class="fas fa-check" aria-hidden="true"></i>`;
 
   if (isSaving) {
     btnClass = 'crm-save-btn is-saving';
     btnText = 'Saving...';
     btnDisabled = true;
-    btnIcon = `<span class="spinner" style="width:12px;height:12px;border:2px solid rgba(0,0,0,0.2);border-top-color:currentColor;border-radius:50%;display:inline-block;animation:spin 0.6s linear infinite;"></span>`;
+    btnIcon = `<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>`;
   } else if (hasPending) {
     btnClass = 'crm-save-btn is-dirty';
     btnText = 'Save';
     btnDisabled = false;
-    btnIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>`;
+    btnIcon = `<i class="fas fa-save" aria-hidden="true"></i>`;
   }
 
   const saveActionHtml = rowLocked
@@ -2996,13 +3327,13 @@ function buildCrmRecordRow(r) {
           ${rawPhone ? `
           <div class="crm-phone-actions">
             <a href="tel:${phoneClean}" class="crm-icon-btn crm-btn-call" title="Call ${phoneClean}" aria-label="Call ${phoneClean}" onclick="event.stopPropagation()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <i class="fas fa-phone-alt" aria-hidden="true"></i>
             </a>
             <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="crm-icon-btn crm-btn-whatsapp" title="Message customer on WhatsApp" aria-label="Message ${phoneClean} on WhatsApp" onclick="event.stopPropagation()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+              <i class="fab fa-whatsapp" aria-hidden="true"></i>
             </a>
             <button type="button" class="crm-icon-btn" onclick="event.stopPropagation(); copyPhone('${phoneClean}')" title="Copy Phone Number" aria-label="Copy phone number">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <i class="fas fa-copy" aria-hidden="true"></i>
             </button>
           </div>
           ` : ''}
@@ -3085,7 +3416,7 @@ function markRowDirty(rId) {
   if (tag) {
     tag.className = 'crm-row-tag unsaved';
     tag.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+      <i class="fas fa-pen" aria-hidden="true"></i>
       Unsaved changes
     `;
   }
@@ -3096,7 +3427,7 @@ function markRowDirty(rId) {
     btn.disabled = false;
     btn.title = 'Save record updates';
     btn.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      <i class="fas fa-save" aria-hidden="true"></i>
       <span>Save</span>
     `;
   }
@@ -3113,7 +3444,7 @@ async function saveRow(rId) {
     btn.className = 'crm-save-btn is-saving';
     btn.disabled = true;
     btn.innerHTML = `
-      <span class="spinner" style="width:12px;height:12px;border:2px solid rgba(0,0,0,0.2);border-top-color:currentColor;border-radius:50%;display:inline-block;animation:spin 0.6s linear infinite;"></span>
+      <i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>
       <span>Saving...</span>
     `;
   }
@@ -3129,22 +3460,29 @@ async function saveRow(rId) {
       })
     });
 
-    // Update memory record
+    // Update memory records (both allRecords and allFilteredRecords)
     const idx = allRecords.findIndex(r => r.id === rId);
     if (idx !== -1) {
       allRecords[idx] = { ...allRecords[idx], ...res.record };
     }
+    const fIdx = allFilteredRecords.findIndex(r => r.id === rId);
+    if (fIdx !== -1) {
+      allFilteredRecords[fIdx] = { ...allFilteredRecords[fIdx], ...res.record };
+    }
     delete pendingChanges[rId];
     savingSet.delete(rId);
 
-    // Dynamic UI updates for this row
+    // Dynamic UI updates for this row immediately reflecting backend confirmed status
     const row = document.getElementById(`rec-row-${rId}`);
+    const isCompleted = String(res.record.status || '').toLowerCase() === 'completed';
     if (row) {
       row.classList.remove('is-dirty');
-      if (res.record.status === 'Completed') {
+      if (isCompleted) {
+        row.classList.remove('is-pending');
         row.classList.add('is-completed');
       } else {
         row.classList.remove('is-completed');
+        row.classList.add('is-pending');
       }
     }
 
@@ -3156,10 +3494,7 @@ async function saveRow(rId) {
     const tag = document.getElementById(`tag-${rId}`);
     if (tag) {
       tag.className = 'crm-row-tag saved';
-      tag.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><polyline points="20 6 9 17 4 12"/></svg>
-        Saved just now
-      `;
+      tag.innerHTML = 'Saved';
     }
 
     if (btn) {
@@ -3167,13 +3502,28 @@ async function saveRow(rId) {
       btn.disabled = true;
       btn.title = 'No unsaved changes';
       btn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+        <i class="fas fa-check" aria-hidden="true"></i>
         <span>Saved</span>
       `;
     }
 
     // Instantly update KPI cards and Progress bar without full re-render
     updateSheetKPIs();
+
+    // Synchronize assignment stats in memory
+    if (currentAssignment) {
+      const compCount = allRecords.filter(r => String(r.status || '').toLowerCase() === 'completed').length;
+      currentAssignment.completed = compCount;
+      currentAssignment.pending = allRecords.length - compCount;
+      currentAssignment.completion_pct = allRecords.length > 0 ? Math.round((compCount / allRecords.length) * 100) : 0;
+      const asgnInList = allAssignments.find(a => a.id === currentAssignment.id);
+      if (asgnInList) {
+        asgnInList.completed = currentAssignment.completed;
+        asgnInList.pending = currentAssignment.pending;
+        asgnInList.completion_pct = currentAssignment.completion_pct;
+      }
+    }
+
     showToast(`Record #${res.record.row_index || rId} saved successfully.`, 'success');
 
   } catch (e) {
@@ -3254,6 +3604,7 @@ function getPaginationPageList(current, total) {
 function goRecPage(p) {
   recPage = p;
   renderRecordsTable();
+  saveActiveAssignmentState();
   const tableCard = document.querySelector('.crm-table-card');
   if (tableCard) {
     tableCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -3266,7 +3617,7 @@ function openSubmitConfirm() {
     showToast('Please save your pending row changes before submitting.', 'error');
     return;
   }
-  const completed = allRecords.filter(r => r.status === 'Completed').length;
+  const completed = allRecords.filter(r => String(r.status || '').toLowerCase() === 'completed').length;
   const total = allRecords.length;
 
   const summaryEl = document.getElementById('submit-modal-summary');
@@ -3296,6 +3647,7 @@ async function doSubmit() {
 
     await loadAssignments();
     await loadSheetRecords();
+    saveActiveAssignmentState();
   } catch (e) {
     closeModal('submit-modal');
     const msg = e.message || '';
@@ -3315,12 +3667,57 @@ function goBackToList() {
     if (!confirm('You have unsaved changes in this sheet. Are you sure you want to exit without saving?')) return;
   }
   pendingChanges = {};
+  clearActiveAssignmentState();
+  currentAssignment = null;
   document.getElementById('view-sheet').style.display = 'none';
   document.getElementById('view-list').style.display = 'block';
   try {
-    history.pushState(null, '', '/employee/data-excel.html');
+    history.replaceState(null, '', '/employee/data-excel.html');
   } catch (err) {}
 }
+
+// ── Workspace State Lifecycle & History Listeners ─────────────────────────
+let scrollSaveTimeout = null;
+window.addEventListener('scroll', () => {
+  if (currentAssignment && document.getElementById('view-sheet')?.style.display === 'block') {
+    clearTimeout(scrollSaveTimeout);
+    scrollSaveTimeout = setTimeout(() => {
+      saveActiveAssignmentState();
+    }, 300);
+  }
+}, { passive: true });
+
+window.addEventListener('pagehide', () => {
+  if (currentAssignment && document.getElementById('view-sheet')?.style.display === 'block') {
+    saveActiveAssignmentState();
+  }
+});
+
+window.addEventListener('beforeunload', (e) => {
+  if (currentAssignment && document.getElementById('view-sheet')?.style.display === 'block') {
+    saveActiveAssignmentState();
+  }
+  if (typeof pendingChanges !== 'undefined' && Object.keys(pendingChanges).length > 0) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+window.addEventListener('popstate', () => {
+  const params = new URLSearchParams(window.location.search);
+  const id = parseInt(params.get('assignmentId'), 10);
+  if (!id) {
+    if (document.getElementById('view-sheet')?.style.display === 'block') {
+      clearActiveAssignmentState();
+      pendingChanges = {};
+      currentAssignment = null;
+      document.getElementById('view-sheet').style.display = 'none';
+      document.getElementById('view-list').style.display = 'block';
+    }
+  } else if (!currentAssignment || currentAssignment.id !== id) {
+    openSheet(id);
+  }
+});
 
 // ── Helper & UI Rendering Utilities ───────────────────────────────────────
 async function apiFetch(path, opts = {}) {
@@ -3378,34 +3775,35 @@ function closeModal(id) {
 }
 
 function renderStatusBadge(status) {
-  const s = status || 'Pending';
-  if (s === 'Completed') {
+  const s = String(status || 'Pending').trim();
+  const lower = s.toLowerCase();
+  if (lower === 'completed') {
     return `
       <span class="crm-badge crm-badge-completed">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+        <i class="fas fa-check" aria-hidden="true"></i>
         Completed
       </span>
     `;
   }
-  if (s === 'In Progress') {
+  if (lower === 'in progress') {
     return `
       <span class="crm-badge crm-badge-inprogress">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <i class="fas fa-clock" aria-hidden="true"></i>
         In Progress
       </span>
     `;
   }
-  if (s === 'Assigned') {
+  if (lower === 'assigned') {
     return `
       <span class="crm-badge crm-badge-assigned">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <i class="fas fa-file-excel" aria-hidden="true"></i>
         Assigned
       </span>
     `;
   }
   return `
     <span class="crm-badge crm-badge-pending">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <i class="fas fa-circle-dot" aria-hidden="true"></i>
       Pending
     </span>
   `;

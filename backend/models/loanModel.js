@@ -121,11 +121,11 @@ const LoanModel = {
       const trimmedSearch = String(search).trim();
       const numMatch = trimmedSearch.replace(/^LN[-_]?/i, '');
       if (/^\d+$/.test(numMatch)) {
-        sql += ' AND (c.name LIKE ? OR c.phone LIKE ? OR l.id = ?)';
-        params.push(`%${trimmedSearch}%`, `%${trimmedSearch}%`, parseInt(numMatch, 10));
+        sql += ' AND (c.name LIKE ? OR c.phone LIKE ? OR c.area LIKE ? OR l.purpose LIKE ? OR l.id = ?)';
+        params.push(`%${trimmedSearch}%`, `%${trimmedSearch}%`, `%${trimmedSearch}%`, `%${trimmedSearch}%`, parseInt(numMatch, 10));
       } else {
-        sql += ' AND (c.name LIKE ? OR c.phone LIKE ?)';
-        params.push(`%${trimmedSearch}%`, `%${trimmedSearch}%`);
+        sql += ' AND (c.name LIKE ? OR c.phone LIKE ? OR c.area LIKE ? OR l.purpose LIKE ?)';
+        params.push(`%${trimmedSearch}%`, `%${trimmedSearch}%`, `%${trimmedSearch}%`, `%${trimmedSearch}%`);
       }
     }
 

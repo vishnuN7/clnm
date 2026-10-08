@@ -672,25 +672,46 @@ async function ensureSettingsTables() {
 
 async function ensureLoginHoursColumns() {
   try {
-    const [cols] = await db.query("SHOW COLUMNS FROM attendance_logs");
-    const colNames = cols.map(c => c.Field);
+    const geolocationService = require('./services/geolocationService');
+    await geolocationService.ensureCacheTable();
 
-    const colsToAdd = [
-      { name: 'ip_address', def: 'VARCHAR(45) NULL' },
-      { name: 'device',     def: 'VARCHAR(150) NULL' },
-      { name: 'browser',    def: 'VARCHAR(100) NULL' },
-      { name: 'os',         def: 'VARCHAR(100) NULL' }
+    const locCols = [
+      { name: 'ip_address',            def: 'VARCHAR(45) NULL' },
+      { name: 'device',                def: 'VARCHAR(150) NULL' },
+      { name: 'browser',               def: 'VARCHAR(100) NULL' },
+      { name: 'os',                    def: 'VARCHAR(100) NULL' },
+      { name: 'location_city',         def: 'VARCHAR(100) NULL' },
+      { name: 'location_region',       def: 'VARCHAR(100) NULL' },
+      { name: 'location_country',      def: 'VARCHAR(100) NULL' },
+      { name: 'location_country_code', def: 'VARCHAR(10) NULL' },
+      { name: 'location_isp',          def: 'VARCHAR(150) NULL' },
+      { name: 'latitude',              def: 'DECIMAL(10, 7) NULL' },
+      { name: 'longitude',             def: 'DECIMAL(10, 7) NULL' },
+      { name: 'location_source',       def: 'VARCHAR(50) NULL' },
+      { name: 'location_resolved_at',   def: 'TIMESTAMP NULL' }
     ];
 
-    for (const col of colsToAdd) {
+    const [cols] = await db.query("SHOW COLUMNS FROM attendance_logs");
+    const colNames = cols.map(c => c.Field);
+    for (const col of locCols) {
       if (!colNames.includes(col.name)) {
         await db.query(`ALTER TABLE attendance_logs ADD COLUMN ${col.name} ${col.def}`);
         console.log(`Added column '${col.name}' to 'attendance_logs' table.`);
       }
     }
-    console.log('Login Hours columns ensured on attendance_logs.');
+
+    const [loginCols] = await db.query("SHOW COLUMNS FROM login_history");
+    const loginColNames = loginCols.map(c => c.Field);
+    for (const col of locCols) {
+      if (col.name !== 'browser' && col.name !== 'os' && !loginColNames.includes(col.name)) {
+        await db.query(`ALTER TABLE login_history ADD COLUMN ${col.name} ${col.def}`);
+        console.log(`Added column '${col.name}' to 'login_history' table.`);
+      }
+    }
+
+    console.log('Login Hours and Location columns ensured on attendance_logs & login_history.');
   } catch (err) {
-    console.error('Failed to ensure Login Hours columns:', err.message);
+    console.error('Failed to ensure Login Hours and Location columns:', err.message);
   }
 }
 
@@ -749,6 +770,34 @@ async function ensureNotificationTables() {
     }
     if (!existingColNames.includes('read_at')) {
       await db.query('ALTER TABLE employee_notifications ADD COLUMN read_at TIMESTAMP NULL AFTER is_read');
+    }
+    if (!existingColNames.includes('expires_at')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN expires_at TIMESTAMP NULL AFTER read_at');
+      await db.query('UPDATE employee_notifications SET expires_at = DATE_ADD(created_at, INTERVAL 24 HOUR) WHERE expires_at IS NULL');
+    }
+    if (!existingColNames.includes('status')) {
+      await db.query("ALTER TABLE employee_notifications ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'active' AFTER expires_at");
+    }
+    if (!existingColNames.includes('priority')) {
+      await db.query("ALTER TABLE employee_notifications ADD COLUMN priority VARCHAR(20) NOT NULL DEFAULT 'normal' AFTER status");
+    }
+    if (!existingColNames.includes('entity_type')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN entity_type VARCHAR(50) NULL AFTER priority');
+    }
+    if (!existingColNames.includes('entity_id')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN entity_id INT NULL AFTER entity_type');
+    }
+    if (!existingColNames.includes('assignment_id')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN assignment_id INT NULL AFTER entity_id');
+    }
+    if (!existingColNames.includes('record_id')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN record_id INT NULL AFTER assignment_id');
+    }
+    if (!existingColNames.includes('customer_id')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN customer_id INT NULL AFTER record_id');
+    }
+    if (!existingColNames.includes('loan_id')) {
+      await db.query('ALTER TABLE employee_notifications ADD COLUMN loan_id INT NULL AFTER customer_id');
     }
 
     console.log('Notification tables initialized successfully.');

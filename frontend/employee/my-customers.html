@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Customers — CLN Employee</title>
+  <title>Dixit Lending Solution — My Customers</title>
   <meta name="theme-color" content="#5a7a52" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -22,7 +23,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     /* ── Main Customer Directory Card ── */
@@ -36,8 +37,8 @@
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
     :root[data-theme='dark'] .customer-directory-card {
-      background: rgba(10, 19, 32, 0.72);
-      border-color: rgba(151, 176, 210, 0.14);
+      background: rgba(16, 23, 33, 0.94);
+      border-color: rgba(123, 192, 67, 0.14);
       box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
     }
     /* ── Main Customer Directory Card Header ── */
@@ -50,8 +51,8 @@
       gap: 16px;
     }
     :root[data-theme='dark'] .customer-directory-header {
-      background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(10,19,32,0.4) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(16,23,33,0.6) 100%);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .customer-directory-header-top {
       display: flex;
@@ -168,13 +169,13 @@
       border-color: var(--border-strong, var(--border));
     }
     :root[data-theme='dark'] .customer-directory-actions .btn-secondary {
-      background: rgba(10, 19, 32, 0.6);
-      border-color: rgba(151, 176, 210, 0.16);
+      background: rgba(20, 29, 41, 0.95);
+      border-color: rgba(123, 192, 67, 0.16);
       color: var(--text-primary);
     }
     :root[data-theme='dark'] .customer-directory-actions .btn-secondary:hover {
-      background: rgba(14, 24, 41, 0.85);
-      border-color: rgba(151, 176, 210, 0.28);
+      background: rgba(0, 107, 60, 0.2);
+      border-color: var(--accent);
     }
     .customer-directory-actions .btn-secondary.active {
       background: rgba(239, 68, 68, 0.1) !important;
@@ -199,8 +200,8 @@
       flex-wrap: wrap;
     }
     :root[data-theme='dark'] .customer-toolbar-row {
-      background: linear-gradient(90deg, rgba(10, 19, 32, 0.88) 0%, rgba(14, 24, 41, 0.94) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      background: linear-gradient(90deg, rgba(16, 23, 33, 0.96) 0%, rgba(12, 18, 25, 0.98) 100%);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .customer-search-wrap {
       position: relative;
@@ -320,13 +321,13 @@
       border-color: var(--accent);
     }
     :root[data-theme='dark'] .btn-clear-filters {
-      background: rgba(10,19,32,0.6);
-      border-color: rgba(151,176,210,0.14);
+      background: rgba(20, 29, 41, 0.95);
+      border-color: rgba(123, 192, 67, 0.16);
     }
     :root[data-theme='dark'] .btn-clear-filters:hover {
-      background: rgba(14,24,41,0.8);
-      color: #8bb4ff;
-      border-color: #8bb4ff;
+      background: rgba(0, 107, 60, 0.2);
+      color: #6ee7b7;
+      border-color: var(--accent);
     }
 
     /* ── Custom Date Range Panel ── */
@@ -337,7 +338,7 @@
     }
     :root[data-theme='dark'] .custom-date-bar {
       background: rgba(139, 180, 255, 0.03);
-      border-bottom-color: rgba(151, 176, 210, 0.1);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .custom-date-inputs {
       display: flex;
@@ -420,8 +421,8 @@
       text-align: left;
     }
     :root[data-theme='dark'] .customer-table th {
-      background: rgba(10, 19, 32, 0.85);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      background: rgba(12, 18, 25, 0.98);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
     }
     .customer-table th.sortable-th {
       cursor: pointer;
@@ -449,7 +450,7 @@
       transition: background 0.15s ease;
     }
     :root[data-theme='dark'] .customer-table td {
-      border-bottom-color: rgba(151, 176, 210, 0.08);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .customer-table tbody tr.customer-row:hover td {
       background: var(--bg-card-hover, rgba(15, 39, 71, 0.03));
@@ -584,7 +585,7 @@
     }
     :root[data-theme='dark'] .customer-city-pill {
       background: rgba(255, 255, 255, 0.04);
-      border-color: rgba(151, 176, 210, 0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
 
     .col-added {
@@ -666,7 +667,7 @@
     }
     :root[data-theme='dark'] .btn-docs-empty {
       background: rgba(255, 255, 255, 0.04);
-      border-color: rgba(151, 176, 210, 0.12);
+      border-color: rgba(123, 192, 67, 0.12);
       color: var(--text-muted);
     }
     :root[data-theme='dark'] .btn-docs-empty:hover {
@@ -694,7 +695,8 @@
     .col-actions {
       text-align: right;
       white-space: nowrap;
-      min-width: 140px;
+      min-width: 190px;
+      width: 190px;
     }
     .customer-row-actions {
       display: inline-flex;
@@ -813,7 +815,7 @@
 
     /* Skeleton Loading State */
     .skeleton-box {
-      background: linear-gradient(90deg, rgba(151,176,210,0.12) 25%, rgba(151,176,210,0.22) 50%, rgba(151,176,210,0.12) 75%);
+      background: linear-gradient(90deg, rgba(123, 192, 67, 0.12) 25%, rgba(123, 192, 67, 0.22) 50%, rgba(123, 192, 67, 0.12) 75%);
       background-size: 200% 100%;
       animation: skeletonPulse 1.5s infinite;
       border-radius: 4px;
@@ -835,8 +837,8 @@
       background: var(--bg-card);
     }
     :root[data-theme='dark'] .tbl-pagination {
-      background: rgba(10, 19, 32, 0.6);
-      border-top-color: rgba(151, 176, 210, 0.1);
+      background: rgba(12, 18, 25, 0.95);
+      border-top-color: rgba(123, 192, 67, 0.12);
     }
     .tbl-pg-btn {
       display: inline-flex;
@@ -873,14 +875,14 @@
       pointer-events: none;
     }
     :root[data-theme='dark'] .tbl-pg-btn {
-      background: rgba(9,17,29,0.58);
-      border-color: rgba(151,176,210,0.14);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.16);
       color: var(--text-secondary);
     }
     :root[data-theme='dark'] .tbl-pg-btn:hover:not(:disabled):not(.active) {
-      background: rgba(139,180,255,0.12);
-      border-color: rgba(139,180,255,0.4);
-      color: #8bb4ff;
+      background: rgba(0, 107, 60, 0.2);
+      border-color: var(--accent);
+      color: #6ee7b7;
     }
     :root[data-theme='dark'] .tbl-pg-btn.active {
       background: var(--accent);
@@ -1093,13 +1095,13 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      border: 1px solid var(--border, rgba(151,176,210,0.18));
+      border: 1px solid var(--border, rgba(123, 192, 67, 0.16));
       background: linear-gradient(135deg, #ffffff 0%, #f8fbff 58%, #f5fbfa 100%);
       box-shadow: 0 28px 80px rgba(16,32,51,0.24);
     }
     :root[data-theme='dark'] .employee-customer-detail-modal {
-      background: linear-gradient(135deg, #0a1320 0%, #0f1c2e 58%, #0a2528 100%);
-      border-color: rgba(151,176,210,0.14);
+      background: linear-gradient(135deg, rgba(16, 23, 33, 0.98) 0%, rgba(12, 18, 25, 0.98) 58%, rgba(6, 30, 22, 0.7) 100%);
+      border-color: rgba(123, 192, 67, 0.16);
       box-shadow: 0 30px 90px rgba(0,0,0,0.48);
     }
     .employee-customer-detail-modal .modal-header {
@@ -1109,12 +1111,12 @@
       gap: 14px;
       margin: 0;
       padding: 18px 22px;
-      border-bottom: 1px solid var(--border, rgba(151,176,210,0.18));
+      border-bottom: 1px solid var(--border, rgba(123, 192, 67, 0.16));
       background: rgba(255,255,255,0.62);
     }
     :root[data-theme='dark'] .employee-customer-detail-modal .modal-header {
       background: rgba(255,255,255,0.03);
-      border-bottom-color: rgba(151,176,210,0.12);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
     }
     .employee-customer-detail-modal .modal-header h3 {
       margin: 0;
@@ -1163,7 +1165,7 @@
       place-items: center;
       padding: 0;
       border-radius: 50%;
-      border: 1px solid var(--border, rgba(151,176,210,0.18));
+      border: 1px solid var(--border, rgba(123, 192, 67, 0.16));
       background: var(--bg-card);
       color: var(--text-secondary);
       font-size: 0;
@@ -1204,7 +1206,7 @@
       gap: 15px;
       align-items: center;
       padding: 18px;
-      border: 1px solid var(--border, rgba(151,176,210,0.18));
+      border: 1px solid var(--border, rgba(123, 192, 67, 0.16));
       border-radius: 16px;
       background:
         linear-gradient(135deg, rgba(47,111,237,0.1), rgba(15,139,113,0.09)),
@@ -1213,8 +1215,8 @@
     }
     :root[data-theme='dark'] .employee-customer-hero {
       background:
-        linear-gradient(135deg, rgba(139,180,255,0.13), rgba(93,212,199,0.08)),
-        rgba(9,17,29,0.76);
+        linear-gradient(135deg, rgba(0, 107, 60, 0.15), rgba(5, 150, 105, 0.08)),
+        rgba(16, 23, 33, 0.94);
       box-shadow: 0 16px 34px rgba(0,0,0,0.26);
     }
     .employee-customer-avatar {
@@ -1266,7 +1268,7 @@
       min-height: 28px;
       padding: 5px 9px;
       border-radius: 999px;
-      border: 1px solid var(--border, rgba(151,176,210,0.18));
+      border: 1px solid var(--border, rgba(123, 192, 67, 0.16));
       background: rgba(255,255,255,0.62);
       color: var(--text-secondary);
       font-size: 12px;
@@ -1275,7 +1277,8 @@
     }
     :root[data-theme='dark'] .employee-customer-meta span,
     :root[data-theme='dark'] .employee-customer-id {
-      background: rgba(9,17,29,0.54);
+      background: rgba(20, 29, 41, 0.7);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .employee-customer-id {
       color: var(--accent, #2f6fed);
@@ -1292,15 +1295,15 @@
     .employee-customer-stat,
     .employee-customer-field,
     .employee-customer-section {
-      border: 1px solid var(--border, rgba(151,176,210,0.18));
+      border: 1px solid var(--border, rgba(123, 192, 67, 0.16));
       background: var(--bg-card);
       border-radius: 14px;
     }
     :root[data-theme='dark'] .employee-customer-stat,
     :root[data-theme='dark'] .employee-customer-field,
     :root[data-theme='dark'] .employee-customer-section {
-      background: rgba(9,17,29,0.5);
-      border-color: rgba(151,176,210,0.12);
+      background: rgba(20, 29, 41, 0.7);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .employee-customer-stat {
       min-width: 0;
@@ -1374,7 +1377,7 @@
       margin-bottom: 14px;
       padding: 11px 13px;
       border-radius: 10px;
-      border: 1px solid var(--border, rgba(151,176,210,0.18));
+      border: 1px solid var(--border, rgba(123, 192, 67, 0.16));
       background: rgba(47,111,237,0.08);
       color: var(--text-primary);
       font-size: 13px;
@@ -1396,7 +1399,7 @@
       min-height: 40px;
       margin-top: 7px;
       padding: 9px 10px;
-      border: 1px solid var(--border, rgba(151,176,210,0.18));
+      border: 1px solid var(--border, rgba(123, 192, 67, 0.16));
       border-radius: 10px;
       background: var(--bg-card);
       color: var(--text-primary);
@@ -1417,7 +1420,7 @@
     }
     :root[data-theme='dark'] .employee-customer-edit-input {
       background: rgba(255,255,255,0.045);
-      border-color: rgba(151,176,210,0.14);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .employee-customer-field.has-error {
       border-color: rgba(220,38,38,0.46);
@@ -1447,13 +1450,13 @@
       justify-content: space-between;
       gap: 12px;
       padding: 12px;
-      border: 1px solid var(--border, rgba(151,176,210,0.18));
+      border: 1px solid var(--border, rgba(123, 192, 67, 0.16));
       border-radius: 12px;
       background: rgba(255,255,255,0.58);
     }
     :root[data-theme='dark'] .employee-customer-doc-item {
       background: rgba(255,255,255,0.035);
-      border-color: rgba(151,176,210,0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .employee-customer-doc-main {
       display: flex;
@@ -1502,7 +1505,7 @@
     }
     .employee-customer-empty {
       padding: 20px;
-      border: 1px dashed var(--border-strong, rgba(151,176,210,0.28));
+      border: 1px dashed var(--border-strong, rgba(123, 192, 67, 0.22));
       border-radius: 12px;
       background: rgba(255,255,255,0.42);
       color: var(--text-secondary);
@@ -1527,7 +1530,7 @@
       justify-content: flex-end;
       margin-top: 14px;
       padding-top: 14px;
-      border-top: 1px solid var(--border, rgba(151,176,210,0.18));
+      border-top: 1px solid var(--border, rgba(123, 192, 67, 0.16));
     }
     .employee-customer-actions .btn {
       min-width: 130px;
@@ -1600,10 +1603,17 @@
 <div class="app-layout employee-page">
   <aside class="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div><h2>CLN Lending Suite</h2><span>Employee Workspace</span></div>
-      </div>
+      <a href="/employee/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
+        </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Employee Workspace</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -1654,7 +1664,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
                 <h4>Notifications</h4>
               </div>
-              <button class="notif-dd-link" onclick="markAllRead()">Mark all read</button>
+              <button class="notif-dd-link" id="notif-mark-all" onclick="markAllRead()">Mark all read</button>
             </div>
             <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
           </div>
@@ -1904,7 +1914,7 @@
   </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705d"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
   // ── State Management ─────────────────────────────────────────
@@ -1952,7 +1962,50 @@
     allCustomers = Array.isArray(res.data?.data) ? res.data.data : [];
     populateCityDropdown();
     applyCustomerFilters();
+
+    // Check URL parameters for customerId smart navigation
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetCustId = urlParams.get('customerId') || urlParams.get('customer_id') || urlParams.get('id');
+    if (targetCustId) {
+      window.focusCustomerInTable(targetCustId);
+    }
   }
+
+  // ── Smart Navigation & Target Highlighting ───────────────────
+  window.focusCustomerInTable = function(customerId) {
+    if (!customerId) return;
+    const targetId = parseInt(customerId, 10);
+    if (!targetId) return;
+
+    let idx = allFilteredCustomers.findIndex(c => Number(c.id) === targetId);
+    if (idx === -1) {
+      const existsInAll = allCustomers.some(c => Number(c.id) === targetId);
+      if (existsInAll) {
+        clearAllFilters();
+        idx = allFilteredCustomers.findIndex(c => Number(c.id) === targetId);
+      }
+    }
+
+    if (idx !== -1) {
+      customersPage = Math.floor(idx / EMP_CUSTOMERS_PER_PAGE) + 1;
+      renderCustomersPage();
+
+      setTimeout(() => {
+        const row = document.getElementById(`customer-row-${targetId}`);
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          row.classList.remove('row-focused-highlight');
+          void row.offsetWidth;
+          row.classList.add('row-focused-highlight');
+          setTimeout(() => {
+            row.classList.remove('row-focused-highlight');
+          }, 5000);
+        }
+      }, 150);
+    } else {
+      showAlert('page-alert', 'Customer could not be located. It may have been removed or is no longer available.', 'error');
+    }
+  };
 
   function renderTableSkeleton() {
     const tbody = document.getElementById('my-customers-tbody');
@@ -2361,7 +2414,7 @@
           <tr>
             <td colspan="8" style="text-align:center;padding:56px 16px;">
               <div style="display:inline-flex;flex-direction:column;align-items:center;gap:12px;max-width:380px;">
-                <div style="width:52px;height:52px;border-radius:14px;background:rgba(151,176,210,0.14);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-size:24px;">
+                <div style="width:52px;height:52px;border-radius:14px;background:rgba(123, 192, 67, 0.12);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-size:24px;">
                   <i class="fas fa-search" aria-hidden="true"></i>
                 </div>
                 <h4 style="font-size:16px;font-weight:750;color:var(--text-primary);margin:0;">No Customers Found</h4>
@@ -2394,7 +2447,7 @@
     const fullName = escapeHtml(c.name || 'Unnamed Customer');
     
     return `
-      <tr class="${isSelected ? 'row-selected' : ''}" data-customer-id="${c.id}">
+      <tr class="${isSelected ? 'row-selected' : ''}" data-customer-id="${c.id}" id="customer-row-${c.id}">
         <td class="checkbox-cell" style="display:${deleteMode ? 'table-cell' : 'none'};width:44px;text-align:center;">
           <input type="checkbox" class="customer-checkbox" value="${c.id}" ${isSelected ? 'checked' : ''} onchange="onCheckboxChange(${c.id}, this)" aria-label="Select ${fullName}" />
         </td>

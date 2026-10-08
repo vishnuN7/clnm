@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — Admin Dashboard</title>
+  <title>Dixit Lending Solution — Dashboard</title>
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -18,7 +18,8 @@
     })();
   </script>
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -33,7 +34,7 @@
     })();
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <style>
     /* ── Topbar Centered Header (Matching Customers Page) ──────────────── */
     .admin-page .topbar {
@@ -50,8 +51,8 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     :root[data-theme='dark'] .admin-page .topbar {
-      background: linear-gradient(90deg, rgba(9, 17, 29, 0.95) 0%, rgba(12, 24, 41, 0.92) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      background: rgba(12, 18, 25, 0.95);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
     }
     .admin-page .topbar-title {
       position: absolute !important;
@@ -172,14 +173,14 @@
       pointer-events: none;
     }
     :root[data-theme='dark'] .tbl-pg-btn {
-      background: rgba(9,17,29,0.58);
-      border-color: rgba(151,176,210,0.14);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.16);
       color: var(--text-secondary);
     }
     :root[data-theme='dark'] .tbl-pg-btn:hover:not(:disabled):not(.active) {
-      background: rgba(139,180,255,0.12);
-      border-color: rgba(139,180,255,0.4);
-      color: #8bb4ff;
+      background: rgba(0, 107, 60, 0.2);
+      border-color: var(--accent);
+      color: #6ee7b7;
     }
     :root[data-theme='dark'] .tbl-pg-btn.active {
       background: linear-gradient(135deg, var(--accent), #1d4ed8);
@@ -214,7 +215,7 @@
     }
     :root[data-theme='dark'] .analytics-period-filters {
       background: rgba(139,180,255,0.07);
-      border-color: rgba(151,176,210,0.14);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .analytics-period-btn {
       padding: 4px 11px;
@@ -259,8 +260,8 @@
       flex-direction: column;
     }
     :root[data-theme='dark'] .analytics-card {
-      background: linear-gradient(135deg, rgba(10,19,32,0.94) 0%, rgba(14,25,42,0.98) 100%);
-      border-color: rgba(151,176,210,0.14);
+      background: linear-gradient(135deg, rgba(16,23,33,0.95) 0%, rgba(12,18,25,0.98) 100%);
+      border-color: rgba(123,192,67,0.14);
       box-shadow: 0 12px 28px rgba(0,0,0,0.28);
     }
     .analytics-card:hover {
@@ -269,7 +270,7 @@
       transform: translateY(-4px);
     }
     :root[data-theme='dark'] .analytics-card:hover {
-      border-color: rgba(139,180,255,0.2);
+      border-color: rgba(123,192,67,0.28);
       box-shadow: 0 20px 36px rgba(0,0,0,0.34);
     }
     .analytics-card-header {
@@ -278,8 +279,8 @@
       background: linear-gradient(90deg, rgba(247,250,255,0.98) 0%, rgba(240,245,252,0.98) 100%);
     }
     :root[data-theme='dark'] .analytics-card-header {
-      background: linear-gradient(90deg, rgba(12,22,36,0.96) 0%, rgba(15,28,46,0.98) 100%);
-      border-bottom-color: rgba(151,176,210,0.12);
+      background: linear-gradient(90deg, rgba(16,23,33,0.98) 0%, rgba(14,20,30,0.98) 100%);
+      border-bottom-color: rgba(123,192,67,0.12);
     }
     .analytics-card-title {
       display: flex;
@@ -315,7 +316,7 @@
     }
     :root[data-theme='dark'] .metric-item {
       background: linear-gradient(135deg, rgba(139,180,255,0.06) 0%, transparent 100%);
-      border-color: rgba(151,176,210,0.1);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .metric-item:hover {
       border-color: var(--border-strong);
@@ -457,7 +458,8 @@
       transition: all 0.3s ease;
     }
     :root[data-theme='dark'] .status-total-badge {
-      background: rgba(10,19,32,0.7);
+      background: rgba(16,23,33,0.85);
+      border-color: rgba(123,192,67,0.14);
     }
     .status-total-label {
       font-size: 10px;
@@ -498,7 +500,8 @@
       gap: 8px;
     }
     :root[data-theme='dark'] .status-card {
-      background: rgba(10,19,32,0.6);
+      background: rgba(16,23,33,0.92);
+      border-color: rgba(123,192,67,0.14);
     }
     .status-card::before {
       content: '';
@@ -608,7 +611,8 @@
       border-radius: var(--radius-sm);
     }
     :root[data-theme='dark'] .status-other-section {
-      background: rgba(10,19,32,0.4);
+      background: rgba(16,23,33,0.6);
+      border-color: rgba(123,192,67,0.14);
     }
     .status-other-label {
       font-size: 10px;
@@ -685,7 +689,7 @@
     }
     :root[data-theme='dark'] .weekly-performance-header {
       background: linear-gradient(90deg, rgba(12,22,36,0.96) 0%, rgba(15,28,46,0.98) 100%);
-      border-bottom-color: rgba(151,176,210,0.12);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .weekly-performance-title-group {
       display: flex;
@@ -740,7 +744,7 @@
     }
     :root[data-theme='dark'] .weekly-date-pill {
       background: rgba(6,12,22,0.44);
-      border-color: rgba(151,176,210,0.13);
+      border-color: rgba(123, 192, 67, 0.12);
       box-shadow: 0 10px 22px rgba(0,0,0,0.22);
     }
     .weekly-date-pill span {
@@ -782,7 +786,7 @@
     }
     :root[data-theme='dark'] .weekly-performance-summary {
       background: rgba(255,255,255,0.02);
-      border-bottom-color: rgba(151,176,210,0.1);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .weekly-summary-item {
       min-width: 0;
@@ -793,7 +797,7 @@
     }
     :root[data-theme='dark'] .weekly-summary-item {
       background: rgba(6,12,22,0.42);
-      border-color: rgba(151,176,210,0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .weekly-summary-label {
       display: block;
@@ -1023,7 +1027,7 @@
     /* ── Employees Overview Panel ── */
     .employee-insights-card {
       margin-bottom: 24px;
-      border: 1px solid rgba(151, 176, 210, 0.22);
+      border: 1px solid rgba(123, 192, 67, 0.22);
       border-radius: 18px;
       background:
         linear-gradient(135deg, rgba(255,255,255,0.94) 0%, rgba(248,251,255,0.92) 56%, rgba(241,248,247,0.88) 100%);
@@ -1032,8 +1036,8 @@
     }
     :root[data-theme='dark'] .employee-insights-card {
       background:
-        linear-gradient(135deg, rgba(10,19,32,0.94) 0%, rgba(13,25,43,0.92) 55%, rgba(8,31,35,0.7) 100%);
-      border-color: rgba(151,176,210,0.14);
+        linear-gradient(135deg, rgba(16,23,33,0.96) 0%, rgba(12,18,25,0.95) 55%, rgba(6,30,22,0.65) 100%);
+      border-color: rgba(123,192,67,0.16);
       box-shadow: 0 24px 58px rgba(0,0,0,0.38);
     }
     .employee-insights-header {
@@ -1047,7 +1051,7 @@
     }
     :root[data-theme='dark'] .employee-insights-header {
       background: rgba(255,255,255,0.025);
-      border-bottom-color: rgba(151,176,210,0.13);
+      border-bottom-color: rgba(123,192,67,0.14);
     }
     .employee-insights-title-group,
     .employee-panel-title,
@@ -1137,7 +1141,7 @@
     :root[data-theme='dark'] .employee-roster-panel,
     :root[data-theme='dark'] .employee-detail-panel {
       background: rgba(255,255,255,0.035);
-      border-color: rgba(151,176,210,0.13);
+      border-color: rgba(123, 192, 67, 0.12);
       box-shadow: 0 16px 34px rgba(0,0,0,0.26);
     }
     .employee-panel-header,
@@ -1153,7 +1157,7 @@
     :root[data-theme='dark'] .employee-panel-header,
     :root[data-theme='dark'] .employee-detail-header {
       background: rgba(255,255,255,0.025);
-      border-bottom-color: rgba(151,176,210,0.12);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .employee-count-pill {
       flex: 0 0 auto;
@@ -1192,7 +1196,7 @@
     }
     :root[data-theme='dark'] .employee-list-item {
       background: rgba(6,12,22,0.42);
-      border-color: rgba(151,176,210,0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .employee-list-item {
       position: relative;
@@ -1241,7 +1245,7 @@
       box-shadow: 0 8px 20px rgba(16,32,51,0.14);
     }
     :root[data-theme='dark'] .employee-avatar.has-photo {
-      border-color: rgba(151,176,210,0.2);
+      border-color: rgba(123, 192, 67, 0.12);
       box-shadow: 0 10px 24px rgba(0,0,0,0.28);
     }
     .employee-avatar img {
@@ -1321,7 +1325,7 @@
     }
     :root[data-theme='dark'] .employee-selected-card {
       background: rgba(6,12,22,0.48);
-      border-color: rgba(151,176,210,0.14);
+      border-color: rgba(123, 192, 67, 0.12);
       box-shadow: 0 10px 22px rgba(0,0,0,0.24);
     }
     .employee-selected-card .employee-avatar {
@@ -1383,7 +1387,7 @@
     }
     :root[data-theme='dark'] .employee-contact-item {
       background: rgba(6,12,22,0.48);
-      border-color: rgba(151,176,210,0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .employee-contact-item span {
       display: block;
@@ -1536,7 +1540,7 @@
     }
     :root[data-theme='dark'] .employee-view-summary {
       background: rgba(6,12,22,0.42);
-      border-color: rgba(151,176,210,0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .employee-view-summary p {
       margin: 0;
@@ -1600,7 +1604,7 @@
     }
     :root[data-theme='dark'] .employee-record-empty {
       background: rgba(6,12,22,0.32);
-      border-color: rgba(151,176,210,0.2);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .employee-view-pagination {
       display: flex;
@@ -1652,7 +1656,7 @@
     }
     :root[data-theme='dark'] .employee-page-btn {
       background: rgba(6,12,22,0.58);
-      border-color: rgba(151,176,210,0.16);
+      border-color: rgba(123, 192, 67, 0.16);
     }
     :root[data-theme='dark'] .employee-page-btn.is-active {
       background: var(--color-primary);
@@ -1677,7 +1681,7 @@
     }
     :root[data-theme='dark'] .customer-detail-hero {
       background: rgba(6,12,22,0.48);
-      border-color: rgba(151,176,210,0.14);
+      border-color: rgba(123, 192, 67, 0.12);
       box-shadow: 0 10px 22px rgba(0,0,0,0.24);
     }
     .customer-detail-profile {
@@ -1749,7 +1753,7 @@
     }
     :root[data-theme='dark'] .customer-detail-stat {
       background: rgba(6,12,22,0.44);
-      border-color: rgba(151,176,210,0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .customer-detail-stat-label {
       display: block;
@@ -1779,7 +1783,7 @@
       box-shadow: 0 8px 18px rgba(16,32,51,0.05);
     }
     :root[data-theme='dark'] .customer-detail-section {
-      border-color: rgba(151,176,210,0.12);
+      border-color: rgba(123, 192, 67, 0.12);
       background: rgba(6,12,22,0.42);
       box-shadow: 0 10px 22px rgba(0,0,0,0.22);
     }
@@ -1794,7 +1798,7 @@
     }
     :root[data-theme='dark'] .customer-detail-section-header {
       background: rgba(255,255,255,0.025);
-      border-bottom-color: rgba(151,176,210,0.12);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .customer-detail-section-title {
       margin: 0;
@@ -1829,7 +1833,7 @@
     }
     :root[data-theme='dark'] .customer-document-item {
       background: rgba(6,12,22,0.42);
-      border-color: rgba(151,176,210,0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .customer-document-copy {
       min-width: 0;
@@ -1969,8 +1973,8 @@
       flex-direction: column;
     }
     :root[data-theme='dark'] .primary-kpi-card {
-      background: linear-gradient(135deg, rgba(10, 19, 32, 0.92) 0%, rgba(14, 25, 42, 0.96) 100%);
-      border-color: rgba(151, 176, 210, 0.14);
+      background: linear-gradient(135deg, rgba(16, 23, 33, 0.94) 0%, rgba(12, 18, 25, 0.98) 100%);
+      border-color: rgba(123, 192, 67, 0.14);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
     }
     .primary-kpi-card::before {
@@ -2080,8 +2084,8 @@
       text-align: center;
     }
     :root[data-theme='dark'] .status-total-box {
-      background: rgba(10, 19, 32, 0.6);
-      border-color: rgba(151, 176, 210, 0.14);
+      background: rgba(16, 23, 33, 0.9);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .status-total-box .st-total-lbl {
       font-size: 10px;
@@ -2195,7 +2199,7 @@
     }
     :root[data-theme='dark'] .status-empty-notice {
       background: rgba(139, 180, 255, 0.05);
-      border-color: rgba(151, 176, 210, 0.15);
+      border-color: rgba(123, 192, 67, 0.16);
     }
     @media (max-width: 900px) {
       .status-panel-layout {
@@ -2232,10 +2236,17 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div><h2><i class="fas fa-landmark" aria-hidden="true" style="margin-right:6px;font-size:14px;"></i>CLN Lending Suite</h2><span>Admin Console</span></div>
-      </div>
+      <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
+        </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Admin Console</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -2436,11 +2447,6 @@
               <button class="analytics-period-btn" data-period="yearly" onclick="setDashboardPeriod('yearly', this)">Yearly</button>
               <button class="analytics-period-btn" data-period="alltime" onclick="setDashboardPeriod('alltime', this)">All Time</button>
             </div>
-            <div class="analytics-period-filters" id="status-period-filters" role="group" aria-label="Status period filter">
-              <button class="analytics-period-btn active" data-period="monthly" onclick="setAnalyticsPeriod('status','monthly',this)">Monthly</button>
-              <button class="analytics-period-btn" data-period="yearly" onclick="setAnalyticsPeriod('status','yearly',this)">Yearly</button>
-              <button class="analytics-period-btn" data-period="alltime" onclick="setAnalyticsPeriod('status','alltime',this)">All Time</button>
-            </div>
           </div>
           <div class="analytics-card-body">
             <div class="status-panel-layout" id="status-breakdown">
@@ -2535,7 +2541,7 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705c"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script>
   let weeklyPage = 1;
   const WEEKLY_PER_PAGE = 20;
@@ -3467,7 +3473,7 @@
     if (emptyEl) emptyEl.style.display = 'none';
 
     const textColor = getCSSVar('--text-secondary') || '#526173';
-    const gridColor = getCSSVar('--border') || 'rgba(151,176,210,0.14)';
+    const gridColor = getCSSVar('--border') || 'rgba(123, 192, 67, 0.12)';
     const accentColor = getCSSVar('--accent-secondary') || '#2f6fed';
     const cardBg = getCSSVar('--bg-card') || 'rgba(255,255,255,0.92)';
 
@@ -3510,7 +3516,7 @@
             backgroundColor: getCSSVar('--bg-card') || '#1a2635',
             titleColor: getCSSVar('--text-primary') || '#eef4ff',
             bodyColor: getCSSVar('--text-secondary') || '#c0ccda',
-            borderColor: getCSSVar('--border') || 'rgba(151,176,210,0.18)',
+            borderColor: getCSSVar('--border') || 'rgba(123, 192, 67, 0.16)',
             borderWidth: 1,
             padding: 12,
             cornerRadius: 8,
@@ -3593,7 +3599,7 @@
           labels: ['No Loans'],
           datasets: [{
             data: [1],
-            backgroundColor: [getCSSVar('--border') || 'rgba(151,176,210,0.18)'],
+            backgroundColor: [getCSSVar('--border') || 'rgba(123, 192, 67, 0.16)'],
             borderColor: cardBg,
             borderWidth: 2,
             hoverOffset: 0
@@ -3636,7 +3642,7 @@
               backgroundColor: getCSSVar('--bg-card') || '#1a2635',
               titleColor: getCSSVar('--text-primary') || '#eef4ff',
               bodyColor: getCSSVar('--text-secondary') || '#c0ccda',
-              borderColor: getCSSVar('--border') || 'rgba(151,176,210,0.18)',
+              borderColor: getCSSVar('--border') || 'rgba(123, 192, 67, 0.16)',
               borderWidth: 1,
               padding: 10,
               cornerRadius: 8,
@@ -3761,7 +3767,7 @@
     if (loansSubEl) loansSubEl.textContent = meta.loansSub;
 
     Chart.defaults.color = getCSSVar('--text-secondary') || '#94a3b8';
-    Chart.defaults.borderColor = getCSSVar('--border') || 'rgba(151,176,210,0.14)';
+    Chart.defaults.borderColor = getCSSVar('--border') || 'rgba(123, 192, 67, 0.12)';
     Chart.defaults.font.family = "'Manrope', sans-serif";
 
     // Update Trend
@@ -3775,6 +3781,9 @@
     (loans?.statusBreakdown || []).forEach(s => statusMap[s.status] = parseInt(s.count, 10));
     renderStatusChart(statusMap, totalLoans);
   }
+  window.setAnalyticsPeriod = function(section, period, btn) {
+    return setDashboardPeriod(period, btn);
+  };
 
   function renderDashboardDate() {
     const el = document.getElementById('current-date');

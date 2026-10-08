@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — My Profile</title>
+  <title>Dixit Lending Solution — My Profile</title>
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <meta name="description" content="Manage your administrator account settings, security, notifications, and activity." />
 
   <!-- Theme initialization (prevents flash of wrong theme) -->
@@ -21,7 +23,7 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -34,7 +36,6 @@
 
     body {
       font-family: var(--font-body, 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif);
-      background: var(--bg-primary);
       color: var(--text-primary);
       margin: 0;
       padding: 0;
@@ -52,7 +53,6 @@
       display: flex;
       flex-direction: column;
       min-width: 0;
-      background: var(--bg-primary);
     }
 
     /* ── Mobile Menu & Topbar Polish ── */
@@ -85,17 +85,31 @@
 
     /* ── Page Content Container ── */
     .page-content {
-      padding: 28px 36px 48px;
-      max-width: 1280px;
-      margin: 0 auto;
+      padding: 24px;
+      flex: 1;
       width: 100%;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 900px) {
+      .page-content {
+        padding: 18px 16px;
+      }
+    }
+
+    @media (max-width: 440px) {
+      .page-content {
+        padding: 14px 12px;
+      }
     }
 
     .profile-workspace {
+      width: 100%;
+      margin: 0 auto;
+      padding-bottom: 40px;
       display: flex;
       flex-direction: column;
       gap: 24px;
-      width: 100%;
     }
 
     /* Loading State */
@@ -135,12 +149,19 @@
     }
 
     .profile-hero-banner {
-      height: 120px;
-      background: linear-gradient(135deg, #0b2239 0%, #153e75 50%, #2f6fed 100%);
+      height: 150px;
       position: relative;
+      background-color: #f1f5f9;
+      background-image: url('/images/profile-banner-light.png');
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      overflow: hidden;
+      transition: background-image 0.25s ease, height 0.2s ease;
     }
     :root[data-theme='dark'] .profile-hero-banner {
-      background: linear-gradient(135deg, #071321 0%, #0d274c 50%, #1e40af 100%);
+      background-color: #07111e;
+      background-image: url('/images/profile-banner-dark.png');
     }
 
     .profile-hero-content {
@@ -693,23 +714,28 @@
       width: 100%;
     }
     .pw-input-wrapper input {
-      padding-right: 40px;
+      padding-right: 44px;
     }
     .pw-eye-btn {
       position: absolute;
-      right: 12px;
+      right: 8px;
       top: 50%;
       transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      min-height: 32px;
+      padding: 0;
       background: none;
       border: none;
       cursor: pointer;
       color: var(--text-muted);
       font-size: 14px;
-      padding: 4px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.2s ease;
+      border-radius: 6px;
+      transition: color 0.2s ease, background 0.2s ease;
     }
     .pw-eye-btn:hover {
       color: var(--text-primary);
@@ -942,7 +968,10 @@
         padding: 0 18px;
       }
       .page-content {
-        padding: 18px 16px 36px;
+        padding: 18px 16px;
+      }
+      .profile-hero-banner {
+        height: 130px;
       }
       .profile-hero-content {
         grid-template-columns: 1fr;
@@ -978,6 +1007,9 @@
       .mobile-menu-btn {
         padding: 6px 10px;
         font-size: 12px;
+      }
+      .profile-hero-banner {
+        height: 110px;
       }
       .hero-identity-section {
         flex-direction: column;
@@ -1017,13 +1049,17 @@
   <!-- ── Admin Sidebar ── -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div>
-          <h2><i class="fas fa-landmark" aria-hidden="true" style="margin-right:6px;font-size:14px;"></i>CLN Lending Suite</h2>
-          <span>Admin Console</span>
+      <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
         </div>
-      </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Admin Console</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -1598,7 +1634,7 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705c"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script>
   'use strict';
 
@@ -1613,8 +1649,31 @@
   let isSaving = false;
   let activeTabName = 'personal';
 
+  // Calendar Date helper (pure YYYY-MM-DD, no timezone shift)
+  function formatCalendarDateInput(dateVal) {
+    if (!dateVal) return '';
+    if (typeof dateVal === 'string') {
+      const match = dateVal.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (match) return `${match[1]}-${match[2]}-${match[3]}`;
+    }
+    return '';
+  }
+
   function formatDisplayDate(dateStr) {
     if (!dateStr) return '—';
+    if (typeof dateStr === 'string') {
+      const match = dateStr.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (match) {
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const day = parseInt(match[3], 10);
+        const month = months[parseInt(match[2], 10) - 1];
+        const year = match[1];
+        return `${day} ${month} ${year}`;
+      }
+    }
+    if (typeof formatDate === 'function') {
+      return formatDate(dateStr);
+    }
     try {
       const d = new Date(dateStr);
       if (isNaN(d.getTime())) return dateStr;
@@ -1639,7 +1698,7 @@
     const u = profileData.user || {};
 
     if (tab === 'personal') {
-      const dob = u.date_of_birth ? u.date_of_birth.slice(0, 10) : '';
+      const dob = formatCalendarDateInput(u.date_of_birth);
       if ((document.getElementById('pi-dob')?.value || '') !== dob) return true;
       if ((document.getElementById('pi-gender')?.value || '') !== (u.gender || '')) return true;
       if ((document.getElementById('pi-city')?.value.trim() || '') !== (u.city || '')) return true;
@@ -1770,7 +1829,7 @@
   // ── Populate Input Fields ──
   function populateFormFields(u, n) {
     // Personal Info
-    document.getElementById('pi-dob').value         = u.date_of_birth ? u.date_of_birth.slice(0, 10) : '';
+    document.getElementById('pi-dob').value         = formatCalendarDateInput(u.date_of_birth);
     document.getElementById('pi-gender').value       = u.gender || '';
     document.getElementById('pi-city').value         = u.city || '';
     document.getElementById('pi-state').value        = u.state || '';
@@ -1807,7 +1866,7 @@
     const u = profileData.user || {};
 
     if (section === 'personal') {
-      document.getElementById('pi-dob').value         = u.date_of_birth ? u.date_of_birth.slice(0, 10) : '';
+      document.getElementById('pi-dob').value         = formatCalendarDateInput(u.date_of_birth);
       document.getElementById('pi-gender').value       = u.gender || '';
       document.getElementById('pi-city').value         = u.city || '';
       document.getElementById('pi-state').value        = u.state || '';

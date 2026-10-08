@@ -4,6 +4,7 @@ const { requireAdmin, requireEmployee, requireAuth } = require('../middleware/au
 const ctrl = require('../controllers/excelController');
 
 // ── Admin Routes ───────────────────────────────────────────────────────────
+router.post(  '/validate-file',           requireAdmin,    ctrl.uploadMiddleware, ctrl.validateFile);
 router.post(  '/upload',                  requireAdmin,    ctrl.uploadMiddleware, ctrl.uploadFile);
 router.get(   '/files',                   requireAdmin,    ctrl.getFiles);
 router.get(   '/files/:id',               requireAdmin,    ctrl.getFile);

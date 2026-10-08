@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// ── IST date helper ───────────────────────────────────────────────────────────
+// ── IST Date & Time Helper ───────────────────────────────────────────────────
 // Returns current date in YYYY-MM-DD format using Asia/Kolkata timezone
 function getTodayIST() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
@@ -8,8 +8,8 @@ function getTodayIST() {
 
 // ── Callback date / period parser ─────────────────────────────────────────────
 // Given a disposition + sub_disposition from Call Back Requested records,
-// calculates the concrete callback_date (YYYY-MM-DD) and callback_period.
-// All dates are anchored to the current IST date at the time of calling.
+// calculates concrete callback_date (YYYY-MM-DD) and callback_period.
+// All dates are anchored to current IST date at call time.
 function parseCallbackSchedule(subDisposition) {
   const sub = (subDisposition || '').toLowerCase().trim();
 
@@ -38,7 +38,7 @@ function parseCallbackSchedule(subDisposition) {
   let period = 'anytime';
 
   // Period mapping
-  if (sub.includes('morning'))   period = 'morning';
+  if (sub.includes('morning'))        period = 'morning';
   else if (sub.includes('afternoon')) period = 'afternoon';
   else if (sub.includes('evening'))   period = 'evening';
 
@@ -54,8 +54,6 @@ function parseCallbackSchedule(subDisposition) {
   } else if (sub.includes('today') || sub.includes('later today') || sub.includes('scheduled callback')) {
     callbackDate = todayIST;
   }
-  // If just a time period with no explicit day → today
-  // (morning, afternoon, evening, other)
 
   return {
     callback_date: toYMD(callbackDate),
@@ -64,15 +62,13 @@ function parseCallbackSchedule(subDisposition) {
 }
 
 // ── Callback dispositions set ─────────────────────────────────────────────────
-const CALLBACK_DISPOSITIONS = new Set(['Call Back Requested', 'call back requested']);
+const CALLBACK_DISPOSITIONS = new Set(['call back requested', 'callback requested']);
 
 function isCallbackDisposition(disposition) {
-  return CALLBACK_DISPOSITIONS.has((disposition || '').trim()) ||
-         (disposition || '').toLowerCase().trim() === 'call back requested';
+  return CALLBACK_DISPOSITIONS.has((disposition || '').toLowerCase().trim());
 }
 
 // ── Centralized Callback Period Windows (Asia/Kolkata IST) ───────────────────
-// Configured start times for each callback window:
 // Morning   = 09:00 onwards
 // Afternoon = 12:00 onwards
 // Evening   = 16:00 onwards
@@ -87,7 +83,7 @@ const CALLBACK_PERIOD_WINDOWS = {
 /**
  * Evaluates whether a notification is currently due for display.
  * Rules:
- * 1. Non-callback notifications (work_assigned, general) are always active.
+ * 1. Non-callback notifications are always active until expired.
  * 2. Completed / Cancelled callback reminders are EXCLUDED.
  * 3. Pending callback reminders are HIDDEN if:
  *    - callback_date > today (Future date e.g. Tomorrow)
@@ -97,7 +93,6 @@ const CALLBACK_PERIOD_WINDOWS = {
  *    - callback_date == today AND current_time >= callback_period_start_time (Due Today)
  */
 function isNotificationDue(n) {
-  // Non-callback notifications are always visible
   if (n.type !== 'callback_reminder') {
     return true;
   }
@@ -141,20 +136,29 @@ function isNotificationDue(n) {
   const windowConfig = CALLBACK_PERIOD_WINDOWS[periodKey] || CALLBACK_PERIOD_WINDOWS.anytime;
   const startTime = windowConfig.start;
 
-  // If current time is before window start time → HIDE until start time arrives
   if (currentHHMM < startTime) {
     return false;
   }
 
-  // Current time is inside or past the window start time → DUE TODAY (SHOW)
   return true;
 }
 
-// ── Get Notifications ─────────────────────────────────────────────────────────
+// ── GET NOTIFICATIONS (Current Authenticated Employee) ─────────────────────────
 exports.getNotifications = async (req, res) => {
   try {
     const empId = req.user.id;
 
+    // 1. Auto-mark expired notifications in database (authoritative lifecycle tracking)
+    await db.query(`
+      UPDATE employee_notifications
+      SET status = 'expired', updated_at = NOW()
+      WHERE employee_id = ?
+        AND expires_at IS NOT NULL
+        AND expires_at <= NOW()
+        AND status != 'expired'
+    `, [empId]).catch(() => {});
+
+    // 2. Fetch active, non-expired notifications for this employee only
     const [rows] = await db.query(
       `SELECT n.*,
               COALESCE(n.message, n.body) AS message_text,
@@ -168,33 +172,53 @@ exports.getNotifications = async (req, res) => {
        FROM employee_notifications n
        LEFT JOIN callback_reminders cr ON cr.notification_id = n.id
        WHERE n.employee_id = ?
+         AND (n.expires_at IS NULL OR n.expires_at > NOW())
+         AND (n.status IS NULL OR n.status != 'expired')
        ORDER BY n.created_at DESC
        LIMIT 100`,
       [empId]
     );
 
-    // Filter out notifications that are not due yet or are completed callbacks
+    // 3. Filter out callback reminders that are not due yet, and format properties
     const activeNotifications = rows.filter(isNotificationDue).map(n => {
       const isRead = Boolean(n.is_read);
       const text = n.message || n.body || n.message_text || '';
       return {
-        ...n,
-        body: text,
-        message: text,
-        is_read: isRead ? 1 : 0,
-        isRead: isRead,
+        id: n.id,
         employee_id: n.employee_id,
         employeeId: n.employee_id,
-        reference_type: n.reference_type || (n.reminder_assignment_id ? 'assignment' : null),
-        referenceType: n.reference_type || (n.reminder_assignment_id ? 'assignment' : null),
-        reference_id: n.reference_id || n.reminder_assignment_id || null,
-        referenceId: n.reference_id || n.reminder_assignment_id || null,
+        type: n.type || 'general',
+        title: n.title || 'Notification',
+        message: text,
+        body: text,
         link_url: n.link_url || null,
         linkUrl: n.link_url || null,
+        priority: n.priority || 'normal',
+        is_read: isRead ? 1 : 0,
+        isRead: isRead,
+        status: n.status || (isRead ? 'read' : 'active'),
         created_at: n.created_at,
         createdAt: n.created_at,
+        expires_at: n.expires_at,
+        expiresAt: n.expires_at,
         read_at: n.read_at || null,
-        readAt: n.read_at || null
+        readAt: n.read_at || null,
+        entity_type: n.entity_type || n.reference_type || null,
+        entity_id: n.entity_id || n.reference_id || null,
+        assignment_id: n.assignment_id || (n.reference_type === 'assignment' ? n.reference_id : null) || n.reminder_assignment_id || null,
+        record_id: n.record_id || (n.reference_type === 'record' ? n.reference_id : null) || n.reminder_record_id || null,
+        customer_id: n.customer_id || null,
+        loan_id: n.loan_id || null,
+        reference_type: n.reference_type || null,
+        reference_id: n.reference_id || null,
+        // Callback reminder metadata
+        reminder_id: n.reminder_id || null,
+        reminder_record_id: n.reminder_record_id || null,
+        reminder_assignment_id: n.reminder_assignment_id || null,
+        reminder_phone: n.reminder_phone || null,
+        callback_date: n.callback_date || null,
+        callback_period: n.callback_period || null,
+        reminder_status: n.reminder_status || null
       };
     });
 
@@ -204,15 +228,16 @@ exports.getNotifications = async (req, res) => {
       success: true,
       notifications: activeNotifications,
       unreadCount,
+      unread_count: unreadCount,
       count: unreadCount
     });
   } catch (err) {
-    console.error('[Notifications] getNotifications:', err.message);
+    console.error('[Notifications] getNotifications error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to fetch notifications.' });
   }
 };
 
-// ── Get Unread Count ──────────────────────────────────────────────────────────
+// ── GET UNREAD COUNT (Fast badge count) ────────────────────────────────────────
 exports.getUnreadCount = async (req, res) => {
   try {
     const empId = req.user.id;
@@ -225,19 +250,22 @@ exports.getUnreadCount = async (req, res) => {
               cr.status     AS reminder_status
        FROM employee_notifications n
        LEFT JOIN callback_reminders cr ON cr.notification_id = n.id
-       WHERE n.employee_id = ? AND n.is_read = 0`,
+       WHERE n.employee_id = ?
+         AND n.is_read = 0
+         AND (n.expires_at IS NULL OR n.expires_at > NOW())
+         AND (n.status IS NULL OR n.status != 'expired')`,
       [empId]
     );
 
     const count = rows.filter(isNotificationDue).length;
     res.json({ success: true, count, unreadCount: count });
   } catch (err) {
-    console.error('[Notifications] getUnreadCount:', err.message);
+    console.error('[Notifications] getUnreadCount error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to fetch unread count.' });
   }
 };
 
-// ── Mark One as Read ──────────────────────────────────────────────────────────
+// ── MARK ONE READ ─────────────────────────────────────────────────────────────
 exports.markRead = async (req, res) => {
   try {
     const empId = req.user.id;
@@ -247,35 +275,64 @@ exports.markRead = async (req, res) => {
       'SELECT id FROM employee_notifications WHERE id = ? AND employee_id = ?',
       [id, empId]
     );
-    if (!notif) return res.status(404).json({ success: false, message: 'Notification not found.' });
+    if (!notif) {
+      return res.status(404).json({ success: false, message: 'Notification not found or access denied.' });
+    }
 
     await db.query(
-      'UPDATE employee_notifications SET is_read = 1, read_at = NOW(), updated_at = NOW() WHERE id = ? AND employee_id = ?',
+      `UPDATE employee_notifications
+       SET is_read = 1,
+           read_at = NOW(),
+           status = CASE WHEN status = 'active' THEN 'read' ELSE status END,
+           updated_at = NOW()
+       WHERE id = ? AND employee_id = ?`,
       [id, empId]
     );
-    res.json({ success: true });
+
+    const [remainRows] = await db.query(
+      `SELECT COUNT(*) as unread_count
+       FROM employee_notifications
+       WHERE employee_id = ?
+         AND is_read = 0
+         AND (expires_at IS NULL OR expires_at > NOW())
+         AND (status IS NULL OR status != 'expired')`,
+      [empId]
+    );
+    const unreadCount = remainRows[0]?.unread_count || 0;
+
+    res.json({ success: true, message: 'Notification marked as read.', unreadCount, unread_count: unreadCount, count: unreadCount });
   } catch (err) {
-    console.error('[Notifications] markRead:', err.message);
+    console.error('[Notifications] markRead error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to mark notification as read.' });
   }
 };
 
-// ── Mark All as Read ──────────────────────────────────────────────────────────
+// ── MARK ALL READ ─────────────────────────────────────────────────────────────
 exports.markAllRead = async (req, res) => {
   try {
     const empId = req.user.id;
+
     await db.query(
-      'UPDATE employee_notifications SET is_read = 1, read_at = NOW(), updated_at = NOW() WHERE employee_id = ?',
+      `UPDATE employee_notifications
+       SET is_read = 1,
+           read_at = NOW(),
+           status = CASE WHEN status = 'active' THEN 'read' ELSE status END,
+           updated_at = NOW()
+       WHERE employee_id = ?
+         AND is_read = 0
+         AND (expires_at IS NULL OR expires_at > NOW())
+         AND (status IS NULL OR status != 'expired')`,
       [empId]
     );
-    res.json({ success: true });
+
+    res.json({ success: true, message: 'All active notifications marked as read.', unreadCount: 0, unread_count: 0, count: 0 });
   } catch (err) {
-    console.error('[Notifications] markAllRead:', err.message);
+    console.error('[Notifications] markAllRead error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to mark all as read.' });
   }
 };
 
-// ── Dismiss / Complete a Callback Reminder ────────────────────────────────────
+// ── DISMISS / COMPLETE A CALLBACK REMINDER ────────────────────────────────────
 exports.dismissReminder = async (req, res) => {
   try {
     const empId = req.user.id;
@@ -285,51 +342,55 @@ exports.dismissReminder = async (req, res) => {
       'SELECT id FROM employee_notifications WHERE id = ? AND employee_id = ?',
       [id, empId]
     );
-    if (!notif) return res.status(404).json({ success: false, message: 'Notification not found.' });
+    if (!notif) {
+      return res.status(404).json({ success: false, message: 'Notification not found or access denied.' });
+    }
 
     // Mark notification read
     await db.query(
-      'UPDATE employee_notifications SET is_read = 1, updated_at = NOW() WHERE id = ?',
-      [id]
+      `UPDATE employee_notifications
+       SET is_read = 1,
+           read_at = NOW(),
+           status = 'read',
+           updated_at = NOW()
+       WHERE id = ? AND employee_id = ?`,
+      [id, empId]
     );
 
-    // Mark associated reminder completed
+    // Mark associated callback reminder completed
     await db.query(
       "UPDATE callback_reminders SET status = 'completed', updated_at = NOW() WHERE notification_id = ? AND employee_id = ?",
       [id, empId]
     );
 
-    res.json({ success: true });
+    res.json({ success: true, message: 'Callback reminder dismissed.' });
   } catch (err) {
-    console.error('[Notifications] dismissReminder:', err.message);
+    console.error('[Notifications] dismissReminder error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to dismiss reminder.' });
   }
 };
 
-// ── Delete Single Notification ────────────────────────────────────────────────
+// ── DELETE SINGLE NOTIFICATION (Owner Only) ───────────────────────────────────
 exports.deleteNotification = async (req, res) => {
   try {
     const empId = req.user.id;
     const { id } = req.params;
 
-    // Verify ownership (only owner can delete)
     const [[notif]] = await db.query(
       'SELECT id FROM employee_notifications WHERE id = ? AND employee_id = ?',
       [id, empId]
     );
-
     if (!notif) {
       return res.status(404).json({ success: false, message: 'Notification not found or access denied.' });
     }
 
-    // Unlink notification_id from callback_reminders if linked (SET NULL)
-    // The underlying customer record & callback reminder remain intact!
+    // Unlink from callback_reminders if linked (SET NULL)
     await db.query(
       'UPDATE callback_reminders SET notification_id = NULL WHERE notification_id = ? AND employee_id = ?',
       [id, empId]
     );
 
-    // Permanently delete notification from DB
+    // Permanently delete notification
     await db.query(
       'DELETE FROM employee_notifications WHERE id = ? AND employee_id = ?',
       [id, empId]
@@ -337,14 +398,282 @@ exports.deleteNotification = async (req, res) => {
 
     res.json({ success: true, message: 'Notification deleted successfully.' });
   } catch (err) {
-    console.error('[Notifications] deleteNotification:', err.message);
+    console.error('[Notifications] deleteNotification error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to delete notification.' });
   }
 };
 
-// ── Internal: Create/Update Callback Reminder ────────────────────────────────
-// Called from excelController.updateRecord when disposition = Call Back Requested.
-// Prevents duplicates per (employee_id, record_id).
+// ── UNIFIED INTERNAL NOTIFICATION CREATION WITH DUPLICATE PREVENTION ──────────
+/**
+ * Creates or updates an employee notification with 24-hour expiration and duplicate prevention.
+ */
+async function createOrUpdateNotification({
+  employeeId,
+  type = 'general',
+  title,
+  message,
+  linkUrl = null,
+  priority = 'normal',
+  assignmentId = null,
+  recordId = null,
+  customerId = null,
+  loanId = null,
+  referenceType = null,
+  referenceId = null,
+  expiresInHours = 24
+}) {
+  if (!employeeId || !title || !message) return null;
+
+  try {
+    // Determine authoritative entity reference
+    const refType = referenceType || (assignmentId ? 'assignment' : (recordId ? 'record' : (customerId ? 'customer' : (loanId ? 'loan' : null))));
+    const refId   = referenceId || assignmentId || recordId || customerId || loanId || null;
+
+    // Check for an existing unread notification for the same employee, type, and reference
+    let existingQuery = `
+      SELECT id FROM employee_notifications
+      WHERE employee_id = ? AND type = ? AND is_read = 0 AND (expires_at IS NULL OR expires_at > NOW())
+    `;
+    const queryParams = [employeeId, type];
+
+    if (refType && refId) {
+      existingQuery += ` AND ((reference_type = ? AND reference_id = ?) OR (assignment_id = ? AND record_id <=> ?))`;
+      queryParams.push(refType, refId, assignmentId || null, recordId || null);
+    } else {
+      existingQuery += ` AND title = ?`;
+      queryParams.push(title);
+    }
+
+    existingQuery += ` ORDER BY id DESC LIMIT 1`;
+
+    const [[existing]] = await db.query(existingQuery, queryParams);
+
+    if (existing) {
+      // Re-use and update existing active unread notification (resets 24h expiration)
+      await db.query(
+        `UPDATE employee_notifications
+         SET title = ?, message = ?, body = ?, link_url = ?, priority = ?,
+             assignment_id = ?, record_id = ?, customer_id = ?, loan_id = ?,
+             reference_type = ?, reference_id = ?,
+             expires_at = DATE_ADD(NOW(), INTERVAL ? HOUR),
+             updated_at = NOW()
+         WHERE id = ?`,
+        [
+          title, message, message, linkUrl, priority,
+          assignmentId || null, recordId || null, customerId || null, loanId || null,
+          refType, refId,
+          expiresInHours,
+          existing.id
+        ]
+      );
+      return existing.id;
+    } else {
+      // Insert fresh active notification with exact 24h expiration
+      const [insertRes] = await db.query(
+        `INSERT INTO employee_notifications
+           (employee_id, type, title, message, body, link_url, priority,
+            assignment_id, record_id, customer_id, loan_id,
+            reference_type, reference_id, is_read, status,
+            expires_at, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'active',
+                 DATE_ADD(NOW(), INTERVAL ? HOUR), NOW(), NOW())`,
+        [
+          employeeId, type, title, message, message, linkUrl, priority,
+          assignmentId || null, recordId || null, customerId || null, loanId || null,
+          refType, refId,
+          expiresInHours
+        ]
+      );
+      return insertRes.insertId;
+    }
+  } catch (err) {
+    console.error('[Notifications] createOrUpdateNotification error:', err.message);
+    return null;
+  }
+}
+exports.createNotification = createOrUpdateNotification;
+
+// ── INTERNAL: WORK / ASSIGNMENT ASSIGNED ───────────────────────────────────────
+exports.createWorkAssignedNotification = async ({ employeeId, assignmentId, fileName, totalRecords, assignedByName }) => {
+  const title = 'New Assignment';
+  const cleanName = fileName ? String(fileName).replace(/\\/g, '/') : 'Workbook';
+  const message = `"${cleanName}" has been assigned to you. Assignment #${assignmentId || ''} · ${totalRecords || 0} records`;
+  const linkUrl = assignmentId
+    ? `/employee/data-excel.html?assignmentId=${encodeURIComponent(assignmentId)}`
+    : '/employee/data-excel.html';
+
+  return createOrUpdateNotification({
+    employeeId,
+    type: 'assignment',
+    title,
+    message,
+    linkUrl,
+    priority: 'normal',
+    assignmentId: assignmentId || null,
+    referenceType: 'assignment',
+    referenceId: assignmentId || null,
+    expiresInHours: 24
+  });
+};
+
+// ── INTERNAL: ASSIGNMENT UPDATED ──────────────────────────────────────────────
+exports.createAssignmentUpdatedNotification = async ({ fileId, status }) => {
+  try {
+    const [assignments] = await db.query(
+      `SELECT ea.id, ea.employee_id, ef.original_name
+       FROM excel_assignments ea
+       JOIN excel_files ef ON ef.id = ea.file_id
+       WHERE ea.file_id = ? AND ea.status != 'Closed'`,
+      [fileId]
+    );
+
+    for (const a of assignments) {
+      const title = 'Assignment Updated';
+      const message = `Assignment #${a.id} ("${a.original_name}") was updated to ${status}.`;
+      const linkUrl = `/employee/data-excel.html?assignmentId=${encodeURIComponent(a.id)}`;
+
+      await createOrUpdateNotification({
+        employeeId: a.employee_id,
+        type: 'assignment_updated',
+        title,
+        message,
+        linkUrl,
+        priority: 'normal',
+        assignmentId: a.id,
+        referenceType: 'assignment',
+        referenceId: a.id,
+        expiresInHours: 24
+      });
+    }
+  } catch (err) {
+    console.error('[Notifications] createAssignmentUpdatedNotification error:', err.message);
+  }
+};
+
+// ── INTERNAL: RECORD ACTION / RECORD UPDATED ──────────────────────────────────
+exports.createRecordActionNotification = async ({ employeeId, assignmentId, recordId, phoneNumber, reason }) => {
+  const title = 'Record Requires Action';
+  const phoneText = phoneNumber ? `Customer ${phoneNumber}` : `Record #${recordId}`;
+  const message = `${phoneText} is awaiting disposition in Assignment #${assignmentId}.${reason ? ' (' + reason + ')' : ''}`;
+  const linkUrl = `/employee/data-excel.html?assignmentId=${encodeURIComponent(assignmentId)}&recordId=${encodeURIComponent(recordId)}`;
+
+  return createOrUpdateNotification({
+    employeeId,
+    type: 'record',
+    title,
+    message,
+    linkUrl,
+    priority: 'important',
+    assignmentId,
+    recordId,
+    referenceType: 'record',
+    referenceId: recordId,
+    expiresInHours: 24
+  });
+};
+
+exports.createRecordUpdatedNotification = async ({ employeeId, assignmentId, phoneNumber, recordId }) => {
+  const title = 'Record Updated';
+  const message = `A customer record${phoneNumber ? ` (${phoneNumber})` : ''} in Assignment #${assignmentId} was updated.`;
+  const linkUrl = recordId
+    ? `/employee/data-excel.html?assignmentId=${encodeURIComponent(assignmentId)}&recordId=${encodeURIComponent(recordId)}`
+    : `/employee/data-excel.html?assignmentId=${encodeURIComponent(assignmentId)}`;
+
+  return createOrUpdateNotification({
+    employeeId,
+    type: 'record_updated',
+    title,
+    message,
+    linkUrl,
+    priority: 'normal',
+    assignmentId,
+    recordId: recordId || null,
+    referenceType: 'record',
+    referenceId: recordId || null,
+    expiresInHours: 24
+  });
+};
+
+// ── INTERNAL: CUSTOMER NOTIFICATION ───────────────────────────────────────────
+exports.createCustomerNotification = async ({ employeeId, customerId, customerName, type = 'customer', title = 'Customer Update', message, priority = 'normal' }) => {
+  const linkUrl = `/employee/my-customers.html?customerId=${encodeURIComponent(customerId)}`;
+  return createOrUpdateNotification({
+    employeeId,
+    type,
+    title,
+    message,
+    linkUrl,
+    priority,
+    customerId,
+    referenceType: 'customer',
+    referenceId: customerId,
+    expiresInHours: 24
+  });
+};
+
+// ── INTERNAL: LOAN NOTIFICATION ───────────────────────────────────────────────
+exports.createLoanNotification = async ({ employeeId, loanId, customerName, status, notes, type = 'loan', title, message, priority = 'normal' }) => {
+  const notifTitle = title || `Loan Application ${status || 'Update'}`;
+  const notifMsg = message || `Loan #LN-${loanId}${customerName ? ' (' + customerName + ')' : ''} status updated to ${status || 'Pending'}.${notes ? ' Remark: ' + notes : ''}`;
+  const linkUrl = `/employee/loans.html?loanId=${encodeURIComponent(loanId)}`;
+
+  return createOrUpdateNotification({
+    employeeId,
+    type,
+    title: notifTitle,
+    message: notifMsg,
+    linkUrl,
+    priority,
+    loanId,
+    referenceType: 'loan',
+    referenceId: loanId,
+    expiresInHours: 24
+  });
+};
+
+// ── INTERNAL: ASSIGNMENT EXPIRATION NOTIFICATIONS ─────────────────────────────
+exports.createAssignmentExpiringNotification = async ({ employeeId, assignmentId, fileName, hoursRemaining, recordsRemaining }) => {
+  const title = 'Assignment Expiring Soon';
+  const cleanName = fileName ? String(fileName).replace(/\\/g, '/') : 'Workbook';
+  const remainingText = recordsRemaining !== undefined ? ` · ${recordsRemaining} records remaining` : '';
+  const message = `"${cleanName}" expires in ${hoursRemaining} hour${hoursRemaining === 1 ? '' : 's'}.${remainingText}`;
+  const linkUrl = `/employee/data-excel.html?assignmentId=${encodeURIComponent(assignmentId)}`;
+
+  return createOrUpdateNotification({
+    employeeId,
+    type: 'assignment_expiring',
+    title,
+    message,
+    linkUrl,
+    priority: 'urgent',
+    assignmentId,
+    referenceType: 'assignment',
+    referenceId: assignmentId,
+    expiresInHours: 24
+  });
+};
+
+exports.createAssignmentExpiredNotification = async ({ employeeId, assignmentId, fileName }) => {
+  const title = 'Assignment Expired';
+  const cleanName = fileName ? String(fileName).replace(/\\/g, '/') : 'Workbook';
+  const message = `"${cleanName}" (Assignment #${assignmentId}) has reached the 30-day limit and is no longer accessible.`;
+  const linkUrl = '/employee/data-excel.html';
+
+  return createOrUpdateNotification({
+    employeeId,
+    type: 'assignment_expired',
+    title,
+    message,
+    linkUrl,
+    priority: 'important',
+    assignmentId,
+    referenceType: 'assignment',
+    referenceId: assignmentId,
+    expiresInHours: 24
+  });
+};
+
+// ── INTERNAL: CREATE / UPDATE CALLBACK REMINDER ───────────────────────────────
 exports.upsertCallbackReminder = async ({ employeeId, assignmentId, recordId, phoneNumber, disposition, subDisposition }) => {
   try {
     if (!isCallbackDisposition(disposition)) {
@@ -353,7 +682,7 @@ exports.upsertCallbackReminder = async ({ employeeId, assignmentId, recordId, ph
         "UPDATE callback_reminders SET status = 'cancelled', updated_at = NOW() WHERE employee_id = ? AND record_id = ? AND status = 'pending'",
         [employeeId, recordId]
       );
-      // Update the linked notification to indicate cancellation
+      // Update linked notification to indicate cancellation
       const [pendingReminders] = await db.query(
         "SELECT notification_id FROM callback_reminders WHERE employee_id = ? AND record_id = ? AND status = 'cancelled'",
         [employeeId, recordId]
@@ -361,7 +690,7 @@ exports.upsertCallbackReminder = async ({ employeeId, assignmentId, recordId, ph
       for (const r of pendingReminders) {
         if (r.notification_id) {
           await db.query(
-            "UPDATE employee_notifications SET title = 'Callback Cancelled', is_read = 0, updated_at = NOW() WHERE id = ?",
+            "UPDATE employee_notifications SET title = 'Callback Cancelled', status = 'read', is_read = 1, updated_at = NOW() WHERE id = ?",
             [r.notification_id]
           );
         }
@@ -375,6 +704,7 @@ exports.upsertCallbackReminder = async ({ employeeId, assignmentId, recordId, ph
       : callback_period === 'evening' ? 'evening'
       : '';
     const notifBody = `Call back customer ${phoneNumber}${periodLabel ? ' this ' + periodLabel : ''}.`;
+    const linkUrl = `/employee/data-excel.html?assignmentId=${encodeURIComponent(assignmentId)}&recordId=${encodeURIComponent(recordId)}`;
 
     // Check if reminder already exists for this employee + record
     const [[existing]] = await db.query(
@@ -392,16 +722,20 @@ exports.upsertCallbackReminder = async ({ employeeId, assignmentId, recordId, ph
         [callback_date, callback_period, assignmentId, phoneNumber, existing.id]
       );
 
-      // Update linked notification if it exists
       let notifId = existing.notification_id;
       if (notifId) {
         const [[nCheck]] = await db.query('SELECT id FROM employee_notifications WHERE id = ? AND employee_id = ?', [notifId, employeeId]);
         if (nCheck) {
           await db.query(
             `UPDATE employee_notifications
-             SET title = 'Customer Callback Reminder', body = ?, is_read = 0, updated_at = NOW()
+             SET title = 'Customer Callback Reminder', message = ?, body = ?,
+                 link_url = ?, priority = 'important',
+                 assignment_id = ?, record_id = ?,
+                 is_read = 0, status = 'active',
+                 expires_at = DATE_ADD(NOW(), INTERVAL 24 HOUR),
+                 updated_at = NOW()
              WHERE id = ? AND employee_id = ?`,
-            [notifBody, notifId, employeeId]
+            [notifBody, notifBody, linkUrl, assignmentId, recordId, notifId, employeeId]
           );
         } else {
           notifId = null;
@@ -409,58 +743,36 @@ exports.upsertCallbackReminder = async ({ employeeId, assignmentId, recordId, ph
       }
 
       if (!notifId) {
-        // Search for existing notification with same phone in body before inserting new
-        const [[existingNotif]] = await db.query(
-          `SELECT id FROM employee_notifications
-           WHERE employee_id = ? AND type = 'callback_reminder' AND body LIKE ?
-           ORDER BY id DESC LIMIT 1`,
-          [employeeId, `%${phoneNumber}%`]
-        );
-
-        if (existingNotif) {
-          notifId = existingNotif.id;
-          await db.query(
-            `UPDATE employee_notifications SET title = 'Customer Callback Reminder', body = ?, is_read = 0, updated_at = NOW() WHERE id = ?`,
-            [notifBody, notifId]
-          );
-        } else {
-          const linkUrl = `/employee/data-excel.html`;
-          const [notifResult] = await db.query(
-            `INSERT INTO employee_notifications (employee_id, type, title, body, link_url, is_read)
-             VALUES (?, 'callback_reminder', 'Customer Callback Reminder', ?, ?, 0)`,
-            [employeeId, notifBody, linkUrl]
-          );
-          notifId = notifResult.insertId;
-        }
+        notifId = await createOrUpdateNotification({
+          employeeId,
+          type: 'callback_reminder',
+          title: 'Customer Callback Reminder',
+          message: notifBody,
+          linkUrl,
+          priority: 'important',
+          assignmentId,
+          recordId,
+          referenceType: 'record',
+          referenceId: recordId,
+          expiresInHours: 24
+        });
         await db.query('UPDATE callback_reminders SET notification_id = ? WHERE id = ?', [notifId, existing.id]);
       }
     } else {
-      // Create or reuse notification first
-      let notifId = null;
-      const [[existingNotif]] = await db.query(
-        `SELECT id FROM employee_notifications
-         WHERE employee_id = ? AND type = 'callback_reminder' AND body LIKE ? AND is_read = 0
-         ORDER BY id DESC LIMIT 1`,
-        [employeeId, `%${phoneNumber}%`]
-      );
+      const notifId = await createOrUpdateNotification({
+        employeeId,
+        type: 'callback_reminder',
+        title: 'Customer Callback Reminder',
+        message: notifBody,
+        linkUrl,
+        priority: 'important',
+        assignmentId,
+        recordId,
+        referenceType: 'record',
+        referenceId: recordId,
+        expiresInHours: 24
+      });
 
-      if (existingNotif) {
-        notifId = existingNotif.id;
-        await db.query(
-          `UPDATE employee_notifications SET title = 'Customer Callback Reminder', body = ?, updated_at = NOW() WHERE id = ?`,
-          [notifBody, notifId]
-        );
-      } else {
-        const linkUrl = `/employee/data-excel.html`;
-        const [notifResult] = await db.query(
-          `INSERT INTO employee_notifications (employee_id, type, title, body, link_url, is_read)
-           VALUES (?, 'callback_reminder', 'Customer Callback Reminder', ?, ?, 0)`,
-          [employeeId, notifBody, linkUrl]
-        );
-        notifId = notifResult.insertId;
-      }
-
-      // Create reminder
       await db.query(
         `INSERT INTO callback_reminders
            (employee_id, assignment_id, record_id, phone_number, callback_date, callback_period, notification_id, status)
@@ -477,128 +789,48 @@ exports.upsertCallbackReminder = async ({ employeeId, assignmentId, recordId, ph
       );
     }
   } catch (err) {
-    console.error('[Notifications] upsertCallbackReminder:', err.message);
+    console.error('[Notifications] upsertCallbackReminder error:', err.message);
   }
 };
 
-// ── Internal: Create Work Assigned Notification ───────────────────────────────
-// Called from excelController.assignEmployees for each newly assigned employee.
-// Prevents duplicate notifications if admin re-assigns or saves multiple times.
-exports.createWorkAssignedNotification = async ({ employeeId, assignmentId, fileName, totalRecords, assignedByName }) => {
+// ── PERIODIC CHECK FOR EXPIRING / EXPIRED ASSIGNMENTS ─────────────────────────
+exports.checkExpiringAssignments = async () => {
   try {
-    const title = 'New Assignment';
-    const message = `"${fileName}" has been assigned to you. Assignment #${assignmentId || ''} (${totalRecords || 0} records)`;
-    const linkUrl = assignmentId
-      ? `/employee/data-excel.html?assignmentId=${assignmentId}`
-      : '/employee/data-excel.html';
+    // 1. Assignments expiring in the next 24 hours
+    const [expiring] = await db.query(`
+      SELECT ea.id as assignment_id, ea.employee_id, ea.expires_at, ef.original_name, ef.total_records,
+             (SELECT COUNT(*) FROM excel_records er WHERE er.file_id = ea.file_id AND er.updated_by = ea.employee_id AND er.status = 'Completed') as completed_count
+      FROM excel_assignments ea
+      JOIN excel_files ef ON ef.id = ea.file_id
+      WHERE ea.lifecycle_status = 'Active'
+        AND ea.expires_at IS NOT NULL
+        AND ea.expires_at > NOW()
+        AND ea.expires_at <= DATE_ADD(NOW(), INTERVAL 24 HOUR)
+    `);
 
-    // Prevent duplicate: check if an unread notification with same assignment reference or same message exists
-    const [[existing]] = await db.query(
-      `SELECT id FROM employee_notifications
-       WHERE employee_id = ? AND (
-         (type IN ('assignment', 'work_assigned') AND reference_id = ? AND is_read = 0)
-         OR (type IN ('assignment', 'work_assigned') AND (message = ? OR body = ?) AND is_read = 0)
-       )
-       ORDER BY id DESC LIMIT 1`,
-      [employeeId, assignmentId || 0, message, message]
-    );
+    for (const a of expiring) {
+      const msLeft = new Date(a.expires_at).getTime() - Date.now();
+      const hoursLeft = Math.max(1, Math.round(msLeft / (1000 * 3600)));
+      const pendingRecords = Math.max(0, (a.total_records || 0) - (a.completed_count || 0));
 
-    if (existing) {
-      await db.query(
-        `UPDATE employee_notifications
-         SET title = ?, message = ?, body = ?, link_url = ?, reference_type = 'assignment', reference_id = ?, updated_at = NOW()
-         WHERE id = ?`,
-        [title, message, message, linkUrl, assignmentId || null, existing.id]
-      );
-    } else {
-      await db.query(
-        `INSERT INTO employee_notifications
-           (employee_id, type, title, message, body, link_url, reference_type, reference_id, is_read)
-         VALUES (?, 'assignment', ?, ?, ?, ?, 'assignment', ?, 0)`,
-        [employeeId, title, message, message, linkUrl, assignmentId || null]
-      );
+      await exports.createAssignmentExpiringNotification({
+        employeeId: a.employee_id,
+        assignmentId: a.assignment_id,
+        fileName: a.original_name,
+        hoursRemaining: hoursLeft,
+        recordsRemaining: pendingRecords
+      });
     }
+
+    // 2. Mark expired notifications
+    await db.query(`
+      UPDATE employee_notifications
+      SET status = 'expired', updated_at = NOW()
+      WHERE expires_at IS NOT NULL
+        AND expires_at <= NOW()
+        AND status != 'expired'
+    `);
   } catch (err) {
-    console.error('[Notifications] createWorkAssignedNotification:', err.message);
-  }
-};
-
-// ── Internal: Create Assignment Updated Notification ──────────────────────────
-exports.createAssignmentUpdatedNotification = async ({ fileId, status }) => {
-  try {
-    const [assignments] = await db.query(
-      `SELECT ea.id, ea.employee_id, ef.original_name
-       FROM excel_assignments ea
-       JOIN excel_files ef ON ef.id = ea.file_id
-       WHERE ea.file_id = ? AND ea.status != 'Closed'`,
-      [fileId]
-    );
-
-    for (const a of assignments) {
-      const title = 'Assignment Updated';
-      const message = `Assignment #${a.id} ("${a.original_name}") was updated to ${status}.`;
-      const linkUrl = `/employee/data-excel.html?assignmentId=${a.id}`;
-
-      // Prevent duplicate unread update notification for same assignment
-      const [[existing]] = await db.query(
-        `SELECT id FROM employee_notifications
-         WHERE employee_id = ? AND type = 'assignment_updated' AND reference_id = ? AND is_read = 0
-         ORDER BY id DESC LIMIT 1`,
-        [a.employee_id, a.id]
-      );
-
-      if (existing) {
-        await db.query(
-          `UPDATE employee_notifications
-           SET title = ?, message = ?, body = ?, link_url = ?, updated_at = NOW()
-           WHERE id = ?`,
-          [title, message, message, linkUrl, existing.id]
-        );
-      } else {
-        await db.query(
-          `INSERT INTO employee_notifications
-             (employee_id, type, title, message, body, link_url, reference_type, reference_id, is_read)
-           VALUES (?, 'assignment_updated', ?, ?, ?, ?, 'assignment', ?, 0)`,
-          [a.employee_id, title, message, message, linkUrl, a.id]
-        );
-      }
-    }
-  } catch (err) {
-    console.error('[Notifications] createAssignmentUpdatedNotification:', err.message);
-  }
-};
-
-// ── Internal: Create Record Updated Notification ──────────────────────────────
-exports.createRecordUpdatedNotification = async ({ employeeId, assignmentId, phoneNumber }) => {
-  try {
-    const title = 'Record Updated';
-    const message = `A customer record${phoneNumber ? ` (${phoneNumber})` : ''} in Assignment #${assignmentId} has been updated.`;
-    const linkUrl = `/employee/data-excel.html?assignmentId=${assignmentId}`;
-
-    // Prevent duplicate unread record update notification for same assignment
-    const [[existing]] = await db.query(
-      `SELECT id FROM employee_notifications
-       WHERE employee_id = ? AND type = 'record_updated' AND reference_id = ? AND is_read = 0
-       ORDER BY id DESC LIMIT 1`,
-      [employeeId, assignmentId]
-    );
-
-    if (existing) {
-      await db.query(
-        `UPDATE employee_notifications
-         SET title = ?, message = ?, body = ?, link_url = ?, updated_at = NOW()
-         WHERE id = ?`,
-        [title, message, message, linkUrl, existing.id]
-      );
-    } else {
-      await db.query(
-        `INSERT INTO employee_notifications
-           (employee_id, type, title, message, body, link_url, reference_type, reference_id, is_read)
-         VALUES (?, 'record_updated', ?, ?, ?, ?, 'record', ?, 0)`,
-        [employeeId, title, message, message, linkUrl, assignmentId]
-      );
-    }
-  } catch (err) {
-    console.error('[Notifications] createRecordUpdatedNotification:', err.message);
+    console.error('[Notifications] checkExpiringAssignments error:', err.message);
   }
 };

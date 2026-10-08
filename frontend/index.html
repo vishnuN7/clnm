@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — Login</title>
-  <meta name="description" content="Secure login portal for the CLN Lending Suite." />
-  <meta name="theme-color" content="#0f2747" />
+  <title>Dixit Lending Solution — Secure Sign In</title>
+  <meta name="description" content="Secure financial portal for Dixit Lending Solution." />
+  <meta name="theme-color" content="#006b3c" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <script>
     (function () {
       try {
         var storedTheme = localStorage.getItem('cln_theme');
-        var theme = storedTheme === 'light' || storedTheme === 'dark'
+        var theme = (storedTheme === 'light' || storedTheme === 'dark')
           ? storedTheme
           : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         document.documentElement.setAttribute('data-theme', theme);
@@ -23,102 +28,291 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css" />
+
+  <link rel="stylesheet" href="/css/auth-theme.css" />
 </head>
-<body class="login-page">
-  <div class="login-wrapper">
+<body class="auth-page login-page">
 
-    <div class="login-container">
-      <div class="login-card">
-        <div class="login-brand">
-          <div class="brand-logo-container">
-            <img class="brand-logo" src="/icons/logo.png" alt="DIXIT Lending Solution Logo" />
-          </div>
-          <h2 class="brand-title">Dixit Lending Solution</h2>
-        </div>
+  <!-- ── ATMOSPHERIC BACKGROUND ART SYSTEM ── -->
+  <div class="bg-art-layer" aria-hidden="true">
+    <!-- 1. Faint Geometric Grid -->
+    <div class="bg-grid-watermark"></div>
 
-        <div class="login-role-toggle" role="group" aria-label="Select login role">
-          <button type="button" id="btn-admin" class="active" onclick="selectRole('admin')">Admin</button>
-          <button type="button" id="btn-employee" onclick="selectRole('employee')">Employee</button>
-        </div>
+    <!-- 2. Ambient Light Drift Orbs (14s primary, 19s secondary) -->
+    <div class="bg-glow-orb bg-glow-primary"></div>
+    <div class="bg-glow-orb bg-glow-secondary"></div>
 
-        <div id="login-alert" class="alert alert-error"></div>
+    <!-- 3. Top-Right Corner Flowing Ribbon Waves (3 Independent Layers) -->
+    <div class="bg-corner-rig bg-corner-tr" aria-hidden="true">
+      <!-- TR Layer 1: Main Green Ribbon (22s infinite) -->
+      <svg class="bg-ribbon-layer tr-layer-main" viewBox="0 0 840 660" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="waveTrGrad1" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#004d2a" stop-opacity="0.55" />
+            <stop offset="50%" stop-color="#006b3c" stop-opacity="0.32" />
+            <stop offset="100%" stop-color="#059669" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M 380 0 C 490 90, 660 260, 840 480 L 840 0 Z" fill="url(#waveTrGrad1)" />
+      </svg>
 
-        <form id="login-form" onsubmit="handleLogin(event)" autocomplete="off">
-          <div class="form-group">
-            <input type="email" id="email" class="form-control" placeholder="Email or username" required autocomplete="off" />
-          </div>
-          
-          <div class="form-group password-group">
-            <div class="password-input-wrapper">
-              <input type="password" id="password" class="form-control" placeholder="Password" required autocomplete="new-password" />
-              <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" aria-label="Show password" title="Show password">
-                <svg id="eye-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path>
-                  <circle cx="12" cy="12" r="2.5"></circle>
-                </svg>
-              </button>
-            </div>
-            <a href="/reset-password.html" class="forgot-password" id="forgot-password-link">Forgot password?</a>
-          </div>
+      <!-- TR Layer 2: Secondary Light-Green Ribbon (28s, 2s delay infinite) -->
+      <svg class="bg-ribbon-layer tr-layer-sec" viewBox="0 0 840 660" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="waveTrGrad2" x1="100%" y1="0%" x2="10%" y2="90%">
+            <stop offset="0%" stop-color="#006b3c" stop-opacity="0.45" />
+            <stop offset="55%" stop-color="#059669" stop-opacity="0.2" />
+            <stop offset="100%" stop-color="#7bc043" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M 240 0 C 380 110, 580 300, 840 570 L 840 0 Z" fill="url(#waveTrGrad2)" />
+      </svg>
 
-          <div class="form-group checkbox-group">
-            <input type="checkbox" id="keep-signed" class="form-checkbox" />
-            <label for="keep-signed" class="checkbox-label">Keep me signed in</label>
-          </div>
-
-          <button type="submit" id="login-btn" class="btn btn-primary">
-            <span id="btn-text">
-              <svg class="login-lock-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="display:inline-block; vertical-align:middle; margin-right:8px;">
-                <rect x="4" y="10" width="16" height="10" rx="2"></rect>
-                <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
-              </svg>
-              Sign in
-            </span>
-            <span id="btn-spinner" class="spinner" style="display:none;"></span>
-          </button>
-        </form>
-
-      </div>
+      <!-- TR Layer 3: Gold Accent Line (18s infinite) -->
+      <svg class="bg-ribbon-layer tr-layer-gold" viewBox="0 0 840 660" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="goldFilamentTr" x1="100%" y1="0%" x2="0%" y2="80%">
+            <stop offset="0%" stop-color="#f5e197" stop-opacity="0.85" />
+            <stop offset="45%" stop-color="#d4af37" stop-opacity="0.9" />
+            <stop offset="85%" stop-color="#b8860b" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#d4af37" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M 235 0 C 375 110, 575 300, 840 565" stroke="url(#goldFilamentTr)" stroke-width="1.8" stroke-linecap="round" />
+        <path d="M 375 0 C 485 90, 655 260, 840 475" stroke="url(#goldFilamentTr)" stroke-width="1.2" stroke-dasharray="8 6" opacity="0.75" />
+        <path d="M 140 0 C 310 130, 520 340, 840 640" stroke="url(#goldFilamentTr)" stroke-width="1" opacity="0.45" />
+      </svg>
     </div>
 
-    <footer class="login-page-footer">
-      <p>© 2026 Dixit Lending Solution. All Rights Reserved.</p>
-      <span class="footer-link"><a href="#">~Support & Assistance: avitecin@gmail.com</a></span>
-    </footer>
+    <!-- 4. Bottom-Left Corner Flowing Ribbon Waves (3 Independent Layers) -->
+    <div class="bg-corner-rig bg-corner-bl" aria-hidden="true">
+      <!-- BL Layer 1: Main Green Ribbon (25s infinite) -->
+      <svg class="bg-ribbon-layer bl-layer-main" viewBox="0 0 860 680" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="waveBlGrad1" x1="0%" y1="100%" x2="90%" y2="10%">
+            <stop offset="0%" stop-color="#004d2a" stop-opacity="0.58" />
+            <stop offset="50%" stop-color="#006b3c" stop-opacity="0.34" />
+            <stop offset="100%" stop-color="#059669" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M 0 350 C 180 390, 390 510, 560 680 L 0 680 Z" fill="url(#waveBlGrad1)" />
+      </svg>
+
+      <!-- BL Layer 2: Secondary Light-Green Ribbon (31s, 3s delay infinite) -->
+      <svg class="bg-ribbon-layer bl-layer-sec" viewBox="0 0 860 680" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="waveBlGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#006b3c" stop-opacity="0.48" />
+            <stop offset="55%" stop-color="#059669" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="#7bc043" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M 0 220 C 220 270, 480 440, 720 680 L 0 680 Z" fill="url(#waveBlGrad2)" />
+      </svg>
+
+      <!-- BL Layer 3: Gold Accent Line (20s infinite) -->
+      <svg class="bg-ribbon-layer bl-layer-gold" viewBox="0 0 860 680" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="goldFilamentBl" x1="0%" y1="100%" x2="80%" y2="10%">
+            <stop offset="0%" stop-color="#f5e197" stop-opacity="0.85" />
+            <stop offset="40%" stop-color="#d4af37" stop-opacity="0.9" />
+            <stop offset="85%" stop-color="#b8860b" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#d4af37" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M 0 215 C 220 265, 480 435, 720 675" stroke="url(#goldFilamentBl)" stroke-width="1.8" stroke-linecap="round" />
+        <path d="M 0 345 C 180 385, 390 505, 560 675" stroke="url(#goldFilamentBl)" stroke-width="1.2" stroke-dasharray="8 6" opacity="0.75" />
+        <path d="M 0 110 C 260 190, 550 400, 840 680" stroke="url(#goldFilamentBl)" stroke-width="1" opacity="0.45" />
+      </svg>
+    </div>
+
+    <!-- 5. Shimmer Particles (max 6 particles, 2-3px) -->
+    <div class="bg-particle p1"></div>
+    <div class="bg-particle p2"></div>
+    <div class="bg-particle p3"></div>
+    <div class="bg-particle p4"></div>
+    <div class="bg-particle p5"></div>
+    <div class="bg-particle p6"></div>
   </div>
 
+  <!-- Topbar Spacer (Clean, no text or switchers) -->
+  <div class="auth-topbar-spacer"></div>
+
+  <!-- ── MAIN LOGIN CARD STAGE ── -->
+  <main class="auth-main-stage">
+    <div class="auth-card">
+      <!-- Official Dixit Brand Logo & Header -->
+      <div class="auth-brand-header">
+        <div class="auth-logo-wrap">
+          <img id="card-logo-img" class="auth-logo-img" src="/icons/dixit-official-logo-dark.png" alt="Dixit Lending Solution" />
+        </div>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Sign in to your Dixit Lending Solution account</p>
+      </div>
+
+      <!-- Segmented Role Selector (Admin | Employee) -->
+      <div class="role-segmented-switch" role="tablist" aria-label="Select login role">
+        <button type="button" id="btn-admin" class="role-btn active" role="tab" aria-selected="true" onclick="selectRole('admin')">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          <span>Admin</span>
+        </button>
+        <button type="button" id="btn-employee" class="role-btn" role="tab" aria-selected="false" onclick="selectRole('employee')">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Employee</span>
+        </button>
+      </div>
+
+      <!-- Error / Feedback Alert Banner -->
+      <div id="login-alert" class="auth-alert auth-alert-error" role="alert">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="login-alert-text"></span>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form" onsubmit="handleLogin(event)" autocomplete="off">
+        <!-- Email / Identifier Field -->
+        <div class="form-group">
+          <div class="input-control-wrap">
+            <svg class="field-lead-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <input
+              type="email"
+              id="email"
+              class="form-input"
+              placeholder="Admin Gmail ID"
+              required
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <!-- Password Field with Single Eye Button -->
+        <div class="form-group">
+          <div class="input-control-wrap">
+            <svg class="field-lead-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input
+              type="password"
+              id="password"
+              class="form-input password-input"
+              placeholder="Password"
+              required
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="password-eye-btn"
+              id="password-eye-btn"
+              onclick="togglePasswordVisibility()"
+              aria-label="Show password"
+              title="Show password"
+            >
+              <svg id="eye-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me & Forgot Password Row -->
+        <div class="form-options-row">
+          <label for="keep-signed" class="remember-label">
+            <input type="checkbox" id="keep-signed" class="custom-checkbox" />
+            <span>Keep me signed in</span>
+          </label>
+          <a href="/reset-password.html" class="forgot-link" id="forgot-password-link">Forgot password?</a>
+        </div>
+
+        <!-- Primary Action CTA -->
+        <button type="submit" id="login-btn" class="submit-cta-btn">
+          <span id="btn-content" style="display:inline-flex; align-items:center; gap:8px;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+            <span id="btn-label-text">Sign In</span>
+          </span>
+          <span id="btn-spinner" class="btn-spinner" style="display:none;"></span>
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- ── PAGE FOOTER ── -->
+  <footer class="auth-footer">
+    <p>© 2026 Dixit Lending Solution. All Rights Reserved.</p>
+    <div class="footer-support">
+      <span>Support &amp; Assistance: <a href="mailto:avitechn@gmail.com">avitechn@gmail.com</a></span>
+    </div>
+  </footer>
+
+  <!-- ── RUNTIME SCRIPTS & AUTH LOGIC ── -->
   <script src="/js/runtime-config.js?v=20260615c"></script>
   <script src="/js/api.js?v=20260615b"></script>
   <script>
     let selectedRole = 'admin';
     let isSubmitting = false;
 
-    // 1. Silent cleanup of any legacy insecure credentials
+    const AUTHORIZED_ADMIN_EMAIL = 'dixitlendingsolution@gmail.com';
+
+    // SVG paths for single password eye
+    const EYE_SVG_PATHS = {
+      eye: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+      eyeOff: '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>'
+    };
+
+    // 1. Silent cleanup of any legacy insecure keys
     ['password', 'userPassword', 'employeePassword', 'savedPassword', 'loginPassword', 'credentials', 'savedCredentials'].forEach(function(k) {
       try { localStorage.removeItem(k); sessionStorage.removeItem(k); } catch (e) {}
     });
 
-    // 2. Show cached login error if any (like auto-deactivation)
+    // 2. Official Dixit Logo preservation
+    function syncLogoVariant() {
+      const logoImg = document.getElementById('card-logo-img');
+      if (logoImg) {
+        logoImg.src = '/icons/dixit-official-logo-dark.png';
+      }
+    }
+    syncLogoVariant();
+
+    // Listen to theme change events from application runtime
+    window.addEventListener('cln:themechange', function (e) {
+      syncLogoVariant();
+    });
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+        var stored = localStorage.getItem('cln_theme');
+        if (!stored) {
+          syncLogoVariant();
+        }
+      });
+    }
+
+    // 3. Show cached login error if any
     const cachedError = localStorage.getItem('login_error') || sessionStorage.getItem('login_error');
     if (cachedError) {
-      const alertEl = document.getElementById('login-alert');
-      if (alertEl) {
-        alertEl.className = 'alert alert-error show';
-        alertEl.textContent = cachedError;
-      }
+      showLoginAlert(cachedError);
       localStorage.removeItem('login_error');
       sessionStorage.removeItem('login_error');
     }
 
-    // 3. Redirect if already authenticated with active session
-    const existingUser = getUser();
-    const existingToken = getToken();
+    function showLoginAlert(msg) {
+      const alertEl = document.getElementById('login-alert');
+      const textEl = document.getElementById('login-alert-text');
+      if (alertEl && textEl) {
+        textEl.textContent = msg;
+        alertEl.classList.add('show');
+      }
+    }
+
+    function clearLoginAlert() {
+      const alertEl = document.getElementById('login-alert');
+      if (alertEl) alertEl.classList.remove('show');
+    }
+
+    // 4. Redirect if already authenticated
+    const existingUser = (typeof getUser === 'function') ? getUser() : null;
+    const existingToken = (typeof getToken === 'function') ? getToken() : null;
     if (existingUser && existingToken) {
       window.location.href = existingUser.role === 'admin' ? '/admin/dashboard.html?fresh=20260516d' : '/employee/dashboard.html';
     }
 
-    // 4. Prefill remembered identifier if "Keep me signed in" was previously enabled
+    // 5. Prefill remembered identifier if previously enabled
     try {
       const rememberedEmail = localStorage.getItem('cln_remembered_email');
       const rememberedRole  = localStorage.getItem('cln_remembered_role');
@@ -126,6 +320,8 @@
 
       if (rememberedRole === 'admin' || rememberedRole === 'employee') {
         selectRole(rememberedRole);
+      } else {
+        selectRole('admin');
       }
 
       if (rememberedEmail) {
@@ -139,49 +335,68 @@
       }
     } catch (err) {}
 
-    // Ensure password field is ALWAYS empty on initial load
+    // Ensure password input is clear on load
     const initialPw = document.getElementById('password');
     if (initialPw) initialPw.value = '';
 
+    // 6. Role Selection Handler
     function selectRole(role) {
       selectedRole = role;
-      document.getElementById('btn-admin').classList.toggle('active', role === 'admin');
-      document.getElementById('btn-employee').classList.toggle('active', role === 'employee');
-      // Clear password field on role switch to prevent cross-account credential leakage
+      const btnAdmin = document.getElementById('btn-admin');
+      const btnEmployee = document.getElementById('btn-employee');
+      const emailInput = document.getElementById('email');
+
+      if (btnAdmin) {
+        btnAdmin.classList.toggle('active', role === 'admin');
+        btnAdmin.setAttribute('aria-selected', role === 'admin' ? 'true' : 'false');
+      }
+      if (btnEmployee) {
+        btnEmployee.classList.toggle('active', role === 'employee');
+        btnEmployee.setAttribute('aria-selected', role === 'employee' ? 'true' : 'false');
+      }
+
+      if (role === 'admin') {
+        if (emailInput) {
+          emailInput.placeholder = 'Admin Gmail ID';
+          emailInput.setAttribute('type', 'email');
+        }
+      } else {
+        if (emailInput) {
+          emailInput.placeholder = 'Employee Email or Username';
+          emailInput.setAttribute('type', 'text');
+        }
+      }
+
       const pwInput = document.getElementById('password');
       if (pwInput) pwInput.value = '';
-      const alertEl = document.getElementById('login-alert');
-      if (alertEl) alertEl.classList.remove('show');
+      clearLoginAlert();
     }
 
-    // Clear password on pageshow
     window.addEventListener('pageshow', () => {
       const pwInput = document.getElementById('password');
       if (pwInput) pwInput.value = '';
     });
 
-    // SVG path data for the two eye states
-    const EYE_PATHS = {
-      eye: '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle>',
-      eyeOff: '<path d="M3 3l18 18"></path><path d="M10.5 10.5a2.5 2.5 0 1 0 3 3"></path><path d="M6.2 6.2C3.9 7.9 2 12 2 12s3.5 6 10 6c1.3 0 2.5-.2 3.6-.6"></path><path d="M14.6 4.6C13.8 4.2 12.9 4 12 4c-6.5 0-10 8-10 8a20.1 20.1 0 0 0 4.8 5.7"></path>'
-    };
-
+    // 7. Password Visibility Toggle
     function togglePasswordVisibility() {
       const passwordInput = document.getElementById('password');
-      const toggleBtn = document.querySelector('.toggle-password');
-      const isVisible = passwordInput.type === 'password';
-
-      passwordInput.type = isVisible ? 'text' : 'password';
-      toggleBtn.classList.toggle('visible', isVisible);
-      toggleBtn.setAttribute('aria-label', isVisible ? 'Hide password' : 'Show password');
-      toggleBtn.setAttribute('title', isVisible ? 'Hide password' : 'Show password');
-
+      const toggleBtn = document.getElementById('password-eye-btn');
       const svg = document.getElementById('eye-icon-svg');
+      if (!passwordInput) return;
+
+      const isVisible = passwordInput.type === 'password';
+      passwordInput.type = isVisible ? 'text' : 'password';
+
+      const label = isVisible ? 'Hide password' : 'Show password';
+      toggleBtn.setAttribute('aria-label', label);
+      toggleBtn.setAttribute('title', label);
+
       if (svg) {
-        svg.innerHTML = isVisible ? EYE_PATHS.eyeOff : EYE_PATHS.eye;
+        svg.innerHTML = isVisible ? EYE_SVG_PATHS.eyeOff : EYE_SVG_PATHS.eye;
       }
     }
 
+    // 8. Login Submission Handler
     async function handleLogin(e) {
       if (e) {
         e.preventDefault();
@@ -194,38 +409,43 @@
       const email      = emailInput ? emailInput.value.trim() : '';
       const password   = pwInput ? pwInput.value : '';
       const keepMeSignedIn = Boolean(document.getElementById('keep-signed')?.checked);
-      const alertEl    = document.getElementById('login-alert');
-      alertEl.classList.remove('show');
+      clearLoginAlert();
 
       if (!email || !password) {
-        alertEl.className = 'alert alert-error show';
-        alertEl.textContent = 'Please enter both email/username and password.';
+        showLoginAlert('Please enter both email/username and password.');
         return false;
+      }
+
+      // Client-side validation: Admin restriction
+      if (selectedRole === 'admin') {
+        const normalized = email.toLowerCase();
+        if (normalized !== AUTHORIZED_ADMIN_EMAIL) {
+          showLoginAlert('This account is not authorized for Admin access. Only the authorized Admin Gmail account is permitted.');
+          return false;
+        }
       }
 
       isSubmitting = true;
       const loginBtn = document.getElementById('login-btn');
-      const btnText = document.getElementById('btn-text');
+      const btnContent = document.getElementById('btn-content');
+      const btnLabelText = document.getElementById('btn-label-text');
       const btnSpinner = document.getElementById('btn-spinner');
 
-      btnText.style.display = 'none';
+      btnLabelText.textContent = 'Signing in...';
       btnSpinner.style.display = 'inline-block';
       loginBtn.disabled = true;
 
       try {
         const res = await api.post('/auth/login', { email, password, role: selectedRole, keepMeSignedIn });
 
-        // Immediately clear the password from memory and the DOM input
         if (pwInput) pwInput.value = '';
 
         if (!res || !res.ok) {
-          const msg = res?.data?.message || 'Login failed. Please check your credentials.';
-          alertEl.className = 'alert alert-error show';
-          alertEl.textContent = msg;
+          const msg = res?.data?.message || 'Authentication failed. Please check your credentials.';
+          showLoginAlert(msg);
           return false;
         }
 
-        // Handle "Keep me signed in" identifier remembering (email & role only, NEVER password)
         if (keepMeSignedIn) {
           try {
             localStorage.setItem('cln_remembered_email', email);
@@ -248,12 +468,12 @@
         }
         return true;
       } catch (err) {
-        alertEl.className = 'alert alert-error show';
-        alertEl.textContent = 'An unexpected error occurred. Please try again.';
+        console.error('[Login Error]', err);
+        showLoginAlert('An unexpected error occurred. Please try again.');
         return false;
       } finally {
         isSubmitting = false;
-        btnText.style.display = 'inline-flex';
+        btnLabelText.textContent = 'Sign In';
         btnSpinner.style.display = 'none';
         loginBtn.disabled = false;
       }

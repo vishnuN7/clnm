@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const mailer = require('./mailer');
 const excelExpiry = require('./excelExpiry');
+const notifCtrl = require('../controllers/notificationController');
 
 function formatAuditTimestamp(date) {
   const options = {
@@ -58,6 +59,7 @@ async function checkAndProcessSchedules() {
   try {
     await cleanupOldCompletedBreakRecords();
     await excelExpiry.processExpiredAssignments();
+    await notifCtrl.checkExpiringAssignments().catch(() => {});
 
     // 1. Fetch current settings
     const [settings] = await db.query('SELECT * FROM system_settings');

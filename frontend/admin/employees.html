@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — Employees</title>
+  <title>Dixit Lending Solution — Employees</title>
   <meta name="theme-color" content="#0f2747" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -24,8 +25,20 @@
     })();
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <style>
+    /* Suppress duplicate native browser password reveal eye button (Microsoft Edge/Chromium on Windows) */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear,
+    input::-ms-reveal,
+    input::-ms-clear {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
     /* ── Scoped Styles for Redesigned Employee Profile Modal ── */
     #profile-modal .modal.emp-profile-modal-shell {
       max-width: 1040px;
@@ -58,8 +71,8 @@
       flex-direction: column;
     }
     :root[data-theme='dark'] .emp-profile-header {
-      background: linear-gradient(180deg, rgba(15, 28, 48, 0.95) 0%, rgba(10, 19, 32, 0.92) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.16);
+      background: linear-gradient(180deg, rgba(16, 23, 33, 0.98) 0%, rgba(12, 18, 25, 0.98) 100%);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
     }
     .emp-profile-header-top {
       display: flex;
@@ -70,7 +83,7 @@
       border-bottom: 1px solid var(--border);
     }
     :root[data-theme='dark'] .emp-profile-header-top {
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .emp-profile-header-title {
       display: flex;
@@ -130,7 +143,7 @@
     }
     :root[data-theme='dark'] .emp-profile-close-btn {
       background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(151, 176, 210, 0.16);
+      border-color: rgba(123, 192, 67, 0.16);
       color: #94a3b8;
     }
     :root[data-theme='dark'] .emp-profile-close-btn:hover {
@@ -235,7 +248,7 @@
     }
     :root[data-theme='dark'] .emp-contact-item {
       background: rgba(255, 255, 255, 0.025);
-      border-color: rgba(151, 176, 210, 0.14);
+      border-color: rgba(123, 192, 67, 0.12);
       color: #cbd5e1;
     }
     .emp-contact-item i {
@@ -257,7 +270,7 @@
       background: var(--bg-card);
     }
     :root[data-theme='dark'] .emp-profile-tabs-nav {
-      border-top-color: rgba(151, 176, 210, 0.12);
+      border-top-color: rgba(123, 192, 67, 0.12);
       background: rgba(12, 23, 38, 0.6);
     }
     .emp-tab-btn {
@@ -343,7 +356,7 @@
     }
     :root[data-theme='dark'] .emp-section-card {
       background: rgba(14, 25, 41, 0.65);
-      border-color: rgba(151, 176, 210, 0.14);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .emp-section-header {
       display: flex;
@@ -353,7 +366,7 @@
       padding-bottom: 10px;
     }
     :root[data-theme='dark'] .emp-section-header {
-      border-bottom-color: rgba(151, 176, 210, 0.1);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .emp-section-header i {
       color: var(--accent);
@@ -412,8 +425,8 @@
       gap: 4px;
     }
     :root[data-theme='dark'] .emp-field-cell {
-      background: rgba(9, 17, 29, 0.45);
-      border-color: rgba(151, 176, 210, 0.12);
+      background: rgba(20, 29, 41, 0.7);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .emp-span-2 {
       grid-column: span 2;
@@ -464,8 +477,8 @@
       gap: 10px;
     }
     :root[data-theme='dark'] .emp-doc-card {
-      background: rgba(9, 17, 29, 0.45);
-      border-color: rgba(151, 176, 210, 0.12);
+      background: rgba(20, 29, 41, 0.7);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .emp-doc-card-header {
       display: flex;
@@ -783,8 +796,8 @@
       transition: background 0.15s ease;
     }
     :root[data-theme='dark'] .emp-timeline-item {
-      background: rgba(9, 17, 29, 0.45);
-      border-color: rgba(151, 176, 210, 0.12);
+      background: rgba(20, 29, 41, 0.7);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .emp-timeline-item:hover {
       background: var(--accent-soft);
@@ -843,8 +856,8 @@
       flex-wrap: wrap;
     }
     :root[data-theme='dark'] .emp-login-card {
-      background: rgba(9, 17, 29, 0.45);
-      border-color: rgba(151, 176, 210, 0.12);
+      background: rgba(20, 29, 41, 0.7);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .emp-login-card-left {
       display: flex;
@@ -977,8 +990,8 @@
       border-bottom: 1px solid var(--border);
     }
     :root[data-theme='dark'] .admin-page .topbar {
-      background: linear-gradient(90deg, rgba(9, 17, 29, 0.95) 0%, rgba(12, 24, 41, 0.92) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      background: rgba(12, 18, 25, 0.95);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
     }
     .admin-page .topbar-title {
       position: absolute !important;
@@ -1038,8 +1051,8 @@
       white-space: nowrap;
     }
     :root[data-theme='dark'] .topbar-date-badge {
-      background: #132237;
-      border-color: rgba(151, 176, 210, 0.2);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
       color: #cbd5e1;
     }
     .topbar-date-badge i {
@@ -1047,7 +1060,7 @@
       font-size: 11px;
     }
     :root[data-theme='dark'] .topbar-date-badge i {
-      color: #60a5fa;
+      color: var(--accent);
     }
 
     /* ── Employee Directory Header Buttons ── */
@@ -1088,7 +1101,7 @@
     }
     :root[data-theme='dark'] .directory-btn-import {
       background: rgba(255, 255, 255, 0.04);
-      border-color: rgba(151, 176, 210, 0.22);
+      border-color: rgba(123, 192, 67, 0.22);
       color: var(--text-primary);
     }
     :root[data-theme='dark'] .directory-btn-import:hover {
@@ -1162,43 +1175,6 @@
     }
     :root[data-theme='dark'] .working-hours-card-icon {
       background: linear-gradient(135deg, rgba(139, 180, 255, 0.12), rgba(93, 212, 199, 0.08));
-    }
-    .working-hours-layout-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 24px;
-      align-items: stretch;
-    }
-    @media (max-width: 900px) {
-      .working-hours-layout-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .settings-pane {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background: rgba(255, 255, 255, 0.4);
-      padding: 22px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-    }
-    :root[data-theme='dark'] .settings-pane {
-      background: rgba(255, 255, 255, 0.02);
-    }
-    .settings-pane-header {
-      margin-bottom: 6px;
-    }
-    .time-pickers-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    @media (max-width: 480px) {
-      .time-pickers-row {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
     }
 
     /* Responsive admin shell fixes for this page */
@@ -1286,61 +1262,225 @@
         padding: 12px;
       }
     }
-    .time-picker-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    /* Compact Working Hours & System Status Card */
+    .compact-working-hours {
+      padding: 0 !important;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-soft);
     }
-    .time-picker-group label {
-      font-size: 11px;
+    .compact-working-hours .working-hours-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      gap: 12px;
+    }
+    .compact-working-hours .working-hours-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .compact-working-hours .working-hours-title {
+      font-size: 14.5px;
+      font-weight: 800;
+      margin: 0;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+    .compact-working-hours .working-hours-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: 2px 0 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .compact-working-hours .working-hours-header-right {
+      flex-shrink: 0;
+    }
+
+    /* Working Hours Body: Controls + Live Status in one compact horizontal bar */
+    .compact-working-hours .working-hours-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 18px;
+      background: var(--bg-card);
+      flex-wrap: wrap;
+    }
+    .working-hours-controls-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+    .wh-time-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .wh-label {
+      font-size: 11.5px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-muted);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
-    .status-display-pane {
-      display: flex;
-      flex-direction: column;
-    }
-    .status-display-card {
-      flex: 1;
-      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    .wh-time-input {
+      height: 36px;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm, 8px);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      width: 115px;
+      font-feature-settings: "tnum";
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .wh-time-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+      outline: none;
+    }
+    .wh-time-sep {
+      color: var(--text-muted);
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      opacity: 0.5;
+      margin: 0 2px;
+    }
+    .wh-save-btn,
+    #save-hours-btn {
+      width: auto !important;
+      min-width: 115px;
+      max-width: 130px;
+      height: 36px;
+      padding: 0 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: var(--radius-sm, 8px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+      transition: all 0.15s ease;
+    }
+    .wh-save-btn:hover:not(:disabled),
+    #save-hours-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+    .wh-save-btn:active,
+    #save-hours-btn:active {
+      transform: translateY(0);
+    }
+    .wh-save-btn:disabled,
+    #save-hours-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .wh-vdivider {
+      width: 1px;
+      height: 34px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    @media (max-width: 992px) {
+      .wh-vdivider {
+        display: none;
+      }
+    }
+
+    /* Operational Status Group */
+    .working-hours-status-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .wh-status-live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 11px;
+      border-radius: 99px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    .wh-live-text {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .wh-clock-block {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      box-shadow: var(--shadow-soft);
-      position: relative;
-      overflow: hidden;
-      min-height: 160px;
+      align-items: flex-start;
+      gap: 1px;
     }
-    .status-display-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
-      pointer-events: none;
+    .wh-clock-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      font-feature-settings: "tnum";
+      line-height: 1.1;
     }
-    .status-display-header {
+    .wh-clock-meta {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-weight: 500;
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 4px;
+      white-space: nowrap;
     }
+    .wh-schedule-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      border-radius: 99px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    /* Pulse Dot Animations */
     .pulse-dot {
-      width: 10px;
-      height: 10px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background-color: var(--success);
       box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
       animation: pulseGreen 1.8s infinite;
+      flex-shrink: 0;
     }
     .pulse-dot.inactive {
       background-color: var(--danger);
@@ -1349,44 +1489,102 @@
     }
     @keyframes pulseGreen {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
     @keyframes pulseRed {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(180, 69, 69, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(180, 69, 69, 0); }
+      70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(180, 69, 69, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(180, 69, 69, 0); }
     }
-    .status-text {
-      font-size: 12px;
+
+    /* Integrated Status Filter Chips Bar */
+    .working-hours-filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      background: rgba(0, 0, 0, 0.02);
+      border-top: 1px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    :root[data-theme='dark'] .working-hours-filters-bar {
+      background: rgba(255, 255, 255, 0.015);
+    }
+    .wh-filter-label {
+      font-size: 11px;
       font-weight: 700;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--text-primary);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
     }
-    .live-clock {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 2px;
-      font-feature-settings: "tnum";
+    .wh-filter-chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .live-clock-meta {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-    .current-schedule-info {
-      margin-top: 14px;
-      padding: 6px 16px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+    .wh-filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 11px;
       border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
       font-size: 12px;
       font-weight: 600;
-      color: var(--text-primary);
-      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+      white-space: nowrap;
     }
+    .wh-filter-chip:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    .wh-filter-chip.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 700;
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .wh-chip-name {
+      line-height: 1.2;
+    }
+    .wh-chip-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+    .wh-filter-chip.active .wh-chip-badge {
+      background: var(--accent);
+      color: #ffffff;
+    }
+    .wh-chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .dot-active { background: #10b981; }
+    .dot-inactive { background: #ef4444; }
+    .dot-auto { background: #f59e0b; }
+    .dot-override { background: #8b5cf6; }
 
     /* Toolbar styling */
     .toolbar-card {
@@ -1566,7 +1764,7 @@
     }
     :root[data-theme='dark'] .employee-directory-icon {
       background: linear-gradient(135deg, rgba(139, 180, 255, 0.12), rgba(93, 212, 199, 0.08));
-      border-color: rgba(151, 176, 210, 0.14);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .employee-directory-icon svg,
     .employee-directory-icon i {
@@ -1644,7 +1842,7 @@
       border-collapse: separate;
       border-spacing: 0;
       width: 100%;
-      min-width: 1060px;
+      min-width: 1080px;
       table-layout: fixed;
     }
     .employee-table th {
@@ -1658,80 +1856,108 @@
       background: linear-gradient(90deg, rgba(247, 250, 255, 0.94) 0%, rgba(240, 245, 252, 0.94) 100%);
       white-space: nowrap;
       user-select: none;
-      text-align: center;
+      vertical-align: middle;
     }
     :root[data-theme='dark'] .employee-table th {
       background: linear-gradient(90deg, rgba(12, 22, 36, 0.82) 0%, rgba(15, 28, 46, 0.92) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
+    .employee-table col.col-index,
     .employee-table th.th-index {
+      width: 52px;
+      min-width: 52px;
+      max-width: 52px;
       text-align: center;
       padding: 12px 6px;
     }
-    .employee-table th.th-name {
-      text-align: center;
-      padding: 12px 10px;
-    }
-    .employee-table th.th-email {
-      text-align: center;
-      padding: 12px 10px;
-    }
-    .employee-table th.th-phone {
-      text-align: center;
-      padding: 12px 10px;
-    }
-    .employee-table th.th-joined {
-      text-align: center;
-      padding: 12px 8px;
-    }
-    .employee-table th.th-status {
-      text-align: center;
-      padding: 12px 8px;
-      min-width: 180px;
-    }
-    .employee-table th.th-actions {
-      text-align: center;
-      padding: 12px 10px;
+    .employee-table col.col-employee,
+    .employee-table th.th-employee {
+      width: 25%;
       min-width: 220px;
+      text-align: left;
+      padding: 12px 14px;
+    }
+    .employee-table col.col-email,
+    .employee-table th.th-email {
+      width: 23%;
+      min-width: 210px;
+      text-align: left;
+      padding: 12px 12px;
+    }
+    .employee-table col.col-phone,
+    .employee-table th.th-phone {
+      width: 13%;
+      min-width: 125px;
+      text-align: left;
+      padding: 12px 12px;
+    }
+    .employee-table col.col-joined,
+    .employee-table th.th-joined {
+      width: 11%;
+      min-width: 115px;
+      text-align: left;
+      padding: 12px 10px;
+    }
+    .employee-table col.col-status,
+    .employee-table th.th-status {
+      width: 11%;
+      min-width: 115px;
+      text-align: center;
+      padding: 12px 8px;
+    }
+    .employee-table col.col-actions,
+    .employee-table th.th-actions {
+      width: 17%;
+      min-width: 210px;
+      text-align: center;
+      padding: 12px 10px;
     }
     .employee-table td {
-      padding: 12px 10px;
+      padding: 10px 10px;
       font-size: 13px;
       color: var(--text-secondary);
       border-bottom: 1px solid var(--border);
-      vertical-align: middle;
+      vertical-align: middle !important;
       min-width: 0;
+      box-sizing: border-box;
+      height: 60px;
     }
     .employee-table td.employee-index-cell {
       text-align: center;
-      padding: 12px 6px;
+      padding: 10px 6px;
+      vertical-align: middle !important;
     }
     .employee-table td.employee-name-cell {
       text-align: left;
-      padding: 12px 12px 12px 14px;
+      padding: 8px 14px;
+      vertical-align: middle !important;
     }
     .employee-table td.employee-email-cell {
       text-align: left;
-      padding: 12px 12px;
+      padding: 10px 12px;
+      vertical-align: middle !important;
     }
     .employee-table td.employee-phone-cell {
       text-align: left;
-      padding: 12px 12px;
+      padding: 10px 12px;
+      vertical-align: middle !important;
     }
     .employee-table td.employee-date-cell {
-      text-align: center;
-      padding: 12px 8px;
+      text-align: left;
+      padding: 10px 10px;
+      vertical-align: middle !important;
     }
     .employee-table td.employee-status-cell {
       text-align: center;
-      padding: 10px 6px;
-      min-width: 180px;
+      padding: 10px 8px;
       white-space: nowrap;
+      vertical-align: middle !important;
     }
     .employee-table td.employee-actions-cell {
       text-align: center;
-      padding: 10px 8px;
-      min-width: 220px;
+      padding: 10px 10px;
+      white-space: nowrap;
+      vertical-align: middle !important;
     }
     .employee-table tbody tr {
       transition: background 0.18s ease, box-shadow 0.18s ease;
@@ -1758,41 +1984,53 @@
       overflow: hidden;
     }
     .employee-identity {
+      width: 100%;
       min-width: 0;
       display: flex;
       align-items: center;
-      gap: 10px;
     }
-    .employee-profile-trigger {
-      width: 100%;
-      border: 1px solid transparent;
-      border-radius: var(--radius-sm);
-      padding: 6px 8px 6px 6px;
+    .employee-identity-btn {
       background: transparent;
-      color: inherit;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm, 8px);
+      padding: 6px 10px;
+      margin: 0;
+      color: var(--text-primary);
       cursor: pointer;
       font: inherit;
       text-align: left;
-      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-width: 0;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      text-decoration: none;
+      box-sizing: border-box;
     }
-    .employee-profile-trigger:hover,
-    .employee-profile-trigger:focus-visible {
-      border-color: rgba(47, 111, 237, 0.22);
-      background: linear-gradient(135deg, rgba(47, 111, 237, 0.08), rgba(15, 139, 113, 0.05));
-      box-shadow: var(--shadow-soft);
+    .employee-identity-btn:hover,
+    .employee-identity-btn:focus-visible {
+      border-color: rgba(47, 111, 237, 0.2);
+      background: rgba(47, 111, 237, 0.07);
       outline: none;
-      transform: translateY(-1px);
     }
-    :root[data-theme='dark'] .employee-profile-trigger:hover,
-    :root[data-theme='dark'] .employee-profile-trigger:focus-visible {
-      border-color: rgba(139, 180, 255, 0.2);
-      background: linear-gradient(135deg, rgba(139, 180, 255, 0.1), rgba(93, 212, 199, 0.05));
+    :root[data-theme='dark'] .employee-identity-btn:hover,
+    :root[data-theme='dark'] .employee-identity-btn:focus-visible {
+      border-color: rgba(139, 180, 255, 0.22);
+      background: rgba(139, 180, 255, 0.09);
+    }
+    .employee-identity-btn:hover .employee-name {
+      color: var(--accent);
+    }
+    .employee-identity-btn:hover .employee-avatar-mini {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 2px var(--accent), 0 4px 10px rgba(0, 0, 0, 0.16);
     }
     .employee-avatar-mini {
-      width: 34px;
-      height: 34px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      flex: 0 0 auto;
+      flex: 0 0 38px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1802,7 +2040,8 @@
       font-size: 13px;
       font-weight: 800;
       background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      box-shadow: 0 5px 14px rgba(16, 32, 51, 0.12);
+      box-shadow: 0 2px 6px rgba(16, 32, 51, 0.12);
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
     }
     .employee-avatar-mini img {
       position: absolute;
@@ -1819,12 +2058,23 @@
       width: 100%;
       height: 100%;
       line-height: 1;
+      font-size: 13px;
+      font-weight: 800;
     }
     :root[data-theme='dark'] .employee-avatar-mini {
       box-shadow: 0 8px 18px rgba(0, 0, 0, 0.26);
     }
+    .employee-identity-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+      min-width: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+    }
     .employee-name {
-      display: inline-block;
+      display: block;
       color: var(--text-primary);
       font-size: 13.5px;
       font-weight: 700;
@@ -1834,8 +2084,86 @@
       white-space: nowrap;
       transition: color 0.16s ease;
     }
-    .employee-profile-trigger:hover .employee-name {
-      color: var(--accent);
+    .employee-id-sub {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── Employee Profile Drawer Avatar & Access Controls ── */
+    .emp-profile-avatar-btn {
+      position: relative;
+      border: none;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      cursor: default;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .emp-profile-avatar-btn.has-photo {
+      cursor: pointer;
+    }
+    .emp-profile-avatar-btn.has-photo:hover .emp-profile-avatar {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 3px var(--accent), 0 8px 20px rgba(0, 0, 0, 0.22);
+    }
+    .prof-avatar-zoom-badge {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--bg-card);
+      transition: transform 0.16s ease, background 0.16s ease;
+      pointer-events: none;
+    }
+    .emp-profile-avatar-btn.has-photo:hover .prof-avatar-zoom-badge {
+      transform: scale(1.15);
+      background: #1d4ed8;
+    }
+    .emp-section-header-split {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .emp-section-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .emp-profile-access-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .emp-profile-access-actions .btn-sm {
+      padding: 4px 10px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: var(--radius-sm, 6px);
+      font-weight: 600;
     }
     .employee-email-link,
     .employee-phone-link {
@@ -1857,6 +2185,14 @@
     .employee-email-link:hover {
       color: var(--accent);
       text-decoration: underline;
+    }
+    .employee-email-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+      display: inline-block;
+      vertical-align: middle;
     }
     .employee-phone-link:hover {
       color: var(--success);
@@ -2266,216 +2602,878 @@
       }
     }
 
-    /* Reset password modal */
-    #password-modal .modal {
-      max-width: 440px;
+    /* ═══════════════════════════════════════════════════════════════
+       RESET EMPLOYEE PASSWORD MODAL (ADMIN SECURITY PANEL)
+    ═══════════════════════════════════════════════════════════════ */
+    #password-modal {
+      z-index: 1060;
+    }
+    #password-modal .modal.password-modal-dialog {
+      max-width: 600px;
+      width: min(600px, calc(100vw - 32px));
       padding: 0;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
       overflow: hidden;
     }
-    #password-modal .modal-header {
-      align-items: flex-start;
-      gap: 14px;
-      margin: 0;
-      padding: 20px 22px 16px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(236, 241, 248, 0.64));
+    :root[data-theme='light'] #password-modal .modal.password-modal-dialog {
+      background: #ffffff;
+      border-color: #e2e8f0;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
     }
-    :root[data-theme='dark'] #password-modal .modal-header {
-      background: linear-gradient(135deg, rgba(139, 180, 255, 0.09), rgba(93, 212, 199, 0.04));
-      border-bottom-color: rgba(151, 176, 210, 0.14);
-    }
-    #password-modal .password-title {
+    #password-modal .password-modal-header {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 0;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
     }
-    #password-modal .password-title-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
+    :root[data-theme='light'] #password-modal .password-modal-header {
+      background: #f8fafc;
+      border-bottom-color: #e2e8f0;
+    }
+    #password-modal .password-header-content {
+      min-width: 0;
+      flex: 1;
+    }
+    #password-modal .password-kicker {
+      margin: 0 0 4px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      display: block;
+    }
+    :root[data-theme='light'] #password-modal .password-kicker {
+      color: #2563eb;
+    }
+    #password-modal .password-modal-header h3 {
+      margin: 0 0 6px;
+      color: var(--text-primary);
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      line-height: 1.25;
+    }
+    #password-modal .password-sub-desc {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text-secondary);
+    }
+    :root[data-theme='light'] #password-modal .password-sub-desc {
+      color: #64748b;
+    }
+    #password-modal .password-close-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
-      flex: 0 0 auto;
-      color: #fff;
-      background: linear-gradient(135deg, var(--accent), #2563eb);
-      box-shadow: 0 10px 24px rgba(15, 39, 71, 0.22);
-    }
-    #password-modal .password-title-icon svg,
-    #password-modal .password-close-btn svg,
-    #password-modal .password-toggle svg {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    #password-modal .password-kicker {
-      margin: 0 0 3px;
-      color: var(--text-muted);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      line-height: 1.2;
-      text-transform: uppercase;
-    }
-    #password-modal .modal-header h3 {
-      margin: 0;
-      color: var(--text-primary);
-      font-size: 19px;
-      font-weight: 800;
-      line-height: 1.18;
-    }
-    #password-modal .password-close-btn {
-      width: 34px;
-      height: 34px;
-      margin-top: 2px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--bg-card);
-      color: var(--text-secondary);
-      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: -2px;
     }
     #password-modal .password-close-btn:hover {
-      border-color: rgba(180, 69, 69, 0.32);
-      background: rgba(180, 69, 69, 0.08);
-      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
     }
+    :root[data-theme='light'] #password-modal .password-close-btn {
+      background: #ffffff;
+      border-color: #cbd5e1;
+    }
+
     #password-modal .password-modal-body {
-      padding: 20px 22px 22px;
+      padding: 20px 24px 22px;
     }
-    #password-modal #password-modal-alert {
-      margin: 0 0 14px;
+    #password-modal .password-inline-alert {
+      margin-bottom: 14px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
     }
     #password-modal #password-modal-alert:not(.show) {
       display: none;
       margin: 0;
     }
+
+    /* Compact Employee Identity Card */
     #password-modal .password-employee-card {
-      display: grid;
-      grid-template-columns: 44px minmax(0, 1fr);
-      gap: 12px;
+      display: flex;
       align-items: center;
-      margin-bottom: 16px;
-      padding: 12px;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 12px;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--bg-body);
+      background: rgba(255, 255, 255, 0.03);
     }
-    :root[data-theme='dark'] #password-modal .password-employee-card {
-      background: rgba(255, 255, 255, 0.025);
-      border-color: rgba(151, 176, 210, 0.15);
+    :root[data-theme='light'] #password-modal .password-employee-card {
+      background: #f8fafc;
+      border-color: #e2e8f0;
     }
     #password-modal .password-employee-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #fff;
-      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-      font-size: 17px;
+      flex-shrink: 0;
+      color: #ffffff;
+      background: #059669;
+      font-size: 16px;
       font-weight: 800;
-      box-shadow: var(--shadow-soft);
     }
     #password-modal .password-employee-copy {
       min-width: 0;
+      flex: 1;
     }
-    #password-modal .password-employee-copy label,
-    #password-modal .password-reset-field label {
-      display: block;
-      margin-bottom: 5px;
-      color: var(--text-secondary);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      line-height: 1.2;
-      text-transform: uppercase;
-    }
-    #password-modal #password-employee-name {
-      height: auto;
-      padding: 0;
-      border: none;
-      border-radius: 0;
-      background: transparent;
-      box-shadow: none;
-      color: var(--text-primary);
+    #password-modal .password-employee-name {
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+      line-height: 1.25;
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
     }
+    #password-modal .password-employee-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #password-modal .password-employee-id {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    #password-modal .password-meta-dot {
+      color: var(--text-muted);
+      font-size: 10px;
+      user-select: none;
+    }
+    #password-modal .password-employee-status-slot .employee-status-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      min-height: 20px;
+      line-height: 1.4;
+    }
+
+    /* Password Input Field */
     #password-modal .password-reset-field {
-      margin-bottom: 0;
+      margin-top: 16px;
+      margin-bottom: 12px;
+    }
+    #password-modal .password-field-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
     }
     #password-modal .password-input-shell {
       position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
     }
-    #password-modal .password-input-shell .form-control {
-      min-height: 46px;
-      padding-right: 48px;
-      border-radius: 12px;
-      font-weight: 600;
-    }
-    #password-modal .password-toggle {
+    #password-modal .password-input-lead-icon {
       position: absolute;
-      top: 50%;
-      right: 9px;
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      border: none;
-      border-radius: 9px;
+      left: 14px;
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 2;
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    #password-modal .password-input-shell .password-input {
+      width: 100%;
+      height: 44px;
+      min-height: 44px;
+      padding: 10px 42px 10px 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 500;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    #password-modal .password-input-shell .password-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      outline: none;
+    }
+    :root[data-theme='light'] #password-modal .password-input-shell .password-input {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+    :root[data-theme='light'] #password-modal .password-input-shell .password-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    /* Single Eye Button */
+    #password-modal .password-toggle-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
       transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
       background: transparent;
       color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 14px;
+      z-index: 2;
+      padding: 0;
     }
-    #password-modal .password-toggle:hover,
-    #password-modal .password-toggle.visible {
-      background: var(--accent-soft);
+    #password-modal .password-toggle-btn:hover,
+    #password-modal .password-toggle-btn.visible {
       color: var(--accent);
+      background: var(--accent-soft);
     }
-    #password-modal .password-helper {
-      margin-top: 8px;
+    :root[data-theme='light'] #password-modal .password-toggle-btn:hover,
+    :root[data-theme='light'] #password-modal .password-toggle-btn.visible {
+      color: #2563eb;
+      background: #eff6ff;
+    }
+    #password-modal .password-toggle-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+    #password-modal .password-toggle-btn i::before,
+    #password-modal .password-toggle-btn .local-fa-icon::before {
+      content: none !important;
+      display: none !important;
+    }
+    #password-modal .password-toggle-btn svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+      stroke: currentColor;
+    }
+
+    /* Compact Requirements & Strength Status Strip */
+    #password-modal .password-status-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      margin-bottom: 20px;
+    }
+    :root[data-theme='light'] #password-modal .password-status-panel {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
+    #password-modal .password-req-strip {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+    #password-modal .req-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      font-weight: 600;
       color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+    #password-modal .req-item .req-icon {
+      font-size: 13px;
+      width: 14px;
+      height: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    #password-modal .req-item .req-icon::before,
+    #password-modal .req-item .local-fa-icon::before {
+      content: none !important;
+      display: none !important;
+    }
+    #password-modal .req-item .req-icon svg {
+      width: 14px;
+      height: 14px;
+      display: block;
+      stroke: currentColor;
+    }
+    #password-modal .req-item.fulfilled {
+      color: #34d399;
+      font-weight: 700;
+    }
+    #password-modal .req-item.fulfilled .req-icon {
+      color: #10b981;
+    }
+    :root[data-theme='light'] #password-modal .req-item.fulfilled {
+      color: #059669;
+    }
+    :root[data-theme='light'] #password-modal .req-item.fulfilled .req-icon {
+      color: #059669;
+    }
+
+    #password-modal .password-strength-strip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       font-size: 12px;
+      flex-shrink: 0;
+    }
+    #password-modal .strength-label {
+      color: var(--text-muted);
       font-weight: 600;
     }
+    #password-modal .strength-text {
+      font-weight: 700;
+      min-width: 82px;
+      text-align: right;
+      transition: color 0.2s ease;
+    }
+    #password-modal .strength-text.strength-none { color: var(--text-muted); }
+    #password-modal .strength-text.strength-weak { color: #f87171; }
+    #password-modal .strength-text.strength-medium { color: #fbbf24; }
+    #password-modal .strength-text.strength-strong { color: #34d399; }
+    :root[data-theme='light'] #password-modal .strength-text.strength-weak { color: #dc2626; }
+    :root[data-theme='light'] #password-modal .strength-text.strength-medium { color: #d97706; }
+    :root[data-theme='light'] #password-modal .strength-text.strength-strong { color: #059669; }
+
+    #password-modal .strength-track {
+      height: 6px;
+      width: 72px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    :root[data-theme='light'] #password-modal .strength-track {
+      background: #e2e8f0;
+    }
+    #password-modal .strength-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: width 0.3s ease, background-color 0.3s ease;
+      background-color: transparent;
+    }
+    #password-modal .strength-bar.bar-weak { width: 33.33%; background-color: #ef4444; }
+    #password-modal .strength-bar.bar-medium { width: 66.66%; background-color: #f59e0b; }
+    #password-modal .strength-bar.bar-strong { width: 100%; background-color: #10b981; }
+
+    /* Modal Actions (Side by Side) */
     #password-modal .password-actions {
-      display: grid;
-      grid-template-columns: 1fr 1.25fr;
-      gap: 10px;
-      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 0;
+      padding-top: 0;
     }
-    #password-modal .password-actions .btn {
-      width: auto;
-      min-height: 42px;
-      border-radius: 11px;
+    #password-modal .password-btn-cancel,
+    #password-modal .password-btn-submit {
+      height: 40px;
+      min-height: 40px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      cursor: pointer;
     }
-    @media (max-width: 480px) {
-      #password-modal .modal {
-        max-width: calc(100vw - 28px);
+    #password-modal .password-btn-cancel {
+      padding: 0 18px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    #password-modal .password-btn-cancel:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-primary);
+    }
+    :root[data-theme='light'] #password-modal .password-btn-cancel {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+    :root[data-theme='light'] #password-modal .password-btn-cancel:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    #password-modal .password-btn-submit {
+      padding: 0 22px;
+      border: none;
+      background: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+    #password-modal .password-btn-submit:hover:not(:disabled) {
+      background: #1d4ed8;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+      transform: translateY(-1px);
+    }
+    #password-modal .password-btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    @media (max-width: 540px) {
+      #password-modal .modal.password-modal-dialog {
+        max-width: calc(100vw - 24px);
+        margin: 12px;
       }
-      #password-modal .modal-header,
+      #password-modal .password-modal-header,
       #password-modal .password-modal-body {
         padding-left: 16px;
         padding-right: 16px;
       }
+      #password-modal .password-status-panel {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      #password-modal .password-strength-strip {
+        width: 100%;
+        justify-content: space-between;
+      }
       #password-modal .password-actions {
-        grid-template-columns: 1fr;
+        flex-direction: column-reverse;
+        width: 100%;
+      }
+      #password-modal .password-btn-cancel,
+      #password-modal .password-btn-submit {
+        width: 100%;
+        justify-content: center;
       }
     }
 
+    /* ── Employee Photo Viewer Modal ── */
+    .photo-viewer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1070;
+      background: rgba(3, 7, 18, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .photo-viewer-overlay.show {
+      display: flex;
+    }
+    .photo-viewer-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg, 16px);
+      box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.5);
+      max-width: 560px;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: photoViewerZoomIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes photoViewerZoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.93) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    .photo-viewer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    .photo-viewer-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .photo-viewer-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .photo-viewer-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .photo-viewer-meta {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      background: var(--bg-secondary);
+      padding: 2px 8px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+    }
+    .photo-viewer-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .photo-viewer-close-btn:hover {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .photo-viewer-body {
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.04);
+      min-height: 280px;
+      max-height: 60vh;
+      overflow: hidden;
+    }
+    :root[data-theme='dark'] .photo-viewer-body {
+      background: rgba(0, 0, 0, 0.35);
+    }
+    .photo-viewer-frame {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .photo-viewer-img {
+      max-width: 100%;
+      max-height: 52vh;
+      object-fit: contain;
+      border-radius: var(--radius);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--border);
+      background: var(--bg-card);
+    }
+    .photo-viewer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    .photo-viewer-caption {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .photo-viewer-emp-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .photo-viewer-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .photo-viewer-dismiss-btn {
+      height: 32px;
+      padding: 0 14px;
+      font-size: 12.5px;
+    }
 
+    /* ── Add New Employee Modal Dialog ── */
+    #add-modal .modal.add-employee-modal-dialog {
+      max-width: 580px;
+      width: min(580px, calc(100vw - 32px));
+      border-radius: var(--radius-lg, 16px);
+      padding: 0;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4);
+    }
+    .add-employee-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      gap: 14px;
+    }
+    .add-employee-header-content {
+      min-width: 0;
+      flex: 1;
+    }
+    .add-emp-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--accent);
+      margin-bottom: 3px;
+      display: block;
+    }
+    #add-modal-heading {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+    .add-emp-sub-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin: 3px 0 0;
+      line-height: 1.4;
+    }
+    .add-emp-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .add-emp-close-btn:hover {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .add-employee-modal-body {
+      padding: 22px 24px;
+    }
+    .add-emp-inline-alert {
+      margin-bottom: 18px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      border-radius: var(--radius-sm);
+    }
+    .add-employee-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 20px;
+    }
+    @media (max-width: 580px) {
+      .add-employee-form-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+    }
+    .add-emp-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 0;
+    }
+    .add-emp-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.2px;
+    }
+    .required-star {
+      color: var(--danger, #ef4444);
+      margin-left: 2px;
+    }
+    .add-emp-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .add-emp-icon {
+      position: absolute;
+      left: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .add-emp-input {
+      width: 100%;
+      height: 42px;
+      padding: 8px 12px 8px 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    :root[data-theme='light'] .add-emp-input {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+    .add-emp-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      outline: none;
+    }
+    .add-emp-pwd-input {
+      padding-right: 44px !important;
+    }
+    .add-emp-eye-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: var(--radius-sm, 6px);
+      transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      padding: 0;
+      z-index: 2;
+    }
+    .add-emp-eye-btn:hover {
+      color: var(--text-primary);
+      background: rgba(0, 0, 0, 0.06);
+    }
+    :root[data-theme='dark'] .add-emp-eye-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+    .add-emp-eye-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+    .add-emp-eye-btn.visible {
+      color: var(--accent);
+    }
+    .password-eye-icon-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .password-eye-icon-wrap svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+      stroke: currentColor;
+    }
+    .add-emp-eye-btn i::before,
+    .add-emp-eye-btn .local-fa-icon::before,
+    .password-toggle-btn i::before,
+    .password-toggle-btn .local-fa-icon::before {
+      content: none !important;
+      display: none !important;
+    }
+    .field-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .add-employee-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    #add-btn {
+      min-width: 140px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+    #add-emp-cancel-btn {
+      height: 40px;
+      padding: 0 18px;
+      font-size: 13.5px;
+    }
 
     /* ── Import Employees Modal ── */
     #import-modal .modal.import-modal-dialog {
@@ -2500,7 +3498,7 @@
     }
     :root[data-theme='dark'] #import-modal .modal-header {
       background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(15, 39, 71, 0.45));
-      border-bottom-color: rgba(151, 176, 210, 0.14);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     #import-modal .import-title-wrap {
       display: flex;
@@ -2711,7 +3709,7 @@
     }
     :root[data-theme='dark'] .import-requirements-box {
       background: rgba(255, 255, 255, 0.02);
-      border-color: rgba(151, 176, 210, 0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .import-requirements-box h5 {
       margin: 0 0 10px;
@@ -2968,14 +3966,14 @@
       pointer-events: none;
     }
     :root[data-theme='dark'] .tbl-pg-btn {
-      background: rgba(9,17,29,0.58);
-      border-color: rgba(151,176,210,0.14);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.16);
       color: var(--text-secondary);
     }
     :root[data-theme='dark'] .tbl-pg-btn:hover:not(:disabled):not(.active) {
-      background: rgba(139,180,255,0.12);
-      border-color: rgba(139,180,255,0.4);
-      color: #8bb4ff;
+      background: rgba(0, 107, 60, 0.2);
+      border-color: var(--accent);
+      color: #6ee7b7;
     }
     :root[data-theme='dark'] .tbl-pg-btn.active {
       background: linear-gradient(135deg, var(--accent), #1d4ed8);
@@ -2997,13 +3995,17 @@
 <div class="app-layout admin-page">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div>
-          <h2>CLN Lending Suite</h2>
-          <span>Admin Console</span>
+      <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
         </div>
-      </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Admin Console</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -3053,59 +4055,60 @@
 
 
       <!-- Working Hours & System Status Card -->
-      <div class="card working-hours-card" style="margin-bottom: 20px;">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding: 16px 20px;">
-          <div style="display: flex; align-items: center; gap: 10px;">
+      <div class="card working-hours-card compact-working-hours" style="margin-bottom: 20px;">
+        <div class="working-hours-header">
+          <div class="working-hours-header-left">
             <span class="working-hours-card-icon"><i class="fas fa-clock"></i></span>
             <div>
-              <h3 style="font-size: 15px; font-weight: 800; margin: 0; color: var(--text-primary);">Employee Working Hours & System Status</h3>
-              <p style="font-size: 12px; color: var(--text-muted); margin: 2px 0 0;">Automatic session scheduling & real-time operational status</p>
+              <h3 class="working-hours-title">Employee Working Hours & System Status</h3>
+              <p class="working-hours-sub">Automatic session scheduling & real-time operational status</p>
             </div>
           </div>
-          <div id="working-hours-status-badge">
-            <span class="badge badge-inactive">Checking Status...</span>
+          <div class="working-hours-header-right">
+            <div id="working-hours-status-badge">
+              <span class="badge badge-inactive">Checking Status...</span>
+            </div>
           </div>
         </div>
-        <div class="card-body" style="padding: 20px;">
-          <div class="working-hours-layout-grid">
 
-            <!-- Left Side Settings Pane -->
-            <div class="settings-pane">
-              <div class="settings-pane-header">
-                <h4 style="font-size: 14px; font-weight: 700; margin: 0 0 4px; color: var(--text-primary);"><i class="fas fa-sliders" style="margin-right: 6px; color: var(--accent-secondary);"></i>Schedule Configuration</h4>
-                <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Specify standard operational hours. Non-override employees outside this window are automatically restricted.</p>
-              </div>
-              <div class="time-pickers-row" style="margin-top: 16px;">
-                <div class="time-picker-group">
-                  <label for="auto-activation-time">Start Time (Auto-Activation)</label>
-                  <input type="time" id="auto-activation-time" class="form-control" />
-                </div>
-                <div class="time-picker-group">
-                  <label for="auto-deactivation-time">End Time (Auto-Deactivation)</label>
-                  <input type="time" id="auto-deactivation-time" class="form-control" />
-                </div>
-              </div>
-              <button class="btn btn-primary" onclick="saveWorkingHours()" id="save-hours-btn" style="margin-top: 18px; width: 100%; height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-                <i class="fas fa-floppy-disk"></i>
-                <span>Save Hours</span>
-              </button>
-            </div>
-
-            <!-- Right Side Status Display Pane -->
-            <div class="status-display-pane">
-              <div class="status-display-card">
-                <div class="status-display-header">
-                  <span class="pulse-dot" id="live-status-dot"></span>
-                  <span class="status-text" id="live-status-text">Checking Hours...</span>
-                </div>
-                <div class="live-clock" id="live-clock-time">--:--:-- --</div>
-                <div class="live-clock-meta" id="live-clock-meta"><i class="fas fa-earth-asia" style="margin-right: 4px;"></i> Asia/Kolkata Time Zone (IST)</div>
-                <div class="current-schedule-info" id="current-schedule-display">
-                  Working Hours: --:-- - --:--
-                </div>
+        <div class="working-hours-body">
+          <!-- Schedule Controls Group (Left) -->
+          <div class="working-hours-controls-group">
+            <div class="wh-time-item">
+              <label for="auto-activation-time" class="wh-label"><i class="fas fa-sun"></i> Start Time</label>
+              <div class="wh-input-wrapper">
+                <input type="time" id="auto-activation-time" class="form-control wh-time-input" />
               </div>
             </div>
+            <div class="wh-time-sep"><i class="fas fa-arrow-right"></i></div>
+            <div class="wh-time-item">
+              <label for="auto-deactivation-time" class="wh-label"><i class="fas fa-moon"></i> End Time</label>
+              <div class="wh-input-wrapper">
+                <input type="time" id="auto-deactivation-time" class="form-control wh-time-input" />
+              </div>
+            </div>
+            <button class="btn btn-primary wh-save-btn" onclick="saveWorkingHours()" id="save-hours-btn" title="Save Working Hours">
+              <i class="fas fa-floppy-disk"></i>
+              <span>Save Hours</span>
+            </button>
+          </div>
 
+          <!-- Divider -->
+          <div class="wh-vdivider"></div>
+
+          <!-- Operational Status Group (Right) -->
+          <div class="working-hours-status-group">
+            <div class="wh-status-live-pill">
+              <span class="pulse-dot" id="live-status-dot"></span>
+              <span class="wh-live-text" id="live-status-text">Checking Hours...</span>
+            </div>
+            <div class="wh-clock-block">
+              <div class="wh-clock-val" id="live-clock-time">--:--:-- --</div>
+              <div class="wh-clock-meta" id="live-clock-meta"><i class="fas fa-earth-asia"></i> Asia/Kolkata Time Zone (IST)</div>
+            </div>
+            <div class="wh-schedule-pill" id="current-schedule-display" title="Active configured working hours">
+              Working Hours: --:-- - --:--
+            </div>
           </div>
         </div>
       </div>
@@ -3122,13 +4125,13 @@
 
         <div class="toolbar-filters-container">
           <div class="filter-dropdown-wrapper">
-            <label for="status-filter">Status</label>
+            <label for="status-filter"><i class="fas fa-filter"></i> Filter Directory</label>
             <select id="status-filter" onchange="handleFilterChange()" class="toolbar-select">
-              <option value="">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="auto_deactivated">Auto-Deactivated</option>
-              <option value="override">Manual Override</option>
+              <option value="">All Statuses (0)</option>
+              <option value="active">Active (0)</option>
+              <option value="inactive">Inactive (0)</option>
+              <option value="auto_deactivated">Auto-Deactivated (0)</option>
+              <option value="override">Manual Override (0)</option>
             </select>
           </div>
         </div>
@@ -3147,7 +4150,7 @@
                   <h3>Employee Directory</h3>
                   <span id="count-badge" class="badge badge-employee employee-count-pill" aria-live="polite">0 employees</span>
                 </div>
-                <p>Manage team access, status, and account security</p>
+                <p class="employee-directory-subdesc">Manage team access, status, and account security</p>
               </div>
             </div>
           </div>
@@ -3163,18 +4166,18 @@
         <div class="table-wrapper employee-table-shell">
           <table class="employee-table" aria-label="Employee Directory">
             <colgroup>
-              <col class="col-index" style="width: 3.5%;" />
-              <col class="col-name" style="width: 18%;" />
-              <col class="col-email" style="width: 20%;" />
-              <col class="col-phone" style="width: 11%;" />
-              <col class="col-joined" style="width: 9.5%;" />
-              <col class="col-status" style="width: 17.5%;" />
-              <col class="col-actions" style="width: 20.5%;" />
+              <col class="col-index" style="width: 52px;" />
+              <col class="col-employee" style="width: 25%;" />
+              <col class="col-email" style="width: 23%;" />
+              <col class="col-phone" style="width: 13%;" />
+              <col class="col-joined" style="width: 11%;" />
+              <col class="col-status" style="width: 11%;" />
+              <col class="col-actions" style="width: 17%;" />
             </colgroup>
             <thead>
               <tr>
                 <th class="th-index">#</th>
-                <th class="th-name">Name</th>
+                <th class="th-employee">Employee</th>
                 <th class="th-email">Email</th>
                 <th class="th-phone">Phone</th>
                 <th class="th-joined">Joined</th>
@@ -3219,7 +4222,12 @@
       <!-- Hero Identity & Contact Ribbon -->
       <div class="emp-profile-identity-card">
         <div class="emp-profile-identity-left">
-          <div class="emp-profile-avatar" id="prof-avatar">E</div>
+          <button type="button" class="emp-profile-avatar-btn" id="prof-avatar-btn" aria-label="Employee profile photo">
+            <span class="emp-profile-avatar" id="prof-avatar">E</span>
+            <span class="prof-avatar-zoom-badge" id="prof-avatar-zoom-badge" aria-hidden="true" style="display: none;">
+              <i class="fas fa-magnifying-glass-plus"></i>
+            </span>
+          </button>
           <div class="emp-profile-identity-meta">
             <div class="emp-profile-name-row">
               <h4 id="prof-name">—</h4>
@@ -3283,11 +4291,27 @@
 
       <!-- PANEL 1: Personal Details -->
       <div class="emp-tab-panel active" id="prof-panel-personal" role="tabpanel">
-        <!-- Section A: Account Information -->
+        <!-- Section A: Access & Security -->
         <div class="emp-section-card">
-          <div class="emp-section-header">
-            <i class="fas fa-shield-halved" aria-hidden="true"></i>
-            <h5>Account Information</h5>
+          <div class="emp-section-header emp-section-header-split">
+            <div class="emp-section-title-group">
+              <i class="fas fa-shield-halved" aria-hidden="true"></i>
+              <h5>Access &amp; Security</h5>
+            </div>
+            <div class="emp-profile-access-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="prof-btn-reset-password" onclick="openPasswordModalFromProfile()" title="Reset this employee's password">
+                <i class="fas fa-key" aria-hidden="true"></i>
+                <span>Reset Password</span>
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="prof-btn-toggle-override" onclick="toggleOverrideFromProfile()" title="Toggle manual override">
+                <i class="fas fa-toggle-on" aria-hidden="true"></i>
+                <span id="prof-btn-override-label">Toggle Override</span>
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="prof-btn-toggle-status" onclick="toggleActiveFromProfile()" title="Activate or deactivate account">
+                <i class="fas fa-power-off" aria-hidden="true"></i>
+                <span id="prof-btn-status-label">Toggle Status</span>
+              </button>
+            </div>
           </div>
           <div class="emp-field-grid emp-cols-4">
             <div class="emp-field-cell">
@@ -3305,6 +4329,22 @@
             <div class="emp-field-cell">
               <label>Account Status</label>
               <span id="prof-account-status">—</span>
+            </div>
+            <div class="emp-field-cell">
+              <label>Manual Override</label>
+              <span id="prof-override-status">—</span>
+            </div>
+            <div class="emp-field-cell">
+              <label>Last Login</label>
+              <span id="prof-last-login">—</span>
+            </div>
+            <div class="emp-field-cell">
+              <label>Date Joined</label>
+              <span id="prof-joined-date">—</span>
+            </div>
+            <div class="emp-field-cell">
+              <label>KYC Verification</label>
+              <span id="prof-kyc-status-val">—</span>
             </div>
           </div>
         </div>
@@ -3521,7 +4561,7 @@
             </div>
             <div class="emp-field-cell">
               <label>Account Number</label>
-              <span id="prof-b-account" class="emp-masked-account">—</span>
+              <span id="prof-b-account" class="emp-doc-number">—</span>
             </div>
             <div class="emp-field-cell">
               <label>IFSC Code</label>
@@ -3639,7 +4679,7 @@
             <i class="fas fa-file-excel import-excel-badge" aria-hidden="true"></i>
             <div>
               <h4>Excel Template Workbook</h4>
-              <p>Download our official pre-formatted .xlsx template containing sample records, column schemas, and instructions.</p>
+              <p>Download our official pre-formatted .xlsx template containing demo employee records and column schemas.</p>
             </div>
           </div>
           <button type="button" class="btn btn-secondary btn-sm" id="btn-download-template" onclick="downloadExcelTemplate()">
@@ -3799,77 +4839,218 @@
   </div>
 </div>
 
-<!-- Add Employee Modal -->
-<div class="modal-overlay" id="add-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>Add New Employee</h3>
-      <button class="modal-close" onclick="closeAddModal()">Close</button>
+<!-- Add New Employee Modal -->
+<div class="modal-overlay" id="add-modal" role="dialog" aria-labelledby="add-modal-heading" aria-modal="true" onclick="handleAddModalBackdropClick(event)">
+  <div class="modal add-employee-modal-dialog" onclick="event.stopPropagation()">
+    <div class="modal-header add-employee-header">
+      <div class="add-employee-header-content">
+        <span class="add-emp-kicker">Employee Access</span>
+        <h3 id="add-modal-heading">Add New Employee</h3>
+        <p class="add-emp-sub-desc">
+          Create a new employee account with portal credentials and operational access.
+        </p>
+      </div>
+      <button type="button" class="modal-close add-emp-close-btn" onclick="closeAddModal()" aria-label="Close add employee modal" title="Close">
+        <i class="fas fa-xmark" aria-hidden="true"></i>
+      </button>
     </div>
-    <div id="modal-alert" class="alert"></div>
-    <div class="form-group"><label>Full Name</label><input type="text" id="emp-name" class="form-control" placeholder="John Doe" /></div>
-    <div class="form-group"><label>Email Address</label><input type="email" id="emp-email" class="form-control" placeholder="john@example.com" /></div>
-    <div class="form-group"><label>Phone Number</label><input type="tel" id="emp-phone" class="form-control" placeholder="9876543210" /></div>
-    <div class="form-group"><label>Password</label><input type="password" id="emp-password" class="form-control" placeholder="Min. 8 characters" /></div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="addEmployee()" id="add-btn">Add Employee</button>
+
+    <div class="add-employee-modal-body">
+      <div id="modal-alert" class="alert add-emp-inline-alert" style="display: none;"></div>
+
+      <div class="add-employee-form-grid">
+        <!-- Row 1: Full Name & Email Address -->
+        <div class="form-group add-emp-field">
+          <label for="emp-name" class="add-emp-label">Full Name <span class="required-star">*</span></label>
+          <div class="add-emp-input-wrapper">
+            <i class="fas fa-user add-emp-icon"></i>
+            <input type="text" id="emp-name" class="form-control add-emp-input" placeholder="e.g. John Doe" autocomplete="name" required />
+          </div>
+        </div>
+
+        <div class="form-group add-emp-field">
+          <label for="emp-email" class="add-emp-label">Email Address <span class="required-star">*</span></label>
+          <div class="add-emp-input-wrapper">
+            <i class="fas fa-envelope add-emp-icon"></i>
+            <input type="email" id="emp-email" class="form-control add-emp-input" placeholder="e.g. john@example.com" autocomplete="email" required />
+          </div>
+        </div>
+
+        <!-- Row 2: Phone Number & Password -->
+        <div class="form-group add-emp-field">
+          <label for="emp-phone" class="add-emp-label">Phone Number <span class="required-star">*</span></label>
+          <div class="add-emp-input-wrapper">
+            <i class="fas fa-phone add-emp-icon"></i>
+            <input type="tel" id="emp-phone" class="form-control add-emp-input" placeholder="e.g. 9876543210" maxlength="10" autocomplete="tel" required />
+          </div>
+          <span class="field-hint">10-digit mobile number</span>
+        </div>
+
+        <div class="form-group add-emp-field">
+          <label for="emp-password" class="add-emp-label">Password <span class="required-star">*</span></label>
+          <div class="add-emp-input-wrapper add-emp-pwd-wrapper">
+            <i class="fas fa-lock add-emp-icon"></i>
+            <input type="password" id="emp-password" class="form-control add-emp-input add-emp-pwd-input" placeholder="Min. 8 characters" autocomplete="new-password" required />
+            <button type="button" id="add-emp-pwd-toggle" class="add-emp-eye-btn" onclick="toggleAddEmployeePasswordVisibility()" aria-label="Show password" title="Show password">
+              <span class="password-eye-icon-wrap" id="add-emp-pwd-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/>
+                  <circle cx="12" cy="12" r="2.5"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+          <span class="field-hint">Minimum 8 characters</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions add-employee-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeAddModal()" id="add-emp-cancel-btn">Cancel</button>
+      <button type="button" class="btn btn-primary" onclick="addEmployee()" id="add-btn">
+        <i class="fas fa-user-plus"></i>
+        <span>Add Employee</span>
+      </button>
     </div>
   </div>
 </div>
 
-<!-- Reset Password Modal -->
-<div class="modal-overlay" id="password-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="password-title">
-        <div class="password-title-icon" aria-hidden="true">
-          <i class="fas fa-key"></i>
-        </div>
-        <div>
-          <p class="password-kicker">Employee Access</p>
-          <h3>Reset Employee Password</h3>
-        </div>
+<!-- Employee Profile Photo Viewer Modal -->
+<div class="modal-overlay photo-viewer-overlay" id="photo-viewer-modal" role="dialog" aria-labelledby="photo-viewer-title" aria-modal="true" onclick="handlePhotoViewerBackdropClick(event)">
+  <div class="photo-viewer-container" onclick="event.stopPropagation()">
+    <div class="photo-viewer-header">
+      <div class="photo-viewer-title-group">
+        <span class="photo-viewer-kicker"><i class="fas fa-image"></i> Profile Photo</span>
+        <h4 id="photo-viewer-title" class="photo-viewer-title">Employee Photo</h4>
+        <span id="photo-viewer-meta" class="photo-viewer-meta">ID #—</span>
       </div>
-      <button class="modal-close password-close-btn" onclick="closePasswordModal()" aria-label="Close reset password modal">
+      <button type="button" class="photo-viewer-close-btn" onclick="closePhotoViewer()" title="Close photo viewer (Esc)" aria-label="Close photo viewer">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+    <div class="photo-viewer-body">
+      <div class="photo-viewer-frame">
+        <img id="photo-viewer-img" src="" alt="Employee Profile Photo" class="photo-viewer-img" />
+      </div>
+    </div>
+    <div class="photo-viewer-footer">
+      <div class="photo-viewer-caption">
+        <span id="photo-viewer-name" class="photo-viewer-emp-name">Employee Name</span>
+        <span class="photo-viewer-tag" id="photo-viewer-role">Employee</span>
+      </div>
+      <button type="button" class="btn btn-secondary photo-viewer-dismiss-btn" onclick="closePhotoViewer()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Employee Password Security Modal -->
+<div class="modal-overlay" id="password-modal" role="dialog" aria-labelledby="password-modal-heading" aria-modal="true">
+  <div class="modal password-modal-dialog">
+    <div class="modal-header password-modal-header">
+      <div class="password-header-content">
+        <span class="password-kicker">Employee Access</span>
+        <h3 id="password-modal-heading">Reset Employee Password</h3>
+        <p class="password-sub-desc">
+          Set a new secure password for the selected employee. The employee will use this password on their next login.
+        </p>
+      </div>
+      <button type="button" class="modal-close password-close-btn" onclick="closePasswordModal()" aria-label="Close reset password modal" title="Close">
         <i class="fas fa-xmark" aria-hidden="true"></i>
       </button>
     </div>
+
     <div class="password-modal-body">
-      <div id="password-modal-alert" class="alert"></div>
+      <div id="password-modal-alert" class="alert password-inline-alert" role="alert" style="display:none;"></div>
+
+      <!-- Compact Employee Identity -->
       <div class="password-employee-card">
         <div class="password-employee-avatar" id="password-employee-avatar">E</div>
         <div class="password-employee-copy">
-          <label for="password-employee-name">Employee</label>
-          <input type="text" id="password-employee-name" class="form-control" readonly />
+          <input type="hidden" id="password-employee-name" />
+          <div class="password-employee-name" id="password-employee-name-display">—</div>
+          <div class="password-employee-meta">
+            <span class="password-employee-id" id="password-employee-id-display">Employee ID #—</span>
+            <span class="password-meta-dot" aria-hidden="true">&bull;</span>
+            <span class="password-employee-status-slot" id="password-employee-status-badge"></span>
+          </div>
         </div>
       </div>
+
+      <!-- New Password Input Field -->
       <div class="form-group password-reset-field">
-        <label for="new-password">New Password</label>
+        <label for="new-password" class="password-field-label">New Password</label>
         <div class="password-input-shell">
-          <input type="password" id="new-password" class="form-control" placeholder="Enter new password" autocomplete="new-password" />
-          <button type="button" class="password-toggle" id="password-visibility-toggle" onclick="toggleResetPasswordVisibility()" aria-label="Show password">
-            <i class="fas fa-eye" id="password-visibility-icon" aria-hidden="true"></i>
+          <span class="password-input-lead-icon" aria-hidden="true">
+            <i class="fas fa-lock"></i>
+          </span>
+          <input
+            type="password"
+            id="new-password"
+            class="form-control password-input"
+            placeholder="Enter new secure password"
+            autocomplete="new-password"
+            oninput="handlePasswordInput(this.value)"
+          />
+          <button
+            type="button"
+            class="password-toggle-btn"
+            id="password-visibility-toggle"
+            onclick="toggleResetPasswordVisibility()"
+            aria-label="Show password"
+            title="Show password"
+          >
+            <span class="password-eye-icon-wrap" id="password-visibility-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/>
+                <circle cx="12" cy="12" r="2.5"/>
+              </svg>
+            </span>
           </button>
         </div>
-        <div class="password-helper">Minimum 8 characters</div>
       </div>
+
+      <!-- Compact Requirements & Strength Status Strip -->
+      <div class="password-status-panel">
+        <div class="password-req-strip">
+          <span id="req-length" class="req-item unfulfilled">
+            <i class="fas fa-circle-dot req-icon" id="req-length-icon" aria-hidden="true"></i>
+            <span>At least 8 characters</span>
+          </span>
+        </div>
+        <div class="password-strength-strip" id="password-strength-box">
+          <span class="strength-label">Strength:</span>
+          <span class="strength-text strength-none" id="password-strength-text">Enter password</span>
+          <div class="strength-track" aria-hidden="true">
+            <div class="strength-bar" id="password-strength-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Actions (Side by Side) -->
       <div class="modal-actions password-actions">
-        <button class="btn btn-secondary" onclick="closePasswordModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="saveEmployeePassword()" id="password-btn">Update Password</button>
+        <button type="button" class="btn btn-secondary password-btn-cancel" onclick="closePasswordModal()" id="password-cancel-btn">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary password-btn-submit" onclick="saveEmployeePassword()" id="password-btn">
+          <i class="fas fa-key" aria-hidden="true"></i>
+          <span id="password-btn-text">Update Password</span>
+        </button>
       </div>
     </div>
   </div>
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705c"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script>
   let allEmployees = [];
   const PAGE_SIZE = 20;
   let currentPage = 1;
   let passwordEmployeeId = null;
   let currentProfileEmployeeId = null;
+  let currentProfileUser = null;
   const user = requireRole('admin');
   if (user) { renderSidebarUser(); loadEmployees(); loadWorkingHours(); initImportDropzone(); }
 
@@ -4013,9 +5194,10 @@
   function handleFilterChange() {
     currentPage = 1;
     renderTable();
+    updateActiveFilterChip(document.getElementById('status-filter')?.value || '');
   }
 
-  function filterByKpi(filterValue) {
+  function selectKpiChip(filterValue) {
     const select = document.getElementById('status-filter');
     if (select) {
       if (select.value === filterValue && filterValue !== '') {
@@ -4024,7 +5206,25 @@
         select.value = filterValue;
       }
       handleFilterChange();
+    } else {
+      updateActiveFilterChip(filterValue);
     }
+  }
+
+  function updateActiveFilterChip(activeValue) {
+    const chips = document.querySelectorAll('.wh-filter-chip');
+    chips.forEach(chip => {
+      const f = chip.getAttribute('data-filter') || '';
+      if (f === (activeValue || '')) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+  }
+
+  function filterByKpi(filterValue) {
+    selectKpiChip(filterValue);
   }
 
   function clearFilters() {
@@ -4061,14 +5261,32 @@
     return base ? `${base}/${path}` : `/${path}`;
   }
 
-  function renderEmployeeAvatar(employee, name) {
-    const initials = escapeHtml(employeeInitials(name));
+  function renderEmployeeIdentity(employee, name, id) {
+    const safeName = escapeHtml(String(name || 'Employee').trim() || 'Employee');
+    const empId = Number(id || employee?.id || 0);
+    const initials = escapeHtml(employeeInitials(safeName));
     const imageUrl = employeeAssetUrl(employee?.profile_picture);
+    const imgTag = imageUrl
+      ? `<img src="${escapeHtml(imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'" />`
+      : '';
+
     return `
-      <span class="employee-avatar-mini" aria-hidden="true">
-        <span class="employee-avatar-fallback">${initials}</span>
-        ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'" />` : ''}
-      </span>`;
+      <div class="employee-identity">
+        <button type="button" class="employee-identity-btn" onclick="openProfileModal(${empId})" title="View profile for ${safeName}" aria-label="View profile for ${safeName}">
+          <span class="employee-avatar-mini" aria-hidden="true">
+            <span class="employee-avatar-fallback">${initials}</span>
+            ${imgTag}
+          </span>
+          <span class="employee-identity-copy">
+            <span class="employee-name" title="${safeName}">${safeName}</span>
+            <span class="employee-id-sub">Employee #${empId}</span>
+          </span>
+        </button>
+      </div>`;
+  }
+
+  function renderEmployeeAvatar(employee, name, id) {
+    return renderEmployeeIdentity(employee, name, id);
   }
 
   function formatEmployeeDate(value) {
@@ -4216,11 +5434,8 @@
       return `
       <tr>
         <td data-label="#" class="employee-index-cell">${startIndex + i + 1}</td>
-        <td data-label="Name" class="employee-name-cell">
-          <button type="button" class="employee-identity employee-profile-trigger" onclick="openProfileModal(${id})" title="View profile for ${escapeHtml(name)}" aria-label="View profile for ${escapeHtml(name)}">
-            ${renderEmployeeAvatar(e, name)}
-            <span class="employee-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
-          </button>
+        <td data-label="Employee" class="employee-name-cell">
+          ${renderEmployeeIdentity(e, name, id)}
         </td>
         <td data-label="Email" class="employee-email-cell">${emailCell}</td>
         <td data-label="Phone" class="employee-phone-cell">${phoneCell}</td>
@@ -4460,6 +5675,23 @@
       document.getElementById('prof-joined').textContent = '—';
       document.getElementById('prof-avatar').textContent = 'E';
       document.getElementById('prof-avatar').style.background = '';
+      const profAvatarBtn = document.getElementById('prof-avatar-btn');
+      if (profAvatarBtn) {
+        profAvatarBtn.classList.remove('has-photo');
+        profAvatarBtn.onclick = null;
+        profAvatarBtn.removeAttribute('title');
+        profAvatarBtn.setAttribute('aria-label', 'Employee avatar');
+      }
+      const profZoomBadge = document.getElementById('prof-avatar-zoom-badge');
+      if (profZoomBadge) profZoomBadge.style.display = 'none';
+      const overrideEl = document.getElementById('prof-override-status');
+      if (overrideEl) overrideEl.textContent = '—';
+      const lastLoginEl = document.getElementById('prof-last-login');
+      if (lastLoginEl) lastLoginEl.textContent = '—';
+      const joinedDateEl = document.getElementById('prof-joined-date');
+      if (joinedDateEl) joinedDateEl.textContent = '—';
+      const kycValEl = document.getElementById('prof-kyc-status-val');
+      if (kycValEl) kycValEl.textContent = '—';
     }
 
     const empIdVal = document.getElementById('prof-employee-id-val');
@@ -4494,6 +5726,7 @@
       const { user: u, bank, emergency, activityLogs, loginHistory } = res.data.data;
       const b = bank || {};
       const e = emergency || {};
+      currentProfileUser = u;
 
       // Persistent Identity
       const employeeName = profileValue(u.name);
@@ -4507,13 +5740,29 @@
       const joinedVal = u.joining_date ? formatDate(u.joining_date) : (u.created_at ? formatDate(u.created_at) : '—');
       document.getElementById('prof-joined').textContent = joinedVal;
 
-      // Avatar
+      // Avatar & Photo Viewer trigger
       const profAvatar = document.getElementById('prof-avatar');
+      const profAvatarBtn = document.getElementById('prof-avatar-btn');
+      const profZoomBadge = document.getElementById('prof-avatar-zoom-badge');
       const profilePhotoUrl = employeeAssetUrl(u.profile_picture);
       if (profilePhotoUrl) {
-        profAvatar.innerHTML = `<img src="${escapeHtml(profilePhotoUrl)}" alt="${escapeHtml(employeeName)} profile photo" onerror="this.style.display='none'" />`;
+        profAvatar.innerHTML = `<img src="${escapeHtml(profilePhotoUrl)}" alt="${escapeHtml(employeeName)} profile photo" onerror="this.style.display='none'; document.getElementById('prof-avatar-zoom-badge')?.setAttribute('style', 'display:none !important');" />`;
+        if (profAvatarBtn) {
+          profAvatarBtn.classList.add('has-photo');
+          profAvatarBtn.setAttribute('title', `Click to view full photo of ${employeeName}`);
+          profAvatarBtn.setAttribute('aria-label', `View full photo of ${employeeName}`);
+          profAvatarBtn.onclick = () => openPhotoViewer(profilePhotoUrl, employeeName, u.id || id, u.role || 'employee');
+        }
+        if (profZoomBadge) profZoomBadge.style.display = 'inline-flex';
       } else {
         profAvatar.innerHTML = escapeHtml(employeeInitials(employeeName));
+        if (profAvatarBtn) {
+          profAvatarBtn.classList.remove('has-photo');
+          profAvatarBtn.removeAttribute('title');
+          profAvatarBtn.setAttribute('aria-label', `${employeeName} avatar`);
+          profAvatarBtn.onclick = null;
+        }
+        if (profZoomBadge) profZoomBadge.style.display = 'none';
       }
 
       // Status Badges
@@ -4529,13 +5778,55 @@
         hdrAcct.innerHTML = `<span class="badge employee-status-badge ${accountStatus.badgeClass}">${escapeHtml(accountStatus.label)}</span>`;
       }
 
-      // Personal Tab
+      // Personal Tab — Access & Security
       if (empIdVal) empIdVal.textContent = u.id ? `#${u.id}` : `#${id}`;
       const userEl = document.getElementById('prof-username');
       if (userEl) userEl.textContent = profileValue(u.username, '—');
       if (empRoleVal) empRoleVal.textContent = profileValue(u.role, 'employee');
       if (acctStatusCell) {
         acctStatusCell.innerHTML = `<span class="badge employee-status-badge ${accountStatus.badgeClass}">${escapeHtml(accountStatus.label)}</span>`;
+      }
+
+      // Manual Override status
+      const overrideEl = document.getElementById('prof-override-status');
+      if (overrideEl) {
+        const isOverridden = employeeFlag(u.manual_override);
+        overrideEl.innerHTML = isOverridden
+          ? '<span class="badge employee-status-badge badge-override"><i class="fas fa-hand" aria-hidden="true"></i> Override ON</span>'
+          : '<span class="text-muted" style="font-size:12px; font-weight:600;">Disabled</span>';
+      }
+      const overrideBtnLbl = document.getElementById('prof-btn-override-label');
+      if (overrideBtnLbl) {
+        overrideBtnLbl.textContent = employeeFlag(u.manual_override) ? 'Remove Override' : 'Enable Override';
+      }
+
+      // Status toggle button label
+      const statusBtnLbl = document.getElementById('prof-btn-status-label');
+      if (statusBtnLbl) {
+        statusBtnLbl.textContent = employeeFlag(u.is_active) ? 'Deactivate' : 'Activate';
+      }
+
+      // Last Login
+      const lastLoginEl = document.getElementById('prof-last-login');
+      if (lastLoginEl) {
+        if (loginHistory && loginHistory.length > 0 && loginHistory[0]?.login_time) {
+          const lt = loginHistory[0].login_time;
+          lastLoginEl.textContent = `${formatDate(lt)} · ${new Date(lt).toLocaleTimeString('en-IN')}`;
+        } else {
+          lastLoginEl.textContent = 'Never logged in';
+        }
+      }
+
+      // Joined Date
+      const joinedDateEl = document.getElementById('prof-joined-date');
+      if (joinedDateEl) {
+        joinedDateEl.textContent = u.joining_date ? formatDate(u.joining_date) : (u.created_at ? formatDate(u.created_at) : '—');
+      }
+
+      // KYC Status Val
+      const kycStatusVal = document.getElementById('prof-kyc-status-val');
+      if (kycStatusVal) {
+        kycStatusVal.innerHTML = `<span class="badge ${badgeClass}">● ${escapeHtml(kvs)}</span>`;
       }
 
       document.getElementById('prof-dob').textContent = u.date_of_birth ? formatDate(u.date_of_birth) : '—';
@@ -4575,7 +5866,7 @@
         document.getElementById('prof-b-bank').textContent = profileValue(b.bank_name, '—');
         document.getElementById('prof-b-ifsc').textContent = profileValue(b.ifsc_code, '—');
         const acctStr = profileValue(b.account_number, '');
-        document.getElementById('prof-b-account').textContent = acctStr ? (acctStr.length > 4 ? `••••••••${acctStr.slice(-4)}` : acctStr) : '—';
+        document.getElementById('prof-b-account').textContent = acctStr || '—';
         document.getElementById('prof-b-branch').textContent = profileValue(b.branch_name, '—');
       } else {
         if (bankGrid) bankGrid.style.display = 'none';
@@ -4801,9 +6092,68 @@
 
   function closeProfileModal() {
     currentProfileEmployeeId = null;
+    currentProfileUser = null;
     resetAdminDocPasswords(null);
     clearProfileAlert();
     document.getElementById('profile-modal').classList.remove('show');
+  }
+
+  function openPasswordModalFromProfile() {
+    if (!currentProfileEmployeeId) return;
+    const name = (currentProfileUser && currentProfileUser.name)
+      || document.getElementById('prof-name')?.textContent
+      || 'Employee';
+    openPasswordModal(currentProfileEmployeeId, name);
+  }
+
+  async function toggleOverrideFromProfile() {
+    if (!currentProfileEmployeeId || !currentProfileUser) return;
+    const isOverridden = employeeFlag(currentProfileUser.manual_override);
+    const newOverride = !isOverridden;
+    const btn = document.getElementById('prof-btn-toggle-override');
+    if (btn) btn.disabled = true;
+    try {
+      const endpoint = newOverride
+        ? `/admin/employees/${currentProfileEmployeeId}/override`
+        : `/admin/employees/${currentProfileEmployeeId}/remove-override`;
+      const res = await api.post(endpoint);
+      if (res?.ok) {
+        showAlert('profile-modal-alert', res.data?.message || (newOverride ? 'Manual override enabled.' : 'Manual override removed.'), 'success');
+        await loadEmployees();
+        await openProfileModal(currentProfileEmployeeId, { preserveAlert: true, preserveScroll: true, activeTab: 'personal' });
+      } else {
+        showAlert('profile-modal-alert', res?.data?.message || 'Failed to update override.', 'error');
+      }
+    } catch (err) {
+      showAlert('profile-modal-alert', 'Failed to update override status.', 'error');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  async function toggleActiveFromProfile() {
+    if (!currentProfileEmployeeId || !currentProfileUser) return;
+    const isActive = employeeFlag(currentProfileUser.is_active);
+    const newActive = !isActive;
+    const btn = document.getElementById('prof-btn-toggle-status');
+    if (btn) btn.disabled = true;
+    try {
+      const endpoint = newActive
+        ? `/admin/employees/${currentProfileEmployeeId}/activate`
+        : `/admin/employees/${currentProfileEmployeeId}/deactivate`;
+      const res = await api.post(endpoint);
+      if (res?.ok) {
+        showAlert('profile-modal-alert', res.data?.message || (newActive ? 'Employee activated successfully.' : 'Employee deactivated successfully.'), 'success');
+        await loadEmployees();
+        await openProfileModal(currentProfileEmployeeId, { preserveAlert: true, preserveScroll: true, activeTab: 'personal' });
+      } else {
+        showAlert('profile-modal-alert', res?.data?.message || 'Failed to update employee status.', 'error');
+      }
+    } catch (err) {
+      showAlert('profile-modal-alert', 'Failed to update employee status.', 'error');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
   }
 
   function setKycDecision(status, event) {
@@ -4928,8 +6278,130 @@
     }
   }
 
-  function openAddModal() { document.getElementById('add-modal').classList.add('show'); }
-  function closeAddModal() { document.getElementById('add-modal').classList.remove('show'); }
+  // ── Photo Viewer Modal Controller ──
+  function openPhotoViewer(imgUrl, name, id, role) {
+    if (!imgUrl) return;
+    const modal = document.getElementById('photo-viewer-modal');
+    const imgEl = document.getElementById('photo-viewer-img');
+    const titleEl = document.getElementById('photo-viewer-title');
+    const metaEl = document.getElementById('photo-viewer-meta');
+    const nameEl = document.getElementById('photo-viewer-name');
+    const roleEl = document.getElementById('photo-viewer-role');
+
+    if (imgEl) imgEl.src = imgUrl;
+    if (titleEl) titleEl.textContent = name || 'Employee Photo';
+    if (metaEl) metaEl.textContent = id ? `ID #${id}` : '';
+    if (nameEl) nameEl.textContent = name || 'Employee';
+    if (roleEl) roleEl.textContent = role || 'Employee';
+
+    if (modal) modal.classList.add('show');
+    document.addEventListener('keydown', handlePhotoViewerKeyDown);
+  }
+
+  function closePhotoViewer() {
+    const modal = document.getElementById('photo-viewer-modal');
+    if (modal) modal.classList.remove('show');
+    const imgEl = document.getElementById('photo-viewer-img');
+    if (imgEl) imgEl.src = '';
+    document.removeEventListener('keydown', handlePhotoViewerKeyDown);
+  }
+
+  function handlePhotoViewerBackdropClick(event) {
+    if (event.target.id === 'photo-viewer-modal') {
+      closePhotoViewer();
+    }
+  }
+
+  function handlePhotoViewerKeyDown(event) {
+    if (event.key === 'Escape' || event.key === 'Esc') {
+      closePhotoViewer();
+    }
+  }
+
+  const PASSWORD_EYE_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg>';
+  const PASSWORD_EYE_OFF_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
+
+  // ── Add Employee Modal Controller ──
+  function toggleAddEmployeePasswordVisibility() {
+    const input = document.getElementById('emp-password');
+    const toggle = document.getElementById('add-emp-pwd-toggle');
+    const icon = document.getElementById('add-emp-pwd-icon');
+    if (!input || !toggle) return;
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    toggle.classList.toggle('visible', show);
+    const label = show ? 'Hide password' : 'Show password';
+    toggle.setAttribute('aria-label', label);
+    toggle.setAttribute('title', label);
+    if (icon) {
+      icon.innerHTML = show ? PASSWORD_EYE_OFF_SVG : PASSWORD_EYE_SVG;
+    }
+    input.focus();
+  }
+
+  function clearAddModalAlert() {
+    const el = document.getElementById('modal-alert');
+    if (el) {
+      el.className = 'alert add-emp-inline-alert';
+      el.textContent = '';
+      el.style.display = 'none';
+    }
+  }
+
+  function showAddModalAlert(msg, type = 'error') {
+    const el = document.getElementById('modal-alert');
+    if (!el) return;
+    el.className = `alert add-emp-inline-alert alert-${type}`;
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function resetAddModalForm() {
+    ['emp-name', 'emp-email', 'emp-phone', 'emp-password'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const pwdInput = document.getElementById('emp-password');
+    if (pwdInput) pwdInput.type = 'password';
+    const toggle = document.getElementById('add-emp-pwd-toggle');
+    const icon = document.getElementById('add-emp-pwd-icon');
+    if (toggle) {
+      toggle.classList.remove('visible');
+      toggle.setAttribute('aria-label', 'Show password');
+      toggle.setAttribute('title', 'Show password');
+    }
+    if (icon) {
+      icon.innerHTML = PASSWORD_EYE_SVG;
+    }
+    clearAddModalAlert();
+  }
+
+  function openAddModal() {
+    resetAddModalForm();
+    const modal = document.getElementById('add-modal');
+    if (modal) modal.classList.add('show');
+    setTimeout(() => document.getElementById('emp-name')?.focus(), 90);
+    document.addEventListener('keydown', handleAddModalKeyDown);
+  }
+
+  function closeAddModal() {
+    const modal = document.getElementById('add-modal');
+    if (modal) modal.classList.remove('show');
+    resetAddModalForm();
+    document.removeEventListener('keydown', handleAddModalKeyDown);
+  }
+
+  function handleAddModalBackdropClick(e) {
+    if (e.target.id === 'add-modal') {
+      closeAddModal();
+    }
+  }
+
+  function handleAddModalKeyDown(e) {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      closeAddModal();
+    }
+  }
 
   function clearPasswordModalAlert() {
     const alertEl = document.getElementById('password-modal-alert');
@@ -4946,8 +6418,11 @@
     if (toggle) {
       toggle.classList.remove('visible');
       toggle.setAttribute('aria-label', 'Show password');
+      toggle.setAttribute('title', 'Show password');
     }
-    if (icon) icon.className = 'fas fa-eye';
+    if (icon) {
+      icon.innerHTML = PASSWORD_EYE_SVG;
+    }
   }
 
   function toggleResetPasswordVisibility() {
@@ -4958,69 +6433,298 @@
     const showPassword = input.type === 'password';
     input.type = showPassword ? 'text' : 'password';
     toggle.classList.toggle('visible', showPassword);
-    toggle.setAttribute('aria-label', showPassword ? 'Hide password' : 'Show password');
-    if (icon) icon.className = showPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+    const label = showPassword ? 'Hide password' : 'Show password';
+    toggle.setAttribute('aria-label', label);
+    toggle.setAttribute('title', label);
+    if (icon) {
+      icon.innerHTML = showPassword ? PASSWORD_EYE_OFF_SVG : PASSWORD_EYE_SVG;
+    }
     input.focus();
+  }
+
+  function evaluatePasswordStrength(pwd) {
+    if (!pwd || pwd.length === 0) {
+      return { score: 0, label: 'Enter password', textClass: 'strength-none', barClass: '' };
+    }
+    if (pwd.length < 8) {
+      return { score: 1, label: 'Weak', textClass: 'strength-weak', barClass: 'bar-weak' };
+    }
+
+    let complexity = 0;
+    if (/[A-Z]/.test(pwd)) complexity++;
+    if (/[a-z]/.test(pwd)) complexity++;
+    if (/[0-9]/.test(pwd)) complexity++;
+    if (/[^A-Za-z0-9]/.test(pwd)) complexity++;
+    if (pwd.length >= 10) complexity++;
+
+    if (complexity <= 2) {
+      return { score: 1, label: 'Weak', textClass: 'strength-weak', barClass: 'bar-weak' };
+    } else if (complexity <= 4) {
+      return { score: 2, label: 'Medium', textClass: 'strength-medium', barClass: 'bar-medium' };
+    } else {
+      return { score: 3, label: 'Strong', textClass: 'strength-strong', barClass: 'bar-strong' };
+    }
+  }
+
+  function handlePasswordInput(value) {
+    clearPasswordModalAlert();
+    const pwd = value || '';
+
+    // Requirement: At least 8 characters
+    const reqLength = document.getElementById('req-length');
+    const reqLengthIcon = document.getElementById('req-length-icon');
+    const isLengthOk = pwd.length >= 8;
+
+    if (reqLength && reqLengthIcon) {
+      if (isLengthOk) {
+        reqLength.className = 'req-item fulfilled';
+        reqLengthIcon.className = 'fas fa-circle-check req-icon local-fa-icon';
+        reqLengthIcon.innerHTML = (window.ICON_SVG && window.ICON_SVG.checkCircle)
+          || '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+      } else {
+        reqLength.className = 'req-item unfulfilled';
+        const isBlank = pwd.length === 0;
+        reqLengthIcon.className = (isBlank ? 'fas fa-circle-dot' : 'fas fa-circle-xmark') + ' req-icon local-fa-icon';
+        reqLengthIcon.innerHTML = isBlank
+          ? ((window.ICON_SVG && window.ICON_SVG.circleDot) || '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>')
+          : ((window.ICON_SVG && window.ICON_SVG.xCircle) || '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>');
+      }
+    }
+
+    // Strength
+    const strength = evaluatePasswordStrength(pwd);
+    const textEl = document.getElementById('password-strength-text');
+    const barEl = document.getElementById('password-strength-bar');
+
+    if (textEl && barEl) {
+      textEl.textContent = strength.label;
+      textEl.className = `strength-text ${strength.textClass}`;
+      barEl.className = `strength-bar ${strength.barClass}`;
+    }
+  }
+
+  function resetPasswordRequirements() {
+    handlePasswordInput('');
   }
 
   function openPasswordModal(id, name) {
     closeAllDropdowns();
     passwordEmployeeId = id;
-    document.getElementById('password-employee-name').value = name;
-    document.getElementById('new-password').value = '';
-    document.getElementById('password-employee-avatar').textContent = (name || 'E').trim().charAt(0).toUpperCase() || 'E';
+
+    // Resolve employee from directory records
+    const emp = Array.isArray(allEmployees)
+      ? (allEmployees.find(e => Number(e.id) === Number(id)) || { id, name })
+      : { id, name };
+
+    const empName = String(emp.name || name || 'Employee').trim() || 'Employee';
+    const empId = emp.id || id;
+    const empInitial = (empName.charAt(0) || 'E').toUpperCase();
+
+    const avatarEl = document.getElementById('password-employee-avatar');
+    if (avatarEl) avatarEl.textContent = empInitial;
+
+    const legacyInput = document.getElementById('password-employee-name');
+    if (legacyInput) legacyInput.value = empName;
+
+    const nameDisplay = document.getElementById('password-employee-name-display');
+    if (nameDisplay) nameDisplay.textContent = empName;
+
+    const idDisplay = document.getElementById('password-employee-id-display');
+    if (idDisplay) idDisplay.textContent = `Employee ID #${empId}`;
+
+    const statusSlot = document.getElementById('password-employee-status-badge');
+    if (statusSlot) {
+      if (typeof getEmployeeStatusMeta === 'function' && emp) {
+        const meta = getEmployeeStatusMeta(emp);
+        statusSlot.innerHTML = `<span class="badge employee-status-badge ${meta.badgeClass}">${escapeHtml(meta.label)}</span>`;
+      } else {
+        statusSlot.innerHTML = '';
+      }
+    }
+
+    const pwdInput = document.getElementById('new-password');
+    if (pwdInput) {
+      pwdInput.value = '';
+      pwdInput.type = 'password';
+    }
+
     resetPasswordVisibility();
+    resetPasswordRequirements();
     clearPasswordModalAlert();
+
+    const submitBtn = document.getElementById('password-btn');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-key" aria-hidden="true"></i> <span>Update Password</span>';
+    }
+    const cancelBtn = document.getElementById('password-cancel-btn');
+    if (cancelBtn) cancelBtn.disabled = false;
+
     document.getElementById('password-modal').classList.add('show');
-    setTimeout(() => document.getElementById('new-password')?.focus(), 80);
+    setTimeout(() => document.getElementById('new-password')?.focus(), 90);
   }
 
   function closePasswordModal() {
     passwordEmployeeId = null;
-    document.getElementById('password-modal').classList.remove('show');
-    clearPasswordModalAlert();
+    const modal = document.getElementById('password-modal');
+    if (modal) modal.classList.remove('show');
+
+    const pwdInput = document.getElementById('new-password');
+    if (pwdInput) pwdInput.value = '';
+
     resetPasswordVisibility();
+    resetPasswordRequirements();
+    clearPasswordModalAlert();
+
+    const submitBtn = document.getElementById('password-btn');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-key" aria-hidden="true"></i> <span>Update Password</span>';
+    }
+    const cancelBtn = document.getElementById('password-cancel-btn');
+    if (cancelBtn) cancelBtn.disabled = false;
   }
 
   async function saveEmployeePassword() {
-    const password = document.getElementById('new-password').value;
-    if (!password || password.trim().length < 8) {
+    clearPasswordModalAlert();
+    if (!passwordEmployeeId) {
+      return showAlert('password-modal-alert', 'Please select a valid employee record.', 'error');
+    }
+
+    const pwdInput = document.getElementById('new-password');
+    const password = pwdInput ? pwdInput.value : '';
+
+    if (!password) {
+      if (pwdInput) pwdInput.focus();
+      return showAlert('password-modal-alert', 'Please enter a new password.', 'error');
+    }
+
+    if (password.trim().length < 8) {
+      if (pwdInput) pwdInput.focus();
       return showAlert('password-modal-alert', 'Password must be at least 8 characters long.', 'error');
     }
 
     const btn = document.getElementById('password-btn');
-    btn.disabled = true;
-    btn.textContent = 'Updating...';
+    const cancelBtn = document.getElementById('password-cancel-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> <span>Updating...</span>';
+    }
+    if (cancelBtn) cancelBtn.disabled = true;
 
-    const res = await api.post(`/admin/employees/${passwordEmployeeId}/password`, { password });
+    try {
+      const res = await api.post(`/admin/employees/${passwordEmployeeId}/password`, { password });
 
-    btn.disabled = false;
-    btn.textContent = 'Update Password';
+      if (res?.ok) {
+        if (btn) {
+          btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> <span>Updated!</span>';
+        }
+        showAlert('password-modal-alert', res.data?.message || 'Employee password updated successfully.', 'success');
 
-    if (res?.ok) {
-      closePasswordModal();
-      showAlert('page-alert', res.data.message, 'success');
-    } else {
-      showAlert('password-modal-alert', res?.data?.message || 'Failed to update password.', 'error');
+        setTimeout(() => {
+          closePasswordModal();
+          showAlert('page-alert', res.data?.message || 'Employee password updated successfully.', 'success');
+          if (typeof loadEmployees === 'function') {
+            loadEmployees();
+          }
+        }, 750);
+      } else {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-key" aria-hidden="true"></i> <span>Update Password</span>';
+        }
+        if (cancelBtn) cancelBtn.disabled = false;
+        showAlert('password-modal-alert', res?.data?.message || 'Failed to update password.', 'error');
+        if (pwdInput) pwdInput.focus();
+      }
+    } catch (err) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-key" aria-hidden="true"></i> <span>Update Password</span>';
+      }
+      if (cancelBtn) cancelBtn.disabled = false;
+      showAlert('password-modal-alert', 'An unexpected network error occurred while updating password.', 'error');
     }
   }
 
   async function addEmployee() {
-    const name = document.getElementById('emp-name').value.trim();
-    const email = document.getElementById('emp-email').value.trim();
-    const phone = document.getElementById('emp-phone').value.trim();
-    const password = document.getElementById('emp-password').value;
-    if (!name || !email || !password) return showAlert('modal-alert', 'Name, email and password are required.', 'error');
+    clearAddModalAlert();
+    const nameInput = document.getElementById('emp-name');
+    const emailInput = document.getElementById('emp-email');
+    const phoneInput = document.getElementById('emp-phone');
+    const pwdInput = document.getElementById('emp-password');
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const password = pwdInput ? pwdInput.value : '';
+
+    if (!name) {
+      if (nameInput) nameInput.focus();
+      return showAddModalAlert('Please enter the employee full name.', 'error');
+    }
+    if (name.length < 2) {
+      if (nameInput) nameInput.focus();
+      return showAddModalAlert('Full name must be at least 2 characters long.', 'error');
+    }
+
+    const phoneRegex = /^\d{10}$/;
+    if (!phone) {
+      if (phoneInput) phoneInput.focus();
+      return showAddModalAlert('Please enter a 10-digit mobile phone number.', 'error');
+    }
+    if (!phoneRegex.test(phone)) {
+      if (phoneInput) phoneInput.focus();
+      return showAddModalAlert('Phone number must be exactly 10 numeric digits.', 'error');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      if (emailInput) emailInput.focus();
+      return showAddModalAlert('Please enter the employee email address.', 'error');
+    }
+    if (!emailRegex.test(email)) {
+      if (emailInput) emailInput.focus();
+      return showAddModalAlert('Please enter a valid email address (e.g. name@example.com).', 'error');
+    }
+
+    if (!password) {
+      if (pwdInput) pwdInput.focus();
+      return showAddModalAlert('Please enter a password for this employee account.', 'error');
+    }
+    if (password.length < 8) {
+      if (pwdInput) pwdInput.focus();
+      return showAddModalAlert('Password must be at least 8 characters long.', 'error');
+    }
+
     const btn = document.getElementById('add-btn');
-    btn.disabled = true; btn.textContent = 'Adding...';
-    const res = await api.post('/admin/employees', { name, email, phone, password });
-    btn.disabled = false; btn.textContent = 'Add Employee';
-    if (res?.ok) {
-      closeAddModal();
-      showAlert('page-alert', 'Employee added successfully!', 'success');
-      ['emp-name','emp-email','emp-phone','emp-password'].forEach(id => document.getElementById(id).value = '');
-      loadEmployees();
-    } else showAlert('modal-alert', res?.data?.message || 'Failed to add employee.', 'error');
+    const cancelBtn = document.getElementById('add-emp-cancel-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Creating Employee...</span>';
+    }
+    if (cancelBtn) cancelBtn.disabled = true;
+
+    try {
+      const res = await api.post('/admin/employees', { name, email, phone, password });
+      if (res?.ok) {
+        closeAddModal();
+        showAlert('page-alert', 'Employee account created successfully!', 'success');
+        loadEmployees();
+      } else {
+        showAddModalAlert(res?.data?.message || 'Failed to create employee.', 'error');
+        if (pwdInput) pwdInput.focus();
+      }
+    } catch (err) {
+      console.error('[AddEmployee] error:', err);
+      showAddModalAlert('An unexpected network error occurred while adding employee.', 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-user-plus"></i> <span>Add Employee</span>';
+      }
+      if (cancelBtn) cancelBtn.disabled = false;
+    }
   }
 
   async function loadWorkingHours() {

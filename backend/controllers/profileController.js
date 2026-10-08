@@ -15,6 +15,23 @@ async function logActivity(userId, activity, req, status = 'Success') {
   ).catch(() => {});
 }
 
+// ── Helper: normalize Date of Birth to YYYY-MM-DD calendar string ────────────
+function normalizeDateOfBirth(dob) {
+  if (!dob) return null;
+  if (typeof dob === 'string') {
+    const trimmed = dob.trim();
+    const match = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+    return match ? match[1] : trimmed;
+  }
+  if (dob instanceof Date && !isNaN(dob.getTime())) {
+    const y = dob.getFullYear();
+    const m = String(dob.getMonth() + 1).padStart(2, '0');
+    const d = String(dob.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  return null;
+}
+
 const profileController = {
 
   // ── GET /api/profile ──────────────────────────────────────────────────────
@@ -27,6 +44,9 @@ const profileController = {
 
       const user = { ...userRows[0] };
       delete user.password; // Never expose password hash
+      if (user.date_of_birth) {
+        user.date_of_birth = normalizeDateOfBirth(user.date_of_birth);
+      }
       user.aadhaar_password_configured = Boolean(user.aadhaar_document_password);
       user.pan_password_configured = Boolean(user.pan_document_password);
       delete user.aadhaar_document_password;
@@ -70,11 +90,36 @@ const profileController = {
         city, state, country, postal_code
       } = req.body;
 
+      let sanitizedDob = null;
+      if (date_of_birth !== undefined && date_of_birth !== null && String(date_of_birth).trim() !== '') {
+        const trimmed = String(date_of_birth).trim();
+        const match = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (!match) {
+          return res.status(400).json({ success: false, message: 'Invalid Date of Birth format. Please use YYYY-MM-DD.' });
+        }
+        const y = parseInt(match[1], 10);
+        const m = parseInt(match[2], 10);
+        const d = parseInt(match[3], 10);
+        if (y < 1900 || m < 1 || m > 12 || d < 1 || d > 31) {
+          return res.status(400).json({ success: false, message: 'Invalid Date of Birth values.' });
+        }
+        const daysInMonth = new Date(y, m, 0).getDate();
+        if (d > daysInMonth) {
+          return res.status(400).json({ success: false, message: `Invalid day for month ${m}: ${d}.` });
+        }
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        if (trimmed > todayStr) {
+          return res.status(400).json({ success: false, message: 'Date of Birth cannot be in the future.' });
+        }
+        sanitizedDob = trimmed;
+      }
+
       await db.query(
         `UPDATE users SET date_of_birth=?, gender=?, address=?, permanent_address=?,
          city=?, state=?, country=?, postal_code=? WHERE id=?`,
-        [date_of_birth || null, gender || null, address || null, permanent_address || null,
-         city || null, state || null, country || null, postal_code || null, userId]
+        [sanitizedDob, gender ? String(gender).trim() : null, address ? String(address).trim() : null, permanent_address ? String(permanent_address).trim() : null,
+         city ? String(city).trim() : null, state ? String(state).trim() : null, country ? String(country).trim() : null, postal_code ? String(postal_code).trim() : null, userId]
       );
 
       await logActivity(userId, 'Updated personal information', req);
@@ -478,6 +523,9 @@ const profileController = {
 
       const user = { ...userRows[0] };
       delete user.password;
+      if (user.date_of_birth) {
+        user.date_of_birth = normalizeDateOfBirth(user.date_of_birth);
+      }
       user.aadhaar_password_configured = Boolean(user.aadhaar_document_password);
       user.pan_password_configured = Boolean(user.pan_document_password);
       delete user.aadhaar_document_password;

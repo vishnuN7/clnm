@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — Employee Dashboard</title>
+  <title>Dixit Lending Solution — Employee Dashboard</title>
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -22,7 +23,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -70,14 +71,14 @@
       pointer-events: none;
     }
     :root[data-theme='dark'] .tbl-pg-btn {
-      background: rgba(9,17,29,0.58);
-      border-color: rgba(151,176,210,0.14);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.16);
       color: var(--text-secondary);
     }
     :root[data-theme='dark'] .tbl-pg-btn:hover:not(:disabled):not(.active) {
-      background: rgba(139,180,255,0.12);
-      border-color: rgba(139,180,255,0.4);
-      color: #8bb4ff;
+      background: rgba(0, 107, 60, 0.2);
+      border-color: var(--accent);
+      color: #6ee7b7;
     }
     :root[data-theme='dark'] .tbl-pg-btn.active {
       background: linear-gradient(135deg, var(--accent), #1d4ed8);
@@ -165,8 +166,8 @@
       overflow: hidden;
     }
     :root[data-theme='dark'] .status-dist-chart {
-      background: linear-gradient(135deg, rgba(139,180,255,0.08) 0%, rgba(10,19,32,0.68) 100%);
-      border-color: rgba(151,176,210,0.12);
+      background: linear-gradient(135deg, rgba(0, 107, 60, 0.08) 0%, rgba(16, 23, 33, 0.85) 100%);
+      border-color: rgba(123, 192, 67, 0.14);
     }
     .status-dist-chart canvas {
       max-width: 100%;
@@ -258,11 +259,11 @@
     }
     :root[data-theme='dark'] .status-item {
       background: rgba(11,20,34,0.5);
-      border-color: rgba(151,176,210,0.1);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     :root[data-theme='dark'] .status-item:hover {
       background: rgba(14,24,41,0.7);
-      border-color: rgba(151,176,210,0.2);
+      border-color: rgba(123, 192, 67, 0.12);
     }
 
     .status-item-zero {
@@ -314,7 +315,7 @@
       position: relative;
     }
     :root[data-theme='dark'] .status-bar-wrap {
-      background: rgba(151,176,210,0.08);
+      background: rgba(123, 192, 67, 0.12);
     }
     .status-bar-fill {
       height: 100%;
@@ -486,7 +487,7 @@
     :root[data-theme='dark'] .status-dist-period-filters,
     :root[data-theme='dark'] .analytics-period-filters {
       background: rgba(139,180,255,0.07);
-      border-color: rgba(151,176,210,0.14);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .status-dist-period-btn,
     .analytics-period-btn {
@@ -532,9 +533,9 @@
       margin-bottom: 22px;
     }
     :root[data-theme='dark'] .filters-bar {
-      background: linear-gradient(90deg, rgba(10, 19, 32, 0.92) 0%, rgba(14, 24, 41, 0.96) 100%);
-      border-color: rgba(151, 176, 210, 0.14);
-      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(90deg, rgba(16, 23, 33, 0.95) 0%, rgba(12, 18, 25, 0.98) 100%);
+      border-color: rgba(123, 192, 67, 0.14);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
     }
     .filter-group {
       display: inline-flex;
@@ -591,13 +592,13 @@
       border-color: var(--accent);
     }
     :root[data-theme='dark'] .filter-reset-btn {
-      background: rgba(10,19,32,0.6);
-      border-color: rgba(151,176,210,0.14);
+      background: rgba(20, 29, 41, 0.95);
+      border-color: rgba(123, 192, 67, 0.16);
     }
     :root[data-theme='dark'] .filter-reset-btn:hover {
-      background: rgba(14,24,41,0.8);
-      color: #8bb4ff;
-      border-color: #8bb4ff;
+      background: rgba(0, 107, 60, 0.2);
+      color: #6ee7b7;
+      border-color: var(--accent);
     }
 
     /* ── Primary KPI Cards ── */
@@ -622,8 +623,8 @@
       user-select: none;
     }
     :root[data-theme='dark'] .primary-kpi-card {
-      background: linear-gradient(135deg, rgba(10, 19, 32, 0.92) 0%, rgba(14, 25, 42, 0.96) 100%);
-      border-color: rgba(151, 176, 210, 0.14);
+      background: linear-gradient(135deg, rgba(16, 23, 33, 0.94) 0%, rgba(12, 18, 25, 0.98) 100%);
+      border-color: rgba(123, 192, 67, 0.14);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
     }
     .primary-kpi-card::before {
@@ -710,8 +711,8 @@
       position: relative;
     }
     :root[data-theme='dark'] .quick-action-card {
-      background: linear-gradient(135deg, rgba(10, 19, 32, 0.92) 0%, rgba(14, 25, 42, 0.96) 100%);
-      border-color: rgba(151, 176, 210, 0.14);
+      background: linear-gradient(135deg, rgba(16, 23, 33, 0.94) 0%, rgba(12, 18, 25, 0.98) 100%);
+      border-color: rgba(123, 192, 67, 0.14);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
     }
     .quick-action-card:hover {
@@ -720,7 +721,7 @@
       box-shadow: 0 12px 24px rgba(16,32,51,0.08);
     }
     :root[data-theme='dark'] .quick-action-card:hover {
-      border-color: rgba(139,180,255,0.4);
+      border-color: rgba(123, 192, 67, 0.28);
       box-shadow: 0 14px 28px rgba(0,0,0,0.32);
     }
     .quick-action-icon {
@@ -811,10 +812,17 @@
 <div class="app-layout employee-page">
   <aside class="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div><h2>CLN Lending Suite</h2><span>Employee Workspace</span></div>
-      </div>
+      <a href="/employee/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
+        </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Employee Workspace</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -865,7 +873,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
                 <h4>Notifications</h4>
               </div>
-              <button class="notif-dd-link" onclick="markAllRead()">Mark all read</button>
+              <button class="notif-dd-link" id="notif-mark-all" onclick="markAllRead()">Mark all read</button>
             </div>
             <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading…</div></div>
           </div>
@@ -1075,7 +1083,7 @@
 <div id="notif-toast" style="position:fixed;bottom:24px;right:24px;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.2);z-index:9999;display:none;align-items:center;gap:8px;"></div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705d"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
   let customerModalListenerAttached = false;

@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add Customer - CLN Employee</title>
+  <title>Dixit Lending Solution — Add Customer</title>
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -22,7 +23,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css?v=20260705d" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     /* ── Stepper Component ────────────────────────────────────── */
@@ -38,7 +39,7 @@
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
     }
     :root[data-theme='dark'] .onboarding-stepper {
-      border-color: rgba(151, 176, 210, 0.14);
+      border-color: rgba(123, 192, 67, 0.12);
       box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
     }
     .stepper-item {
@@ -65,7 +66,7 @@
     }
     :root[data-theme='dark'] .stepper-badge {
       background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(151, 176, 210, 0.15);
+      border-color: rgba(123, 192, 67, 0.16);
     }
     .stepper-info {
       display: flex;
@@ -117,7 +118,7 @@
       position: relative;
     }
     :root[data-theme='dark'] .stepper-connector {
-      background: rgba(151, 176, 210, 0.14);
+      background: rgba(123, 192, 67, 0.12);
     }
     .stepper-connector.is-active {
       background: var(--accent);
@@ -142,7 +143,7 @@
       transition: all 0.2s ease;
     }
     :root[data-theme='dark'] .customer-workflow-card {
-      border-color: rgba(151, 176, 210, 0.14);
+      border-color: rgba(123, 192, 67, 0.12);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
     }
     .workflow-card-header {
@@ -156,7 +157,7 @@
       background: var(--bg-card);
     }
     :root[data-theme='dark'] .workflow-card-header {
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      border-bottom-color: rgba(123, 192, 67, 0.12);
     }
     .workflow-card-header-left {
       display: flex;
@@ -276,8 +277,8 @@
       transition: all 0.18s ease;
     }
     :root[data-theme='dark'] .customer-form-grid .form-control {
-      background: rgba(9, 17, 29, 0.65);
-      border-color: rgba(151, 176, 210, 0.16);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
     }
     .customer-form-grid .form-control:focus {
       border-color: var(--accent);
@@ -316,7 +317,7 @@
       gap: 10px;
       margin-top: 18px;
       padding-top: 14px;
-      border-top: 1px solid rgba(151, 176, 210, 0.12);
+      border-top: 1px solid rgba(123, 192, 67, 0.12);
     }
     .form-submit-row .btn {
       height: 38px;
@@ -435,7 +436,7 @@
     }
     :root[data-theme='dark'] .summary-field-box {
       background: rgba(255, 255, 255, 0.02);
-      border-color: rgba(151, 176, 210, 0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .summary-field-box.full-span {
       grid-column: 1 / -1;
@@ -487,80 +488,87 @@
       background: rgba(139, 180, 255, 0.12);
       color: #8bb4ff;
     }
-    .upload-form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px 20px;
-    }
-    @media (max-width: 720px) {
-      .upload-form-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .upload-form-grid .form-control {
-      width: 100%;
-      height: 38px;
-      padding: 0 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-size: 13.5px;
-      box-sizing: border-box;
-    }
-    :root[data-theme='dark'] .upload-form-grid .form-control {
-      background: rgba(9, 17, 29, 0.65);
-      border-color: rgba(151, 176, 210, 0.16);
+    /* ── Native Password Reveal Suppression ──────────────────── */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear,
+    input::-ms-reveal,
+    input::-ms-clear {
+      display: none !important;
     }
 
-    /* ── File Chooser Dark Mode ────────────────────────────────── */
-    .custom-file-input {
+    /* ── Multi-File Upload Dropzone Box ───────────────────────── */
+    .upload-file-chooser-card {
+      margin-bottom: 18px;
+    }
+    .file-dropzone-box {
+      border: 2px dashed rgba(47, 111, 237, 0.35);
+      background: rgba(47, 111, 237, 0.025);
+      border-radius: 12px;
+      padding: 24px 22px;
       display: flex;
       align-items: center;
-      width: 100%;
-      height: 40px;
-      padding: 3px 8px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 12.5px;
-      color: var(--text-primary);
-      box-sizing: border-box;
+      justify-content: space-between;
+      gap: 18px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    :root[data-theme='dark'] .custom-file-input {
-      background: rgba(14, 23, 38, 0.7);
-      border-color: rgba(151, 176, 210, 0.2);
-      color: #e2e8f0;
+    :root[data-theme='dark'] .file-dropzone-box {
+      border-color: rgba(139, 180, 255, 0.28);
+      background: rgba(139, 180, 255, 0.035);
     }
-    .custom-file-input:hover {
+    .file-dropzone-box:hover,
+    .file-dropzone-box.is-dragover {
       border-color: var(--accent);
+      background: rgba(47, 111, 237, 0.065);
     }
-    .custom-file-input::-webkit-file-upload-button,
-    .custom-file-input::file-selector-button {
+    :root[data-theme='dark'] .file-dropzone-box:hover,
+    :root[data-theme='dark'] .file-dropzone-box.is-dragover {
+      border-color: #8bb4ff;
+      background: rgba(139, 180, 255, 0.08);
+    }
+    .dropzone-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
       background: rgba(47, 111, 237, 0.1);
-      border: 1px solid rgba(47, 111, 237, 0.28);
       color: var(--accent);
-      padding: 5px 14px;
-      border-radius: 6px;
-      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    :root[data-theme='dark'] .dropzone-icon {
+      background: rgba(139, 180, 255, 0.15);
+      color: #8bb4ff;
+    }
+    .dropzone-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .dropzone-title {
+      margin: 0 0 4px;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .dropzone-desc {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .dropzone-browse-btn {
+      width: auto !important;
+      flex-shrink: 0;
+      white-space: nowrap;
+      height: 38px;
+      padding: 0 18px;
+      font-size: 13px;
       font-weight: 600;
-      cursor: pointer;
-      margin-right: 12px;
-      transition: all 0.18s ease;
-    }
-    :root[data-theme='dark'] .custom-file-input::-webkit-file-upload-button,
-    :root[data-theme='dark'] .custom-file-input::file-selector-button {
-      background: rgba(59, 130, 246, 0.18);
-      border-color: rgba(96, 165, 250, 0.35);
-      color: #93c5fd;
-    }
-    .custom-file-input::-webkit-file-upload-button:hover,
-    .custom-file-input::file-selector-button:hover {
-      background: var(--accent);
-      color: #ffffff;
-      border-color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
     }
 
     /* ── Multi-File Staging Queue ────────────────────────────── */
@@ -580,7 +588,7 @@
     }
     .staged-queue-header h4 {
       margin: 0;
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text-primary);
       display: flex;
@@ -590,6 +598,9 @@
     .staged-queue-header h4 i {
       color: var(--accent);
     }
+    :root[data-theme='dark'] .staged-queue-header h4 i {
+      color: #8bb4ff;
+    }
     .staged-cards-list {
       display: flex;
       flex-direction: column;
@@ -598,16 +609,17 @@
     .staged-item-card {
       padding: 14px 16px;
       background: rgba(47, 111, 237, 0.035);
-      border: 1px solid rgba(47, 111, 237, 0.25);
-      border-radius: 11px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      border: 1px solid rgba(47, 111, 237, 0.22);
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 240px 1.2fr 1.2fr auto;
+      gap: 16px;
+      align-items: flex-start;
       transition: all 0.2s ease;
     }
     :root[data-theme='dark'] .staged-item-card {
-      background: rgba(139, 180, 255, 0.04);
-      border-color: rgba(139, 180, 255, 0.25);
+      background: rgba(139, 180, 255, 0.035);
+      border-color: rgba(139, 180, 255, 0.2);
     }
     .staged-item-card.has-error {
       background: rgba(239, 68, 68, 0.04);
@@ -617,25 +629,17 @@
       background: rgba(239, 68, 68, 0.07);
       border-color: rgba(239, 68, 68, 0.4);
     }
-    .staged-item-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .staged-item-meta-wrap {
+    .staged-file-col {
       display: flex;
       align-items: center;
       gap: 12px;
       min-width: 0;
-      flex: 1;
     }
-    .staged-item-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      background: rgba(47, 111, 237, 0.12);
+    .staged-file-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 9px;
+      background: rgba(47, 111, 237, 0.1);
       color: var(--accent);
       display: flex;
       align-items: center;
@@ -643,101 +647,106 @@
       font-size: 16px;
       flex-shrink: 0;
     }
-    :root[data-theme='dark'] .staged-item-icon {
-      background: rgba(139, 180, 255, 0.15);
-      color: #8bb4ff;
-    }
-    .staged-item-card.has-error .staged-item-icon {
-      background: rgba(239, 68, 68, 0.12);
-      color: #ef4444;
-    }
-    .staged-item-meta {
-      min-width: 0;
-      flex: 1;
-    }
-    .staged-item-name-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .staged-filename {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: var(--text-primary);
-      word-break: break-word;
-    }
-    .staged-size-badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 1px 7px;
-      border-radius: 10px;
-      background: rgba(0, 0, 0, 0.06);
-      color: var(--text-secondary);
-    }
-    :root[data-theme='dark'] .staged-size-badge {
-      background: rgba(255, 255, 255, 0.08);
-      color: #94a3b8;
-    }
-    .staged-status-badge {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 1px 8px;
-      border-radius: 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .staged-status-badge.status-ready {
-      background: rgba(47, 111, 237, 0.1);
-      color: var(--accent);
-    }
-    :root[data-theme='dark'] .staged-status-badge.status-ready {
+    :root[data-theme='dark'] .staged-file-icon {
       background: rgba(139, 180, 255, 0.14);
       color: #8bb4ff;
     }
-    .staged-status-badge.status-uploading {
-      background: rgba(245, 158, 11, 0.12);
-      color: #d97706;
+    .staged-file-col-info {
+      min-width: 0;
+      flex: 1;
     }
-    :root[data-theme='dark'] .staged-status-badge.status-uploading {
-      background: rgba(251, 191, 36, 0.14);
-      color: #fbbf24;
+    .staged-filename {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
     }
-    .staged-status-badge.status-uploaded {
-      background: rgba(16, 185, 129, 0.12);
-      color: #059669;
-    }
-    :root[data-theme='dark'] .staged-status-badge.status-uploaded {
-      background: rgba(52, 211, 153, 0.14);
-      color: #34d399;
-    }
-    .staged-status-badge.status-error {
-      background: rgba(239, 68, 68, 0.12);
-      color: #dc2626;
-    }
-    :root[data-theme='dark'] .staged-status-badge.status-error {
-      background: rgba(248, 113, 113, 0.15);
-      color: #f87171;
+    .staged-meta {
+      font-size: 11px;
+      color: var(--text-muted);
     }
     .staged-error-text {
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 600;
       color: #dc2626;
-      margin-top: 3px;
+      margin-top: 4px;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
     }
     :root[data-theme='dark'] .staged-error-text {
       color: #f87171;
     }
-    .staged-item-actions {
+    .staged-doctype-col,
+    .staged-pwd-col {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .staged-doctype-col .form-field-label,
+    .staged-pwd-col .form-field-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .staged-doctype-select {
+      height: 38px;
+      font-size: 13px;
+      border-radius: 8px;
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+    :root[data-theme='dark'] .staged-doctype-select {
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
+      color: #e2e8f0;
+    }
+    .staged-other-input {
+      height: 34px;
+      font-size: 12.5px;
+      border-radius: 6px;
+      margin-top: 6px;
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+    :root[data-theme='dark'] .staged-other-input {
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
+      color: #e2e8f0;
+    }
+    .staged-pwd-input {
+      height: 38px;
+      font-size: 13px;
+      border-radius: 8px;
+      padding-right: 40px;
+      width: 100%;
+    }
+    .staged-actions-col {
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-shrink: 0;
+      align-self: center;
     }
-    .staged-item-actions .btn {
+    .staged-actions-col .btn {
+      width: auto !important;
+      white-space: nowrap;
       height: 32px;
       padding: 0 12px;
       font-size: 12px;
@@ -746,37 +755,23 @@
       align-items: center;
       gap: 6px;
     }
-    .staged-item-config-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px 18px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(151, 176, 210, 0.12);
-    }
-    @media (max-width: 680px) {
-      .staged-item-config-grid {
-        grid-template-columns: 1fr;
+    @media (max-width: 1024px) {
+      .staged-item-card {
+        grid-template-columns: 1fr 1fr;
+      }
+      .staged-actions-col {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
       }
     }
-    .staged-config-field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .staged-config-field .form-control {
-      height: 38px;
-      padding: 0 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-size: 13px;
-      box-sizing: border-box;
-      width: 100%;
-    }
-    :root[data-theme='dark'] .staged-config-field .form-control {
-      background: rgba(9, 17, 29, 0.65);
-      border-color: rgba(151, 176, 210, 0.18);
+    @media (max-width: 640px) {
+      .staged-item-card {
+        grid-template-columns: 1fr;
+      }
+      .staged-actions-col {
+        grid-column: auto;
+        justify-content: flex-start;
+      }
     }
     .staged-batch-actions {
       display: flex;
@@ -791,7 +786,7 @@
     }
     :root[data-theme='dark'] .staged-batch-actions {
       background: rgba(255, 255, 255, 0.02);
-      border-color: rgba(151, 176, 210, 0.14);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .staged-batch-summary {
       font-size: 13px;
@@ -813,7 +808,7 @@
       gap: 8px;
     }
 
-    /* ── Password Input & Toggle Eye Button ───────────────────── */
+    /* ── Password Input & Single Eye Button ───────────────────── */
     .password-input-wrapper {
       position: relative;
       display: flex;
@@ -821,7 +816,7 @@
       width: 100%;
     }
     .password-input-wrapper .form-control {
-      padding-right: 42px;
+      padding-right: 40px;
       height: 38px;
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -832,45 +827,69 @@
       box-sizing: border-box;
     }
     :root[data-theme='dark'] .password-input-wrapper .form-control {
-      background: rgba(9, 17, 29, 0.65);
-      border-color: rgba(151, 176, 210, 0.18);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
+      color: #e2e8f0;
     }
     .toggle-password-btn {
       position: absolute;
-      right: 8px;
+      right: 6px;
       width: 28px;
       height: 28px;
-      background: rgba(0, 0, 0, 0.04);
-      border: 1px solid var(--border);
+      background: transparent;
+      border: none;
       border-radius: 6px;
       color: var(--text-muted);
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 13px;
+      padding: 0;
       transition: all 0.18s ease;
-    }
-    :root[data-theme='dark'] .toggle-password-btn {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(151, 176, 210, 0.18);
-      color: #94a3b8;
+      outline: none;
     }
     .toggle-password-btn:hover {
-      color: var(--text-primary);
-      border-color: var(--accent);
-      background: rgba(47, 111, 237, 0.1);
+      color: var(--accent);
+      background: rgba(47, 111, 237, 0.08);
     }
     :root[data-theme='dark'] .toggle-password-btn:hover {
-      color: #ffffff;
-      border-color: #8bb4ff;
+      color: #8bb4ff;
+      background: rgba(139, 180, 255, 0.12);
+    }
+    .toggle-password-btn i::before,
+    .toggle-password-btn .local-fa-icon::before,
+    .toggle-password-btn::before,
+    .toggle-password-btn::after {
+      content: none !important;
+      display: none !important;
+    }
+    .pwd-eye-icon-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .pwd-eye-icon-wrap svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+      stroke: currentColor;
+      fill: none;
+    }
+    .field-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
     }
 
     /* ── Uploaded Documents List & Cards ──────────────────────── */
     .uploaded-docs-section {
       margin-top: 24px;
       padding-top: 18px;
-      border-top: 1px solid rgba(151, 176, 210, 0.14);
+      border-top: 1px solid rgba(123, 192, 67, 0.12);
     }
     .uploaded-docs-header {
       display: flex;
@@ -923,7 +942,7 @@
     }
     :root[data-theme='dark'] .docs-empty-state {
       background: rgba(255, 255, 255, 0.02);
-      border-color: rgba(151, 176, 210, 0.12);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .docs-empty-state i {
       font-size: 22px;
@@ -945,7 +964,7 @@
     }
     :root[data-theme='dark'] .uploaded-doc-card {
       background: rgba(255, 255, 255, 0.02);
-      border-color: rgba(151, 176, 210, 0.14);
+      border-color: rgba(123, 192, 67, 0.12);
     }
     .uploaded-doc-card:hover {
       border-color: rgba(47, 111, 237, 0.3);
@@ -1036,7 +1055,7 @@
     .uploaded-doc-pwd-section {
       margin-top: 8px;
       padding-top: 8px;
-      border-top: 1px dashed rgba(151, 176, 210, 0.15);
+      border-top: 1px dashed rgba(123, 192, 67, 0.16);
     }
     .uploaded-pwd-row {
       display: flex;
@@ -1076,8 +1095,8 @@
       width: 100%;
     }
     :root[data-theme='dark'] .uploaded-pwd-input-wrap .form-control {
-      background: rgba(9, 17, 29, 0.7);
-      border-color: rgba(151, 176, 210, 0.18);
+      background: rgba(20, 29, 41, 0.96);
+      border-color: rgba(123, 192, 67, 0.18);
     }
     .uploaded-pwd-input-wrap .toggle-password-btn {
       width: 24px;
@@ -1091,6 +1110,8 @@
       gap: 8px;
     }
     .uploaded-doc-actions .btn {
+      width: auto !important;
+      white-space: nowrap;
       height: 32px;
       padding: 0 12px;
       font-size: 12px;
@@ -1223,7 +1244,7 @@
       overflow: hidden;
     }
     :root[data-theme='dark'] .local-preview-box {
-      border-color: rgba(151, 176, 210, 0.2);
+      border-color: rgba(123, 192, 67, 0.12);
       box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
     }
     .local-preview-header {
@@ -1343,15 +1364,17 @@
 <div class="app-layout add-customer-page employee-page">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M4 10h16"/><path d="M6 10V7l6-3 6 3v3"/><path d="M5 20h14"/><path d="M7 20v-7"/><path d="M12 20v-7"/><path d="M17 20v-7"/></svg>
+      <a href="/employee/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
         </div>
-        <div>
-          <h2>CLN Lending Suite</h2>
-          <span>Employee Workspace</span>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Employee Workspace</span>
         </div>
-      </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -1401,7 +1424,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
                 <h4>Notifications</h4>
               </div>
-              <button class="notif-dd-link" onclick="markAllRead()">Mark all read</button>
+              <button class="notif-dd-link" id="notif-mark-all" onclick="markAllRead()">Mark all read</button>
             </div>
             <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
           </div>
@@ -1535,6 +1558,9 @@
                 <button type="button" class="btn btn-secondary" id="cancel-edit-btn" onclick="cancelCustomerEdit()" style="display:none;">
                   <i class="fas fa-times"></i> <span>Cancel</span>
                 </button>
+                <button type="button" class="btn btn-secondary" id="discard-draft-btn" onclick="discardCustomerDraft()" style="display:none;" title="Discard unsaved customer draft and reset form">
+                  <i class="fas fa-trash-alt"></i> <span>Discard Draft</span>
+                </button>
                 <button type="submit" class="btn btn-primary" id="add-cust-btn">
                   <i class="fas fa-user-plus"></i> <span id="add-cust-btn-text">Add Customer</span>
                 </button>
@@ -1605,19 +1631,27 @@
             </div>
           </div>
           <div class="workflow-card-body">
-            <!-- File Chooser (Multi-file enabled) -->
-            <div class="upload-file-chooser-box">
-              <div class="form-group" style="margin-bottom:0;">
-                <label for="doc-files" class="form-field-label">File Upload <span class="req">*</span></label>
-                <input type="file" id="doc-files" class="custom-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" multiple onchange="handleFilesSelection(event)" />
-                <p class="paste-helper-text"><i class="fas fa-info-circle"></i> Select one or multiple documents (Ctrl/Shift supported). Allowed: PDF, JPG, PNG, WebP · Max 5MB per file.</p>
+            <!-- ── Multi-File Upload Chooser Box ── -->
+            <div class="upload-file-chooser-card">
+              <div class="file-dropzone-box" id="file-dropzone-box" onclick="document.getElementById('doc-file-input').click()">
+                <input type="file" id="doc-file-input" class="hidden-file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" onchange="handleMultipleFilesSelected(event)" style="display:none;" />
+                <div class="dropzone-icon">
+                  <i class="fas fa-cloud-arrow-up"></i>
+                </div>
+                <div class="dropzone-content">
+                  <h5 class="dropzone-title">Choose Files or Drag &amp; Drop Here</h5>
+                  <p class="dropzone-desc">Select one or multiple documents at once (hold Ctrl/Shift). Allowed: PDF, JPG, PNG, WebP · Max 5MB per file.</p>
+                </div>
+                <button type="button" class="btn btn-primary dropzone-browse-btn" onclick="event.stopPropagation(); document.getElementById('doc-file-input').click();">
+                  <i class="fas fa-folder-open"></i> <span>Browse Files</span>
+                </button>
               </div>
             </div>
 
-            <!-- Staged Files Queue (Immediately appears upon selecting one or more files) -->
+            <!-- Staged Files Queue (Documents Ready to Upload) -->
             <div class="selected-files-queue" id="selected-files-queue" style="display:none;">
               <div class="staged-queue-header">
-                <h4><i class="fas fa-layer-group"></i> Selected Documents (<span id="staged-count-num">0</span>)</h4>
+                <h4><i class="fas fa-layer-group"></i> Documents Ready to Upload (<span id="staged-count-num">0</span>)</h4>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="clearStagedQueue()" title="Clear all staged files">
                   <i class="fas fa-trash-alt"></i> <span>Clear Queue</span>
                 </button>
@@ -1720,7 +1754,7 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705d"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
   let currentCustomer = null;
@@ -1730,6 +1764,14 @@
   if (user) {
     renderSidebarUser();
     loadAreas();
+    setupDropzoneEvents();
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCustomerId = urlParams.get('customer_id');
+    if (urlCustomerId) {
+      loadExistingCustomerForWorkflow(urlCustomerId);
+    } else {
+      initCustomerDraft();
+    }
   }
 
   const netSalaryInput = document.getElementById('cust-net-salary');
@@ -1822,6 +1864,142 @@
     });
   }
 
+  // ── Customer Details Draft Auto-Save & Restoration ─────────
+  function getDraftStorageKey() {
+    const u = (typeof getUser === 'function' ? getUser() : null) || (typeof user !== 'undefined' ? user : null);
+    const uid = u?.id || 'default';
+    return `employee_${uid}_add_customer_draft`;
+  }
+
+  let draftDebounceTimer = null;
+
+  function debouncedSaveCustomerDraft() {
+    clearTimeout(draftDebounceTimer);
+    draftDebounceTimer = setTimeout(saveCustomerDraft, 250);
+  }
+
+  function saveCustomerDraft() {
+    // Only save draft when drafting a new customer (not editing an already saved customer)
+    if (isEditMode || (currentCustomer && currentCustomer.id)) return;
+
+    const draft = {
+      name: document.getElementById('cust-name')?.value || '',
+      phone: document.getElementById('cust-phone')?.value || '',
+      email: document.getElementById('cust-email')?.value || '',
+      area: document.getElementById('cust-area')?.value || '',
+      net_salary: document.getElementById('cust-net-salary')?.value || '',
+      total_obligation: document.getElementById('cust-total-obligation')?.value || '',
+      address: document.getElementById('cust-address')?.value || '',
+      quick_paste: document.getElementById('cust-quick-paste')?.value || '',
+      updatedAt: Date.now()
+    };
+
+    const hasContent = Object.entries(draft).some(([k, v]) => k !== 'updatedAt' && typeof v === 'string' && v.trim().length > 0);
+    if (!hasContent) {
+      clearCustomerDraft();
+      return;
+    }
+
+    try {
+      localStorage.setItem(getDraftStorageKey(), JSON.stringify(draft));
+      updateDiscardDraftBtnVisibility(true);
+    } catch (e) {}
+  }
+
+  function clearCustomerDraft() {
+    try {
+      localStorage.removeItem(getDraftStorageKey());
+    } catch (e) {}
+    updateDiscardDraftBtnVisibility(false);
+  }
+
+  function restoreCustomerDraft() {
+    if (currentCustomer && currentCustomer.id) return false;
+
+    try {
+      const raw = localStorage.getItem(getDraftStorageKey());
+      if (!raw) return false;
+      const draft = JSON.parse(raw);
+      if (!draft) return false;
+
+      let restoredAny = false;
+      const setIf = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined && val !== null && String(val).trim().length > 0) {
+          el.value = val;
+          restoredAny = true;
+        }
+      };
+
+      setIf('cust-name', draft.name);
+      setIf('cust-phone', draft.phone);
+      setIf('cust-email', draft.email);
+      setIf('cust-area', draft.area);
+      setIf('cust-address', draft.address);
+      setIf('cust-quick-paste', draft.quick_paste);
+
+      const salaryEl = document.getElementById('cust-net-salary');
+      if (salaryEl && draft.net_salary) {
+        salaryEl.value = draft.net_salary;
+        formatInputValue(salaryEl);
+        restoredAny = true;
+      }
+
+      const obligEl = document.getElementById('cust-total-obligation');
+      if (obligEl && draft.total_obligation) {
+        obligEl.value = draft.total_obligation;
+        formatInputValue(obligEl);
+        restoredAny = true;
+      }
+
+      if (restoredAny) {
+        updateDiscardDraftBtnVisibility(true);
+        return true;
+      }
+    } catch (e) {
+      return false;
+    }
+    return false;
+  }
+
+  function discardCustomerDraft() {
+    if (!confirm('Are you sure you want to discard this unsaved customer draft? All entered fields will be cleared.')) return;
+    clearCustomerDraft();
+    ['cust-name', 'cust-phone', 'cust-email', 'cust-area', 'cust-address', 'cust-quick-paste', 'cust-net-salary', 'cust-total-obligation'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    clearFieldErrors();
+    updateDiscardDraftBtnVisibility(false);
+    showAlert('page-alert', 'Customer draft discarded and form cleared.', 'info');
+  }
+
+  function updateDiscardDraftBtnVisibility(visible) {
+    const btn = document.getElementById('discard-draft-btn');
+    if (btn) {
+      btn.style.display = (visible && !isEditMode && !(currentCustomer && currentCustomer.id)) ? 'inline-flex' : 'none';
+    }
+  }
+
+  function initCustomerDraft() {
+    const restored = restoreCustomerDraft();
+    if (restored) {
+      showAlert('page-alert', 'Restored your unsaved customer details draft.', 'info');
+    }
+
+    const draftFields = ['cust-name', 'cust-phone', 'cust-email', 'cust-area', 'cust-address', 'cust-quick-paste', 'cust-net-salary', 'cust-total-obligation'];
+    draftFields.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', debouncedSaveCustomerDraft);
+        el.addEventListener('change', saveCustomerDraft);
+      }
+    });
+
+    window.addEventListener('pagehide', saveCustomerDraft);
+    window.addEventListener('beforeunload', saveCustomerDraft);
+  }
+
   function extractValueByLabel(text, labels) {
     const lines = text.split(/\r?\n/);
     for (const rawLine of lines) {
@@ -1869,6 +2047,7 @@ Official Email ID - rahul@infosys.com
 Total Work Experience - 6 Years
 Net Monthly Income (Rs) - 65000`;
     document.getElementById('cust-quick-paste').value = sample;
+    saveCustomerDraft();
   }
 
   function parseQuickPasteDetails(text) {
@@ -1904,6 +2083,7 @@ Net Monthly Income (Rs) - 65000`;
 
     const parsed = parseQuickPasteDetails(raw);
     applyParsedQuickPaste(parsed);
+    saveCustomerDraft();
     showAlert('page-alert', 'Customer fields prefilled from pasted sheet. Please verify and submit.', 'success');
   }
 
@@ -1987,6 +2167,7 @@ Net Monthly Income (Rs) - 65000`;
   function enableCustomerEdit() {
     if (!currentCustomer) return;
     isEditMode = true;
+    updateDiscardDraftBtnVisibility(false);
 
     document.getElementById('cust-name').value = currentCustomer.name || '';
     document.getElementById('cust-phone').value = currentCustomer.phone || '';
@@ -2008,6 +2189,7 @@ Net Monthly Income (Rs) - 65000`;
 
   function cancelCustomerEdit() {
     isEditMode = false;
+    updateDiscardDraftBtnVisibility(false);
     document.getElementById('cust-form-wrapper').style.display = 'none';
     document.getElementById('cust-summary-wrapper').style.display = 'block';
     document.getElementById('cancel-edit-btn').style.display = 'none';
@@ -2118,6 +2300,8 @@ Net Monthly Income (Rs) - 65000`;
       created_at: createdAt
     };
 
+    clearCustomerDraft();
+
     if (quickPaste) {
       const parsedQuickPaste = parseQuickPasteDetails(quickPaste);
       sessionStorage.setItem('cln_auto_loan_data', JSON.stringify({
@@ -2152,8 +2336,9 @@ Net Monthly Income (Rs) - 65000`;
     document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  // ── Multi-File Staging Queue & Session Password State ─────
+  // ── Document Upload Workflow State & Cache ───────────────
   let stagedDocuments = [];
+  let loadedCustomerDocumentsList = [];
   const sessionDocPasswords = new Map();
   const uploadedDocPasswordsState = new Map();
   let currentPreviewObjectURL = null;
@@ -2161,44 +2346,85 @@ Net Monthly Income (Rs) - 65000`;
   const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024; // 5 MB
   const ALLOWED_DOCUMENT_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png', 'webp'];
 
-  function detectDefaultDocType(filename, index = 0) {
-    const lower = (filename || '').toLowerCase();
-    if (lower.includes('aadhaar') || lower.includes('adhar')) return 'Aadhaar Card';
-    if (lower.includes('pan')) return 'PAN Card';
-    if (lower.includes('bank')) return '3 Months Bank Statement';
-    if (lower.includes('salary') || lower.includes('slip')) return '3 Months Salary Slips';
-    if (lower.includes('form 16') || lower.includes('form16')) return 'Form 16';
-    if (lower.includes('cheque')) return 'Cancelled Cheque';
-    if (lower.includes('photo') || lower.includes('passport')) return 'Passport Size Photograph';
-    if (lower.includes('loan')) return 'Existing Loan Statement';
+  const STANDARD_DOC_TYPES = [
+    'Aadhaar Card',
+    'PAN Card',
+    'Passport Size Photograph',
+    '3 Months Bank Statement',
+    '6 Months Bank Statement',
+    '3 Months Salary Slips',
+    '6 Months Salary Slips',
+    'Form 16',
+    'Cancelled Cheque',
+    'Existing Loan Statement',
+    'Other'
+  ];
 
-    const sequence = [
-      'Aadhaar Card',
-      'PAN Card',
-      '3 Months Bank Statement',
-      '3 Months Salary Slips',
-      'Passport Size Photograph',
-      'Cancelled Cheque',
-      'Form 16'
-    ];
-    return sequence[index % sequence.length] || 'Other';
+  // SVG strings for exactly ONE reliable eye icon without font collisions or browser duplicates
+  const PASSWORD_EYE_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg>';
+  const PASSWORD_EYE_OFF_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3l18 18"/><path d="M10.5 10.5a2.5 2.5 0 1 0 3 3"/><path d="M6.2 6.2C3.9 7.9 2 12 2 12s3.5 6 10 6c1.3 0 2.5-.2 3.6-.6"/><path d="M14.6 4.6C13.8 4.2 12.9 4 12 4c-6.5 0-10 8-10 8a20.1 20.1 0 0 0 4.8 5.7"/></svg>';
+
+  // Auto-detect default document type from filename
+  function detectDefaultDocType(fileName) {
+    const lower = (fileName || '').toLowerCase();
+    if (lower.includes('aadhaar') || lower.includes('aadhar') || lower.includes('adhar')) return 'Aadhaar Card';
+    if (lower.includes('pan')) return 'PAN Card';
+    if (lower.includes('photo') || lower.includes('passport')) return 'Passport Size Photograph';
+    if (lower.includes('salary') || lower.includes('payslip') || lower.includes('pay-slip')) {
+      if (lower.includes('6') || lower.includes('six')) return '6 Months Salary Slips';
+      return '3 Months Salary Slips';
+    }
+    if (lower.includes('bank') || lower.includes('statement')) {
+      if (lower.includes('6') || lower.includes('six')) return '6 Months Bank Statement';
+      return '3 Months Bank Statement';
+    }
+    if (lower.includes('form16') || lower.includes('form 16') || lower.includes('form-16')) return 'Form 16';
+    if (lower.includes('cheque') || lower.includes('check')) return 'Cancelled Cheque';
+    if (lower.includes('loan')) return 'Existing Loan Statement';
+    return '';
   }
 
-  function handleFilesSelection(event) {
-    clearFieldErrors();
-    const files = event.target.files;
-    if (!files || !files.length) return;
+  function showDocError(elementId, message) {
+    const el = document.getElementById(elementId);
+    if (el) {
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+    showAlert('page-alert', message, 'error');
+  }
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+  function clearDocErrors() {
+    ['err-doc-type', 'err-doc-file'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = '';
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  // 1. Multi-File Selection Handler (Supports Ctrl/Shift multiple files)
+  function handleMultipleFilesSelected(event) {
+    clearDocErrors();
+    const fileList = event.target.files;
+    if (!fileList || !fileList.length) return;
+    addFilesToStagedQueue(Array.from(fileList));
+    event.target.value = '';
+  }
+
+  function addFilesToStagedQueue(files) {
+    let addedCount = 0;
+    for (const file of files) {
       const ext = (file.name.split('.').pop() || '').toLowerCase();
       let error = null;
 
       if (!ALLOWED_DOCUMENT_EXTENSIONS.includes(ext)) {
-        error = `Invalid format ".${escapeHtml(ext)}". Only PDF, JPG, PNG, and WebP are allowed.`;
+        error = `Invalid format ".${ext}". Allowed: PDF, JPG, PNG, WebP.`;
       } else if (file.size > MAX_DOCUMENT_BYTES) {
-        error = `File size (${formatFileSize(file.size)}) exceeds the maximum 5 MB limit.`;
+        error = `File size (${formatFileSize(file.size)}) exceeds 5 MB limit.`;
       }
+
+      const detectedType = detectDefaultDocType(file.name);
 
       const item = {
         id: 'staged_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
@@ -2207,22 +2433,105 @@ Net Monthly Income (Rs) - 65000`;
         size: file.size,
         formattedSize: formatFileSize(file.size),
         ext,
-        docType: detectDefaultDocType(file.name, stagedDocuments.length),
+        docType: detectedType,
         otherDocType: '',
         password: '',
         showPassword: false,
-        status: error ? 'error' : 'ready', // 'ready' | 'uploading' | 'uploaded' | 'error'
+        status: error ? 'error' : 'ready',
         error,
         errorMessage: ''
       };
 
       stagedDocuments.push(item);
+      addedCount++;
     }
 
-    event.target.value = '';
     renderStagedQueue();
+    if (addedCount > 0) {
+      showAlert('page-alert', `Added ${addedCount} document${addedCount === 1 ? '' : 's'} to queue. Please verify the document type for each before uploading.`, 'info');
+      document.getElementById('selected-files-queue')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
+  function setupDropzoneEvents() {
+    const dropzone = document.getElementById('file-dropzone-box');
+    if (!dropzone) return;
+
+    ['dragenter', 'dragover'].forEach((eventName) => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('is-dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach((eventName) => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('is-dragover');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt?.files;
+      if (files && files.length) {
+        addFilesToStagedQueue(Array.from(files));
+      }
+    }, false);
+  }
+
+  // 2. Per-Item Handlers in Queue
+  function handleStagedDocTypeChange(id, val) {
+    const item = stagedDocuments.find((d) => d.id === id);
+    if (!item) return;
+    item.docType = val;
+    const otherWrap = document.getElementById(`staged-other-wrap-${id}`);
+    if (otherWrap) {
+      otherWrap.style.display = val === 'Other' ? 'block' : 'none';
+      if (val === 'Other') {
+        const inp = otherWrap.querySelector('input');
+        if (inp) inp.focus();
+      }
+    }
+    const selectEl = document.getElementById(`staged-doctype-${id}`);
+    if (selectEl) selectEl.classList.remove('is-invalid');
+  }
+
+  function handleStagedOtherDocTypeInput(id, val) {
+    const item = stagedDocuments.find((d) => d.id === id);
+    if (!item) return;
+    item.otherDocType = val.trim();
+    const otherWrap = document.getElementById(`staged-other-wrap-${id}`);
+    const inp = otherWrap?.querySelector('input');
+    if (inp) inp.classList.remove('is-invalid');
+  }
+
+  function handleStagedPasswordInput(id, val) {
+    const item = stagedDocuments.find((d) => d.id === id);
+    if (item) item.password = val.trim();
+  }
+
+  function toggleStagedPassword(id) {
+    const item = stagedDocuments.find((d) => d.id === id);
+    if (!item) return;
+    item.showPassword = !item.showPassword;
+
+    const input = document.getElementById(`staged-pwd-${id}`);
+    const iconWrap = document.getElementById(`staged-pwd-icon-${id}`);
+    const btn = document.getElementById(`staged-pwd-toggle-${id}`);
+
+    if (input) input.type = item.showPassword ? 'text' : 'password';
+    if (iconWrap) iconWrap.innerHTML = item.showPassword ? PASSWORD_EYE_OFF_SVG : PASSWORD_EYE_SVG;
+    if (btn) {
+      const label = item.showPassword ? 'Hide password' : 'Show password';
+      btn.setAttribute('title', label);
+      btn.setAttribute('aria-label', label);
+    }
+  }
+
+  // 3. Render Staged Documents Queue
   function renderStagedQueue() {
     const queueContainer = document.getElementById('selected-files-queue');
     const cardsList = document.getElementById('staged-cards-list');
@@ -2251,6 +2560,7 @@ Net Monthly Income (Rs) - 65000`;
 
     cardsList.innerHTML = stagedDocuments.map((item) => {
       const isError = Boolean(item.error);
+      const isOther = item.docType === 'Other';
       let statusBadgeMarkup = '';
 
       if (item.status === 'uploading') {
@@ -2265,102 +2575,67 @@ Net Monthly Income (Rs) - 65000`;
         statusBadgeMarkup = '<span class="staged-status-badge status-ready"><i class="fas fa-check"></i> Ready</span>';
       }
 
+      const optionsMarkup = STANDARD_DOC_TYPES.map((type) => {
+        const isSelected = item.docType === type;
+        return `<option value="${escapeHtml(type)}" ${isSelected ? 'selected' : ''}>${escapeHtml(type)}</option>`;
+      }).join('');
+
       return `
         <div class="staged-item-card ${isError ? 'has-error' : ''}" id="card-${item.id}">
-          <div class="staged-item-top">
-            <div class="staged-item-meta-wrap">
-              <div class="staged-item-icon">${getFileIconMarkup(item.name)}</div>
-              <div class="staged-item-meta">
-                <div class="staged-item-name-row">
-                  <strong class="staged-filename" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</strong>
-                  <span class="staged-size-badge">${item.formattedSize}</span>
-                  ${statusBadgeMarkup}
-                </div>
-                ${isError ? `<div class="staged-error-text"><i class="fas fa-exclamation-triangle"></i> ${escapeHtml(item.error)}</div>` : ''}
+          <!-- 1. File Details -->
+          <div class="staged-file-col">
+            <div class="staged-file-icon">${getFileIconMarkup(item.name)}</div>
+            <div class="staged-file-col-info">
+              <div class="staged-filename" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div>
+              <div class="staged-meta">
+                <span>${item.ext.toUpperCase()} · ${item.formattedSize}</span>
               </div>
-            </div>
-            <div class="staged-item-actions">
-              ${!isError ? `
-                <button type="button" class="btn btn-secondary btn-sm" onclick="previewStagedDoc('${item.id}')" title="Preview document">
-                  <i class="fas fa-eye"></i> <span>View</span>
-                </button>
-              ` : ''}
-              <button type="button" class="btn btn-secondary btn-sm staged-remove-btn" onclick="removeStagedDoc('${item.id}')" title="Remove this file">
-                <i class="fas fa-times"></i> <span>Remove</span>
-              </button>
+              <div style="margin-top:3px;">${statusBadgeMarkup}</div>
+              ${isError ? `<div class="staged-error-text"><i class="fas fa-exclamation-triangle"></i> ${escapeHtml(item.error)}</div>` : ''}
+              ${item.errorMessage ? `<div class="staged-error-text"><i class="fas fa-times-circle"></i> ${escapeHtml(item.errorMessage)}</div>` : ''}
             </div>
           </div>
 
-          ${!isError ? `
-          <div class="staged-item-config-grid">
-            <div class="staged-config-field">
-              <label class="form-field-label">Document Type <span class="req">*</span></label>
-              <select class="form-control staged-doctype-select" onchange="updateStagedDocType('${item.id}', this.value)">
-                <option value="Aadhaar Card" ${item.docType === 'Aadhaar Card' ? 'selected' : ''}>Aadhaar Card</option>
-                <option value="PAN Card" ${item.docType === 'PAN Card' ? 'selected' : ''}>PAN Card</option>
-                <option value="Passport Size Photograph" ${item.docType === 'Passport Size Photograph' ? 'selected' : ''}>Passport Size Photograph</option>
-                <option value="3 Months Bank Statement" ${item.docType === '3 Months Bank Statement' ? 'selected' : ''}>3 Months Bank Statement</option>
-                <option value="6 Months Bank Statement" ${item.docType === '6 Months Bank Statement' ? 'selected' : ''}>6 Months Bank Statement</option>
-                <option value="3 Months Salary Slips" ${item.docType === '3 Months Salary Slips' ? 'selected' : ''}>3 Months Salary Slips</option>
-                <option value="6 Months Salary Slips" ${item.docType === '6 Months Salary Slips' ? 'selected' : ''}>6 Months Salary Slips</option>
-                <option value="Form 16" ${item.docType === 'Form 16' ? 'selected' : ''}>Form 16</option>
-                <option value="Cancelled Cheque" ${item.docType === 'Cancelled Cheque' ? 'selected' : ''}>Cancelled Cheque</option>
-                <option value="Existing Loan Statement" ${item.docType === 'Existing Loan Statement' ? 'selected' : ''}>Existing Loan Statement</option>
-                <option value="Other" ${item.docType === 'Other' ? 'selected' : ''}>Other</option>
-              </select>
-              <input type="text" class="form-control staged-other-input" placeholder="Specify document type..." value="${escapeHtml(item.otherDocType || '')}" oninput="updateStagedOtherDocType('${item.id}', this.value)" style="${item.docType === 'Other' ? 'display:block;margin-top:6px;' : 'display:none;margin-top:6px;'}" />
-            </div>
-            <div class="staged-config-field">
-              <label class="form-field-label"><i class="fas fa-lock"></i> Document Password (if encrypted)</label>
-              <div class="password-input-wrapper">
-                <input type="${item.showPassword ? 'text' : 'password'}" class="form-control staged-pwd-input" placeholder="Enter password for this document..." value="${escapeHtml(item.password || '')}" oninput="updateStagedPassword('${item.id}', this.value)" autocomplete="new-password" />
-                <button type="button" class="toggle-password-btn" onclick="toggleStagedPassword('${item.id}')" title="Show or hide password" aria-label="Toggle password visibility">
-                  <i class="${item.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'}"></i>
-                </button>
-              </div>
+          <!-- 2. Document Type Selection -->
+          <div class="staged-doctype-col">
+            <label for="staged-doctype-${item.id}" class="form-field-label">Document Type <span class="req">*</span></label>
+            <select id="staged-doctype-${item.id}" class="form-control staged-doctype-select" onchange="handleStagedDocTypeChange('${item.id}', this.value)" ${isError ? 'disabled' : ''}>
+              <option value="" ${!item.docType ? 'selected' : ''}>Select Document Type</option>
+              ${optionsMarkup}
+            </select>
+            <div id="staged-other-wrap-${item.id}" style="${isOther ? 'display:block;' : 'display:none;'}">
+              <input type="text" class="form-control staged-other-input" placeholder="Specify document type..." value="${escapeHtml(item.otherDocType || '')}" oninput="handleStagedOtherDocTypeInput('${item.id}', this.value)" />
             </div>
           </div>
-          ` : ''}
+
+          <!-- 3. Document Password (Single Eye Button) -->
+          <div class="staged-pwd-col">
+            <label for="staged-pwd-${item.id}" class="form-field-label">
+              <i class="fas fa-lock"></i> Document Password <span class="opt-label">(Optional)</span>
+            </label>
+            <div class="password-input-wrapper">
+              <input type="${item.showPassword ? 'text' : 'password'}" id="staged-pwd-${item.id}" class="form-control staged-pwd-input" placeholder="Password (if encrypted)..." value="${escapeHtml(item.password || '')}" oninput="handleStagedPasswordInput('${item.id}', this.value)" autocomplete="new-password" ${isError ? 'disabled' : ''} />
+              <button type="button" class="toggle-password-btn" id="staged-pwd-toggle-${item.id}" onclick="toggleStagedPassword('${item.id}')" title="${item.showPassword ? 'Hide password' : 'Show password'}" aria-label="${item.showPassword ? 'Hide password' : 'Show password'}">
+                <span class="pwd-eye-icon-wrap" id="staged-pwd-icon-${item.id}" aria-hidden="true">${item.showPassword ? PASSWORD_EYE_OFF_SVG : PASSWORD_EYE_SVG}</span>
+              </button>
+            </div>
+            <small class="field-hint"><i class="fas fa-shield-alt"></i> Leave blank if unencrypted</small>
+          </div>
+
+          <!-- 4. Card Actions -->
+          <div class="staged-actions-col">
+            ${!isError ? `
+              <button type="button" class="btn btn-secondary btn-sm" onclick="previewStagedDoc('${item.id}')" title="Preview document">
+                <i class="fas fa-eye"></i> <span>View</span>
+              </button>
+            ` : ''}
+            <button type="button" class="btn btn-secondary btn-sm staged-remove-btn" onclick="removeStagedDoc('${item.id}')" title="Remove this file">
+              <i class="fas fa-times"></i> <span>Remove</span>
+            </button>
+          </div>
         </div>
       `;
     }).join('');
-  }
-
-  function updateStagedDocType(id, value) {
-    const item = stagedDocuments.find((d) => d.id === id);
-    if (!item) return;
-    item.docType = value;
-    const card = document.getElementById(`card-${id}`);
-    if (card) {
-      const otherInput = card.querySelector('.staged-other-input');
-      if (otherInput) {
-        otherInput.style.display = value === 'Other' ? 'block' : 'none';
-        if (value === 'Other') otherInput.focus();
-      }
-    }
-  }
-
-  function updateStagedOtherDocType(id, value) {
-    const item = stagedDocuments.find((d) => d.id === id);
-    if (item) item.otherDocType = value.trim();
-  }
-
-  function updateStagedPassword(id, value) {
-    const item = stagedDocuments.find((d) => d.id === id);
-    if (item) item.password = value.trim();
-  }
-
-  function toggleStagedPassword(id) {
-    const item = stagedDocuments.find((d) => d.id === id);
-    if (!item) return;
-    item.showPassword = !item.showPassword;
-    const card = document.getElementById(`card-${id}`);
-    if (card) {
-      const pwdInput = card.querySelector('.staged-pwd-input');
-      const eyeIcon = card.querySelector('.toggle-password-btn i');
-      if (pwdInput) pwdInput.type = item.showPassword ? 'text' : 'password';
-      if (eyeIcon) eyeIcon.className = item.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
-    }
   }
 
   function removeStagedDoc(id) {
@@ -2381,13 +2656,16 @@ Net Monthly Income (Rs) - 65000`;
     const openTabBtn = document.getElementById('preview-open-tab-btn');
 
     title.innerHTML = `${getFileIconMarkup(fileName)} <span>Preview: ${escapeHtml(fileName)}</span>`;
-    openTabBtn.href = blobUrl;
+    openTabBtn.onclick = function (e) {
+      e.preventDefault();
+      window.open(blobUrl, '_blank');
+    };
     openTabBtn.style.display = 'inline-flex';
     body.innerHTML = '';
 
     const lowerName = (fileName || '').toLowerCase();
     const typeStr = (mimeOrExt || '').toLowerCase();
-    const isImage = typeStr.includes('image') || ['jpg', 'jpeg', 'png', 'webp'].some(ext => lowerName.endsWith('.' + ext));
+    const isImage = typeStr.includes('image') || ['jpg', 'jpeg', 'png', 'webp'].some((ext) => lowerName.endsWith('.' + ext));
     const isPdf = typeStr.includes('pdf') || lowerName.endsWith('.pdf');
 
     if (isImage) {
@@ -2507,9 +2785,10 @@ Net Monthly Income (Rs) - 65000`;
     }
   }
 
-  // ── Batch Document Upload ─────────────────────────────────
+  // ── 4. Batch Upload All Queued Documents ──────────────────
   async function uploadAllStagedDocuments() {
     clearFieldErrors();
+    clearDocErrors();
     if (!currentCustomer || !currentCustomer.id) {
       return showAlert('page-alert', 'Please register or select a customer before uploading documents.', 'error');
     }
@@ -2517,6 +2796,48 @@ Net Monthly Income (Rs) - 65000`;
     const validPending = stagedDocuments.filter((d) => !d.error && d.status !== 'uploaded');
     if (!validPending.length) {
       return showAlert('page-alert', 'No valid documents in queue to upload.', 'error');
+    }
+
+    // Validate that every pending item has an assigned document type
+    for (const item of validPending) {
+      if (!item.docType) {
+        showAlert('page-alert', `Please select a Document Type for "${item.name}".`, 'error');
+        const selectEl = document.getElementById(`staged-doctype-${item.id}`);
+        if (selectEl) {
+          selectEl.focus();
+          selectEl.classList.add('is-invalid');
+        }
+        return;
+      }
+      if (item.docType === 'Other' && !item.otherDocType) {
+        showAlert('page-alert', `Please specify the custom Document Type for "${item.name}".`, 'error');
+        const otherWrap = document.getElementById(`staged-other-wrap-${item.id}`);
+        const inputEl = otherWrap?.querySelector('input');
+        if (inputEl) {
+          inputEl.focus();
+          inputEl.classList.add('is-invalid');
+        }
+        return;
+      }
+    }
+
+    // Duplicate check confirmation
+    const typeCounts = new Map();
+    for (const item of validPending) {
+      const t = (item.docType === 'Other' ? item.otherDocType : item.docType).toLowerCase();
+      typeCounts.set(t, (typeCounts.get(t) || 0) + 1);
+    }
+    const uploadedTypes = new Set(loadedCustomerDocumentsList.map((d) => (d.doc_type || '').toLowerCase()));
+    const duplicates = [];
+    for (const [t, count] of typeCounts) {
+      if (count > 1 || uploadedTypes.has(t)) {
+        const origType = validPending.find((d) => (d.docType === 'Other' ? d.otherDocType : d.docType).toLowerCase() === t);
+        duplicates.push(origType.docType === 'Other' ? origType.otherDocType : origType.docType);
+      }
+    }
+    if (duplicates.length) {
+      const proceed = confirm(`The following document type(s) appear multiple times or are already uploaded for this customer:\n\n• ${duplicates.join('\n• ')}\n\nDo you want to proceed with uploading?`);
+      if (!proceed) return;
     }
 
     const batchBtn = document.getElementById('btn-upload-all');
@@ -2531,13 +2852,10 @@ Net Monthly Income (Rs) - 65000`;
       item.status = 'uploading';
       renderStagedQueue();
 
-      const effectiveDocType = item.docType === 'Other'
-        ? (item.otherDocType || 'Other')
-        : item.docType;
-
       const form = new FormData();
       form.append('documents', item.file);
-      form.append('doc_type', effectiveDocType);
+      const effectiveType = item.docType === 'Other' ? item.otherDocType : item.docType;
+      form.append('doc_type', effectiveType);
       if (item.password) {
         form.append('document_password', item.password);
       }
@@ -2548,10 +2866,9 @@ Net Monthly Income (Rs) - 65000`;
           item.status = 'uploaded';
           item.errorMessage = '';
           successCount++;
-          // Retain password in session map for each uploaded document
-          const docIds = res.data?.ids || (res.data?.documents ? res.data.documents.map(d => d.id) : []);
+          const docIds = res.data?.ids || (res.data?.documents ? res.data.documents.map((d) => d.id) : []);
           if (docIds.length && item.password) {
-            docIds.forEach(id => sessionDocPasswords.set(id, item.password));
+            docIds.forEach((id) => sessionDocPasswords.set(id, item.password));
           }
         } else {
           item.status = 'error';
@@ -2573,18 +2890,20 @@ Net Monthly Income (Rs) - 65000`;
 
     if (successCount > 0) {
       updateStepper(3);
-      showAlert('page-alert', `Successfully uploaded ${successCount} document${successCount === 1 ? '' : 's'}.${failCount > 0 ? ` (${failCount} failed)` : ''}`, successCount && !failCount ? 'success' : 'info');
-      // Remove successfully uploaded items from queue
+      showAlert(
+        'page-alert',
+        `Successfully uploaded ${successCount} document${successCount === 1 ? '' : 's'}.${failCount > 0 ? ` (${failCount} failed)` : ''}`,
+        successCount && !failCount ? 'success' : 'info'
+      );
       stagedDocuments = stagedDocuments.filter((d) => d.status !== 'uploaded');
       renderStagedQueue();
-      // Refresh documents list from backend
       loadCustomerDocuments(currentCustomer.id);
     } else {
       showAlert('page-alert', 'Failed to upload selected documents. Please check errors on each file and retry.', 'error');
     }
   }
 
-  // ── Load & Refresh Customer Documents (Backend API) ───────
+  // ── 5. Load & Refresh Customer Documents (Backend API) ────
   async function loadCustomerDocuments(customerId) {
     const listContainer = document.getElementById('uploaded-docs');
     const countPill = document.getElementById('uploaded-count-pill');
@@ -2598,6 +2917,7 @@ Net Monthly Income (Rs) - 65000`;
       }
 
       const docs = res.data?.data?.documents || [];
+      loadedCustomerDocumentsList = docs;
       if (countPill) countPill.textContent = docs.length;
 
       if (!docs.length) {
@@ -2611,7 +2931,6 @@ Net Monthly Income (Rs) - 65000`;
         const docType = doc.doc_type || 'Document';
         const uploadedStamp = doc.uploaded_at ? `${formatDate(doc.uploaded_at)} · ${formatTime(doc.uploaded_at)}` : 'Uploaded';
 
-        // Check if password exists from backend OR current session state
         const storedPwd = doc.document_password || sessionDocPasswords.get(docId) || '';
         const isPwdProtected = Boolean(storedPwd);
         const isShown = Boolean(uploadedDocPasswordsState.get(docId));
@@ -2640,8 +2959,8 @@ Net Monthly Income (Rs) - 65000`;
                     <span class="uploaded-pwd-label"><i class="fas fa-key"></i> Password</span>
                     <div class="uploaded-pwd-input-wrap">
                       <input type="${isShown ? 'text' : 'password'}" id="uploaded-pwd-${docId}" class="form-control uploaded-pwd-input" value="${escapeHtml(storedPwd)}" readonly />
-                      <button type="button" class="toggle-password-btn" id="uploaded-pwd-toggle-${docId}" onclick="toggleUploadedDocPassword(${docId})" title="Show or hide password" aria-label="Toggle password visibility">
-                        <i class="${isShown ? 'fas fa-eye-slash' : 'fas fa-eye'}" id="uploaded-pwd-icon-${docId}"></i>
+                      <button type="button" class="toggle-password-btn" id="uploaded-pwd-toggle-${docId}" onclick="toggleUploadedDocPassword(${docId})" title="${isShown ? 'Hide password' : 'Show password'}" aria-label="${isShown ? 'Hide password' : 'Show password'}">
+                        <span class="pwd-eye-icon-wrap" id="uploaded-pwd-icon-${docId}" aria-hidden="true">${isShown ? PASSWORD_EYE_OFF_SVG : PASSWORD_EYE_SVG}</span>
                       </button>
                     </div>
                   </div>
@@ -2673,10 +2992,16 @@ Net Monthly Income (Rs) - 65000`;
     uploadedDocPasswordsState.set(docId, nextState);
 
     const input = document.getElementById(`uploaded-pwd-${docId}`);
-    const icon = document.getElementById(`uploaded-pwd-icon-${docId}`);
+    const iconWrap = document.getElementById(`uploaded-pwd-icon-${docId}`);
+    const btn = document.getElementById(`uploaded-pwd-toggle-${docId}`);
 
     if (input) input.type = nextState ? 'text' : 'password';
-    if (icon) icon.className = nextState ? 'fas fa-eye-slash' : 'fas fa-eye';
+    if (iconWrap) iconWrap.innerHTML = nextState ? PASSWORD_EYE_OFF_SVG : PASSWORD_EYE_SVG;
+    if (btn) {
+      const label = nextState ? 'Hide password' : 'Show password';
+      btn.setAttribute('title', label);
+      btn.setAttribute('aria-label', label);
+    }
   }
 
   function refreshCustomerDocuments() {
@@ -2715,6 +3040,29 @@ Net Monthly Income (Rs) - 65000`;
     }
   }
 
+  // Auto-load customer from URL query param if present (?customer_id=...)
+  async function loadExistingCustomerForWorkflow(customerId) {
+    try {
+      const res = await api.get(`/employee/customers/${customerId}`);
+      if (!res?.ok || !res.data?.data?.customer) return;
+
+      currentCustomer = res.data.data.customer;
+      renderCustomerSummary(currentCustomer);
+      document.getElementById('cust-form-wrapper').style.display = 'none';
+      document.getElementById('cust-summary-wrapper').style.display = 'block';
+      document.getElementById('cust-card-title').textContent = 'Customer Details';
+      document.getElementById('cust-card-subtitle').textContent = 'Verified customer profile registered in CLN Lending Suite.';
+
+      document.getElementById('upload-section').style.display = 'flex';
+      document.getElementById('customer-added-section').style.display = 'flex';
+      updateStepper(2);
+
+      loadCustomerDocuments(customerId);
+    } catch (err) {
+      console.warn('Could not auto-load customer from URL query param:', err);
+    }
+  }
+
   // ── Loan Origination Navigation ───────────────────────────
   function goToCreateLoan() {
     if (!currentCustomer || !currentCustomer.id) {
@@ -2731,6 +3079,7 @@ Net Monthly Income (Rs) - 65000`;
 
     currentCustomer = null;
     isEditMode = false;
+    clearCustomerDraft();
     clearStagedQueue();
     sessionDocPasswords.clear();
     uploadedDocPasswordsState.clear();
@@ -2740,6 +3089,12 @@ Net Monthly Income (Rs) - 65000`;
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
+
+    // Reset document upload section
+    clearStagedQueue();
+    const fileInput = document.getElementById('doc-file-input');
+    if (fileInput) fileInput.value = '';
+    clearDocErrors();
 
     // Reset views
     document.getElementById('cust-form-wrapper').style.display = 'block';

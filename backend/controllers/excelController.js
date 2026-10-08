@@ -22,14 +22,18 @@ exports.uploadMiddleware = upload.single('excelFile');
 const COL_ALIASES = {
   'phone number':    ['phone number','phone no','phone','mobile','mobile number','mobile no','contact','contact number','mob','mob no','phonenumber','mobilenumber'],
   'disposition':     ['disposition','desposition','disp','dispo','call disposition','call status'],
-  'sub disposition': ['sub disposition','sub desposition','sub disp','sub dispo','sub-disposition','sub-desposition','subdisposition','subdesposition','sub call status','sub status']
+  'sub disposition': ['sub disposition','sub desposition','sub disp','sub dispo','sub-disposition','sub-desposition','subdisposition','subdesposition','sub call status','sub status'],
+  'employee':        ['employee','emp','employee name','emp name','agent','caller','telecaller','assigned to','user','owner'],
+  'status':          ['status','call status','record status','lead status'],
+  'notes':           ['notes','call notes','call note','note','remark','remarks','comment','comments'],
+  'updated at':      ['updated at','updated_at','date','updated on','timestamp','last updated']
 };
 
 function resolveColumns(headerRow) {
-  // Returns { 'phone number': colIdx, 'disposition': colIdx, 'sub disposition': colIdx }
   const result = {};
+  if (!Array.isArray(headerRow)) return result;
   headerRow.forEach((h, idx) => {
-    const hl = String(h).toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+    const hl = String(h || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
     for (const [canon, aliases] of Object.entries(COL_ALIASES)) {
       if (aliases.includes(hl) && !(canon in result)) {
         result[canon] = idx;
@@ -39,66 +43,502 @@ function resolveColumns(headerRow) {
   return result;
 }
 
-// ── Helper ─────────────────────────────────────────────────────────────────
 function fmtPhone(val) {
   if (val === null || val === undefined) return '';
   return String(val).trim();
 }
 
-// ── Admin: Upload Excel File ───────────────────────────────────────────────
-exports.uploadFile = async (req, res) => {
+function parseWorkbook(buffer, originalName) {
+  const ext = path.extname(originalName || '').toLowerCase();
+  if (ext !== '.xlsx' && ext !== '.xls') {
+    throw new Error('Only .xlsx and .xls files are allowed.');
+  }
+
+  const wb = XLSX.read(buffer, { type: 'buffer' });
+  if (!wb.SheetNames || wb.SheetNames.length === 0) {
+    throw new Error('Excel file is empty or has no sheets.');
+  }
+
+  // Target sheet: prefer 'Export' (case-insensitive), or fall back to the first sheet
+  const targetSheetName = wb.SheetNames.find(s => s.trim().toLowerCase() === 'export') || wb.SheetNames[0];
+  const ws = wb.Sheets[targetSheetName];
+  if (!ws) {
+    throw new Error(`Sheet "${targetSheetName}" not found.`);
+  }
+
+  const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+  if (!rows || rows.length < 2) {
+    throw new Error('The Excel sheet contains no data rows. At least one phone number row is required.');
+  }
+
+  const headerRow = rows[0];
+  const colMap = resolveColumns(headerRow);
+  const phoneIdx = colMap['phone number'];
+  const dispIdx = colMap['disposition'];
+  const subIdx = colMap['sub disposition'];
+  const empIdx = colMap['employee'];
+  const statusIdx = colMap['status'];
+  const notesIdx = colMap['notes'];
+  const updatedIdx = colMap['updated at'];
+
+  if (phoneIdx === undefined) {
+    const detected = headerRow.filter(Boolean).join(', ') || '(none)';
+    throw new Error(`Could not find a Phone Number column in the sheet. Detected columns: ${detected}`);
+  }
+
+  const dataRows = rows.slice(1).filter(r => fmtPhone(r[phoneIdx]) !== '');
+  if (dataRows.length === 0) {
+    throw new Error('No valid phone number rows found in the sheet.');
+  }
+
+  return {
+    wb,
+    sheetName: targetSheetName,
+    availableSheets: wb.SheetNames,
+    dataRows,
+    phoneIdx,
+    dispIdx,
+    subIdx,
+    empIdx,
+    statusIdx,
+    notesIdx,
+    updatedIdx
+  };
+}
+
+// ── Admin: Validate Excel File (Memory Only) ──────────────────────────────
+exports.validateFile = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded.' });
 
     const originalName = req.file.originalname;
-    const ext          = path.extname(originalName).toLowerCase();
-    if (ext !== '.xlsx' && ext !== '.xls') {
-      return res.status(400).json({ success: false, message: 'Only .xlsx and .xls files are allowed.' });
+    const parsed = parseWorkbook(req.file.buffer, originalName);
+
+    let completedCount = 0;
+    const preview = [];
+
+    parsed.dataRows.forEach((r, idx) => {
+      const phone = fmtPhone(r[parsed.phoneIdx]);
+      const disp = parsed.dispIdx !== undefined ? String(r[parsed.dispIdx] || '').trim() : '';
+      const subDisp = parsed.subIdx !== undefined ? String(r[parsed.subIdx] || '').trim() : '';
+      const emp = parsed.empIdx !== undefined ? String(r[parsed.empIdx] || '').trim() : '';
+      const statusRaw = parsed.statusIdx !== undefined ? String(r[parsed.statusIdx] || '').trim() : '';
+      const notes = parsed.notesIdx !== undefined ? String(r[parsed.notesIdx] || '').trim() : '';
+
+      const isCompleted = (statusRaw.toLowerCase() === 'completed') || (disp !== '' && subDisp !== '');
+      if (isCompleted) {
+        completedCount++;
+      }
+
+      if (idx < 15) {
+        preview.push({
+          rowIndex: idx + 1,
+          phoneNumber: phone,
+          disposition: disp || '-',
+          subDisposition: subDisp || '-',
+          employee: emp || '-',
+          status: isCompleted ? 'Completed' : 'Pending',
+          notes: notes || ''
+        });
+      }
+    });
+
+    const totalRecords = parsed.dataRows.length;
+    const availableRecords = totalRecords - completedCount;
+
+    res.json({
+      success: true,
+      fileName: originalName,
+      fileSize: req.file.size,
+      sheetName: parsed.sheetName,
+      availableSheets: parsed.availableSheets,
+      totalRecords,
+      completedRecords: completedCount,
+      availableRecords,
+      detectedColumns: {
+        hasPhone: parsed.phoneIdx !== undefined,
+        hasDisposition: parsed.dispIdx !== undefined,
+        hasSubDisposition: parsed.subIdx !== undefined,
+        hasEmployee: parsed.empIdx !== undefined,
+        hasStatus: parsed.statusIdx !== undefined,
+        hasNotes: parsed.notesIdx !== undefined
+      },
+      preview
+    });
+  } catch (err) {
+    console.error('[Excel] validateFile:', err.message);
+    res.status(400).json({ success: false, message: err.message || 'Validation failed.' });
+  }
+};
+
+/**
+ * Core allocation helper executed inside a database transaction
+ */
+async function performAllocation(connection, fileId, config, adminUser) {
+  const {
+    method = 'equal_split',
+    allocations = [],
+    employee_ids = [],
+    force_reassign = false
+  } = config;
+
+  const [[file]] = await connection.query('SELECT * FROM excel_files WHERE id = ? FOR UPDATE', [fileId]);
+  if (!file) throw new Error('File not found.');
+
+  // Fetch all records for this file
+  let [records] = await connection.query(
+    'SELECT id, row_index, phone_number, disposition, sub_disposition, status, assignment_id, assigned_to, source_employee_name FROM excel_records WHERE file_id = ? ORDER BY row_index ASC',
+    [fileId]
+  );
+
+  if (force_reassign) {
+    // Clear assignments on non-completed records only
+    await connection.query(
+      `UPDATE excel_records SET assignment_id = NULL, assigned_to = NULL WHERE file_id = ? AND status != 'Completed'`,
+      [fileId]
+    );
+    // Delete assignments that have 0 completed records
+    await connection.query(
+      `DELETE FROM excel_assignments WHERE file_id = ? AND progress = 0`,
+      [fileId]
+    );
+    // Refresh records
+    [records] = await connection.query(
+      'SELECT id, row_index, phone_number, disposition, sub_disposition, status, assignment_id, assigned_to, source_employee_name FROM excel_records WHERE file_id = ? ORDER BY row_index ASC',
+      [fileId]
+    );
+  }
+
+  // Available unassigned pending records (completed records are protected)
+  const availableRecords = records.filter(r => r.status !== 'Completed' && !r.assignment_id);
+  if (availableRecords.length === 0) {
+    throw new Error('No unallocated pending records available in this file.');
+  }
+
+  // Verify employee users exist
+  const [activeUsers] = await connection.query('SELECT id, name, email FROM users WHERE role = "employee"');
+  const userMap = new Map(activeUsers.map(u => [u.id, u]));
+
+  const plannedAllocations = [];
+
+  if (method === 'range') {
+    if (!Array.isArray(allocations) || allocations.length === 0) {
+      throw new Error('At least one record range allocation is required.');
     }
 
-    // Parse workbook
-    const wb      = XLSX.read(req.file.buffer, { type: 'buffer' });
-    const wsName  = wb.SheetNames[0];
-    if (!wsName) return res.status(400).json({ success: false, message: 'Excel file is empty or has no sheets.' });
-    const ws      = wb.Sheets[wsName];
-    const rows    = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    // Validate ranges & check for overlaps
+    for (let i = 0; i < allocations.length; i++) {
+      const a = allocations[i];
+      const empId = parseInt(a.employee_id, 10);
+      const startRow = parseInt(a.start_row, 10);
+      const endRow = parseInt(a.end_row, 10);
 
-    // Parse header row and resolve columns by alias
-    const colMap  = resolveColumns(rows[0]);
-    const phoneIdx = colMap['phone number'];
-    const dispIdx  = colMap['disposition'];
-    const subIdx   = colMap['sub disposition'];
+      if (!userMap.has(empId)) {
+        throw new Error(`Invalid employee selected (ID: ${a.employee_id}).`);
+      }
+      if (isNaN(startRow) || isNaN(endRow) || startRow < 1 || endRow < startRow) {
+        throw new Error(`Invalid row range (${a.start_row} to ${a.end_row}) for ${userMap.get(empId).name}.`);
+      }
+      if (endRow > file.total_records) {
+        throw new Error(`Row range end (${endRow}) exceeds total file records (${file.total_records}).`);
+      }
 
-    if (phoneIdx === undefined) {
-      return res.status(400).json({ success: false, message: 'Could not find a Phone Number column in the uploaded file.' });
+      // Overlap check with previous ranges
+      for (let j = 0; j < i; j++) {
+        const prev = allocations[j];
+        const pStart = parseInt(prev.start_row, 10);
+        const pEnd = parseInt(prev.end_row, 10);
+        if (!(endRow < pStart || startRow > pEnd)) {
+          throw new Error(`Overlapping range detected: Rows ${startRow}–${endRow} overlaps with Rows ${pStart}–${pEnd}.`);
+        }
+      }
+
+      // Filter available records in this range
+      const matching = availableRecords.filter(r => r.row_index >= startRow && r.row_index <= endRow);
+      if (matching.length === 0) {
+        throw new Error(`No available pending records found in row range ${startRow}–${endRow}.`);
+      }
+
+      plannedAllocations.push({
+        employee_id: empId,
+        start_row: startRow,
+        end_row: endRow,
+        assigned_count: matching.length,
+        allocation_method: 'range',
+        recordIds: matching.map(r => r.id)
+      });
     }
 
-    const dataRows = rows.slice(1).filter(r => fmtPhone(r[phoneIdx]) !== '');
-    if (dataRows.length === 0) {
-      return res.status(400).json({ success: false, message: 'No phone number rows found in the file.' });
+  } else if (method === 'count') {
+    if (!Array.isArray(allocations) || allocations.length === 0) {
+      throw new Error('At least one record count allocation is required.');
     }
+
+    let offset = 0;
+    for (const a of allocations) {
+      const empId = parseInt(a.employee_id, 10);
+      const count = parseInt(a.count, 10);
+
+      if (!userMap.has(empId)) throw new Error(`Invalid employee selected (ID: ${a.employee_id}).`);
+      if (isNaN(count) || count <= 0) throw new Error(`Invalid record count for ${userMap.get(empId).name}.`);
+
+      if (offset + count > availableRecords.length) {
+        throw new Error(`Requested total count exceeds available unallocated records (${availableRecords.length}).`);
+      }
+
+      const chunk = availableRecords.slice(offset, offset + count);
+      offset += count;
+
+      plannedAllocations.push({
+        employee_id: empId,
+        start_row: chunk[0].row_index,
+        end_row: chunk[chunk.length - 1].row_index,
+        assigned_count: chunk.length,
+        allocation_method: 'count',
+        recordIds: chunk.map(r => r.id)
+      });
+    }
+
+  } else if (method === 'individual') {
+    if (!Array.isArray(allocations) || allocations.length === 0) {
+      throw new Error('At least one individual record allocation is required.');
+    }
+
+    const assignedSet = new Set();
+    for (const a of allocations) {
+      const empId = parseInt(a.employee_id, 10);
+      const ids = Array.isArray(a.record_ids) ? a.record_ids.map(Number) : [];
+
+      if (!userMap.has(empId)) throw new Error(`Invalid employee selected (ID: ${a.employee_id}).`);
+      if (ids.length === 0) throw new Error(`No records selected for ${userMap.get(empId).name}.`);
+
+      for (const id of ids) {
+        if (assignedSet.has(id)) {
+          throw new Error(`Duplicate record ID ${id} specified across multiple employees.`);
+        }
+        assignedSet.add(id);
+      }
+
+      const matching = availableRecords.filter(r => ids.includes(r.id));
+      if (matching.length === 0) throw new Error(`Selected records not found or already completed.`);
+
+      const rowIndices = matching.map(r => r.row_index);
+      plannedAllocations.push({
+        employee_id: empId,
+        start_row: Math.min(...rowIndices),
+        end_row: Math.max(...rowIndices),
+        assigned_count: matching.length,
+        allocation_method: 'individual',
+        recordIds: matching.map(r => r.id)
+      });
+    }
+
+  } else {
+    // Default: 'equal_split'
+    const rawIds = (Array.isArray(employee_ids) && employee_ids.length > 0)
+      ? employee_ids
+      : (Array.isArray(allocations) ? allocations.map(a => a.employee_id) : []);
+
+    const empIds = [...new Set(rawIds.map(Number))].filter(id => userMap.has(id));
+    if (empIds.length === 0) {
+      throw new Error('Please select at least one valid employee for equal split allocation.');
+    }
+
+    const totalAvail = availableRecords.length;
+    const n = empIds.length;
+    const baseCount = Math.floor(totalAvail / n);
+    const remainder = totalAvail % n;
+
+    let offset = 0;
+    for (let i = 0; i < n; i++) {
+      const empId = empIds[i];
+      const count = baseCount + (i < remainder ? 1 : 0);
+      if (count === 0) continue;
+
+      const chunk = availableRecords.slice(offset, offset + count);
+      offset += count;
+
+      plannedAllocations.push({
+        employee_id: empId,
+        start_row: chunk[0].row_index,
+        end_row: chunk[chunk.length - 1].row_index,
+        assigned_count: chunk.length,
+        allocation_method: 'equal_split',
+        recordIds: chunk.map(r => r.id)
+      });
+    }
+  }
+
+  // Execute database inserts and updates
+  const now = new Date();
+  const expiresAt = excelExpiry.calculateExpiresAt(now);
+  const adminName = adminUser.name || 'Admin';
+  const createdAssignments = [];
+
+  for (const plan of plannedAllocations) {
+    const [insRes] = await connection.query(
+      `INSERT INTO excel_assignments
+        (file_id, employee_id, assigned_by, assigned_at, expires_at, lifecycle_status, status, start_row, end_row, assigned_count, allocation_method)
+       VALUES (?, ?, ?, ?, ?, 'Active', 'Assigned', ?, ?, ?, ?)`,
+      [
+        fileId,
+        plan.employee_id,
+        adminUser.id,
+        now,
+        expiresAt,
+        plan.start_row,
+        plan.end_row,
+        plan.assigned_count,
+        plan.allocation_method
+      ]
+    );
+
+    const assignmentId = insRes.insertId;
+    createdAssignments.push({
+      id: assignmentId,
+      employee_id: plan.employee_id,
+      employee_name: userMap.get(plan.employee_id)?.name || 'Employee',
+      start_row: plan.start_row,
+      end_row: plan.end_row,
+      assigned_count: plan.assigned_count,
+      allocation_method: plan.allocation_method
+    });
+
+    // Update records with assignment_id and assigned_to
+    if (plan.recordIds.length > 0) {
+      await connection.query(
+        `UPDATE excel_records SET assignment_id = ?, assigned_to = ? WHERE id IN (?)`,
+        [assignmentId, plan.employee_id, plan.recordIds]
+      );
+    }
+
+    // Notification
+    try {
+      await notifCtrl.createWorkAssignedNotification({
+        employeeId: plan.employee_id,
+        assignmentId,
+        fileName: file.original_name,
+        totalRecords: plan.assigned_count,
+        assignedByName: adminName
+      });
+    } catch (notifErr) {
+      console.warn('[Excel] Failed to send work assigned notification:', notifErr.message);
+    }
+  }
+
+  // Update master file status
+  await connection.query(
+    `UPDATE excel_files SET status = 'Assigned', updated_at = NOW() WHERE id = ?`,
+    [fileId]
+  );
+
+  return createdAssignments;
+}
+
+// ── Admin: Upload Excel File ───────────────────────────────────────────────
+exports.uploadFile = async (req, res) => {
+  let connection;
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded.' });
+
+    const originalName = req.file.originalname;
+    const parsed = parseWorkbook(req.file.buffer, originalName);
+
+    // Fetch active users to map any completed records with source employee name
+    const [allUsers] = await db.query('SELECT id, name, email FROM users');
+    const userMap = new Map();
+    for (const u of allUsers) {
+      if (u.name) userMap.set(u.name.trim().toLowerCase(), u.id);
+      if (u.email) userMap.set(u.email.trim().toLowerCase(), u.id);
+    }
+
+    connection = await db.getConnection();
+    await connection.beginTransaction();
 
     const fileName = `${Date.now()}_${originalName}`;
-
-    const [fileResult] = await db.query(
+    const [fileResult] = await connection.query(
       `INSERT INTO excel_files (file_name, original_name, uploaded_by, status, total_records)
-       VALUES (?, ?, ?, 'Assigned', ?)`,
-      [fileName, originalName, req.user.id, dataRows.length]
+       VALUES (?, ?, ?, 'Pending', ?)`,
+      [fileName, originalName, req.user.id, parsed.dataRows.length]
     );
     const fileId = fileResult.insertId;
 
-    // Bulk insert records — capture disposition & sub-disposition if already in the file
-    const values = dataRows.map((r, idx) => [
-      fileId,
-      idx + 1,
-      fmtPhone(r[phoneIdx]),
-      dispIdx !== undefined ? String(r[dispIdx] || '').trim() : '',
-      subIdx  !== undefined ? String(r[subIdx]  || '').trim() : ''
-    ]);
-    await db.query(
-      'INSERT INTO excel_records (file_id, row_index, phone_number, disposition, sub_disposition) VALUES ?',
+    // Prepare bulk insert values for excel_records
+    const values = parsed.dataRows.map((r, idx) => {
+      const phone = fmtPhone(r[parsed.phoneIdx]);
+      const disp = parsed.dispIdx !== undefined ? String(r[parsed.dispIdx] || '').trim() : '';
+      const subDisp = parsed.subIdx !== undefined ? String(r[parsed.subIdx] || '').trim() : '';
+      const empText = parsed.empIdx !== undefined ? String(r[parsed.empIdx] || '').trim() : '';
+      const statusRaw = parsed.statusIdx !== undefined ? String(r[parsed.statusIdx] || '').trim() : '';
+      const notes = parsed.notesIdx !== undefined ? String(r[parsed.notesIdx] || '').trim() : '';
+
+      const isCompleted = (statusRaw.toLowerCase() === 'completed') || (disp !== '' && subDisp !== '');
+      const status = isCompleted ? 'Completed' : 'Pending';
+
+      let matchedUserId = null;
+      if (empText && userMap.has(empText.toLowerCase())) {
+        matchedUserId = userMap.get(empText.toLowerCase());
+      }
+
+      // If completed and matched, assign to that user as historical work
+      const assignedTo = isCompleted ? matchedUserId : null;
+      const updatedBy = isCompleted ? matchedUserId : null;
+
+      return [
+        fileId,
+        null, // assignment_id (set during allocation or backfill)
+        assignedTo,
+        empText || null,
+        idx + 1,
+        phone,
+        disp,
+        subDisp,
+        notes || null,
+        status,
+        updatedBy
+      ];
+    });
+
+    await connection.query(
+      `INSERT INTO excel_records
+        (file_id, assignment_id, assigned_to, source_employee_name, row_index, phone_number, disposition, sub_disposition, notes, status, updated_by)
+       VALUES ?`,
       [values]
     );
+
+    // Check if allocation payload was provided
+    let createdAssignments = [];
+    let allocConfig = null;
+
+    if (req.body.allocations) {
+      try {
+        const raw = typeof req.body.allocations === 'string' ? JSON.parse(req.body.allocations) : req.body.allocations;
+        allocConfig = {
+          method: req.body.allocation_method || req.body.method || 'range',
+          allocations: Array.isArray(raw) ? raw : (raw.allocations || []),
+          employee_ids: raw.employee_ids || req.body.employee_ids || [],
+          force_reassign: false
+        };
+      } catch (pErr) {
+        console.warn('[Excel] Could not parse allocations JSON:', pErr.message);
+      }
+    } else if (req.body.employee_ids) {
+      let eids = req.body.employee_ids;
+      if (typeof eids === 'string') {
+        try { eids = JSON.parse(eids); } catch (_) { eids = [parseInt(eids, 10)]; }
+      }
+      allocConfig = {
+        method: req.body.allocation_method || req.body.method || 'equal_split',
+        employee_ids: Array.isArray(eids) ? eids : [eids],
+        force_reassign: false
+      };
+    }
+
+    if (allocConfig && ((allocConfig.allocations && allocConfig.allocations.length > 0) || (allocConfig.employee_ids && allocConfig.employee_ids.length > 0))) {
+      createdAssignments = await performAllocation(connection, fileId, allocConfig, req.user);
+    }
+
+    await connection.commit();
 
     const [[file]] = await db.query(
       `SELECT ef.*, u.name as uploaded_by_name
@@ -108,10 +548,55 @@ exports.uploadFile = async (req, res) => {
       [fileId]
     );
 
-    res.json({ success: true, message: 'File uploaded successfully.', file });
+    res.json({
+      success: true,
+      message: createdAssignments.length > 0
+        ? `Master workbook uploaded and allocated to ${createdAssignments.length} employee(s) successfully.`
+        : 'Master workbook uploaded successfully.',
+      file,
+      assignments: createdAssignments
+    });
   } catch (err) {
+    if (connection) await connection.rollback();
     console.error('[Excel] uploadFile:', err.message);
     res.status(500).json({ success: false, message: err.message || 'Upload failed.' });
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
+// ── Admin: Assign Employees to File ────────────────────────────────────────
+exports.assignEmployees = async (req, res) => {
+  let connection;
+  try {
+    const { id } = req.params;
+    let config = req.body;
+
+    if (config.allocations && typeof config.allocations === 'string') {
+      try { config.allocations = JSON.parse(config.allocations); } catch (_) {}
+    }
+    if (config.employee_ids && typeof config.employee_ids === 'string') {
+      try { config.employee_ids = JSON.parse(config.employee_ids); } catch (_) {}
+    }
+
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    const createdAssignments = await performAllocation(connection, id, config, req.user);
+
+    await connection.commit();
+
+    res.json({
+      success: true,
+      message: `File allocated to ${createdAssignments.length} employee assignment(s) successfully.`,
+      assignments: createdAssignments
+    });
+  } catch (err) {
+    if (connection) await connection.rollback();
+    console.error('[Excel] assignEmployees:', err.message);
+    res.status(400).json({ success: false, message: err.message || 'Assignment failed.' });
+  } finally {
+    if (connection) connection.release();
   }
 };
 
@@ -129,13 +614,18 @@ exports.getFiles = async (req, res) => {
 
     for (const f of files) {
       const [empRows] = await db.query(
-        `SELECT u.name FROM excel_assignments ea
+        `SELECT ea.id, ea.employee_id, u.name, u.email, ea.start_row, ea.end_row,
+                ea.assigned_count, ea.status as assignment_status, ea.progress, ea.allocation_method,
+                (SELECT COUNT(*) FROM excel_records er WHERE er.assignment_id = ea.id AND er.status = 'Completed') as completed
+         FROM excel_assignments ea
          JOIN users u ON u.id = ea.employee_id
-         WHERE ea.file_id = ?`,
+         WHERE ea.file_id = ?
+         ORDER BY ea.id ASC`,
         [f.id]
       );
+      f.assignments = empRows;
       f.assigned_employees = empRows.map(e => e.name);
-      f.pending_count      = f.total_records - f.completed_count;
+      f.pending_count      = Math.max(0, f.total_records - f.completed_count);
       f.completion_pct     = f.total_records > 0
         ? Math.round((f.completed_count / f.total_records) * 100) : 0;
     }
@@ -162,10 +652,11 @@ exports.getFile = async (req, res) => {
     const [assignments] = await db.query(
       `SELECT ea.*, u.name as employee_name, u.email as employee_email,
         (SELECT COUNT(*) FROM excel_records er
-         WHERE er.file_id = ea.file_id AND er.updated_by = ea.employee_id AND er.status = 'Completed') as completed
+         WHERE er.assignment_id = ea.id AND er.status = 'Completed') as completed
        FROM excel_assignments ea
        JOIN users u ON u.id = ea.employee_id
-       WHERE ea.file_id = ?`,
+       WHERE ea.file_id = ?
+       ORDER BY ea.id ASC`,
       [id]
     );
 
@@ -174,7 +665,7 @@ exports.getFile = async (req, res) => {
       [id]
     );
     const completedCount  = countRow[0].completed;
-    const pendingCount    = file.total_records - completedCount;
+    const pendingCount    = Math.max(0, file.total_records - completedCount);
     const completionPct   = file.total_records > 0
       ? Math.round((completedCount / file.total_records) * 100) : 0;
 
@@ -189,80 +680,40 @@ exports.getFile = async (req, res) => {
   }
 };
 
-// ── Admin: Assign Employees ────────────────────────────────────────────────
-exports.assignEmployees = async (req, res) => {
-  try {
-    const { id }           = req.params;
-    const { employee_ids } = req.body;
-
-    if (!Array.isArray(employee_ids) || employee_ids.length === 0) {
-      return res.status(400).json({ success: false, message: 'employee_ids must be a non-empty array.' });
-    }
-
-    const [[file]] = await db.query('SELECT id, original_name FROM excel_files WHERE id = ?', [id]);
-    if (!file) return res.status(404).json({ success: false, message: 'File not found.' });
-
-    // Remove old assignments first
-    await db.query('DELETE FROM excel_assignments WHERE file_id = ?', [id]);
-
-    // Insert new with explicit expires_at (30 days from assignment) and lifecycle_status
-    const now = new Date();
-    const expiresAt = excelExpiry.calculateExpiresAt(now);
-    const vals = employee_ids.map(eid => [id, eid, req.user.id, now, expiresAt, 'Active', 'Assigned']);
-    await db.query(
-      'INSERT INTO excel_assignments (file_id, employee_id, assigned_by, assigned_at, expires_at, lifecycle_status, status) VALUES ?',
-      [vals]
-    );
-
-    await db.query(`UPDATE excel_files SET status = 'Assigned', updated_at = NOW() WHERE id = ?`, [id]);
-
-    // Create a "New Assignment" notification for each newly assigned employee
-    const adminName = req.user.name || 'Admin';
-    for (const empId of employee_ids) {
-      const [[asgnRow]] = await db.query(
-        'SELECT id FROM excel_assignments WHERE file_id = ? AND employee_id = ?',
-        [id, empId]
-      );
-      await notifCtrl.createWorkAssignedNotification({
-        employeeId: empId,
-        assignmentId: asgnRow ? asgnRow.id : null,
-        fileName: file.original_name,
-        totalRecords: file.total_records,
-        assignedByName: adminName
-      });
-    }
-
-    res.json({ success: true, message: `File assigned to ${employee_ids.length} employee(s).` });
-  } catch (err) {
-    console.error('[Excel] assignEmployees:', err.message);
-    res.status(500).json({ success: false, message: 'Assignment failed.' });
-  }
-};
-
 // ── Admin: Get File Records ────────────────────────────────────────────────
 exports.getFileRecords = async (req, res) => {
   try {
     const { id }     = req.params;
-    const { search, filter, page = 1, limit = 100 } = req.query;
+    const { search, filter, employee_id, assignment_id, page = 1, limit = 100 } = req.query;
     const offset     = (parseInt(page) - 1) * parseInt(limit);
 
     let where  = 'er.file_id = ?';
     const args = [id];
 
     if (search) {
-      where += ' AND (er.phone_number LIKE ? OR er.disposition LIKE ? OR er.sub_disposition LIKE ?)';
+      where += ' AND (er.phone_number LIKE ? OR er.disposition LIKE ? OR er.sub_disposition LIKE ? OR er.notes LIKE ?)';
       const like = `%${search}%`;
-      args.push(like, like, like);
+      args.push(like, like, like, like);
     }
     if (filter === 'completed') { where += " AND er.status = 'Completed'"; }
     if (filter === 'pending')   { where += " AND er.status = 'Pending'"; }
+    if (employee_id)            { where += " AND (er.assigned_to = ? OR er.updated_by = ?)"; args.push(employee_id, employee_id); }
+    if (assignment_id)          { where += " AND er.assignment_id = ?"; args.push(assignment_id); }
 
     const [records] = await db.query(
-      `SELECT er.*, u.name as employee_name
+      `SELECT er.*,
+              u_upd.name  as updated_by_name,
+              u_asgn.name as assigned_to_name,
+              u_asgn.email as assigned_to_email,
+              ea.start_row as assignment_start_row,
+              ea.end_row as assignment_end_row,
+              ea.allocation_method
        FROM excel_records er
-       LEFT JOIN users u ON u.id = er.updated_by
+       LEFT JOIN users u_upd  ON u_upd.id  = er.updated_by
+       LEFT JOIN users u_asgn ON u_asgn.id = er.assigned_to
+       LEFT JOIN excel_assignments ea ON ea.id = er.assignment_id
        WHERE ${where}
-       ORDER BY er.row_index
+       ORDER BY er.row_index ASC
        LIMIT ? OFFSET ?`,
       [...args, parseInt(limit), offset]
     );
@@ -292,7 +743,6 @@ exports.updateFileStatus = async (req, res) => {
     if (status === 'Closed') {
       await db.query("UPDATE excel_assignments SET status = 'Closed' WHERE file_id = ?", [id]);
     }
-    // Notify assigned employees about assignment update
     await notifCtrl.createAssignmentUpdatedNotification({ fileId: id, status });
 
     res.json({ success: true, message: `Status updated to ${status}.` });
@@ -321,32 +771,53 @@ exports.deleteFile = async (req, res) => {
   }
 };
 
-// ── Admin: Export File as CSV ──────────────────────────────────────────────
+// ── Admin/Employee: Export File as CSV/XLSX ────────────────────────────────
 exports.exportFile = async (req, res) => {
   try {
     const { id } = req.params;
+    const { format = 'csv', assignment_id, employee_id } = req.query;
+
     const [[file]] = await db.query('SELECT * FROM excel_files WHERE id = ?', [id]);
     if (!file) return res.status(404).json({ success: false, message: 'File not found.' });
 
+    let where = 'er.file_id = ?';
+    const args = [id];
+
+    // If caller is an employee, strictly limit to their records
+    if (req.user.role !== 'admin') {
+      where += ' AND er.assigned_to = ?';
+      args.push(req.user.id);
+    } else {
+      if (assignment_id) {
+        where += ' AND er.assignment_id = ?';
+        args.push(assignment_id);
+      } else if (employee_id) {
+        where += ' AND er.assigned_to = ?';
+        args.push(employee_id);
+      }
+    }
+
     const [records] = await db.query(
-      `SELECT er.phone_number, er.disposition, er.sub_disposition,
-              u.name as employee_name, er.status, er.updated_at
+      `SELECT er.row_index, er.phone_number, er.disposition, er.sub_disposition, er.notes,
+              u_upd.name as employee_name, er.status, er.updated_at
        FROM excel_records er
-       LEFT JOIN users u ON u.id = er.updated_by
-       WHERE er.file_id = ?
-       ORDER BY er.row_index`,
-      [id]
+       LEFT JOIN users u_upd ON u_upd.id = er.updated_by
+       WHERE ${where}
+       ORDER BY er.row_index ASC`,
+      args
     );
 
-    const { format = 'csv' } = req.query;
-
     if (format === 'xlsx') {
-      // Export as XLSX
-      const sheetData = [['Phone Number', 'Disposition', 'Sub Disposition', 'Employee', 'Status', 'Updated At']];
+      const sheetData = [['Row Index', 'Phone Number', 'Disposition', 'Sub Disposition', 'Call Notes', 'Employee', 'Status', 'Updated At']];
       for (const r of records) {
         sheetData.push([
-          r.phone_number, r.disposition || '', r.sub_disposition || '',
-          r.employee_name || '', r.status,
+          r.row_index,
+          r.phone_number,
+          r.disposition || '',
+          r.sub_disposition || '',
+          r.notes || '',
+          r.employee_name || '',
+          r.status,
           r.updated_at ? new Date(r.updated_at).toLocaleString('en-IN') : ''
         ]);
       }
@@ -361,13 +832,15 @@ exports.exportFile = async (req, res) => {
     }
 
     // Default CSV
-    let csv = 'Phone Number,Disposition,Sub Disposition,Employee,Status,Updated At\n';
+    let csv = 'Row Index,Phone Number,Disposition,Sub Disposition,Call Notes,Employee,Status,Updated At\n';
     for (const r of records) {
       const row = [
+        r.row_index,
         r.phone_number,
-        r.disposition    || '',
+        r.disposition     || '',
         r.sub_disposition || '',
-        r.employee_name  || '',
+        r.notes           || '',
+        r.employee_name   || '',
         r.status,
         r.updated_at ? new Date(r.updated_at).toLocaleString('en-IN') : ''
       ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
@@ -385,16 +858,14 @@ exports.exportFile = async (req, res) => {
 };
 
 // ── Admin: Employees List for Assignment Dropdown ──────────────────────────
-// Include employees who are active OR auto-deactivated (outside business hours).
-// Exclude only hard-deactivated employees (is_active=0 AND auto_deactivated=0).
 exports.getEmployeesList = async (req, res) => {
   try {
     const [employees] = await db.query(
-      `SELECT id, name, email, is_active, auto_deactivated
+      `SELECT DISTINCT id, name, email, department, designation, is_active, auto_deactivated
        FROM users
        WHERE role = 'employee'
          AND NOT (is_active = 0 AND auto_deactivated = 0 AND manual_override = 0)
-       ORDER BY name`
+       ORDER BY name ASC, id ASC`
     );
     res.json({ success: true, employees });
   } catch (err) {
@@ -417,8 +888,8 @@ exports.getAudit = async (req, res) => {
     const [rows] = await db.query(
       `SELECT ea.*, u.name as employee_name, ef.original_name as file_name
        FROM excel_audit ea
-       JOIN users u       ON u.id  = ea.employee_id
-       JOIN excel_files ef ON ef.id = ea.file_id
+       LEFT JOIN users u       ON u.id  = ea.employee_id
+       LEFT JOIN excel_files ef ON ef.id = ea.file_id
        WHERE ${where}
        ORDER BY ea.created_at DESC
        LIMIT ? OFFSET ?`,
@@ -442,11 +913,12 @@ exports.getMyAssignments = async (req, res) => {
   try {
     const empId = req.user.id;
     const [rows] = await db.query(
-      `SELECT ea.*, ef.original_name, ef.total_records, ef.status as file_status,
+      `SELECT ea.*, ef.original_name, ef.status as file_status,
               ef.uploaded_at, ef.updated_at as file_updated_at,
               u.name as assigned_by_name,
         (SELECT COUNT(*) FROM excel_records er
-         WHERE er.file_id = ef.id AND er.updated_by = ? AND er.status = 'Completed') as completed
+         WHERE er.assignment_id = ea.id AND er.status = 'Completed') as completed,
+        COALESCE(ea.assigned_count, (SELECT COUNT(*) FROM excel_records er WHERE er.assignment_id = ea.id), ef.total_records) as total_records
        FROM excel_assignments ea
        JOIN excel_files ef ON ea.file_id = ef.id
        JOIN users u        ON u.id = ea.assigned_by
@@ -454,15 +926,18 @@ exports.getMyAssignments = async (req, res) => {
          AND ea.status != 'Closed'
          AND ${excelExpiry.getActiveAssignmentCondition('ea')}
        ORDER BY ea.assigned_at DESC`,
-      [empId, empId]
+      [empId]
     );
 
-    const assignments = rows.map(r => ({
-      ...r,
-      pending:         r.total_records - r.completed,
-      completion_pct:  r.total_records > 0
-        ? Math.round((r.completed / r.total_records) * 100) : 0
-    }));
+    const assignments = rows.map(r => {
+      const tot = Number(r.total_records) || 0;
+      const comp = Number(r.completed) || 0;
+      return {
+        ...r,
+        pending:         Math.max(0, tot - comp),
+        completion_pct:  tot > 0 ? Math.round((comp / tot) * 100) : 0
+      };
+    });
 
     res.json({ success: true, assignments });
   } catch (err) {
@@ -497,13 +972,13 @@ exports.getAssignmentRecords = async (req, res) => {
 
     const [[file]] = await db.query('SELECT * FROM excel_files WHERE id = ?', [asgn.file_id]);
 
-    let where  = 'er.file_id = ?';
-    const args = [asgn.file_id];
+    let where  = '(er.assignment_id = ? OR (er.assignment_id IS NULL AND er.file_id = ? AND er.assigned_to = ?))';
+    const args = [asgn.id, asgn.file_id, empId];
 
     if (search) {
-      where += ' AND (er.phone_number LIKE ? OR er.disposition LIKE ? OR er.sub_disposition LIKE ?)';
+      where += ' AND (er.phone_number LIKE ? OR er.disposition LIKE ? OR er.sub_disposition LIKE ? OR er.notes LIKE ?)';
       const like = `%${search}%`;
-      args.push(like, like, like);
+      args.push(like, like, like, like);
     }
     if (filter === 'completed') { where += " AND er.status = 'Completed'"; }
     if (filter === 'pending')   { where += " AND er.status = 'Pending'"; }
@@ -511,7 +986,7 @@ exports.getAssignmentRecords = async (req, res) => {
     const [records] = await db.query(
       `SELECT er.* FROM excel_records er
        WHERE ${where}
-       ORDER BY er.row_index
+       ORDER BY er.row_index ASC
        LIMIT ? OFFSET ?`,
       [...args, parseInt(limit), offset]
     );
@@ -521,9 +996,14 @@ exports.getAssignmentRecords = async (req, res) => {
       args
     );
 
+    const [[{ comp }]] = await db.query(
+      `SELECT COUNT(*) as comp FROM excel_records er WHERE ${where} AND er.status = 'Completed'`,
+      args
+    );
+
     res.json({
       success: true,
-      assignment: asgn,
+      assignment: { ...asgn, completed: comp },
       file,
       records,
       total,
@@ -536,24 +1016,41 @@ exports.getAssignmentRecords = async (req, res) => {
   }
 };
 
-// ── Shared: Update a Record (Employee must be assigned to the file) ─────────
+// ── Shared: Update a Record (Strict Row-Level IDOR Protection) ─────────────
 exports.updateRecord = async (req, res) => {
   try {
     const userId   = req.user.id;
     const { recordId } = req.params;
     const { disposition, sub_disposition, notes } = req.body;
 
-    // Fetch current record
     const [[record]] = await db.query('SELECT * FROM excel_records WHERE id = ?', [recordId]);
     if (!record) return res.status(404).json({ success: false, message: 'Record not found.' });
 
-    // Verify assignment (admin can always update)
+    // Strict Employee Authorization Check
+    let asgn = null;
     if (req.user.role !== 'admin') {
-      const [[asgn]] = await db.query(
-        'SELECT * FROM excel_assignments WHERE file_id = ? AND employee_id = ? AND status != ?',
-        [record.file_id, userId, 'Closed']
-      );
-      if (!asgn) return res.status(403).json({ success: false, message: 'Access denied: not assigned to this file.' });
+      // Must be assigned to this record
+      if (record.assigned_to && record.assigned_to !== userId) {
+        return res.status(403).json({ success: false, message: 'Access denied: this record is assigned to another employee.' });
+      }
+
+      if (record.assignment_id) {
+        const [[a]] = await db.query(
+          'SELECT * FROM excel_assignments WHERE id = ? AND employee_id = ? AND status != ?',
+          [record.assignment_id, userId, 'Closed']
+        );
+        asgn = a;
+      } else {
+        const [[a]] = await db.query(
+          'SELECT * FROM excel_assignments WHERE file_id = ? AND employee_id = ? AND status != ?',
+          [record.file_id, userId, 'Closed']
+        );
+        asgn = a;
+      }
+
+      if (!asgn) {
+        return res.status(403).json({ success: false, message: 'Access denied: not assigned to this file.' });
+      }
 
       if (excelExpiry.isAssignmentExpired(asgn)) {
         return res.status(403).json({
@@ -564,11 +1061,8 @@ exports.updateRecord = async (req, res) => {
       }
     }
 
-    // Save old values for audit
     const oldDisp    = record.disposition;
     const oldSubDisp = record.sub_disposition;
-
-    // Determine new status
     const newDisp    = disposition    !== undefined ? disposition    : oldDisp;
     const newSubDisp = sub_disposition !== undefined ? sub_disposition : oldSubDisp;
     const newNotes   = notes !== undefined ? (notes ? String(notes).trim() : null) : record.notes;
@@ -594,65 +1088,63 @@ exports.updateRecord = async (req, res) => {
        oldDisp, newDisp, oldSubDisp, newSubDisp]
     );
 
-    // Update assignment progress
-    const [[prog]] = await db.query(
-      `SELECT COUNT(*) as completed FROM excel_records
-       WHERE file_id = ? AND updated_by = ? AND status = 'Completed'`,
-      [record.file_id, userId]
-    );
+    // Update assignment progress for this specific assignment
+    const targetAsgnId = record.assignment_id || (asgn ? asgn.id : null);
+    if (targetAsgnId) {
+      const [[prog]] = await db.query(
+        `SELECT COUNT(*) as completed FROM excel_records
+         WHERE assignment_id = ? AND status = 'Completed'`,
+        [targetAsgnId]
+      );
+      const [[currAsgn]] = await db.query(
+        'SELECT * FROM excel_assignments WHERE id = ?',
+        [targetAsgnId]
+      );
 
-    const [[currAsgn]] = await db.query(
-      'SELECT status FROM excel_assignments WHERE file_id = ? AND employee_id = ?',
-      [record.file_id, userId]
-    );
-    const [[fileInfo]] = await db.query(
-      'SELECT total_records FROM excel_files WHERE id = ?',
-      [record.file_id]
-    );
+      const targetCount = currAsgn ? (currAsgn.assigned_count || 0) : 0;
+      let updatedAsgnStatus = 'In Progress';
+      if (currAsgn && targetCount > 0 && prog.completed >= targetCount) {
+        updatedAsgnStatus = 'Completed';
+      }
 
-    let updatedAsgnStatus = 'In Progress';
-    if (currAsgn && currAsgn.status === 'Completed' && prog.completed >= (fileInfo ? fileInfo.total_records : 0)) {
-      updatedAsgnStatus = 'Completed';
+      await db.query(
+        `UPDATE excel_assignments SET progress = ?, status = ?, updated_at = NOW()
+         WHERE id = ?`,
+        [prog.completed, updatedAsgnStatus, targetAsgnId]
+      );
     }
 
-    await db.query(
-      `UPDATE excel_assignments SET progress = ?, status = ?, updated_at = NOW()
-       WHERE file_id = ? AND employee_id = ?`,
-      [prog.completed, updatedAsgnStatus, record.file_id, userId]
-    );
-
-    // Update file status to In Progress if still Assigned
-    await db.query(
-      `UPDATE excel_files SET status = 'In Progress', updated_at = NOW()
-       WHERE id = ? AND status = 'Assigned'`,
+    // Update master file status
+    const [[fileStats]] = await db.query(
+      `SELECT COUNT(*) as total, SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed
+       FROM excel_records WHERE file_id = ?`,
       [record.file_id]
     );
-
-    // ── Callback reminder logic ──────────────────────────────────────────────
-    // Lookup the assignment id for this employee + file
-    const [[asgnForNotif]] = await db.query(
-      'SELECT id FROM excel_assignments WHERE file_id = ? AND employee_id = ?',
-      [record.file_id, userId]
+    let newFileStatus = 'In Progress';
+    if (fileStats && fileStats.total > 0 && fileStats.total === Number(fileStats.completed)) {
+      newFileStatus = 'Completed';
+    }
+    await db.query(
+      `UPDATE excel_files SET status = ?, updated_at = NOW() WHERE id = ?`,
+      [newFileStatus, record.file_id]
     );
-    if (req.user.role !== 'admin' && asgnForNotif) {
+
+    // Callback reminder
+    if (req.user.role !== 'admin' && targetAsgnId) {
       await notifCtrl.upsertCallbackReminder({
         employeeId:   userId,
-        assignmentId: asgnForNotif.id,
+        assignmentId: targetAsgnId,
         recordId:     parseInt(recordId, 10),
         phoneNumber:  record.phone_number,
         disposition:  newDisp,
         subDisposition: newSubDisp
       });
     } else if (req.user.role === 'admin') {
-      // If admin modified the record, notify the assigned employee(s)
-      const [assignedEmployees] = await db.query(
-        'SELECT id, employee_id FROM excel_assignments WHERE file_id = ? AND status != ?',
-        [record.file_id, 'Closed']
-      );
-      for (const a of assignedEmployees) {
+      const targetEmp = record.assigned_to;
+      if (targetEmp && targetAsgnId) {
         await notifCtrl.createRecordUpdatedNotification({
-          employeeId: a.employee_id,
-          assignmentId: a.id,
+          employeeId: targetEmp,
+          assignmentId: targetAsgnId,
           phoneNumber: record.phone_number
         });
       }
@@ -686,11 +1178,11 @@ exports.submitAssignment = async (req, res) => {
       });
     }
 
-    // Check all records are complete
+    // Check all records assigned to this assignment are complete
     const [incomplete] = await db.query(
       `SELECT phone_number FROM excel_records
-       WHERE file_id = ? AND (disposition IS NULL OR disposition = '' OR sub_disposition IS NULL OR sub_disposition = '')`,
-      [asgn.file_id]
+       WHERE assignment_id = ? AND (disposition IS NULL OR disposition = '' OR sub_disposition IS NULL OR sub_disposition = '')`,
+      [assignmentId]
     );
 
     if (incomplete.length > 0) {
@@ -726,7 +1218,7 @@ exports.submitAssignment = async (req, res) => {
   }
 };
 
-// ── Employee: Search across assigned records ──────────────────────────────
+// ── Employee/Admin: Search across assigned records ────────────────────────
 exports.searchAssignedRecords = async (req, res) => {
   try {
     const empId = req.user.id;
@@ -744,33 +1236,28 @@ exports.searchAssignedRecords = async (req, res) => {
     const conditions = ["(ef.status IS NULL OR ef.status != 'Deleted')"];
     const params = [];
 
-    // Security: Only allow employee to see their assigned files (unless admin)
+    // Security: strictly isolate employee to their assigned records
     if (role !== 'admin') {
-      conditions.push('ea.employee_id = ?');
-      params.push(empId);
-      // Strictly exclude expired assignments from employee search
+      conditions.push('(r.assigned_to = ? OR (r.assigned_to IS NULL AND ea.employee_id = ?))');
+      params.push(empId, empId);
       conditions.push(excelExpiry.getActiveAssignmentCondition('ea'));
     } else if (req.query.employee_id) {
-      conditions.push('ea.employee_id = ?');
-      params.push(req.query.employee_id);
+      conditions.push('(r.assigned_to = ? OR (r.assigned_to IS NULL AND ea.employee_id = ?))');
+      params.push(req.query.employee_id, req.query.employee_id);
     }
 
-    // Phone filter
-    let cleanPhone = '';
     if (phone && phone.trim()) {
-      cleanPhone = phone.trim().replace(/[^0-9+]/g, '');
+      const cleanPhone = phone.trim().replace(/[^0-9+]/g, '');
       const rawPhone = phone.trim();
       conditions.push('(r.phone_number = ? OR r.phone_number = ? OR r.phone_number LIKE ?)');
       params.push(rawPhone, cleanPhone, `%${cleanPhone || rawPhone}%`);
     }
 
-    // Assignment / File filter
     if (assignment_id && assignment_id !== 'all') {
       conditions.push('(ea.id = ? OR ef.id = ?)');
       params.push(assignment_id, assignment_id);
     }
 
-    // Status filter
     if (status && status !== 'all') {
       if (status.toLowerCase() === 'pending') {
         conditions.push("(r.status = 'Pending' OR r.status IS NULL OR r.status = '')");
@@ -780,7 +1267,6 @@ exports.searchAssignedRecords = async (req, res) => {
       }
     }
 
-    // Date filters (on assignment assigned_at or record updated_at)
     if (from_date) {
       conditions.push('DATE(ea.assigned_at) >= ?');
       params.push(from_date);
@@ -796,13 +1282,6 @@ exports.searchAssignedRecords = async (req, res) => {
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
     const safeLimit = Math.min(Math.max(parseInt(limit, 10) || 100, 1), 300);
-
-    let orderBy = 'ea.assigned_at DESC, r.id DESC';
-    let orderParams = [];
-    if (cleanPhone) {
-      orderBy = '(CASE WHEN r.phone_number = ? THEN 1 WHEN r.phone_number LIKE ? THEN 2 ELSE 3 END), ea.assigned_at DESC, r.id DESC';
-      orderParams = [cleanPhone, `%${cleanPhone}%`];
-    }
 
     const sql = `
       SELECT 
@@ -827,13 +1306,13 @@ exports.searchAssignedRecords = async (req, res) => {
         ea.status AS assignment_status
       FROM excel_records r
       JOIN excel_files ef ON ef.id = r.file_id
-      JOIN excel_assignments ea ON ea.file_id = r.file_id
+      JOIN excel_assignments ea ON (ea.id = r.assignment_id OR (r.assignment_id IS NULL AND ea.file_id = r.file_id))
       ${whereClause}
-      ORDER BY ${orderBy}
+      ORDER BY ea.assigned_at DESC, r.id DESC
       LIMIT ${safeLimit}
     `;
 
-    const [rows] = await db.query(sql, [...params, ...orderParams]);
+    const [rows] = await db.query(sql, params);
 
     res.json({
       success: true,
@@ -845,4 +1324,3 @@ exports.searchAssignedRecords = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to search assigned records.' });
   }
 };
-

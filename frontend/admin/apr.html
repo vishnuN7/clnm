@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — APR & Workforce Analytics</title>
+  <title>Dixit Lending Solution — APR</title>
   <meta name="description" content="APR — Attendance, Performance & Reports Management Dashboard." />
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -22,7 +23,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- CDNs for charts and exporting -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -61,8 +62,8 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     :root[data-theme='dark'] .admin-page .topbar {
-      background: linear-gradient(90deg, rgba(9, 17, 29, 0.95) 0%, rgba(12, 24, 41, 0.92) 100%);
-      border-bottom-color: rgba(151, 176, 210, 0.12);
+      background: rgba(12, 18, 25, 0.95);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
     }
     .admin-page .topbar-title {
       position: absolute !important;
@@ -885,10 +886,17 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div><h2>CLN Lending Suite</h2><span>Admin Console</span></div>
-      </div>
+      <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
+        </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Admin Console</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -1177,7 +1185,7 @@
                     <th>IP Address</th>
                     <th>Browser</th>
                     <th>OS / Device</th>
-                    <th>Location</th>
+                    <th style="min-width: 170px;">Location</th>
                   </tr>
                 </thead>
                 <tbody id="history-tbody">
@@ -1332,7 +1340,7 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705c"></script>
+<script src="/js/api.js?v=20261008"></script>
 <script>
   // ── Pagination & State Management ──
   const PAGE_SIZE = 20;
@@ -1896,6 +1904,59 @@
     renderHistoryPage();
   }
 
+  function renderLocationCell(r) {
+    const isLocal = r.is_localhost || r.location === 'Localhost / Development' || r.ip_address === '::1' || r.ip_address === '127.0.0.1';
+    const isPriv = r.is_private || r.location === 'Private Network / LAN';
+
+    if (isLocal) {
+      return `
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 8px;background:var(--bg-body, rgba(0,0,0,0.03));border-radius:4px;border:1px solid var(--border, rgba(0,0,0,0.08));">
+          <i class="fas fa-laptop-code" style="color:var(--text-muted);font-size:11px;" aria-hidden="true"></i>
+          <span style="font-weight:600;color:var(--text-secondary);font-size:12px;">Localhost / Development</span>
+        </div>
+      `;
+    }
+
+    if (isPriv) {
+      return `
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 8px;background:var(--bg-body, rgba(0,0,0,0.03));border-radius:4px;border:1px solid var(--border, rgba(0,0,0,0.08));">
+          <i class="fas fa-network-wired" style="color:var(--text-muted);font-size:11px;" aria-hidden="true"></i>
+          <span style="font-weight:600;color:var(--text-secondary);font-size:12px;">Private Network / LAN</span>
+        </div>
+      `;
+    }
+
+    const locText = r.location && r.location !== 'N/A' && r.location !== 'Location unavailable' ? r.location : null;
+    if (!locText) {
+      return `
+        <div style="display:inline-flex;align-items:center;gap:6px;color:var(--text-muted);font-size:12px;">
+          <i class="fas fa-circle-question" style="font-size:11px;opacity:0.6;" aria-hidden="true"></i>
+          <span>Location unavailable</span>
+        </div>
+      `;
+    }
+
+    const tooltipParts = [locText];
+    if (r.location_isp) tooltipParts.push(`ISP: ${r.location_isp}`);
+    if (r.latitude != null && r.longitude != null) tooltipParts.push(`Coordinates: ${r.latitude}, ${r.longitude}`);
+    const tooltip = escapeHtml(tooltipParts.join(' • '));
+
+    return `
+      <div style="display:flex;flex-direction:column;gap:2px;" title="${tooltip}">
+        <div style="display:inline-flex;align-items:center;gap:6px;">
+          <i class="fas fa-location-dot" style="color:var(--accent, #3b82f6);font-size:12px;flex-shrink:0;" aria-hidden="true"></i>
+          <span style="font-weight:600;color:var(--text-primary);font-size:12px;line-height:1.35;">${escapeHtml(locText)}</span>
+        </div>
+        ${r.location_isp ? `
+          <div style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted);padding-left:18px;line-height:1.2;">
+            <i class="fas fa-network-wired" style="font-size:9px;opacity:0.7;" aria-hidden="true"></i>
+            <span>${escapeHtml(r.location_isp)}</span>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
   function renderHistoryPage() {
     const tbody = document.getElementById('history-tbody');
     if (!allHistoryData || allHistoryData.length === 0) {
@@ -1926,7 +1987,7 @@
         <td><code style="font-size:11px;background:var(--bg-secondary);padding:2px 6px;border-radius:4px;">${r.ip_address || '—'}</code></td>
         <td>${escapeHtml(r.browser || '—')}</td>
         <td>${escapeHtml(r.os || '—')} (${escapeHtml(r.device || 'Desktop')})</td>
-        <td><span style="color:var(--text-muted);">${r.location || 'Local / Office'}</span></td>
+        <td style="white-space:normal;min-width:170px;">${renderLocationCell(r)}</td>
       </tr>
     `).join('');
 
@@ -2319,7 +2380,7 @@
         return {
           title: 'Session Login History Audit Logs',
           filename: 'apr_session_login_history',
-          columns: ['Emp ID', 'Employee Name', 'Login Date', 'Login Time', 'Logout Time', 'Duration', 'IP Address', 'Browser', 'OS / Device', 'Location'],
+          columns: ['Emp ID', 'Employee Name', 'Login Date', 'Login Time', 'Logout Time', 'Duration', 'IP Address', 'Browser', 'OS / Device', 'Location', 'ISP / Network'],
           data: allHistoryData.map(r => [
             r.employee_id || r.id,
             r.employee_name,
@@ -2330,7 +2391,8 @@
             r.ip_address || '—',
             r.browser || '—',
             `${r.os || '—'} (${r.device || 'Desktop'})`,
-            r.location || 'Local / Office'
+            r.location || (r.ip_address === '::1' || r.ip_address === '127.0.0.1' ? 'Localhost / Development' : '—'),
+            r.location_isp || '—'
           ])
         };
       case 'performance':

@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLN Lending Suite — EMI Calculator</title>
+  <title>Dixit Lending Solution — EMI Calculator</title>
   <meta name="theme-color" content="#0f2747" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
   <script>
     (function () {
       try {
@@ -22,7 +23,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="/css/styles.css?v=20260705c" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="/css/calculator-hub.css?v=20260925" />
   <style>
@@ -137,7 +138,8 @@
     }
 
     :root[data-theme='dark'] .stat-card.result-card-highlight {
-      background: linear-gradient(135deg, rgba(10, 19, 32, 0.92) 0%, rgba(47, 111, 237, 0.08) 100%);
+      background: linear-gradient(135deg, rgba(16, 23, 33, 0.94) 0%, rgba(0, 107, 60, 0.12) 100%);
+      border-color: rgba(123, 192, 67, 0.18);
     }
 
     .savings-badge {
@@ -440,6 +442,44 @@
       .tabs-navigation::-webkit-scrollbar { display: none; }
       .tab-btn { white-space: nowrap; }
     }
+
+    #repayment-print-section {
+      display: none;
+    }
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #102033 !important;
+      }
+      .app-layout, .sidebar, .sidebar-overlay, .topbar, .tabs-navigation, .card, .loan-hub-nav-card, .table-controls-wrapper, .pagination-container, .export-btn-group, .btn, button {
+        display: none !important;
+      }
+      #repayment-print-section {
+        display: block !important;
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        background: #ffffff !important;
+        color: #102033 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      #repayment-print-section table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+      }
+      #repayment-print-section tr {
+        page-break-inside: avoid;
+      }
+      #repayment-print-section thead {
+        display: table-header-group;
+      }
+      #repayment-print-section th, #repayment-print-section td {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
   </style>
   <!-- Chart.js and Export libraries -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -452,10 +492,17 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <div class="logo-icon">CLN</div>
-        <div><h2>CLN Lending Suite</h2><span>Admin Console</span></div>
-      </div>
+      <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
+        </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Admin Console</span>
+        </div>
+      </a>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -510,7 +557,7 @@
             </div>
             <div>
               <h2 class="loan-hub-title">Loan Calculator Hub</h2>
-              <p class="loan-hub-subtitle">Complete borrowing assessment suite — EMI, eligibility, affordability, part-prepayment, and balance transfer</p>
+              <p class="loan-hub-subtitle">Complete borrowing assessment suite — EMI calculation, borrower eligibility, and balance transfer analysis</p>
             </div>
           </div>
           <div class="hub-compliance-pill">
@@ -526,14 +573,6 @@
           <button type="button" class="hub-tab-btn" id="hub-tab-eligibility" role="tab" aria-selected="false" onclick="switchHubTab('eligibility')">
             <i class="fas fa-user-check"></i>
             <span>Eligibility</span>
-          </button>
-          <button type="button" class="hub-tab-btn" id="hub-tab-affordability" role="tab" aria-selected="false" onclick="switchHubTab('affordability')">
-            <i class="fas fa-wallet"></i>
-            <span>Affordability</span>
-          </button>
-          <button type="button" class="hub-tab-btn" id="hub-tab-prepayment" role="tab" aria-selected="false" onclick="switchHubTab('prepayment')">
-            <i class="fas fa-coins"></i>
-            <span>Prepayment</span>
           </button>
           <button type="button" class="hub-tab-btn" id="hub-tab-transfer" role="tab" aria-selected="false" onclick="switchHubTab('transfer')">
             <i class="fas fa-right-left"></i>
@@ -589,18 +628,15 @@
               </div>
 
               <div class="form-group">
-                <label for="input-fee">Processing Fee (%) (Optional)</label>
-                <input type="number" id="input-fee" step="0.01" class="form-control" placeholder="1.5" />
-                <div class="error-msg" id="err-fee" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
-              </div>
-
-              <div class="form-group">
-                <label for="input-prepayment">Prepayment Amount (Optional)</label>
-                <div style="position:relative;">
-                  <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                  <input type="text" id="input-prepayment" class="form-control" placeholder="1,00,000" style="padding-left:28px;" />
-                </div>
-                <div class="error-msg" id="err-prepayment" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                <label for="select-lender">Bank / NBFC</label>
+                <select id="select-lender" class="form-control" onchange="onLenderChange(this.value)">
+                  <option value="">Select Bank / NBFC (Dixit Default)</option>
+                  <option value="icici_bank">ICICI Bank</option>
+                  <option value="hdfc_bank">HDFC Bank</option>
+                  <option value="incred_finance">InCred Finance</option>
+                  <option value="idfc_first_bank">IDFC FIRST Bank</option>
+                </select>
+                <div id="selected-lender-badge" class="lender-status-hint" style="display:none; font-size:12px; margin-top:6px; font-weight:600; align-items:center; gap:6px;"></div>
               </div>
 
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
@@ -614,7 +650,7 @@
         <!-- Outputs & Charts (Right) -->
         <div>
           <!-- Summary Cards -->
-          <div class="results-stats-grid">
+          <div class="results-stats-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));">
             <div class="stat-card result-card-highlight">
               <div class="stat-card-top">
                 <span class="results-header-text">Monthly EMI</span>
@@ -638,23 +674,6 @@
               </div>
               <div class="primary-result-value" id="res-total">₹0</div>
               <div class="stat-card-desc">Principal + interest</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-card-top">
-                <span class="results-header-text">Processing Fee</span>
-                <span class="stat-card-icon-wrap" style="color:#d97706; background:rgba(217,119,6,0.12);"><i class="fas fa-file-invoice-dollar"></i></span>
-              </div>
-              <div class="primary-result-value" id="res-fee">₹0</div>
-              <div class="stat-card-desc">Upfront lender fee</div>
-            </div>
-            <div class="stat-card" id="card-cost-savings">
-              <div class="stat-card-top">
-                <span class="results-header-text" id="res-cost-label">Effective Cost</span>
-                <span class="stat-card-icon-wrap" style="color:var(--success); background:rgba(15,139,113,0.12);"><i class="fas fa-coins"></i></span>
-              </div>
-              <div class="primary-result-value" id="res-cost">₹0</div>
-              <div class="stat-card-desc" id="res-cost-desc">Estimated total outflow (inc. fee)</div>
-              <div id="savings-badge-container"></div>
             </div>
           </div>
 
@@ -767,7 +786,11 @@
             </div>
           </div>
 
-          <div class="table-controls-right">
+          <div class="table-controls-right" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div id="export-lender-badge" class="export-lender-indicator" style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:6px 12px; border-radius:6px; background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-secondary);">
+              <i class="fas fa-building-columns" id="export-lender-icon" style="color:var(--accent);"></i>
+              <span id="export-lender-text">Dixit Lending Solution</span>
+            </div>
             <div class="export-btn-group">
               <button type="button" class="btn btn-secondary export-btn" onclick="exportPDF()">
                 <i class="fas fa-file-pdf" style="margin-right:6px; color:#e05252;"></i>Export PDF
@@ -794,13 +817,12 @@
                 <th class="th-right sortable" onclick="handleSort('emiAmount')">EMI</th>
                 <th class="th-right sortable" onclick="handleSort('principalComponent')">Principal</th>
                 <th class="th-right sortable" onclick="handleSort('interestComponent')">Interest</th>
-                <th class="th-right sortable" onclick="handleSort('prepayment')">Prepayment</th>
                 <th class="th-right sortable" onclick="handleSort('outstandingBalance')">Outstanding Balance</th>
               </tr>
             </thead>
             <tbody id="schedule-tbody">
               <tr>
-                <td colspan="7" class="text-center text-muted" style="padding:40px 0;">
+                <td colspan="6" class="text-center text-muted" style="padding:40px 0;">
                   <i class="fas fa-table" style="font-size:32px; opacity:0.35; display:block; margin-bottom:10px;"></i>
                   Enter the loan details above and click Calculate to view the amortization schedule.
                 </td>
@@ -813,6 +835,8 @@
           <div id="pagination-info" style="font-size:13px; color:var(--text-secondary);"></div>
           <div class="pagination-buttons" id="pagination-btns"></div>
         </div>
+
+        <div id="repayment-print-section"></div>
       </div>
       </div>
 
@@ -856,9 +880,15 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="flat-fee">Processing Fee (%) (Optional)</label>
-                  <input type="number" id="flat-fee" step="0.01" class="form-control" placeholder="1.5" />
-                  <div class="error-msg" id="flat-err-fee" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                  <label for="flat-select-lender">Bank / NBFC</label>
+                  <select id="flat-select-lender" class="form-control" onchange="onFlatLenderChange(this.value)">
+                    <option value="">Select Bank / NBFC (Dixit Default)</option>
+                    <option value="icici_bank">ICICI Bank</option>
+                    <option value="hdfc_bank">HDFC Bank</option>
+                    <option value="incred_finance">InCred Finance</option>
+                    <option value="idfc_first_bank">IDFC FIRST Bank</option>
+                  </select>
+                  <div id="flat-selected-lender-badge" class="lender-status-hint" style="display:none; font-size:12px; margin-top:6px; font-weight:600; align-items:center; gap:6px;"></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
@@ -878,7 +908,7 @@
           <!-- Outputs & Charts (Right) -->
           <div>
             <!-- Summary Cards -->
-            <div class="results-stats-grid">
+            <div class="results-stats-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));">
               <div class="stat-card result-card-highlight">
                 <div class="stat-card-top">
                   <span class="results-header-text">Monthly Payment</span>
@@ -902,22 +932,6 @@
                 </div>
                 <div class="primary-result-value" id="flat-res-total">₹0</div>
                 <div class="stat-card-desc">Principal + total interest</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-card-top">
-                  <span class="results-header-text">Processing Fee</span>
-                  <span class="stat-card-icon-wrap" style="color:#d97706; background:rgba(217,119,6,0.12);"><i class="fas fa-file-invoice-dollar"></i></span>
-                </div>
-                <div class="primary-result-value" id="flat-res-fee">₹0</div>
-                <div class="stat-card-desc">Upfront lender fee</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-card-top">
-                  <span class="results-header-text">Effective Cost</span>
-                  <span class="stat-card-icon-wrap" style="color:var(--success); background:rgba(15,139,113,0.12);"><i class="fas fa-coins"></i></span>
-                </div>
-                <div class="primary-result-value" id="flat-res-cost">₹0</div>
-                <div class="stat-card-desc">Estimated total outflow (inc. fee)</div>
               </div>
             </div>
 
@@ -986,7 +1000,11 @@
             <div class="table-controls-left">
               <span style="font-size:13px; font-weight:600; color:var(--text-muted);"><i class="fas fa-circle-info" style="margin-right:4px;"></i> Fixed monthly payment schedule</span>
             </div>
-            <div class="table-controls-right">
+            <div class="table-controls-right" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <div id="flat-export-lender-badge" class="export-lender-indicator" style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:6px 12px; border-radius:6px; background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-secondary);">
+                <i class="fas fa-building-columns" id="flat-export-lender-icon" style="color:var(--accent);"></i>
+                <span id="flat-export-lender-text">Dixit Lending Solution</span>
+              </div>
               <div class="export-btn-group">
                 <button type="button" class="btn btn-secondary export-btn" onclick="exportFlatPDF()">
                   <i class="fas fa-file-pdf" style="margin-right:6px; color:#e05252;"></i>Export PDF
@@ -997,7 +1015,7 @@
                 <button type="button" class="btn btn-secondary export-btn" onclick="exportFlatCSV()">
                   <i class="fas fa-file-csv" style="margin-right:6px; color:#2563eb;"></i>Export CSV
                 </button>
-                <button type="button" class="btn btn-secondary export-btn" onclick="triggerPrint()">
+                <button type="button" class="btn btn-secondary export-btn" onclick="triggerFlatPrint()">
                   <i class="fas fa-print" style="margin-right:6px;"></i>Print
                 </button>
               </div>
@@ -1075,8 +1093,12 @@
 
                   <div class="form-group">
                     <label for="compare-bank-1">Bank / NBFC (Optional)</label>
-                    <select id="compare-bank-1" class="form-control">
+                    <select id="compare-bank-1" class="form-control" onchange="onCompareLenderChange()">
                       <option value="">Select a Bank / NBFC (Optional)</option>
+                      <option value="icici_bank">ICICI Bank</option>
+                      <option value="hdfc_bank">HDFC Bank</option>
+                      <option value="incred_finance">InCred Finance</option>
+                      <option value="idfc_first_bank">IDFC FIRST Bank</option>
                       <option value="BAJAJ FIN">Bajaj Finance</option>
                       <option value="MMFSL">Mahindra Finance</option>
                       <option value="SFL">Shriram Finance</option>
@@ -1132,8 +1154,12 @@
 
                   <div class="form-group">
                     <label for="compare-bank-2">Bank / NBFC (Optional)</label>
-                    <select id="compare-bank-2" class="form-control">
+                    <select id="compare-bank-2" class="form-control" onchange="onCompareLenderChange()">
                       <option value="">Select a Bank / NBFC (Optional)</option>
+                      <option value="icici_bank">ICICI Bank</option>
+                      <option value="hdfc_bank">HDFC Bank</option>
+                      <option value="incred_finance">InCred Finance</option>
+                      <option value="idfc_first_bank">IDFC FIRST Bank</option>
                       <option value="BAJAJ FIN">Bajaj Finance</option>
                       <option value="MMFSL">Mahindra Finance</option>
                       <option value="SFL">Shriram Finance</option>
@@ -1212,19 +1238,25 @@
                 <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-primary);"><i class="fas fa-table-columns" style="margin-right:8px; color:var(--accent);"></i>Comparison Details</h3>
                 <p style="margin:3px 0 0; font-size:12px; color:var(--text-muted);">Side-by-side metric comparison between both loan options.</p>
               </div>
-              <div class="export-btn-group" style="margin:0;">
-                <button type="button" class="btn btn-secondary export-btn" onclick="exportComparePDF()">
-                  <i class="fas fa-file-pdf" style="margin-right:6px; color:#e05252;"></i>Export PDF
-                </button>
-                <button type="button" class="btn btn-secondary export-btn" onclick="exportCompareExcel()">
-                  <i class="fas fa-file-excel" style="margin-right:6px; color:#107c41;"></i>Export Excel
-                </button>
-                <button type="button" class="btn btn-secondary export-btn" onclick="triggerPrint()">
-                  <i class="fas fa-print" style="margin-right:6px;"></i>Print
-                </button>
-                <button type="button" class="btn btn-secondary export-btn" onclick="shareCompare()">
-                  <i class="fas fa-share-nodes" style="margin-right:6px;"></i>Share
-                </button>
+              <div class="table-controls-right" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <div id="compare-export-lender-badge" class="export-lender-indicator" style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:6px 12px; border-radius:6px; background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-secondary);">
+                  <i class="fas fa-code-compare" id="compare-export-lender-icon" style="color:var(--accent);"></i>
+                  <span id="compare-export-lender-text">Loan Comparison</span>
+                </div>
+                <div class="export-btn-group" style="margin:0;">
+                  <button type="button" class="btn btn-secondary export-btn" onclick="exportComparePDF()">
+                    <i class="fas fa-file-pdf" style="margin-right:6px; color:#e05252;"></i>Export PDF
+                  </button>
+                  <button type="button" class="btn btn-secondary export-btn" onclick="exportCompareExcel()">
+                    <i class="fas fa-file-excel" style="margin-right:6px; color:#107c41;"></i>Export Excel
+                  </button>
+                  <button type="button" class="btn btn-secondary export-btn" onclick="exportCompareCSV()">
+                    <i class="fas fa-file-csv" style="margin-right:6px; color:#2563eb;"></i>Export CSV
+                  </button>
+                  <button type="button" class="btn btn-secondary export-btn" onclick="triggerComparePrint()">
+                    <i class="fas fa-print" style="margin-right:6px;"></i>Print
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1282,7 +1314,7 @@
                     <button type="button" class="preset-pill" data-foir="40" onclick="setEligibilityFoir(40)">40% (Conservative)</button>
                     <button type="button" class="preset-pill" data-foir="50" onclick="setEligibilityFoir(50)">50% (Standard Banking)</button>
                     <button type="button" class="preset-pill" data-foir="60" onclick="setEligibilityFoir(60)">60% (High Income)</button>
-                    <button type="button" class="preset-pill" data-foir="65" onclick="setEligibilityFoir(65)">65% (Co-Applicant / Maximum)</button>
+                    <button type="button" class="preset-pill" data-foir="70" onclick="setEligibilityFoir(70)">70% (Co-Applicant / Max)</button>
                   </div>
                   <div class="error-msg" id="err-elig-foir" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
                 </div>
@@ -1303,6 +1335,18 @@
                     </div>
                   </div>
                   <div class="error-msg" id="err-elig-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="select-elig-lender">Bank / NBFC</label>
+                  <select id="select-elig-lender" class="form-control" onchange="onEligLenderChange(this.value)">
+                    <option value="">Select Bank / NBFC (Dixit Default)</option>
+                    <option value="icici_bank">ICICI Bank</option>
+                    <option value="hdfc_bank">HDFC Bank</option>
+                    <option value="incred_finance">InCred Finance</option>
+                    <option value="idfc_first_bank">IDFC FIRST Bank</option>
+                  </select>
+                  <div id="elig-selected-lender-badge" class="lender-status-hint" style="display:none; font-size:12px; margin-top:6px; font-weight:600; align-items:center; gap:6px;"></div>
                 </div>
 
                 <div style="display:flex; gap:10px; margin-top:20px;">
@@ -1326,6 +1370,31 @@
               <div id="elig-banner" class="hub-banner positive" style="display:none;"></div>
 
               <div id="elig-results-wrapper" style="display:none;">
+                <div class="table-controls-wrapper" style="margin-bottom:16px; border:1px solid var(--border); border-radius:8px; background:var(--bg-card); padding:10px 16px;">
+                  <div class="table-controls-left">
+                    <span style="font-size:13px; font-weight:700; color:var(--text-primary);"><i class="fas fa-user-check" style="margin-right:6px; color:var(--accent-secondary);"></i>Assessment Results</span>
+                  </div>
+                  <div class="table-controls-right" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <div id="elig-export-lender-badge" class="export-lender-indicator" style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:6px 12px; border-radius:6px; background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-secondary);">
+                      <i class="fas fa-building-columns" id="elig-export-lender-icon" style="color:var(--accent);"></i>
+                      <span id="elig-export-lender-text">Dixit Lending Solution</span>
+                    </div>
+                    <div class="export-btn-group">
+                      <button type="button" class="btn btn-secondary export-btn" onclick="exportEligPDF()">
+                        <i class="fas fa-file-pdf" style="margin-right:6px; color:#e05252;"></i>Export PDF
+                      </button>
+                      <button type="button" class="btn btn-secondary export-btn" onclick="exportEligExcel()">
+                        <i class="fas fa-file-excel" style="margin-right:6px; color:#107c41;"></i>Export Excel
+                      </button>
+                      <button type="button" class="btn btn-secondary export-btn" onclick="exportEligCSV()">
+                        <i class="fas fa-file-csv" style="margin-right:6px; color:#2563eb;"></i>Export CSV
+                      </button>
+                      <button type="button" class="btn btn-secondary export-btn" onclick="triggerEligPrint()">
+                        <i class="fas fa-print" style="margin-right:6px;"></i>Print
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 <div class="stat-cards-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:20px;">
                   <div class="stat-card result-card-emerald">
                     <div class="stat-label">Eligible Loan Amount</div>
@@ -1388,374 +1457,7 @@
         </div>
       </div>
 
-      <!-- 3. Affordability Calculator Hub Panel -->
-      <div id="hub-content-affordability" class="hub-tab-content">
-        <div class="emi-calculator-layout">
-          <!-- Input Form (Left) -->
-          <div class="card" style="margin-bottom:0; height:100%;">
-            <div class="card-header">
-              <h3><i class="fas fa-wallet" style="margin-right:8px; color:var(--accent-secondary);"></i>Monthly Cash Flow &amp; Budget</h3>
-            </div>
-            <div class="card-body">
-              <form id="afford-form" onsubmit="event.preventDefault(); calculateAffordability();">
-                <div class="form-group">
-                  <label for="input-afford-income">Monthly Household Net Income</label>
-                  <div style="position:relative;">
-                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                    <input type="text" id="input-afford-income" class="form-control" placeholder="e.g. 70,000" value="" style="padding-left:28px;" required />
-                  </div>
-                  <div class="error-msg" id="err-afford-income" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
-                </div>
-
-                <div class="form-group">
-                  <label for="input-afford-expenses">Living &amp; Household Expenses</label>
-                  <div style="position:relative;">
-                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                    <input type="text" id="input-afford-expenses" class="form-control" placeholder="e.g. 25,000" value="" style="padding-left:28px;" />
-                  </div>
-                  <small style="color:var(--text-muted); font-size:11px;">Rent, groceries, utilities, school fees, insurance, etc.</small>
-                  <div class="error-msg" id="err-afford-expenses" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
-                </div>
-
-                <div class="form-group">
-                  <label for="input-afford-debts">Existing Loan EMIs &amp; Debt Commitments</label>
-                  <div style="position:relative;">
-                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                    <input type="text" id="input-afford-debts" class="form-control" placeholder="e.g. 10,000" value="" style="padding-left:28px;" />
-                  </div>
-                  <small style="color:var(--text-muted); font-size:11px;">Existing car/personal loan EMIs or credit card minimums</small>
-                </div>
-
-                <div class="form-group">
-                  <label>Emergency Buffer on Disposable Surplus</label>
-                  <div class="preset-pills-row" id="afford-buffer-pills">
-                    <button type="button" class="preset-pill" data-buffer="20" onclick="setAffordabilityBuffer(20)">20% (Aggressive)</button>
-                    <button type="button" class="preset-pill" data-buffer="30" onclick="setAffordabilityBuffer(30)">30% (Recommended)</button>
-                    <button type="button" class="preset-pill" data-buffer="40" onclick="setAffordabilityBuffer(40)">40% (Conservative)</button>
-                    <button type="button" class="preset-pill" data-buffer="50" onclick="setAffordabilityBuffer(50)">50% (High Safety)</button>
-                  </div>
-                  <div class="error-msg" id="err-afford-buffer" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
-                  <small style="color:var(--text-muted); font-size:11px; margin-top:4px; display:block;">Percent of monthly cash surplus preserved for savings and unexpected events.</small>
-                </div>
-
-                <div class="form-group">
-                  <label for="input-afford-rate">Interest Rate (% p.a.)</label>
-                  <input type="number" id="input-afford-rate" step="0.05" class="form-control" placeholder="e.g. 10.5" value="" required />
-                  <div class="error-msg" id="err-afford-rate" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
-                </div>
-
-                <div class="form-group">
-                  <label for="input-afford-tenure">Planned Loan Tenure</label>
-                  <div class="tenure-input-group">
-                    <input type="number" id="input-afford-tenure" step="1" class="form-control" placeholder="e.g. 5" value="" required />
-                    <div class="toggle-group">
-                      <button type="button" class="toggle-btn active" id="btn-afford-years" onclick="setAffordabilityTenureUnit('years')">Yr</button>
-                      <button type="button" class="toggle-btn" id="btn-afford-months" onclick="setAffordabilityTenureUnit('months')">Mo</button>
-                    </div>
-                  </div>
-                  <div class="error-msg" id="err-afford-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
-                </div>
-
-                <div style="display:flex; gap:10px; margin-top:20px;">
-                  <button type="submit" class="btn btn-primary" style="flex:1;">
-                    <i class="fas fa-calculator" style="margin-right:6px;"></i> Evaluate Affordability
-                  </button>
-                  <button type="button" class="btn btn-secondary" onclick="resetAffordability()">
-                    <i class="fas fa-rotate-left"></i> Reset
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <!-- Results Section (Right) -->
-          <div class="card" style="margin-bottom:0; height:100%;">
-            <div class="card-header">
-              <h3><i class="fas fa-piggy-bank" style="margin-right:8px; color:var(--accent-secondary);"></i>Affordability &amp; Cash Flow Analysis</h3>
-            </div>
-            <div class="card-body">
-              <div id="afford-banner" class="hub-banner positive" style="display:none;"></div>
-
-              <div id="afford-results-wrapper" style="display:none;">
-                <div class="stat-cards-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:20px;">
-                  <div class="stat-card result-card-purple">
-                    <div class="stat-label">Comfortably Affordable Loan</div>
-                    <div class="stat-value" id="res-afford-amount" style="color:#8b5cf6;">₹0</div>
-                    <small style="font-size:11px; color:var(--text-muted);">Sustainable borrowing limit</small>
-                  </div>
-                  <div class="stat-card">
-                    <div class="stat-label">Comfortable New EMI</div>
-                    <div class="stat-value" id="res-afford-emi">₹0</div>
-                    <small style="font-size:11px; color:var(--text-muted);">Within monthly cash surplus</small>
-                  </div>
-                  <div class="stat-card">
-                    <div class="stat-label">Total Monthly Surplus</div>
-                    <div class="stat-value" id="res-afford-surplus">₹0</div>
-                    <small style="font-size:11px; color:var(--text-muted);">Income - Expenses - Debts</small>
-                  </div>
-                  <div class="stat-card">
-                    <div class="stat-label">Preserved Emergency Buffer</div>
-                    <div class="stat-value" id="res-afford-buffer">₹0</div>
-                    <small style="font-size:11px; color:var(--text-muted);">Protected safety margin</small>
-                  </div>
-                </div>
-
-                <!-- Cashflow breakdown progress bar -->
-                <div class="card" style="padding:16px; margin-bottom:20px; border:1px solid var(--border); background:var(--bg-card);">
-                  <h4 style="font-size:14px; font-weight:700; margin:0 0 4px; color:var(--text-primary);">Monthly Income Distribution</h4>
-                  <p style="font-size:12px; color:var(--text-muted); margin:0 0 12px;">Visual allocation of monthly earnings across living outflows, debts, and new loan capacity.</p>
-
-                  <div class="cashflow-progress-bar-wrap">
-                    <div class="cashflow-progress-bar">
-                      <div class="cashflow-segment seg-living" id="seg-bar-living" style="width:0%;" title="Living Expenses"></div>
-                      <div class="cashflow-segment seg-existing" id="seg-bar-debts" style="width:0%;" title="Existing Debts"></div>
-                      <div class="cashflow-segment seg-new-emi" id="seg-bar-new-emi" style="width:0%;" title="New Comfortable EMI"></div>
-                      <div class="cashflow-segment seg-surplus" id="seg-bar-surplus" style="width:0%;" title="Preserved Savings"></div>
-                    </div>
-                  </div>
-
-                  <div class="cashflow-legend-grid">
-                    <div class="cashflow-legend-item">
-                      <span class="legend-color-dot" style="background:#3b82f6;"></span>
-                      <span>Living Expenses: <strong id="leg-val-living">₹0</strong></span>
-                    </div>
-                    <div class="cashflow-legend-item">
-                      <span class="legend-color-dot" style="background:#f59e0b;"></span>
-                      <span>Existing Debts: <strong id="leg-val-debts">₹0</strong></span>
-                    </div>
-                    <div class="cashflow-legend-item">
-                      <span class="legend-color-dot" style="background:#10b981;"></span>
-                      <span>New Loan EMI: <strong id="leg-val-new">₹0</strong></span>
-                    </div>
-                    <div class="cashflow-legend-item">
-                      <span class="legend-color-dot" style="background:#8b5cf6;"></span>
-                      <span>Emergency Buffer: <strong id="leg-val-surplus">₹0</strong></span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Budget Details Table -->
-                <div class="card" style="padding:16px; margin-bottom:20px; border:1px solid var(--border); background:var(--bg-card);">
-                  <h4 style="font-size:14px; font-weight:700; margin:0 0 12px; color:var(--text-primary);">Detailed Monthly Cashflow Summary</h4>
-                  <div style="overflow-x:auto;">
-                    <table class="hub-comparison-table">
-                      <thead>
-                        <tr>
-                          <th>Parameter</th>
-                          <th style="text-align:right;">Amount (₹)</th>
-                        </tr>
-                      </thead>
-                      <tbody id="afford-breakdown-tbody"></tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              <div id="afford-placeholder" style="padding:40px 20px; text-align:center; color:var(--text-muted);">
-                <i class="fas fa-hand-holding-dollar" style="font-size:42px; opacity:0.35; margin-bottom:12px; display:block;"></i>
-                <div style="font-size:15px; font-weight:600; margin-bottom:6px;">Evaluate Real Monthly Affordability</div>
-                <div style="font-size:12.5px; max-width:420px; margin:0 auto;">Enter your monthly cash flow details to evaluate how much loan you can comfortably afford while safeguarding your emergency savings.</div>
-              </div>
-
-              <div class="hub-disclaimer-note">
-                <i class="fas fa-circle-info"></i>
-                <div>
-                  <strong>Financial Prudence Note:</strong> Affordability estimates reflect practical cash flow rather than maximum legal borrowing capacity. Maintaining an emergency buffer ensures loan obligations remain sustainable during unexpected life events or temporary loss of income.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4. Prepayment Calculator Hub Panel -->
-      <div id="hub-content-prepayment" class="hub-tab-content">
-        <div class="emi-calculator-layout">
-          <!-- Input Form (Left) -->
-          <div class="card" style="margin-bottom:0; height:100%;">
-            <div class="card-header">
-              <h3><i class="fas fa-coins" style="margin-right:8px; color:var(--accent-secondary);"></i>Existing Loan &amp; Prepayment Details</h3>
-            </div>
-            <div class="card-body">
-              <form id="prepay-form" onsubmit="event.preventDefault(); calculatePrepayment();">
-                <div class="form-group">
-                  <label for="input-prepay-principal">Current Outstanding Principal</label>
-                  <div style="position:relative;">
-                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                    <input type="text" id="input-prepay-principal" class="form-control" placeholder="e.g. 20,00,000" value="" style="padding-left:28px;" required />
-                  </div>
-                  <div class="error-msg" id="err-prepay-principal" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
-                </div>
-
-                <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                  <div class="form-group">
-                    <label for="input-prepay-rate">Interest Rate (% p.a.)</label>
-                    <input type="number" id="input-prepay-rate" step="0.05" class="form-control" placeholder="e.g. 9.5" value="" required />
-                    <div class="error-msg" id="err-prepay-rate" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
-                  </div>
-                  <div class="form-group">
-                    <label for="input-prepay-tenure">Remaining Tenure</label>
-                    <div class="tenure-input-group">
-                      <input type="number" id="input-prepay-tenure" step="1" class="form-control" placeholder="e.g. 180" value="" required />
-                      <div class="toggle-group">
-                        <button type="button" class="toggle-btn active" id="btn-prepay-months" onclick="setPrepaymentTenureUnit('months')">Mo</button>
-                        <button type="button" class="toggle-btn" id="btn-prepay-years" onclick="setPrepaymentTenureUnit('years')">Yr</button>
-                      </div>
-                    </div>
-                    <div class="error-msg" id="err-prepay-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="input-prepay-emi">Current Monthly EMI (₹)</label>
-                  <div style="position:relative;">
-                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                    <input type="text" id="input-prepay-emi" class="form-control" placeholder="e.g. 20,888 (optional, auto-calculated)" value="" style="padding-left:28px;" />
-                  </div>
-                  <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-                    <small style="color:var(--text-muted); font-size:11px;">Leave empty or calculate automatically from terms above.</small>
-                    <button type="button" class="hub-inline-calc-btn" onclick="calculatePrepayEMIFromDetails()">
-                      <i class="fas fa-calculator"></i> Calculate from details
-                    </button>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="input-prepay-amount">Lump-Sum Part-Prepayment Amount</label>
-                  <div style="position:relative;">
-                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:600;">₹</span>
-                    <input type="text" id="input-prepay-amount" class="form-control" placeholder="e.g. 3,00,000" value="" style="padding-left:28px;" required />
-                  </div>
-                  <div class="error-msg" id="err-prepay-amount" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
-                </div>
-
-                <div class="form-group">
-                  <label for="input-prepay-fee">Prepayment Penalty / Processing Fee (% if any)</label>
-                  <input type="number" id="input-prepay-fee" step="0.1" class="form-control" placeholder="0" value="" />
-                  <small style="color:var(--text-muted); font-size:11px;">RBI mandates 0% penalty on floating-rate individual loans; fixed-rate loans may incur fees.</small>
-                </div>
-
-                <div style="display:flex; gap:10px; margin-top:20px;">
-                  <button type="submit" class="btn btn-primary" style="flex:1;">
-                    <i class="fas fa-calculator" style="margin-right:6px;"></i> Calculate Savings
-                  </button>
-                  <button type="button" class="btn btn-secondary" onclick="resetPrepayment()">
-                    <i class="fas fa-rotate-left"></i> Reset
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <!-- Results Section (Right) -->
-          <div class="card" style="margin-bottom:0; height:100%;">
-            <div class="card-header">
-              <h3><i class="fas fa-chart-pie" style="margin-right:8px; color:var(--accent-secondary);"></i>Prepayment Impact &amp; Strategy Comparison</h3>
-            </div>
-            <div class="card-body">
-              <div id="prepay-banner" class="hub-banner positive" style="display:none;"></div>
-
-              <div id="prepay-results-wrapper" style="display:none;">
-                <!-- Strategy Selection Toggle Cards -->
-                <div class="strategy-cards-grid">
-                  <div class="strategy-card" id="strategy-card-a" onclick="setPrepaymentStrategy('tenure'); calculatePrepayment();">
-                    <span class="strategy-badge">Strategy A (Recommended)</span>
-                    <h4 class="strategy-title">Reduce Loan Tenure</h4>
-                    <p class="strategy-desc">Keep your monthly EMI unchanged. Finish loan significantly faster and maximize total interest savings.</p>
-                    <div class="strategy-metric-row">
-                      <span class="strategy-metric-label">Tenure Reduction:</span>
-                      <span class="strategy-metric-value hub-val-positive" id="card-a-tenure-saved">0 Months</span>
-                    </div>
-                    <div class="strategy-metric-row">
-                      <span class="strategy-metric-label">Interest Saved:</span>
-                      <span class="strategy-metric-value hub-val-highlight" id="card-a-interest-saved">₹0</span>
-                    </div>
-                    <div class="strategy-metric-row">
-                      <span class="strategy-metric-label">Net Lifetime Benefit:</span>
-                      <span class="strategy-metric-value hub-val-positive" id="card-a-net-savings">₹0</span>
-                    </div>
-                  </div>
-
-                  <div class="strategy-card" id="strategy-card-b" onclick="setPrepaymentStrategy('emi'); calculatePrepayment();">
-                    <span class="strategy-badge">Strategy B</span>
-                    <h4 class="strategy-title">Reduce Monthly EMI</h4>
-                    <p class="strategy-desc">Keep original tenure unchanged. Lower monthly outgo to improve immediate monthly cash flow.</p>
-                    <div class="strategy-metric-row">
-                      <span class="strategy-metric-label">Monthly EMI Saved:</span>
-                      <span class="strategy-metric-value hub-val-positive" id="card-b-emi-saved">₹0 / mo</span>
-                    </div>
-                    <div class="strategy-metric-row">
-                      <span class="strategy-metric-label">Interest Saved:</span>
-                      <span class="strategy-metric-value hub-val-highlight" id="card-b-interest-saved">₹0</span>
-                    </div>
-                    <div class="strategy-metric-row">
-                      <span class="strategy-metric-label">Net Lifetime Benefit:</span>
-                      <span class="strategy-metric-value hub-val-positive" id="card-b-net-savings">₹0</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Primary KPI Metrics -->
-                <div class="stat-cards-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:20px;">
-                  <div class="stat-card result-card-emerald">
-                    <div class="stat-label">Net Total Savings</div>
-                    <div class="stat-value" id="res-prepay-savings" style="color:var(--success, #0f8b71);">₹0</div>
-                    <small style="font-size:11px; color:var(--text-muted);">Interest saved minus charges</small>
-                  </div>
-                  <div class="stat-card">
-                    <div class="stat-label" id="res-prepay-metric-label">Tenure Saved</div>
-                    <div class="stat-value" id="res-prepay-metric" style="color:var(--accent-secondary);">0 Mos</div>
-                    <small style="font-size:11px; color:var(--text-muted);">Active strategy impact</small>
-                  </div>
-                  <div class="stat-card">
-                    <div class="stat-label">New Remaining Principal</div>
-                    <div class="stat-value" id="res-prepay-remaining">₹0</div>
-                    <small style="font-size:11px; color:var(--text-muted);">Adjusted outstanding loan balance</small>
-                  </div>
-                  <div class="stat-card">
-                    <div class="stat-label">Prepayment Charges</div>
-                    <div class="stat-value" id="res-prepay-charges">₹0</div>
-                    <small style="font-size:11px; color:var(--text-muted);">Penalty / bank fee</small>
-                  </div>
-                </div>
-
-                <!-- Comprehensive Comparison Table -->
-                <div class="card" style="padding:16px; margin-bottom:20px; border:1px solid var(--border); background:var(--bg-card);">
-                  <h4 style="font-size:14px; font-weight:700; margin:0 0 12px; color:var(--text-primary);">Prepayment Strategy Comparison Matrix</h4>
-                  <div style="overflow-x:auto;">
-                    <table class="hub-comparison-table">
-                      <thead>
-                        <tr>
-                          <th>Parameter</th>
-                          <th>Without Prepayment</th>
-                          <th>Option A (Reduce Tenure)</th>
-                          <th>Option B (Reduce EMI)</th>
-                        </tr>
-                      </thead>
-                      <tbody id="prepay-comparison-tbody"></tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              <div id="prepay-placeholder" style="padding:40px 20px; text-align:center; color:var(--text-muted);">
-                <i class="fas fa-piggy-bank" style="font-size:42px; opacity:0.35; margin-bottom:12px; display:block;"></i>
-                <div style="font-size:15px; font-weight:600; margin-bottom:6px;">Simulate Part-Prepayment Benefits</div>
-                <div style="font-size:12.5px; max-width:420px; margin:0 auto;">Enter your current loan details and proposed lump-sum prepayment to evaluate interest savings and tenure reduction.</div>
-              </div>
-
-              <div class="hub-disclaimer-note">
-                <i class="fas fa-circle-info"></i>
-                <div>
-                  <strong>Regulatory Advisory:</strong> As per RBI guidelines, commercial banks and NBFCs cannot levy prepayment charges on individual floating-rate term loans. Prepayment charges may apply to commercial loans, fixed-rate loans, or non-individual borrowings.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 5. Balance Transfer Calculator Hub Panel -->
+      <!-- 4. Balance Transfer Calculator Hub Panel -->
       <div id="hub-content-transfer" class="hub-tab-content">
         <div class="emi-calculator-layout">
           <!-- Input Form (Left) -->
@@ -1767,6 +1469,17 @@
               <form id="transfer-form" onsubmit="event.preventDefault(); calculateBalanceTransfer();">
                 <div style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:6px;">
                   Current Existing Loan
+                </div>
+
+                <div class="form-group">
+                  <label for="select-transfer-existing-lender">Current Bank / Lender (Existing)</label>
+                  <select id="select-transfer-existing-lender" class="form-control" onchange="onTransferLenderChange()">
+                    <option value="">Current Lender (or Dixit Default)</option>
+                    <option value="icici_bank">ICICI Bank</option>
+                    <option value="hdfc_bank">HDFC Bank</option>
+                    <option value="incred_finance">InCred Finance</option>
+                    <option value="idfc_first_bank">IDFC FIRST Bank</option>
+                  </select>
                 </div>
 
                 <div class="form-group">
@@ -1807,6 +1520,18 @@
 
                 <div style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--accent-secondary); margin:20px 0 12px; border-bottom:1px solid var(--border); padding-bottom:6px;">
                   Proposed New Loan (Transfer Target)
+                </div>
+
+                <div class="form-group">
+                  <label for="select-transfer-new-lender">Target Bank / NBFC (Refinancing Lender)</label>
+                  <select id="select-transfer-new-lender" class="form-control" onchange="onTransferLenderChange()">
+                    <option value="">Select Target Lender (Dixit Default)</option>
+                    <option value="icici_bank">ICICI Bank</option>
+                    <option value="hdfc_bank">HDFC Bank</option>
+                    <option value="incred_finance">InCred Finance</option>
+                    <option value="idfc_first_bank">IDFC FIRST Bank</option>
+                  </select>
+                  <div id="transfer-selected-lender-badge" class="lender-status-hint" style="display:none; font-size:12px; margin-top:6px; font-weight:600; align-items:center; gap:6px;"></div>
                 </div>
 
                 <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -1857,6 +1582,31 @@
               <div id="transfer-banner" class="hub-banner positive" style="display:none;"></div>
 
               <div id="transfer-results-wrapper" style="display:none;">
+                <div class="table-controls-wrapper" style="margin-bottom:16px; border:1px solid var(--border); border-radius:8px; background:var(--bg-card); padding:10px 16px;">
+                  <div class="table-controls-left">
+                    <span style="font-size:13px; font-weight:700; color:var(--text-primary);"><i class="fas fa-scale-balanced" style="margin-right:6px; color:var(--accent-secondary);"></i>Refinancing Analysis</span>
+                  </div>
+                  <div class="table-controls-right" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <div id="transfer-export-lender-badge" class="export-lender-indicator" style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:6px 12px; border-radius:6px; background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-secondary);">
+                      <i class="fas fa-building-columns" id="transfer-export-lender-icon" style="color:var(--accent);"></i>
+                      <span id="transfer-export-lender-text">Dixit Lending Solution</span>
+                    </div>
+                    <div class="export-btn-group">
+                      <button type="button" class="btn btn-secondary export-btn" onclick="exportTransferPDF()">
+                        <i class="fas fa-file-pdf" style="margin-right:6px; color:#e05252;"></i>Export PDF
+                      </button>
+                      <button type="button" class="btn btn-secondary export-btn" onclick="exportTransferExcel()">
+                        <i class="fas fa-file-excel" style="margin-right:6px; color:#107c41;"></i>Export Excel
+                      </button>
+                      <button type="button" class="btn btn-secondary export-btn" onclick="exportTransferCSV()">
+                        <i class="fas fa-file-csv" style="margin-right:6px; color:#2563eb;"></i>Export CSV
+                      </button>
+                      <button type="button" class="btn btn-secondary export-btn" onclick="triggerTransferPrint()">
+                        <i class="fas fa-print" style="margin-right:6px;"></i>Print
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 <div class="stat-cards-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); margin-bottom:20px;">
                   <div class="stat-card result-card-emerald">
                     <div class="stat-label">Net Lifetime Savings</div>
@@ -1920,15 +1670,14 @@
 </div>
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
-<script src="/js/api.js?v=20260705d"></script>
+<script src="/js/api.js?v=20261008"></script>
+<script src="/js/calculator-hub.js?v=20261007"></script>
 <script>
   const user = requireRole('admin');
   if (user) {
     renderSidebarUser();
-    const dateEl = document.getElementById('current-date');
-    if (dateEl) {
-      dateEl.textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    setTimeout(restoreEmiCalculatorState, 100);
   }
 
   // State parameters
@@ -1941,6 +1690,338 @@
     hasPrepayment: false,
     summary: {}
   };
+
+  // ── State Persistence ──────────────────────────────────────────
+  function getEmiCalculatorStorageKey() {
+    const u = (typeof getUser === 'function' ? getUser() : null) || (typeof user !== 'undefined' ? user : null);
+    const uid = u?.id || 'default';
+    return `admin_${uid}_emi_calculator_state`;
+  }
+
+  function saveEmiCalculatorState() {
+    try {
+      const p = principalInput ? principalInput.value : '';
+      const r = document.getElementById('input-rate') ? document.getElementById('input-rate').value : '';
+      const t = document.getElementById('input-tenure') ? document.getElementById('input-tenure').value : '';
+      if (p || r || t || selectedLender) {
+        localStorage.setItem(getEmiCalculatorStorageKey(), JSON.stringify({
+          principal: p,
+          rate: r,
+          tenure: t,
+          tenureUnit: tenureUnit,
+          selectedLender: selectedLender,
+          updatedAt: Date.now()
+        }));
+      } else {
+        localStorage.removeItem(getEmiCalculatorStorageKey());
+      }
+    } catch (e) {}
+  }
+
+  function restoreEmiCalculatorState() {
+    try {
+      const raw = localStorage.getItem(getEmiCalculatorStorageKey());
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      if (!s) return;
+      if (s.principal && principalInput) principalInput.value = s.principal;
+      if (s.rate && document.getElementById('input-rate')) document.getElementById('input-rate').value = s.rate;
+      if (s.tenure && document.getElementById('input-tenure')) document.getElementById('input-tenure').value = s.tenure;
+      if (s.tenureUnit && s.tenureUnit !== tenureUnit) setTenureUnit(s.tenureUnit);
+      if (s.selectedLender !== undefined) {
+        selectedLender = s.selectedLender || '';
+        const lenderEl = document.getElementById('select-lender');
+        if (lenderEl) lenderEl.value = selectedLender;
+        updateLenderUI();
+      }
+      if (s.principal && s.rate && s.tenure) {
+        calculateEMI();
+      }
+    } catch (e) {}
+  }
+
+  window.addEventListener('pagehide', saveEmiCalculatorState);
+  window.addEventListener('beforeunload', saveEmiCalculatorState);
+
+  // ── Bank / NBFC Lender Visual Identities & Profiles ───────────
+  let selectedLender = '';
+
+  const MANDATORY_LEGAL_DISCLAIMER = "Illustrative repayment schedule based on the loan parameters entered in the EMI calculator. This document is for estimation purposes only and does not constitute a loan sanction, approval, offer, agreement, or official statement from the lender.";
+
+  const LENDER_PROFILES = {
+    default: {
+      id: 'default',
+      key: '',
+      name: 'DIXIT LENDING SOLUTION',
+      shortName: 'Dixit Lending Solution',
+      primaryColor: [15, 39, 71],       // #0F2747 Dixit Navy
+      secondaryColor: [15, 139, 113],   // #0F8B71 Forest Teal
+      accentColor: [47, 111, 237],      // #2F6FED Royal Blue
+      lightBg: [248, 250, 253],         // #F8FAFD
+      borderStroke: [217, 227, 239],    // #D9E3EF
+      hexPrimary: '#0f2747',
+      hexSecondary: '#0f8b71',
+      hexAccent: '#2f6fed',
+      hexLightBg: '#f8fafc',
+      hexBorder: '#d9e3ef',
+      fileSlug: 'Dixit_Lending'
+    },
+    icici_bank: {
+      id: 'icici_bank',
+      key: 'icici_bank',
+      name: 'ICICI BANK',
+      shortName: 'ICICI Bank',
+      primaryColor: [176, 42, 48],      // #B02A30 ICICI Maroon
+      secondaryColor: [243, 112, 33],   // #F37021 ICICI Orange
+      accentColor: [5, 60, 109],        // #053C6D Deep Corporate Blue Accent
+      lightBg: [255, 248, 245],         // #FFF8F5
+      borderStroke: [252, 220, 212],    // #FCDCD4
+      hexPrimary: '#B02A30',
+      hexSecondary: '#F37021',
+      hexAccent: '#053C6D',
+      hexLightBg: '#FFF8F5',
+      hexBorder: '#FCDCD4',
+      fileSlug: 'ICICI_Bank'
+    },
+    hdfc_bank: {
+      id: 'hdfc_bank',
+      key: 'hdfc_bank',
+      name: 'HDFC BANK',
+      shortName: 'HDFC Bank',
+      primaryColor: [0, 76, 143],       // #004C8F HDFC Classic Corporate Navy
+      secondaryColor: [237, 35, 42],    // #ED232A HDFC Red
+      accentColor: [0, 46, 91],         // #002E5B Dark Indigo
+      lightBg: [244, 248, 252],         // #F4F8FC
+      borderStroke: [210, 227, 244],    // #D2E3F4
+      hexPrimary: '#004C8F',
+      hexSecondary: '#ED232A',
+      hexAccent: '#002E5B',
+      hexLightBg: '#F4F8FC',
+      hexBorder: '#D2E3F4',
+      fileSlug: 'HDFC_Bank'
+    },
+    incred_finance: {
+      id: 'incred_finance',
+      key: 'incred_finance',
+      name: 'InCred Finance',
+      shortName: 'InCred Finance',
+      primaryColor: [230, 81, 0],       // #E65100 Vivid InCred Deep Orange
+      secondaryColor: [35, 44, 61],     // #232C3D Dark Slate
+      accentColor: [255, 102, 0],       // #FF6600 Bright Orange
+      lightBg: [255, 249, 245],         // #FFF9F5
+      borderStroke: [255, 224, 204],    // #FFE0CC
+      hexPrimary: '#E65100',
+      hexSecondary: '#232C3D',
+      hexAccent: '#FF6600',
+      hexLightBg: '#FFF9F5',
+      hexBorder: '#FFE0CC',
+      fileSlug: 'InCred_Finance'
+    },
+    idfc_first_bank: {
+      id: 'idfc_first_bank',
+      key: 'idfc_first_bank',
+      name: 'IDFC FIRST BANK',
+      shortName: 'IDFC FIRST Bank',
+      primaryColor: [156, 29, 38],      // #9C1D26 IDFC Crimson Maroon
+      secondaryColor: [255, 199, 44],   // #FFC72C IDFC Gold
+      accentColor: [102, 16, 22],       // #661016 Deep Wine
+      lightBg: [253, 248, 248],         // #FDF8F8
+      borderStroke: [244, 211, 213],    // #F4D3D5
+      hexPrimary: '#9C1D26',
+      hexSecondary: '#FFC72C',
+      hexAccent: '#661016',
+      hexLightBg: '#FDF8F8',
+      hexBorder: '#F4D3D5',
+      fileSlug: 'IDFC_FIRST_Bank'
+    }
+  };
+
+  function getSelectedLenderProfile() {
+    return LENDER_PROFILES[selectedLender] || LENDER_PROFILES.default;
+  }
+
+  function updateLenderUI() {
+    const lender = getSelectedLenderProfile();
+    const badgeEl = document.getElementById('selected-lender-badge');
+    const tableBadgeText = document.getElementById('export-lender-text');
+    const tableBadgeIcon = document.getElementById('export-lender-icon');
+    const tableBadgeEl = document.getElementById('export-lender-badge');
+
+    if (badgeEl) {
+      if (selectedLender) {
+        badgeEl.style.display = 'flex';
+        badgeEl.style.color = lender.hexPrimary;
+        badgeEl.innerHTML = `<i class="fas fa-building-columns" style="margin-right:5px;"></i>${lender.shortName}`;
+      } else {
+        badgeEl.style.display = 'none';
+        badgeEl.innerHTML = '';
+      }
+    }
+
+    if (tableBadgeText) {
+      tableBadgeText.textContent = selectedLender ? lender.shortName : 'Dixit Lending Solution';
+    }
+    if (tableBadgeIcon) {
+      tableBadgeIcon.style.color = lender.hexPrimary;
+    }
+    if (tableBadgeEl) {
+      if (selectedLender) {
+        tableBadgeEl.style.borderColor = lender.hexBorder;
+        tableBadgeEl.style.background = lender.hexLightBg;
+        tableBadgeEl.style.color = lender.hexPrimary;
+      } else {
+        tableBadgeEl.style.borderColor = 'var(--border)';
+        tableBadgeEl.style.background = 'var(--bg-secondary)';
+        tableBadgeEl.style.color = 'var(--text-secondary)';
+      }
+    }
+  }
+
+  function onLenderChange(val) {
+    selectedLender = val || '';
+    window.selectedLender = selectedLender;
+    updateLenderUI();
+    saveEmiCalculatorState();
+  }
+
+  function getExportDocumentData() {
+    const schedule = calculatedData && (calculatedData.amortizationSchedule || (calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule));
+    if (!schedule || schedule.length === 0) {
+      return null;
+    }
+    const sum = calculatedData.summary || {};
+    const lender = getSelectedLenderProfile();
+    const principal = Math.round(sum.principal || calculatedData.principal || 0);
+    const rate = sum.rate !== undefined ? sum.rate : (calculatedData.interestRate || 0);
+    const tenureMonths = sum.tenureMonths || calculatedData.tenureMonths || schedule.length;
+    const emi = Math.round(sum.originalEMI || calculatedData.monthlyEMI || 0);
+    const totalInterest = Math.round(sum.originalTotalInterest || calculatedData.totalInterest || 0);
+    const totalRepayment = Math.round(sum.originalTotalAmount || calculatedData.totalRepayment || (principal + totalInterest));
+
+    return {
+      lender,
+      schedule,
+      principal,
+      rate,
+      tenureMonths,
+      tenureYears: (tenureMonths / 12).toFixed(1),
+      emi,
+      totalInterest,
+      totalRepayment,
+      disclaimer: MANDATORY_LEGAL_DISCLAIMER
+    };
+  }
+
+  // Lender-Branded Print Schedule
+  function preparePrintContent() {
+    const docData = getExportDocumentData();
+    const printContainer = document.getElementById('repayment-print-section');
+    if (!printContainer || !docData) return false;
+
+    const { lender, schedule, principal, rate, tenureMonths, tenureYears, emi, totalInterest, totalRepayment, disclaimer } = docData;
+
+    let rowsHtml = '';
+    schedule.forEach(r => {
+      rowsHtml += `
+        <tr>
+          <td style="text-align:center; padding:5px 8px; border:1px solid ${lender.hexBorder};">Month ${r.emiNumber}</td>
+          <td style="padding:5px 8px; border:1px solid ${lender.hexBorder};">${r.paymentDate}</td>
+          <td style="text-align:right; padding:5px 8px; border:1px solid ${lender.hexBorder}; font-weight:600;">₹${Math.round(r.emiAmount).toLocaleString('en-IN')}</td>
+          <td style="text-align:right; padding:5px 8px; border:1px solid ${lender.hexBorder};">₹${Math.round(r.principalComponent).toLocaleString('en-IN')}</td>
+          <td style="text-align:right; padding:5px 8px; border:1px solid ${lender.hexBorder}; color:#c026d3;">₹${Math.round(r.interestComponent).toLocaleString('en-IN')}</td>
+          <td style="text-align:right; padding:5px 8px; border:1px solid ${lender.hexBorder}; font-weight:700;">₹${Math.round(r.outstandingBalance).toLocaleString('en-IN')}</td>
+        </tr>
+      `;
+    });
+
+    printContainer.innerHTML = `
+      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; color:#102033; padding:15px 0;">
+        <!-- Top Brand Stripe -->
+        <div style="height:6px; background:${lender.hexPrimary}; margin-bottom:2px;"></div>
+        <div style="height:2px; background:${lender.hexSecondary}; margin-bottom:14px;"></div>
+
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; border-bottom:1px solid ${lender.hexBorder}; padding-bottom:12px;">
+          <div>
+            <h1 style="margin:0; font-size:18pt; font-weight:800; color:${lender.hexPrimary}; letter-spacing:0.5px;">${lender.name}</h1>
+            <h2 style="margin:6px 0 0 0; font-size:13pt; font-weight:700; color:#102033;">Loan Repayment Schedule</h2>
+          </div>
+          <div style="text-align:right; font-size:8.5pt; color:#526173; line-height:1.5;">
+            <div style="font-weight:600; color:#102033;">Reference: DLS-${lender.fileSlug.toUpperCase()}-${principal}</div>
+            <div>Generated: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+          </div>
+        </div>
+
+        <!-- Summary Box -->
+        <div style="background:${lender.hexLightBg}; border:1px solid ${lender.hexBorder}; border-radius:6px; padding:12px 16px; margin-bottom:16px;">
+          <div style="font-weight:700; font-size:9.5pt; color:${lender.hexPrimary}; margin-bottom:8px; border-bottom:1px solid ${lender.hexBorder}; padding-bottom:4px;">
+            <span>LOAN DETAILS &amp; REPAYMENT SUMMARY</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; font-size:9pt;">
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#526173;">Principal Amount:</span>
+              <span style="font-weight:700;">₹${principal.toLocaleString('en-IN')}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#526173;">Monthly EMI:</span>
+              <span style="font-weight:800; color:${lender.hexPrimary};">₹${emi.toLocaleString('en-IN')}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#526173;">Interest Rate:</span>
+              <span style="font-weight:700;">${rate}% p.a.</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#526173;">Total Interest Payable:</span>
+              <span style="font-weight:700;">₹${totalInterest.toLocaleString('en-IN')}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#526173;">Loan Tenure:</span>
+              <span style="font-weight:700;">${tenureMonths} Months (${tenureYears} Years)</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#526173;">Total Repayment Amount:</span>
+              <span style="font-weight:700;">₹${totalRepayment.toLocaleString('en-IN')}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Amortization Table -->
+        <table style="width:100%; border-collapse:collapse; font-size:8.5pt; margin-bottom:16px;">
+          <thead>
+            <tr style="background:${lender.hexPrimary}; color:#ffffff;">
+              <th style="padding:6px 8px; text-align:center; border:1px solid ${lender.hexPrimary};">#</th>
+              <th style="padding:6px 8px; text-align:left; border:1px solid ${lender.hexPrimary};">Payment Date</th>
+              <th style="padding:6px 8px; text-align:right; border:1px solid ${lender.hexPrimary};">EMI Amount</th>
+              <th style="padding:6px 8px; text-align:right; border:1px solid ${lender.hexPrimary};">Principal Paid</th>
+              <th style="padding:6px 8px; text-align:right; border:1px solid ${lender.hexPrimary};">Interest Paid</th>
+              <th style="padding:6px 8px; text-align:right; border:1px solid ${lender.hexPrimary};">Outstanding Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        <!-- Mandatory Disclaimer -->
+        <div style="border-top:1px solid ${lender.hexBorder}; padding-top:8px; font-size:7.5pt; color:#526173; line-height:1.4;">
+          <strong>Disclaimer:</strong> ${disclaimer}
+        </div>
+      </div>
+    `;
+    return true;
+  }
+
+  function triggerPrint() {
+    const docData = getExportDocumentData();
+    if (!docData) {
+      alert('Calculate the loan before exporting the repayment schedule.');
+      return;
+    }
+    preparePrintContent();
+    window.print();
+  }
+
+  window.addEventListener('beforeprint', preparePrintContent);
 
   // Pagination & table state
   let currentPage = 1;
@@ -2012,17 +2093,28 @@
   if (prepaymentInput) prepaymentInput.addEventListener('input', () => formatInputValue(prepaymentInput));
 
   function setTenureUnit(unit) {
+    const tenureInput = document.getElementById('input-tenure');
+    if (tenureInput && tenureInput.value !== '' && tenureUnit !== unit) {
+      const curVal = parseFloat(tenureInput.value);
+      if (!isNaN(curVal) && curVal > 0) {
+        if (unit === 'months') {
+          tenureInput.value = Math.round(curVal * 12);
+        } else {
+          const yrs = curVal / 12;
+          tenureInput.value = Number.isInteger(yrs) ? yrs : parseFloat(yrs.toFixed(1));
+        }
+      }
+    }
     tenureUnit = unit;
     const btnYears = document.getElementById('btn-years');
     const btnMonths = document.getElementById('btn-months');
     if (btnYears) btnYears.classList.toggle('active', unit === 'years');
     if (btnMonths) btnMonths.classList.toggle('active', unit === 'months');
 
-    const tenureInput = document.getElementById('input-tenure');
     if (tenureInput) {
       tenureInput.placeholder = unit === 'years' ? '5' : '60';
     }
-    if (calculatedData && (calculatedData.principal || (calculatedData.summary && calculatedData.summary.principal))) {
+    if (calculatedData && calculatedData.principal > 0) {
       calculateEMI();
     }
   }
@@ -2057,18 +2149,9 @@
     renderRepaymentTable();
   }
 
-  function triggerPrint() {
-    const schedule = calculatedData && (calculatedData.amortizationSchedule || (calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule));
-    if (!schedule || schedule.length === 0) {
-      alert('Calculate the loan before exporting the repayment schedule.');
-      return;
-    }
-    window.print();
-  }
-
   // Error messaging helpers
   function clearErrors() {
-    ['err-principal', 'err-rate', 'err-tenure', 'err-fee', 'err-prepayment'].forEach(id => {
+    ['err-principal', 'err-rate', 'err-tenure'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.textContent = '';
@@ -2092,14 +2175,10 @@
     const principalStr = principalInput ? principalInput.value.replace(/,/g, '') : '';
     const rateStr = document.getElementById('input-rate') ? document.getElementById('input-rate').value : '';
     const tenureStr = document.getElementById('input-tenure') ? document.getElementById('input-tenure').value : '';
-    const feeStr = document.getElementById('input-fee') ? document.getElementById('input-fee').value : '';
-    const prepayStr = prepaymentInput ? prepaymentInput.value.replace(/,/g, '') : '';
 
     const principal = parseFloat(principalStr);
     const rateVal = parseFloat(rateStr);
     const tenureVal = parseFloat(tenureStr);
-    const feePercent = feeStr ? parseFloat(feeStr) : 0;
-    const prepayment = prepayStr ? parseFloat(prepayStr) : 0;
 
     let hasError = false;
     if (isNaN(principal) || principal <= 0) {
@@ -2112,14 +2191,6 @@
     }
     if (isNaN(tenureVal) || tenureVal <= 0) {
       showError('err-tenure', 'Tenure must be a positive number.');
-      hasError = true;
-    }
-    if (feeStr && (isNaN(feePercent) || feePercent < 0 || feePercent > 100)) {
-      showError('err-fee', 'Processing fee must be between 0% and 100%.');
-      hasError = true;
-    }
-    if (prepayStr && (isNaN(prepayment) || prepayment < 0 || prepayment > principal)) {
-      showError('err-prepayment', 'Prepayment amount cannot exceed the principal loan amount.');
       hasError = true;
     }
 
@@ -2136,59 +2207,35 @@
       return;
     }
 
-    // Processing Fee Amount
-    const feeAmount = principal * (feePercent / 100);
-
-    // Calculate Original Schedule
+    // Calculate Schedule
     const originalResult = runAmortizationSchedule(principal, rateVal, totalMonths, 0);
-    
-    // Calculate Prepayment Schedule if applicable
-    let prepayResult = null;
-    const hasPrepay = prepayment > 0;
-    if (hasPrepay) {
-      prepayResult = runAmortizationSchedule(principal, rateVal, totalMonths, prepayment);
-    }
 
-    const activeEMI = hasPrepay ? prepayResult.emi : originalResult.emi;
-    const activeTotalInterest = hasPrepay ? prepayResult.totalInterest : originalResult.totalInterest;
-    const activeTotalAmount = hasPrepay ? prepayResult.totalAmount : originalResult.totalAmount;
-    const effectiveCost = activeTotalAmount + feeAmount;
-    const activeSchedule = hasPrepay ? prepayResult.schedule : originalResult.schedule;
+    const activeEMI = originalResult.emi;
+    const activeTotalInterest = originalResult.totalInterest;
+    const activeTotalAmount = originalResult.totalAmount;
+    const activeSchedule = originalResult.schedule;
 
-    // Compile central calculation state matching Requirement 7 exactly:
     calculatedData = {
       principal: principal,
       interestRate: rateVal,
       tenureMonths: totalMonths,
-      processingFee: feeAmount,
-      prepayment: prepayment,
       monthlyEMI: activeEMI,
       totalInterest: activeTotalInterest,
       totalRepayment: activeTotalAmount,
-      effectiveCost: effectiveCost,
       amortizationSchedule: activeSchedule,
       originalSchedule: originalResult.schedule,
-      prepaySchedule: hasPrepay ? prepayResult.schedule : originalResult.schedule,
-      hasPrepayment: hasPrepay,
+      hasPrepayment: false,
       summary: {
         principal: principal,
         rate: rateVal,
         interestRate: rateVal,
         tenureMonths: totalMonths,
-        processingFee: feeAmount,
-        prepayment: prepayment,
         monthlyEMI: activeEMI,
         totalInterest: activeTotalInterest,
         totalRepayment: activeTotalAmount,
-        effectiveCost: effectiveCost,
         originalEMI: originalResult.emi,
         originalTotalInterest: originalResult.totalInterest,
-        originalTotalAmount: originalResult.totalAmount,
-        prepayEMI: hasPrepay ? prepayResult.emi : originalResult.emi,
-        prepayTotalInterest: hasPrepay ? prepayResult.totalInterest : originalResult.totalInterest,
-        prepayTotalAmount: hasPrepay ? prepayResult.totalAmount : originalResult.totalAmount,
-        interestSaved: hasPrepay ? (originalResult.totalInterest - prepayResult.totalInterest) : 0,
-        tenureReducedMonths: hasPrepay ? (originalResult.schedule.length - prepayResult.schedule.length) : 0
+        originalTotalAmount: originalResult.totalAmount
       }
     };
     window.calculatedData = calculatedData;
@@ -2201,6 +2248,7 @@
     // Reset table variables
     currentPage = 1;
     renderRepaymentTable();
+    saveEmiCalculatorState();
   }
 
   function calculateLoan() {
@@ -2208,6 +2256,19 @@
   }
   window.calculateEMI = calculateEMI;
   window.calculateLoan = calculateEMI;
+  window.onLenderChange = onLenderChange;
+  window.getSelectedLenderProfile = getSelectedLenderProfile;
+  window.updateLenderUI = updateLenderUI;
+  window.LENDER_PROFILES = LENDER_PROFILES;
+  window.MANDATORY_LEGAL_DISCLAIMER = MANDATORY_LEGAL_DISCLAIMER;
+  window.getExportDocumentData = getExportDocumentData;
+  window.exportPDF = exportPDF;
+  window.exportExcel = exportExcel;
+  window.exportCSV = exportCSV;
+  window.triggerPrint = triggerPrint;
+  window.preparePrintContent = preparePrintContent;
+  window.resetCalculator = resetCalculator;
+  window.setTenureUnit = setTenureUnit;
 
   // Generates amortization details with exact zero balance resolution
   function runAmortizationSchedule(principal, annualRate, totalMonths, prepayVal) {
@@ -2324,28 +2385,19 @@
   // Render text results in top stats and summary bar
   function renderSummaryResults() {
     const d = calculatedData;
-    const activeSchedule = d.amortizationSchedule || (d.hasPrepayment ? d.prepaySchedule : d.originalSchedule);
+    const activeSchedule = d.amortizationSchedule || d.originalSchedule || [];
     const activeEMI = d.monthlyEMI;
     const activeInterest = d.totalInterest;
     const activeTotal = d.totalRepayment;
-    const activeFee = d.processingFee;
-    const activeCost = d.effectiveCost;
 
     // Primary KPI cards
     const elEmi = document.getElementById('res-emi');
     const elInt = document.getElementById('res-interest');
     const elTot = document.getElementById('res-total');
-    const elFee = document.getElementById('res-fee');
-    const elCost = document.getElementById('res-cost');
 
     if (elEmi) elEmi.textContent = formatValueCurrency(activeEMI);
     if (elInt) elInt.textContent = formatValueCurrency(activeInterest);
     if (elTot) elTot.textContent = formatValueCurrency(activeTotal);
-    if (elFee) elFee.textContent = formatValueCurrency(activeFee);
-    if (elCost) {
-      elCost.textContent = formatValueCurrency(activeCost);
-      elCost.style.color = d.hasPrepayment ? 'var(--success)' : 'var(--text-primary)';
-    }
 
     // Amortization metric bar
     const sumBar = document.getElementById('amort-summary-bar');
@@ -2360,36 +2412,6 @@
       if (elBarInt) elBarInt.textContent = formatValueCurrency(activeInterest);
       if (elBarRepay) elBarRepay.textContent = formatValueCurrency(activeTotal);
     }
-
-    // Cost card / Prepayment logic
-    const costLabelEl = document.getElementById('res-cost-label');
-    const badgeContainer = document.getElementById('savings-badge-container');
-    if (badgeContainer) badgeContainer.innerHTML = '';
-
-    if (calculatedData.hasPrepayment) {
-      if (costLabelEl) costLabelEl.textContent = 'Effective Cost of Loan';
-
-      if (badgeContainer) {
-        const savingsValStr = formatValueCurrency(d.summary.interestSaved);
-        const savingsBadge = document.createElement('div');
-        savingsBadge.className = 'savings-badge';
-        savingsBadge.style.background = 'rgba(15, 139, 113, 0.12)';
-        savingsBadge.style.color = 'var(--success)';
-        savingsBadge.textContent = `Saved: ${savingsValStr}`;
-        
-        const tenureBadge = document.createElement('div');
-        tenureBadge.className = 'savings-badge';
-        tenureBadge.style.marginLeft = '6px';
-        tenureBadge.style.background = 'rgba(47, 111, 237, 0.12)';
-        tenureBadge.style.color = 'var(--accent)';
-        tenureBadge.textContent = `Tenure Cut: ${d.summary.tenureReducedMonths}m`;
-
-        badgeContainer.appendChild(savingsBadge);
-        badgeContainer.appendChild(tenureBadge);
-      }
-    } else {
-      if (costLabelEl) costLabelEl.textContent = 'Effective Cost';
-    }
   }
 
   // Render Doughnut/Pie Chart
@@ -2397,12 +2419,10 @@
     const d = calculatedData;
     const principal = d.principal;
     const interest = d.totalInterest;
-    const fee = d.processingFee;
-    const grandTotal = d.effectiveCost || (principal + interest + fee);
+    const grandTotal = principal + interest;
 
     const principalPct = grandTotal > 0 ? ((principal / grandTotal) * 100).toFixed(1) : '0.0';
     const interestPct = grandTotal > 0 ? ((interest / grandTotal) * 100).toFixed(1) : '0.0';
-    const feePct = fee > 0 && grandTotal > 0 ? ((fee / grandTotal) * 100).toFixed(1) : '0.0';
 
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
@@ -2420,11 +2440,6 @@
     const pieLabels = [`Principal (${principalPct}%)`, `Interest (${interestPct}%)`];
     const pieData = [principal, interest];
     const pieColors = ['#2f6fed', '#b44545'];
-    if (fee > 0) {
-      pieLabels.push(`Fee (${feePct}%)`);
-      pieData.push(fee);
-      pieColors.push('#e2a03f');
-    }
 
     const ctx = document.getElementById('chart-pie').getContext('2d');
     pieChartInstance = new Chart(ctx, {
@@ -2460,21 +2475,6 @@
     // Render Progress Bars & Summary Details
     const detailsContainer = document.getElementById('breakdown-details-container');
     if (detailsContainer) {
-      const feeRow = `
-        <div>
-          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
-            <span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
-              <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#e2a03f;"></span>
-              Processing Fee
-            </span>
-            <span>₹${Math.round(fee).toLocaleString('en-IN')} (${feePct}%)</span>
-          </div>
-          <div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden;">
-            <div style="background:#e2a03f; width:${feePct}%; height:100%;"></div>
-          </div>
-        </div>
-      `;
-
       detailsContainer.innerHTML = `
         <div class="breakdown-summary-list" style="display:flex; flex-direction:column; gap:12px;">
           <!-- Principal -->
@@ -2505,11 +2505,9 @@
             </div>
           </div>
           
-          ${feeRow}
-          
           <!-- Total Cost -->
           <div style="border-top:1px solid var(--border); padding-top:10px; display:flex; justify-content:space-between; font-size:14px; font-weight:700;">
-            <span>Total Cost of Loan</span>
+            <span>Total Repayment</span>
             <span>₹${Math.round(grandTotal).toLocaleString('en-IN')}</span>
           </div>
         </div>
@@ -2566,7 +2564,7 @@
 
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const textLabelColor = isDark ? '#c0ccda' : '#526173';
-    const gridColor = isDark ? 'rgba(151, 176, 210, 0.12)' : '#e4ebf4';
+    const gridColor = isDark ? 'rgba(123, 192, 67, 0.12)' : '#e4ebf4';
 
     if (lineChartInstance) {
       lineChartInstance.destroy();
@@ -2679,14 +2677,17 @@
 
   // Reset all parameters to initial clean empty state
   function resetCalculator() {
+    try { localStorage.removeItem(getEmiCalculatorStorageKey()); } catch (e) {}
     if (principalInput) principalInput.value = '';
     const rateEl = document.getElementById('input-rate');
     if (rateEl) rateEl.value = '';
     const tenureEl = document.getElementById('input-tenure');
     if (tenureEl) tenureEl.value = '';
-    const feeEl = document.getElementById('input-fee');
-    if (feeEl) feeEl.value = '';
-    if (prepaymentInput) prepaymentInput.value = '';
+    const lenderEl = document.getElementById('select-lender');
+    if (lenderEl) lenderEl.value = '';
+    selectedLender = '';
+    window.selectedLender = '';
+    updateLenderUI();
     const searchEl = document.getElementById('table-search');
     if (searchEl) searchEl.value = '';
     searchQuery = '';
@@ -2696,15 +2697,11 @@
       principal: 0,
       interestRate: 0,
       tenureMonths: 0,
-      processingFee: 0,
-      prepayment: 0,
       monthlyEMI: 0,
       totalInterest: 0,
       totalRepayment: 0,
-      effectiveCost: 0,
       amortizationSchedule: [],
       originalSchedule: [],
-      prepaySchedule: [],
       hasPrepayment: false,
       summary: {}
     };
@@ -2713,11 +2710,6 @@
     document.getElementById('res-emi').textContent = '₹0';
     document.getElementById('res-interest').textContent = '₹0';
     document.getElementById('res-total').textContent = '₹0';
-    document.getElementById('res-fee').textContent = '₹0';
-    document.getElementById('res-cost').textContent = '₹0';
-    document.getElementById('res-cost').style.color = 'var(--text-primary)';
-    const badgeContainer = document.getElementById('savings-badge-container');
-    if (badgeContainer) badgeContainer.innerHTML = '';
 
     const sumBar = document.getElementById('amort-summary-bar');
     if (sumBar) sumBar.style.display = 'none';
@@ -2860,7 +2852,6 @@
           <th class="th-right">Total Payments</th>
           <th class="th-right">Principal Paid</th>
           <th class="th-right">Interest Paid</th>
-          <th class="th-right">Prepayment</th>
           <th class="th-right">Closing Balance</th>
         `;
       }
@@ -2885,7 +2876,7 @@
 
       tbody.innerHTML = '';
       if (paginated.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted" style="padding:20px 0;">No matching entries found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted" style="padding:20px 0;">No matching entries found.</td></tr>`;
         document.getElementById('pagination-wrapper').style.display = 'none';
         return;
       }
@@ -2898,7 +2889,6 @@
           <td class="td-right">${formatValueCurrency(row.totalPayments)}</td>
           <td class="td-right">${formatValueCurrency(row.principalPaid)}</td>
           <td class="td-right" style="color:var(--danger);">${formatValueCurrency(row.interestPaid)}</td>
-          <td class="td-right">${row.prepayment > 0 ? formatValueCurrency(row.prepayment) : '—'}</td>
           <td class="td-right" style="font-weight:700;">${formatValueCurrency(row.closingBalance)}</td>
         `;
         tbody.appendChild(tr);
@@ -2927,7 +2917,6 @@
         <th class="th-right sortable ${sortColumn === 'emiAmount' ? sortOrder : ''}" onclick="handleSort('emiAmount')">EMI</th>
         <th class="th-right sortable ${sortColumn === 'principalComponent' ? sortOrder : ''}" onclick="handleSort('principalComponent')">Principal</th>
         <th class="th-right sortable ${sortColumn === 'interestComponent' ? sortOrder : ''}" onclick="handleSort('interestComponent')">Interest</th>
-        <th class="th-right sortable ${sortColumn === 'prepayment' ? sortOrder : ''}" onclick="handleSort('prepayment')">Prepayment</th>
         <th class="th-right sortable ${sortColumn === 'outstandingBalance' ? sortOrder : ''}" onclick="handleSort('outstandingBalance')">Outstanding Balance</th>
       `;
     }
@@ -2969,7 +2958,7 @@
 
     tbody.innerHTML = '';
     if (paginated.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted" style="padding:20px 0;">No matching entries found.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted" style="padding:20px 0;">No matching entries found.</td></tr>`;
       document.getElementById('pagination-wrapper').style.display = 'none';
       return;
     }
@@ -2982,7 +2971,6 @@
         <td class="td-right">${formatValueCurrency(row.emiAmount)}</td>
         <td class="td-right">${formatValueCurrency(row.principalComponent)}</td>
         <td class="td-right" style="color:var(--danger);">${formatValueCurrency(row.interestComponent)}</td>
-        <td class="td-right">${row.prepayment > 0 ? formatValueCurrency(row.prepayment) : '—'}</td>
         <td class="td-right" style="font-weight:700;">${formatValueCurrency(row.outstandingBalance)}</td>
       `;
       tbody.appendChild(tr);
@@ -3013,13 +3001,13 @@
       return;
     }
 
-    const schedule = calculatedData && (calculatedData.amortizationSchedule || (calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule));
-    if (!schedule || schedule.length === 0) {
+    const docData = getExportDocumentData();
+    if (!docData) {
       alert('Calculate the loan before exporting the repayment schedule.');
       return;
     }
 
-    const sum = calculatedData.summary;
+    const { lender, schedule, principal, rate, tenureMonths, tenureYears, emi, totalInterest, totalRepayment, disclaimer } = docData;
     const doc = new jsPDF('p', 'pt', 'a4');
 
     // Register custom font for authentic ₹ symbol
@@ -3037,126 +3025,127 @@
       }
     }
 
-    const brandNavy = [15, 39, 71];
+    const curSymbol = fontName === 'SegoeUI' ? '₹' : '₹';
+    const primaryBrand = lender.primaryColor;
+    const secondaryBrand = lender.secondaryColor;
     const textDark = [16, 32, 51];
     const textMuted = [82, 97, 115];
     const textLight = [123, 136, 151];
-    const borderStroke = [217, 227, 239];
-    const cardBg = [248, 250, 252];
+    const borderStroke = lender.borderStroke || [217, 227, 239];
+    const cardBg = lender.lightBg || [248, 250, 252];
 
-    // Header branding
+    // Set Document Properties
+    doc.setProperties({
+      title: `${lender.name} - Loan Repayment Schedule`,
+      subject: `Repayment Schedule - Reference DLS-${lender.fileSlug.toUpperCase()}-${principal}`,
+      author: 'Dixit Lending Solution',
+      creator: 'Dixit Lending Solution EMI Calculator'
+    });
+
+    // Top decorative brand stripes
+    doc.setFillColor(...primaryBrand);
+    doc.rect(0, 0, 595.28, 6, 'F');
+    doc.setFillColor(...secondaryBrand);
+    doc.rect(0, 6, 595.28, 2.5, 'F');
+
+    // Header branding: Lender Name & Document Title
     doc.setFont(fontName, 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(...textLight);
-    doc.text('DIXIT LENDING SOLUTION', 40, 42);
+    doc.setFontSize(16);
+    doc.setTextColor(...primaryBrand);
+    doc.text(lender.name, 40, 36);
 
-    // Document Title
     doc.setFont(fontName, 'bold');
-    doc.setFontSize(20);
-    doc.setTextColor(...brandNavy);
-    doc.text('Loan Repayment Schedule', 40, 64);
+    doc.setFontSize(13);
+    doc.setTextColor(...textDark);
+    doc.text('Loan Repayment Schedule', 40, 52);
 
-    // Subtitle
+    // Right header metadata
+    const formattedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     doc.setFont(fontName, 'normal');
-    doc.setFontSize(10);
+    doc.setFontSize(8.5);
     doc.setTextColor(...textMuted);
-    doc.text('Illustrative repayment schedule based on the loan details provided', 40, 79);
-
-    // Date
-    const formattedDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-    doc.setFontSize(9);
-    doc.setTextColor(...textLight);
-    doc.text(`Generated: ${formattedDate}`, 555, 79, { align: 'right' });
+    doc.text(`Reference: DLS-${lender.fileSlug.toUpperCase()}-${principal}`, 555, 36, { align: 'right' });
+    doc.text(`Generated: ${formattedDate}`, 555, 50, { align: 'right' });
 
     // Divider
     doc.setDrawColor(...borderStroke);
     doc.setLineWidth(1);
-    doc.line(40, 90, 555, 90);
+    doc.line(40, 64, 555, 64);
 
     // Loan Summary Box
     doc.setFillColor(...cardBg);
     doc.setDrawColor(...borderStroke);
-    doc.roundedRect(40, 102, 515, 94, 6, 6, 'FD');
+    doc.roundedRect(40, 74, 515, 78, 4, 4, 'FD');
 
     // Section title
     doc.setFont(fontName, 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(...brandNavy);
-    doc.text('LOAN DETAILS & REPAYMENT SUMMARY', 54, 120);
+    doc.setFontSize(9.5);
+    doc.setTextColor(...primaryBrand);
+    doc.text('LOAN DETAILS & REPAYMENT SUMMARY', 52, 90);
 
     // Left Column details
     doc.setFont(fontName, 'normal');
-    doc.setFontSize(9.5);
+    doc.setFontSize(9);
+    doc.setTextColor(...textMuted);
+    doc.text('Principal Amount:', 52, 107);
+    doc.setFont(fontName, 'bold');
     doc.setTextColor(...textDark);
-    doc.text(`Principal Amount:`, 54, 138);
-    doc.setFont(fontName, 'bold');
-    doc.text(`₹${Math.round(sum.principal).toLocaleString('en-IN')}`, 160, 138);
+    doc.text(`${curSymbol}${principal.toLocaleString('en-IN')}`, 165, 107);
 
     doc.setFont(fontName, 'normal');
-    doc.text(`Annual Interest Rate:`, 54, 154);
+    doc.setTextColor(...textMuted);
+    doc.text('Annual Interest Rate:', 52, 123);
     doc.setFont(fontName, 'bold');
-    doc.text(`${sum.rate}% p.a.`, 160, 154);
+    doc.setTextColor(...textDark);
+    doc.text(`${rate}% p.a.`, 165, 123);
 
     doc.setFont(fontName, 'normal');
-    doc.text(`Loan Tenure:`, 54, 170);
+    doc.setTextColor(...textMuted);
+    doc.text('Loan Tenure:', 52, 139);
     doc.setFont(fontName, 'bold');
-    doc.text(`${sum.tenureMonths} Months (${(sum.tenureMonths / 12).toFixed(1)} Years)`, 160, 170);
-
-    doc.setFont(fontName, 'normal');
-    doc.text(`Processing Fee:`, 54, 186);
-    doc.setFont(fontName, 'bold');
-    doc.text(`₹${Math.round(sum.processingFee).toLocaleString('en-IN')}`, 160, 186);
+    doc.setTextColor(...textDark);
+    doc.text(`${tenureMonths} Months (${tenureYears} Years)`, 165, 139);
 
     // Right Column details
     doc.setFont(fontName, 'normal');
-    doc.text(`Monthly EMI:`, 320, 138);
+    doc.setTextColor(...textMuted);
+    doc.text('Monthly EMI:', 315, 107);
     doc.setFont(fontName, 'bold');
-    doc.setTextColor(...brandNavy);
-    doc.text(`₹${Math.round(sum.originalEMI).toLocaleString('en-IN')}`, 430, 138);
+    doc.setTextColor(...primaryBrand);
+    doc.text(`${curSymbol}${emi.toLocaleString('en-IN')}`, 430, 107);
 
     doc.setFont(fontName, 'normal');
+    doc.setTextColor(...textMuted);
+    doc.text('Total Interest Payable:', 315, 123);
+    doc.setFont(fontName, 'bold');
     doc.setTextColor(...textDark);
-    doc.text(`Total Interest Payable:`, 320, 154);
-    doc.setFont(fontName, 'bold');
-    doc.text(`₹${Math.round(calculatedData.hasPrepayment ? sum.prepayTotalInterest : sum.originalTotalInterest).toLocaleString('en-IN')}`, 430, 154);
+    doc.text(`${curSymbol}${totalInterest.toLocaleString('en-IN')}`, 430, 123);
 
     doc.setFont(fontName, 'normal');
-    doc.text(`Total Repayment:`, 320, 170);
+    doc.setTextColor(...textMuted);
+    doc.text('Total Repayment Amount:', 315, 139);
     doc.setFont(fontName, 'bold');
-    doc.text(`₹${Math.round(calculatedData.hasPrepayment ? sum.prepayTotalAmount : sum.originalTotalAmount).toLocaleString('en-IN')}`, 430, 170);
+    doc.setTextColor(...textDark);
+    doc.text(`${curSymbol}${totalRepayment.toLocaleString('en-IN')}`, 430, 139);
 
-    doc.setFont(fontName, 'normal');
-    if (calculatedData.hasPrepayment) {
-      doc.text(`Interest Saved:`, 320, 186);
-      doc.setFont(fontName, 'bold');
-      doc.setTextColor(15, 139, 113);
-      doc.text(`₹${Math.round(sum.interestSaved).toLocaleString('en-IN')}`, 430, 186);
-    } else {
-      const effCost = sum.principal + sum.originalTotalInterest + sum.processingFee;
-      doc.text(`Effective Outflow:`, 320, 186);
-      doc.setFont(fontName, 'bold');
-      doc.text(`₹${Math.round(effCost).toLocaleString('en-IN')}`, 430, 186);
-    }
-
-    // Amortization Table Data
+    // Amortization Table Data (All Installments)
     const tableData = schedule.map(r => [
       `Month ${r.emiNumber}`,
       r.paymentDate,
-      `₹${Math.round(r.emiAmount).toLocaleString('en-IN')}`,
-      `₹${Math.round(r.principalComponent).toLocaleString('en-IN')}`,
-      `₹${Math.round(r.interestComponent).toLocaleString('en-IN')}`,
-      r.prepayment > 0 ? `₹${Math.round(r.prepayment).toLocaleString('en-IN')}` : '—',
-      `₹${Math.round(r.outstandingBalance).toLocaleString('en-IN')}`
+      `${curSymbol}${Math.round(r.emiAmount).toLocaleString('en-IN')}`,
+      `${curSymbol}${Math.round(r.principalComponent).toLocaleString('en-IN')}`,
+      `${curSymbol}${Math.round(r.interestComponent).toLocaleString('en-IN')}`,
+      `${curSymbol}${Math.round(r.outstandingBalance).toLocaleString('en-IN')}`
     ]);
 
     doc.autoTable({
-      head: [["#", "Payment Date", "EMI Amount", "Principal Paid", "Interest Paid", "Prepayment", "Outstanding Balance"]],
+      head: [["#", "Payment Date", "EMI Amount", "Principal Paid", "Interest Paid", "Outstanding Balance"]],
       body: tableData,
-      startY: 210,
+      startY: 164,
       showHead: 'everyPage',
       theme: 'plain',
       headStyles: {
-        fillColor: brandNavy,
+        fillColor: primaryBrand,
         textColor: [255, 255, 255],
         fontStyle: 'bold',
         fontSize: 8.5,
@@ -3166,101 +3155,159 @@
       styles: {
         font: fontName,
         fontSize: 8,
-        cellPadding: { top: 5, bottom: 5, left: 6, right: 6 },
+        cellPadding: { top: 4.5, bottom: 4.5, left: 6, right: 6 },
         textColor: textDark,
-        lineColor: [230, 236, 244],
+        lineColor: borderStroke,
         lineWidth: 0.5
       },
       columnStyles: {
-        0: { cellWidth: 50, halign: 'center' },
-        1: { cellWidth: 70, halign: 'left' },
-        2: { cellWidth: 75, halign: 'right' },
-        3: { cellWidth: 80, halign: 'right' },
-        4: { cellWidth: 80, halign: 'right' },
-        5: { cellWidth: 70, halign: 'right' },
-        6: { cellWidth: 90, halign: 'right', fontStyle: 'bold' }
+        0: { cellWidth: 48, halign: 'center' },
+        1: { cellWidth: 82, halign: 'left' },
+        2: { cellWidth: 90, halign: 'right' },
+        3: { cellWidth: 95, halign: 'right' },
+        4: { cellWidth: 95, halign: 'right' },
+        5: { cellWidth: 105, halign: 'right', fontStyle: 'bold' }
       },
       alternateRowStyles: {
-        fillColor: [248, 250, 253]
+        fillColor: cardBg
       },
-      margin: { left: 40, right: 40, bottom: 35 }
+      margin: { left: 40, right: 40, top: 38, bottom: 48 }
     });
 
-    // Add page numbers and disclaimer footer to every page
+    // Add page numbers, running header, and mandatory legal disclaimer footer to every page
     const totalPages = doc.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i);
+
+      // Running header on continuation pages
+      if (i > 1) {
+        doc.setFont(fontName, 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(...textMuted);
+        doc.text(`${lender.name} — Loan Repayment Schedule`, 40, 22);
+        doc.text(`Reference: DLS-${lender.fileSlug.toUpperCase()}-${principal}`, 555, 22, { align: 'right' });
+        doc.setDrawColor(...borderStroke);
+        doc.setLineWidth(0.5);
+        doc.line(40, 26, 555, 26);
+      }
+
+      // Footer
+      doc.setDrawColor(...borderStroke);
+      doc.setLineWidth(0.5);
+      doc.line(40, 804, 555, 804);
+
       doc.setFont(fontName, 'normal');
-      doc.setFontSize(7.5);
+      doc.setFontSize(6.8);
       doc.setTextColor(...textLight);
-      doc.text('This schedule is illustrative and indicative. Actual repayment amounts may vary based on disbursement dates and bank terms.', 40, 822);
-      doc.text(`Page ${i} of ${totalPages}`, 555, 822, { align: 'right' });
+      const disclaimerLines = doc.splitTextToSize(disclaimer, 430);
+      doc.text(disclaimerLines, 40, 814);
+
+      doc.setFontSize(8);
+      doc.setTextColor(...textMuted);
+      doc.text(`Page ${i} of ${totalPages}`, 555, 818, { align: 'right' });
     }
 
-    doc.save(`Loan_Repayment_Schedule_${Math.round(sum.principal)}.pdf`);
+    doc.save(`Loan_Repayment_Schedule_${lender.fileSlug}_${principal}.pdf`);
   }
 
-  // Excel Export
+  // Excel Export with Lender Identity & Multi-Sheet Structure
   function exportExcel() {
-    const schedule = calculatedData && (calculatedData.amortizationSchedule || (calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule));
-    if (!schedule || schedule.length === 0) {
+    const docData = getExportDocumentData();
+    if (!docData) {
       alert('Calculate the loan before exporting the repayment schedule.');
       return;
     }
 
-    const sum = calculatedData.summary;
-    const wsData = [
-      ['DIXIT LENDING SOLUTION — Loan Repayment Schedule'],
+    const { lender, schedule, principal, rate, tenureMonths, tenureYears, emi, totalInterest, totalRepayment, disclaimer } = docData;
+
+    // Sheet 1: Repayment Schedule
+    const wsScheduleData = [
+      [`${lender.name} — LOAN REPAYMENT SCHEDULE`],
+      [`Principal: INR ${principal.toLocaleString('en-IN')} | Interest Rate: ${rate}% p.a. | Tenure: ${tenureMonths} Months (${tenureYears} Years) | Reference: DLS-${lender.fileSlug.toUpperCase()}-${principal}`],
       [],
-      ['Principal Amount', Math.round(sum.principal)],
-      ['Interest Rate (% p.a.)', sum.rate],
-      ['Tenure (Months)', sum.tenureMonths],
-      ['Monthly EMI', Math.round(sum.originalEMI)],
-      ['Total Interest Payable', Math.round(calculatedData.hasPrepayment ? sum.prepayTotalInterest : sum.originalTotalInterest)],
-      ['Total Repayment', Math.round(calculatedData.hasPrepayment ? sum.prepayTotalAmount : sum.originalTotalAmount)],
-      ['Processing Fee', Math.round(sum.processingFee)],
-      [],
-      ['EMI #', 'Payment Date', 'EMI Amount', 'Principal Paid', 'Interest Paid', 'Prepayment', 'Outstanding Balance']
+      ['EMI #', 'Payment Date', 'EMI Amount (INR)', 'Principal Paid (INR)', 'Interest Paid (INR)', 'Outstanding Balance (INR)', 'Lender']
     ];
 
     schedule.forEach(r => {
-      wsData.push([
+      wsScheduleData.push([
         r.emiNumber,
         r.paymentDate,
         Math.round(r.emiAmount),
         Math.round(r.principalComponent),
         Math.round(r.interestComponent),
-        Math.round(r.prepayment),
-        Math.round(r.outstandingBalance)
+        Math.round(r.outstandingBalance),
+        lender.shortName
       ]);
     });
 
+    wsScheduleData.push([]);
+    wsScheduleData.push(['Legal Disclaimer:', disclaimer]);
+
+    // Sheet 2: Loan Summary
+    const wsSummaryData = [
+      [`${lender.name} — LOAN DETAILS & REPAYMENT SUMMARY`],
+      [],
+      ['Loan Parameter', 'Value'],
+      ['Lender', lender.name],
+      ['Principal Loan Amount (INR)', principal],
+      ['Annual Interest Rate (% p.a.)', `${rate}%`],
+      ['Loan Tenure (Months)', tenureMonths],
+      ['Loan Tenure (Years)', parseFloat(tenureYears)],
+      ['Monthly EMI (INR)', emi],
+      ['Total Interest Payable (INR)', totalInterest],
+      ['Total Repayment Amount (INR)', totalRepayment],
+      ['Reference ID', `DLS-${lender.fileSlug.toUpperCase()}-${principal}`],
+      ['Generated On', new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })],
+      [],
+      ['Legal Disclaimer', disclaimer]
+    ];
+
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    ws['!cols'] = [{wch:10},{wch:16},{wch:18},{wch:18},{wch:18},{wch:16},{wch:22}];
-    XLSX.utils.book_append_sheet(wb, ws, "Repayment Schedule");
-    XLSX.writeFile(wb, `Loan_Repayment_Schedule_${Math.round(sum.principal)}.xlsx`);
+
+    const wsSchedule = XLSX.utils.aoa_to_sheet(wsScheduleData);
+    wsSchedule['!cols'] = [{ wch: 10 }, { wch: 16 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 22 }, { wch: 20 }];
+    XLSX.utils.book_append_sheet(wb, wsSchedule, "Repayment Schedule");
+
+    const wsSummary = XLSX.utils.aoa_to_sheet(wsSummaryData);
+    wsSummary['!cols'] = [{ wch: 32 }, { wch: 45 }];
+    XLSX.utils.book_append_sheet(wb, wsSummary, "Loan Summary");
+
+    XLSX.writeFile(wb, `Loan_Repayment_Schedule_${lender.fileSlug}_${principal}.xlsx`);
   }
 
-  // CSV Export
+  // CSV Export with Lender Metadata
   function exportCSV() {
-    const schedule = calculatedData && (calculatedData.amortizationSchedule || (calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule));
-    if (!schedule || schedule.length === 0) {
+    const docData = getExportDocumentData();
+    if (!docData) {
       alert('Calculate the loan before exporting the repayment schedule.');
       return;
     }
 
-    let csvContent = "\uFEFFEMI Number,Payment Date,EMI Amount (INR),Principal Paid (INR),Interest Paid (INR),Prepayment (INR),Outstanding Balance (INR)\r\n";
+    const { lender, schedule, principal, rate, tenureMonths, tenureYears, emi, totalInterest, totalRepayment, disclaimer } = docData;
+
+    const formattedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    let csvContent = `\uFEFF# LENDER: ${lender.name}\r\n`;
+    csvContent += `# LOAN REPAYMENT SCHEDULE\r\n`;
+    csvContent += `# Principal Amount: ${principal} INR\r\n`;
+    csvContent += `# Annual Interest Rate: ${rate}% p.a.\r\n`;
+    csvContent += `# Loan Tenure: ${tenureMonths} Months (${tenureYears} Years)\r\n`;
+    csvContent += `# Monthly EMI: ${emi} INR\r\n`;
+    csvContent += `# Total Interest Payable: ${totalInterest} INR\r\n`;
+    csvContent += `# Total Repayment Amount: ${totalRepayment} INR\r\n`;
+    csvContent += `# Reference: DLS-${lender.fileSlug.toUpperCase()}-${principal}\r\n`;
+    csvContent += `# Disclaimer: ${disclaimer}\r\n`;
+    csvContent += `# Generated: ${formattedDate}\r\n`;
+    csvContent += `EMI Number,Payment Date,EMI Amount (INR),Principal Paid (INR),Interest Paid (INR),Outstanding Balance (INR),Lender\r\n`;
 
     schedule.forEach(r => {
-      csvContent += `${r.emiNumber},${r.paymentDate},${Math.round(r.emiAmount)},${Math.round(r.principalComponent)},${Math.round(r.interestComponent)},${Math.round(r.prepayment)},${Math.round(r.outstandingBalance)}\r\n`;
+      csvContent += `${r.emiNumber},${r.paymentDate},${Math.round(r.emiAmount)},${Math.round(r.principalComponent)},${Math.round(r.interestComponent)},${Math.round(r.outstandingBalance)},"${lender.shortName}"\r\n`;
     });
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `Loan_Repayment_Schedule_${Math.round(calculatedData.principal || calculatedData.summary.principal)}.csv`);
+    link.setAttribute("download", `Loan_Repayment_Schedule_${lender.fileSlug}_${principal}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -3292,6 +3339,7 @@
     document.getElementById('compare-form').reset();
     document.getElementById('compare-results-section').style.display = 'none';
     comparedData = null;
+    window.comparedData = null;
     document.querySelectorAll('#tab-content-compare .error-msg').forEach(el => {
       el.textContent = '';
       el.style.display = 'none';
@@ -3343,6 +3391,7 @@
       opt2: { p: p2, r: r2, t: t2, b: b2, emi: emi2, interest: interest2, total: total2 },
       betterOption, savings, emiDiff, interestDiff
     };
+    window.comparedData = comparedData;
 
     renderCompareResults();
   }
@@ -3453,103 +3502,6 @@
       .catch(() => alert('Summary:\n\n' + text));
   }
 
-  function exportCompareExcel() {
-    if (!comparedData) return;
-    const { opt1, opt2, betterOption, savings, emiDiff, interestDiff } = comparedData;
-    const wsData = [
-      ['DIXIT LENDING SOLUTION — Loan Comparison Report'],
-      [],
-      ['Parameters', `Option 1 (${opt1.b || 'N/A'})`, `Option 2 (${opt2.b || 'N/A'})`, 'Difference'],
-      ['Loan Amount (Principal)', Math.round(opt1.p), Math.round(opt2.p), Math.round(Math.abs(opt1.p - opt2.p))],
-      ['Interest Rate (% per annum)', `${opt1.r}%`, `${opt2.r}%`, `${Math.abs(opt1.r - opt2.r).toFixed(2)}%`],
-      ['Tenure (Months)', opt1.t, opt2.t, Math.abs(opt1.t - opt2.t)],
-      ['Monthly EMI', Math.round(opt1.emi), Math.round(opt2.emi), Math.round(emiDiff)],
-      ['Total Interest Payable', Math.round(opt1.interest), Math.round(opt2.interest), Math.round(interestDiff)],
-      ['Total Repayment Cost', Math.round(opt1.total), Math.round(opt2.total), Math.round(savings)],
-      [],
-      [`Recommendation: Option ${betterOption} is recommended — saves ₹${Math.round(savings).toLocaleString('en-IN')} overall.`]
-    ];
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    ws['!cols'] = [{wch:28},{wch:20},{wch:20},{wch:15}];
-    XLSX.utils.book_append_sheet(wb, ws, 'Comparison Report');
-    XLSX.writeFile(wb, `Loan_Comparison_${Math.round(opt1.p)}.xlsx`);
-  }
-
-  async function exportComparePDF() {
-    const { jsPDF } = window.jspdf;
-    if (!jsPDF) { alert('PDF library not loaded yet.'); return; }
-    if (!comparedData) return;
-    const { opt1, opt2, betterOption, savings, emiDiff, interestDiff } = comparedData;
-    const doc = new jsPDF('p', 'pt', 'a4');
-
-    let fontName = 'helvetica';
-    const fonts = await getPdfFonts();
-    if (fonts) {
-      try {
-        doc.addFileToVFS('segoeui.ttf', fonts.regular);
-        doc.addFont('segoeui.ttf', 'SegoeUI', 'normal');
-        doc.addFileToVFS('segoeuib.ttf', fonts.bold);
-        doc.addFont('segoeuib.ttf', 'SegoeUI', 'bold');
-        fontName = 'SegoeUI';
-      } catch (err) {}
-    }
-
-    const brandNavy = [15, 39, 71];
-    doc.setFont(fontName, 'bold'); doc.setFontSize(10); doc.setTextColor(123, 136, 151);
-    doc.text('DIXIT LENDING SOLUTION', 40, 42);
-
-    doc.setFont(fontName, 'bold'); doc.setFontSize(20); doc.setTextColor(...brandNavy);
-    doc.text('Loan Comparison Report', 40, 64);
-    doc.setFontSize(10); doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Comparative analysis between loan options', 40, 79);
-    doc.setFontSize(9); doc.setTextColor(123, 136, 151);
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`, 555, 79, { align: 'right' });
-    doc.setDrawColor(217, 227, 239); doc.line(40, 90, 555, 90);
-
-    doc.setFont(fontName, 'bold'); doc.setFontSize(11); doc.setTextColor(15, 139, 113);
-    doc.text(`Recommendation: Loan Option ${betterOption} is financially better`, 40, 115);
-    doc.setFont(fontName, 'normal'); doc.setFontSize(9.5); doc.setTextColor(82, 97, 115);
-    doc.text(`Choosing Option ${betterOption} saves ₹${Math.round(savings).toLocaleString('en-IN')} in total repayment versus Option ${betterOption === 1 ? 2 : 1}.`, 40, 132);
-
-    doc.autoTable({
-      head: [['Loan Parameters', `Option 1 (${opt1.b || 'N/A'})`, `Option 2 (${opt2.b || 'N/A'})`, 'Difference']],
-      body: [
-        ['Principal Amount', `₹${Math.round(opt1.p).toLocaleString('en-IN')}`, `₹${Math.round(opt2.p).toLocaleString('en-IN')}`, `₹${Math.round(Math.abs(opt1.p-opt2.p)).toLocaleString('en-IN')}`],
-        ['Interest Rate', `${opt1.r}% p.a.`, `${opt2.r}% p.a.`, `${Math.abs(opt1.r-opt2.r).toFixed(2)}%`],
-        ['Tenure', `${opt1.t} Months`, `${opt2.t} Months`, `${Math.abs(opt1.t-opt2.t)} Months`],
-        ['Monthly EMI', `₹${Math.round(opt1.emi).toLocaleString('en-IN')}`, `₹${Math.round(opt2.emi).toLocaleString('en-IN')}`, `₹${Math.round(emiDiff).toLocaleString('en-IN')}`],
-        ['Total Interest', `₹${Math.round(opt1.interest).toLocaleString('en-IN')}`, `₹${Math.round(opt2.interest).toLocaleString('en-IN')}`, `₹${Math.round(interestDiff).toLocaleString('en-IN')}`],
-        ['Total Repayment', `₹${Math.round(opt1.total).toLocaleString('en-IN')}`, `₹${Math.round(opt2.total).toLocaleString('en-IN')}`, `₹${Math.round(savings).toLocaleString('en-IN')}`]
-      ],
-      startY: 150,
-      showHead: 'everyPage',
-      theme: 'plain',
-      headStyles: { fillColor: brandNavy, textColor: [255, 255, 255], fontStyle: 'bold', font: fontName, fontSize: 9 },
-      styles: { fontSize: 8.5, cellPadding: 8, font: fontName, lineColor: [230, 236, 244], lineWidth: 0.5 },
-      alternateRowStyles: { fillColor: [248, 250, 253] },
-      columnStyles: {
-        0: { cellWidth: 155 },
-        1: { cellWidth: 120, halign: 'right' },
-        2: { cellWidth: 120, halign: 'right' },
-        3: { cellWidth: 120, halign: 'right', fontStyle: 'bold' }
-      },
-      margin: { left: 40, right: 40, bottom: 35 }
-    });
-
-    const totalPages = doc.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      doc.setFont(fontName, 'normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(140, 150, 165);
-      doc.text('This comparison is illustrative and indicative. Actual bank terms may vary.', 40, 822);
-      doc.text(`Page ${i} of ${totalPages}`, 555, 822, { align: 'right' });
-    }
-
-    doc.save(`Loan_Comparison_${Math.round(opt1.p)}.pdf`);
-  }
-
   // ── Flat Rate Calculator ──────────────────────────────────────────────────
   let flatTenureUnit = 'years';
   let flatCalculatedData = null;
@@ -3572,15 +3524,29 @@
   }
 
   function setFlatTenureUnit(unit) {
+    const tenureInput = document.getElementById('flat-tenure');
+    if (tenureInput && tenureInput.value !== '' && flatTenureUnit !== unit) {
+      const curVal = parseFloat(tenureInput.value);
+      if (!isNaN(curVal) && curVal > 0) {
+        if (unit === 'months') {
+          tenureInput.value = Math.round(curVal * 12);
+        } else {
+          const yrs = curVal / 12;
+          tenureInput.value = Number.isInteger(yrs) ? yrs : parseFloat(yrs.toFixed(1));
+        }
+      }
+    }
     flatTenureUnit = unit;
-    document.getElementById('flat-btn-years').classList.toggle('active', unit === 'years');
-    document.getElementById('flat-btn-months').classList.toggle('active', unit === 'months');
-    document.getElementById('flat-tenure').placeholder = unit === 'years' ? '2' : '24';
+    const btnYears = document.getElementById('flat-btn-years');
+    const btnMonths = document.getElementById('flat-btn-months');
+    if (btnYears) btnYears.classList.toggle('active', unit === 'years');
+    if (btnMonths) btnMonths.classList.toggle('active', unit === 'months');
+    if (tenureInput) tenureInput.placeholder = unit === 'years' ? '2' : '24';
     if (flatCalculatedData) calculateFlatRateLoan();
   }
 
   function clearFlatErrors() {
-    ['flat-err-principal', 'flat-err-rate', 'flat-err-tenure', 'flat-err-fee'].forEach(function(id) {
+    ['flat-err-principal', 'flat-err-rate', 'flat-err-tenure'].forEach(function(id) {
       const el = document.getElementById(id);
       if (el) { el.textContent = ''; el.style.display = 'none'; }
     });
@@ -3597,12 +3563,10 @@
     const principalStr = flatPrincipalInput ? flatPrincipalInput.value.replace(/,/g, '') : '';
     const rateStr = document.getElementById('flat-rate') ? document.getElementById('flat-rate').value : '';
     const tenureStr = document.getElementById('flat-tenure') ? document.getElementById('flat-tenure').value : '';
-    const feeStr = document.getElementById('flat-fee') ? document.getElementById('flat-fee').value : '';
 
     const principal = parseFloat(principalStr);
     const rateVal = parseFloat(rateStr);
     const tenureVal = parseFloat(tenureStr);
-    const feePercent = feeStr ? parseFloat(feeStr) : 0;
 
     let hasError = false;
     if (isNaN(principal) || principal <= 0) {
@@ -3617,10 +3581,6 @@
       showFlatError('flat-err-tenure', 'Tenure must be a positive whole number.');
       hasError = true;
     }
-    if (feeStr && (isNaN(feePercent) || feePercent < 0 || feePercent > 100)) {
-      showFlatError('flat-err-fee', 'Processing fee must be between 0% and 100%.');
-      hasError = true;
-    }
     if (hasError) return;
 
     const totalMonths = flatTenureUnit === 'years' ? tenureVal * 12 : tenureVal;
@@ -3633,8 +3593,6 @@
     const totalInterest = principal * (rateVal / 100) * tenureYears;
     const totalAmount = principal + totalInterest;
     const monthlyPayment = totalAmount / totalMonths;
-    const processingFee = principal * (feePercent / 100);
-    const effectiveCost = totalAmount + processingFee;
 
     flatCalculatedData = {
       principal: principal,
@@ -3643,9 +3601,7 @@
       tenureYears: tenureYears,
       totalInterest: totalInterest,
       totalAmount: totalAmount,
-      monthlyPayment: monthlyPayment,
-      processingFee: processingFee,
-      effectiveCost: effectiveCost
+      monthlyPayment: monthlyPayment
     };
     window.flatCalculatedData = flatCalculatedData;
 
@@ -3658,11 +3614,12 @@
 
   function renderFlatResults() {
     const d = flatCalculatedData;
-    document.getElementById('flat-res-payment').textContent = formatFlatCurrency(d.monthlyPayment);
-    document.getElementById('flat-res-interest').textContent = formatFlatCurrency(d.totalInterest);
-    document.getElementById('flat-res-total').textContent = formatFlatCurrency(d.totalAmount);
-    document.getElementById('flat-res-fee').textContent = formatFlatCurrency(d.processingFee);
-    document.getElementById('flat-res-cost').textContent = formatFlatCurrency(d.effectiveCost);
+    const paymentEl = document.getElementById('flat-res-payment');
+    const interestEl = document.getElementById('flat-res-interest');
+    const totalEl = document.getElementById('flat-res-total');
+    if (paymentEl) paymentEl.textContent = formatFlatCurrency(d.monthlyPayment);
+    if (interestEl) interestEl.textContent = formatFlatCurrency(d.totalInterest);
+    if (totalEl) totalEl.textContent = formatFlatCurrency(d.totalAmount);
   }
 
   function formatFlatCurrency(num) {
@@ -3678,10 +3635,9 @@
 
   function renderFlatBreakdown() {
     const d = flatCalculatedData;
-    const grandTotal = d.totalAmount + d.processingFee;
+    const grandTotal = d.totalAmount;
     const principalPct = ((d.principal / grandTotal) * 100).toFixed(1);
     const interestPct = ((d.totalInterest / grandTotal) * 100).toFixed(1);
-    const feePct = d.processingFee > 0 ? ((d.processingFee / grandTotal) * 100).toFixed(1) : '0.0';
 
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
@@ -3696,11 +3652,6 @@
     const pieLabels = ['Principal (' + principalPct + '%)', 'Flat Interest (' + interestPct + '%)'];
     const pieData = [d.principal, d.totalInterest];
     const pieColors = ['#2f6fed', '#b44545'];
-    if (d.processingFee > 0) {
-      pieLabels.push('Fee (' + feePct + '%)');
-      pieData.push(d.processingFee);
-      pieColors.push('#e2a03f');
-    }
 
     const ctx = document.getElementById('flat-chart-pie').getContext('2d');
     flatPieChartInstance = new Chart(ctx, {
@@ -3733,20 +3684,6 @@
       }
     });
 
-    const feeRow = d.processingFee > 0 ? `
-      <div>
-        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
-          <span style="color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
-            <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#e2a03f;"></span>Processing Fee
-          </span>
-          <span>₹${Math.round(d.processingFee).toLocaleString('en-IN')} (${feePct}%)</span>
-        </div>
-        <div style="background:var(--border); height:6px; border-radius:3px; overflow:hidden;">
-          <div style="background:#e2a03f; width:${feePct}%; height:100%;"></div>
-        </div>
-      </div>
-    ` : '';
-
     document.getElementById('flat-breakdown-details').innerHTML = `
       <div style="display:flex; flex-direction:column; gap:12px;">
         <div>
@@ -3771,9 +3708,8 @@
             <div style="background:#b44545; width:${interestPct}%; height:100%;"></div>
           </div>
         </div>
-        ${feeRow}
         <div style="border-top:1px solid var(--border); padding-top:10px; display:flex; justify-content:space-between; font-size:14px; font-weight:700;">
-          <span>Total Cost of Loan</span>
+          <span>Total Repayment</span>
           <span>₹${Math.round(grandTotal).toLocaleString('en-IN')}</span>
         </div>
       </div>
@@ -3883,14 +3819,18 @@
     if (tEl) tEl.value = '';
     const fEl = document.getElementById('flat-fee');
     if (fEl) fEl.value = '';
+    const flatLenderSelect = document.getElementById('flat-select-lender');
+    if (flatLenderSelect) flatLenderSelect.value = '';
+    if (typeof onFlatLenderChange === 'function') onFlatLenderChange('');
     clearFlatErrors();
     flatCalculatedData = null;
     window.flatCalculatedData = null;
     flatCurrentPage = 1;
     flatRowsPerPage = 12;
 
-    ['flat-res-payment', 'flat-res-interest', 'flat-res-total', 'flat-res-fee', 'flat-res-cost'].forEach(function(id) {
-      document.getElementById(id).textContent = '₹0';
+    ['flat-res-payment', 'flat-res-interest', 'flat-res-total'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '₹0';
     });
 
     if (flatPieChartInstance) { flatPieChartInstance.destroy(); flatPieChartInstance = null; }
@@ -3920,186 +3860,6 @@
     if (pagWrapper) pagWrapper.style.display = 'none';
   }
 
-  // ── Flat Rate Exports ─────────────────────────────────────────────────────
-
-  function exportFlatExcel() {
-    if (!flatCalculatedData) { alert('Please perform calculations first before exporting.'); return; }
-    const d = flatCalculatedData;
-    const rows = buildFlatScheduleRows(d);
-
-    const wsData = [
-      ['DIXIT LENDING SOLUTION — Flat Rate Loan Schedule'],
-      [],
-      ['Principal', Math.round(d.principal)],
-      ['Flat Interest Rate', d.rateVal + '% p.a.'],
-      ['Tenure', d.totalMonths + ' Months (' + d.tenureYears.toFixed(2) + ' Years)'],
-      ['Total Flat Interest', Math.round(d.totalInterest)],
-      ['Total Amount Payable', Math.round(d.totalAmount)],
-      ['Monthly Payment', Math.round(d.monthlyPayment)],
-      ['Processing Fee', Math.round(d.processingFee)],
-      ['Effective Cost of Loan', Math.round(d.effectiveCost)],
-      [],
-      ['Period', 'Opening Principal', 'Flat Interest', 'Principal Component', 'Monthly Payment', 'Remaining Principal']
-    ];
-    rows.forEach(function(r) {
-      wsData.push(['Month ' + r.period, Math.round(r.open), Math.round(r.flatInt), Math.round(r.prinComp), Math.round(r.payment), Math.round(r.rem)]);
-    });
-
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    ws['!cols'] = [{wch:10},{wch:20},{wch:16},{wch:22},{wch:18},{wch:22}];
-    XLSX.utils.book_append_sheet(wb, ws, 'Flat Rate Schedule');
-    XLSX.writeFile(wb, `Loan_Repayment_Schedule_Flat_${Math.round(d.principal)}.xlsx`);
-  }
-
-  function exportFlatCSV() {
-    if (!flatCalculatedData) { alert('Please perform calculations first.'); return; }
-    const d = flatCalculatedData;
-    const rows = buildFlatScheduleRows(d);
-
-    let csv = 'data:text/csv;charset=utf-8,';
-    csv += 'Period,Opening Principal,Flat Interest,Principal Component,Monthly Payment,Remaining Principal\n';
-    rows.forEach(function(r) {
-      csv += 'Month ' + r.period + ',' + Math.round(r.open) + ',' + Math.round(r.flatInt) + ',' + Math.round(r.prinComp) + ',' + Math.round(r.payment) + ',' + Math.round(r.rem) + '\n';
-    });
-
-    const link = document.createElement('a');
-    link.setAttribute('href', encodeURI(csv));
-    link.setAttribute('download', `Loan_Repayment_Schedule_Flat_${Math.round(d.principal)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
-  async function exportFlatPDF() {
-    const jsPDFLib = window.jspdf;
-    if (!jsPDFLib || !jsPDFLib.jsPDF) { alert('PDF library not loaded yet. Please wait a second.'); return; }
-    if (!flatCalculatedData) { alert('Please perform calculations first.'); return; }
-    const d = flatCalculatedData;
-    const rows = buildFlatScheduleRows(d);
-
-    const doc = new jsPDFLib.jsPDF('p', 'pt', 'a4');
-    let fontName = 'helvetica';
-    const fonts = await getPdfFonts();
-    if (fonts) {
-      try {
-        doc.addFileToVFS('segoeui.ttf', fonts.regular);
-        doc.addFont('segoeui.ttf', 'SegoeUI', 'normal');
-        doc.addFileToVFS('segoeuib.ttf', fonts.bold);
-        doc.addFont('segoeuib.ttf', 'SegoeUI', 'bold');
-        fontName = 'SegoeUI';
-      } catch (err) {}
-    }
-
-    const brandNavy = [15, 39, 71];
-    const textDark = [16, 32, 51];
-    const textMuted = [82, 97, 115];
-    const textLight = [123, 136, 151];
-    const borderStroke = [217, 227, 239];
-    const cardBg = [248, 250, 252];
-
-    doc.setFont(fontName, 'bold'); doc.setFontSize(10); doc.setTextColor(...textLight);
-    doc.text('DIXIT LENDING SOLUTION', 40, 42);
-
-    doc.setFont(fontName, 'bold'); doc.setFontSize(20); doc.setTextColor(...brandNavy);
-    doc.text('Loan Repayment Schedule (Flat Rate)', 40, 64);
-    doc.setFontName ? doc.setFont(fontName, 'normal') : doc.setFont('normal'); doc.setFontSize(10); doc.setTextColor(...textMuted);
-    doc.text('Illustrative flat rate repayment schedule based on the loan details provided', 40, 79);
-    doc.setFontSize(9); doc.setTextColor(...textLight);
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`, 555, 79, { align: 'right' });
-    doc.setDrawColor(...borderStroke); doc.line(40, 90, 555, 90);
-
-    // Summary Box
-    doc.setFillColor(...cardBg); doc.setDrawColor(...borderStroke);
-    doc.roundedRect(40, 102, 515, 94, 6, 6, 'FD');
-
-    doc.setFont(fontName, 'bold'); doc.setFontSize(11); doc.setTextColor(...brandNavy);
-    doc.text('FLAT RATE LOAN SUMMARY', 54, 120);
-
-    doc.setFont(fontName, 'normal'); doc.setFontSize(9.5); doc.setTextColor(...textDark);
-    doc.text('Principal Amount:', 54, 138);
-    doc.setFont(fontName, 'bold');
-    doc.text(`₹${Math.round(d.principal).toLocaleString('en-IN')}`, 160, 138);
-
-    doc.setFont(fontName, 'normal');
-    doc.text('Flat Interest Rate:', 54, 154);
-    doc.setFont(fontName, 'bold');
-    doc.text(`${d.rateVal}% p.a.`, 160, 154);
-
-    doc.setFont(fontName, 'normal');
-    doc.text('Loan Tenure:', 54, 170);
-    doc.setFont(fontName, 'bold');
-    doc.text(`${d.totalMonths} Months (${d.tenureYears.toFixed(1)} Years)`, 160, 170);
-
-    doc.setFont(fontName, 'normal');
-    doc.text('Processing Fee:', 54, 186);
-    doc.setFont(fontName, 'bold');
-    doc.text(`₹${Math.round(d.processingFee).toLocaleString('en-IN')}`, 160, 186);
-
-    doc.setFont(fontName, 'normal');
-    doc.text('Monthly Payment:', 320, 138);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(...brandNavy);
-    doc.text(`₹${Math.round(d.monthlyPayment).toLocaleString('en-IN')}`, 430, 138);
-
-    doc.setFont(fontName, 'normal'); doc.setTextColor(...textDark);
-    doc.text('Total Flat Interest:', 320, 154);
-    doc.setFont(fontName, 'bold');
-    doc.text(`₹${Math.round(d.totalInterest).toLocaleString('en-IN')}`, 430, 154);
-
-    doc.setFont(fontName, 'normal');
-    doc.text('Total Repayment:', 320, 170);
-    doc.setFont(fontName, 'bold');
-    doc.text(`₹${Math.round(d.totalAmount).toLocaleString('en-IN')}`, 430, 170);
-
-    doc.setFont(fontName, 'normal');
-    doc.text('Effective Outflow:', 320, 186);
-    doc.setFont(fontName, 'bold');
-    doc.text(`₹${Math.round(d.effectiveCost).toLocaleString('en-IN')}`, 430, 186);
-
-    const tableData = rows.map(function(r) {
-      return [
-        'Month ' + r.period,
-        '₹' + Math.round(r.open).toLocaleString('en-IN'),
-        '₹' + Math.round(r.flatInt).toLocaleString('en-IN'),
-        '₹' + Math.round(r.prinComp).toLocaleString('en-IN'),
-        '₹' + Math.round(r.payment).toLocaleString('en-IN'),
-        '₹' + Math.round(r.rem).toLocaleString('en-IN')
-      ];
-    });
-
-    doc.autoTable({
-      head: [['Period', 'Opening Principal', 'Flat Interest', 'Principal Comp.', 'Monthly Payment', 'Remaining Principal']],
-      body: tableData,
-      startY: 210,
-      showHead: 'everyPage',
-      theme: 'plain',
-      headStyles: { fillColor: brandNavy, textColor: [255, 255, 255], fontStyle: 'bold', font: fontName, fontSize: 8.5 },
-      styles: { fontSize: 8, cellPadding: { top: 5, bottom: 5, left: 6, right: 6 }, font: fontName, lineColor: [230, 236, 244], lineWidth: 0.5 },
-      alternateRowStyles: { fillColor: [248, 250, 253] },
-      columnStyles: {
-        0: { cellWidth: 60, halign: 'center' },
-        1: { cellWidth: 90, halign: 'right' },
-        2: { cellWidth: 90, halign: 'right' },
-        3: { cellWidth: 90, halign: 'right' },
-        4: { cellWidth: 90, halign: 'right' },
-        5: { cellWidth: 95, halign: 'right', fontStyle: 'bold' }
-      },
-      margin: { left: 40, right: 40, bottom: 35 }
-    });
-
-    const totalPages = doc.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      doc.setFont(fontName, 'normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(...textLight);
-      doc.text('This schedule is illustrative and indicative. Actual repayment amounts may vary based on disbursement dates and bank terms.', 40, 822);
-      doc.text(`Page ${i} of ${totalPages}`, 555, 822, { align: 'right' });
-    }
-
-    doc.save(`Loan_Repayment_Schedule_Flat_${Math.round(d.principal)}.pdf`);
-  }
-
   // Ensure full schedule is printed on print action
   window.addEventListener('beforeprint', function() {
     if (activeTab === 'flat' && flatCalculatedData) {
@@ -4119,7 +3879,7 @@
         tbody.appendChild(tr);
       });
     } else if (activeTab === 'reducing' && calculatedData.originalSchedule.length > 0) {
-      const schedule = calculatedData.hasPrepayment ? calculatedData.prepaySchedule : calculatedData.originalSchedule;
+      const schedule = calculatedData.originalSchedule;
       const tbody = document.getElementById('schedule-tbody');
       tbody.innerHTML = '';
       schedule.forEach(function(row) {
@@ -4130,7 +3890,6 @@
           <td class="td-right">${formatValueCurrency(row.emiAmount)}</td>
           <td class="td-right">${formatValueCurrency(row.principalComponent)}</td>
           <td class="td-right">${formatValueCurrency(row.interestComponent)}</td>
-          <td class="td-right">${row.prepayment > 0 ? formatValueCurrency(row.prepayment) : '—'}</td>
           <td class="td-right" style="font-weight:700;">${formatValueCurrency(row.outstandingBalance)}</td>
         `;
         tbody.appendChild(tr);
@@ -4168,9 +3927,6 @@
       resetCalculator();
     });
   }
-
 </script>
-
-<script src="/js/calculator-hub.js?v=20260925"></script>
 </body>
 </html>

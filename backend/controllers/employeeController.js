@@ -6,6 +6,7 @@ const DocumentModel = require('../models/documentModel');
 const path = require('path');
 const fs = require('fs');
 const whatsappService = require('../utils/whatsappService');
+const notifCtrl = require('./notificationController');
 
 const employeeController = {
   // ── Dashboard ───────────────────────────────────────────────
@@ -200,6 +201,17 @@ const employeeController = {
       
       // WhatsApp workflow trigger: Lead Created (Welcome Message)
       whatsappService.sendWorkflowMessage('Welcome Message', id, { employee_id: req.user.id });
+
+      // Employee Notification Center trigger
+      notifCtrl.createCustomerNotification({
+        employeeId: req.user.id,
+        customerId: id,
+        customerName: name,
+        type: 'customer',
+        title: 'New Customer Added',
+        message: `Customer "${name}" (${phone}) has been registered.`,
+        priority: 'normal'
+      }).catch(e => console.error('[Employee] Customer notification error:', e.message));
 
       return res.status(201).json({ success: true, message: 'Customer added successfully.', id, customer });
     } catch (err) {
@@ -472,6 +484,9 @@ const employeeController = {
         period, 
         startDate, 
         endDate,
+        area,
+        search,
+        customer_id,
         loginStartDate,
         loginEndDate,
         uploadStartDate,
@@ -483,6 +498,9 @@ const employeeController = {
       const loans = await LoanModel.getAll({ 
         applied_by: req.user.id, 
         status, 
+        area,
+        search,
+        customer_id: customer_id ? parseInt(customer_id, 10) : undefined,
         period, 
         startDate, 
         endDate,
@@ -525,25 +543,73 @@ const employeeController = {
   async createLoan(req, res) {
     try {
       const { customer_id, amount, purpose } = req.body;
-      if (!customer_id || !amount) {
-        return res.status(400).json({ success: false, message: 'Customer and amount are required.' });
+      const numCustomerId = parseInt(customer_id, 10);
+      if (!numCustomerId || isNaN(numCustomerId) || numCustomerId <= 0) {
+        return res.status(400).json({ success: false, message: 'A valid customer is required.' });
       }
 
-      const customer = await CustomerModel.findById(customer_id);
+      const numAmount = parseFloat(amount);
+      if (isNaN(numAmount) || numAmount <= 0) {
+        return res.status(400).json({ success: false, message: 'Please enter a valid requested loan amount.' });
+      }
+
+      const cleanPurpose = typeof purpose === 'string' ? purpose.trim() : '';
+      if (!cleanPurpose) {
+        return res.status(400).json({ success: false, message: 'Please select or enter a Bank / NBFC.' });
+      }
+
+      const customer = await CustomerModel.findById(numCustomerId);
       if (!customer) {
         return res.status(404).json({ success: false, message: 'Customer not found.' });
       }
 
-      const id = await LoanModel.create({ customer_id, amount, purpose, applied_by: req.user.id });
+      // Check customer ownership
+      if (String(customer.added_by) !== String(req.user.id)) {
+        return res.status(403).json({ success: false, message: 'You are not authorized to create loans for this customer.' });
+      }
+
+      const id = await LoanModel.create({
+        customer_id: numCustomerId,
+        amount: numAmount,
+        purpose: cleanPurpose,
+        applied_by: req.user.id
+      });
       
       // WhatsApp workflow trigger: Application Submitted (Confirmation Message)
-      whatsappService.sendWorkflowMessage('Application Submitted', customer_id, {
+      whatsappService.sendWorkflowMessage('Application Submitted', numCustomerId, {
         loan_number: 'LN-' + id,
-        loan_amount: amount,
+        loan_amount: numAmount,
         employee_id: req.user.id
       });
 
-      return res.status(201).json({ success: true, message: 'Loan application created.', id });
+      // Employee Notification Center trigger
+      notifCtrl.createLoanNotification({
+        employeeId: req.user.id,
+        loanId: id,
+        customerName: customer.name,
+        status: 'Pending',
+        type: 'loan',
+        title: 'Loan Application Created',
+        message: `Application #LN-${id} for ${customer.name} (₹${Number(numAmount).toLocaleString('en-IN')}) submitted.`,
+        priority: 'normal'
+      }).catch(e => console.error('[Employee] Loan notification error:', e.message));
+
+      return res.status(201).json({
+        success: true,
+        message: 'Loan application created successfully.',
+        id,
+        loan: {
+          id,
+          customer_id: numCustomerId,
+          customer_name: customer.name,
+          customer_phone: customer.phone,
+          area: customer.area,
+          amount: numAmount,
+          purpose: cleanPurpose,
+          status: 'Pending',
+          created_at: new Date().toISOString()
+        }
+      });
     } catch (err) {
       console.error('[Employee] Create loan error:', err);
       return res.status(500).json({ success: false, message: 'Failed to create loan.' });
