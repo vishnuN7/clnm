@@ -1319,6 +1319,53 @@
       box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
     }
 
+    /* ── Updated Loan Row Highlight ── */
+    @keyframes loanRowHighlightPulse {
+      0% {
+        background-color: rgba(123, 192, 67, 0.32);
+        box-shadow: inset 4px 0 0 #7bc043;
+      }
+      30% {
+        background-color: rgba(123, 192, 67, 0.22);
+        box-shadow: inset 4px 0 0 #7bc043;
+      }
+      70% {
+        background-color: rgba(123, 192, 67, 0.10);
+        box-shadow: inset 3px 0 0 #7bc043;
+      }
+      100% {
+        background-color: transparent;
+        box-shadow: inset 0 0 0 transparent;
+      }
+    }
+
+    tr.loan-row-updated-highlight {
+      animation: loanRowHighlightPulse 4.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    :root[data-theme='dark'] tr.loan-row-updated-highlight {
+      animation: loanRowHighlightPulseDark 4.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    @keyframes loanRowHighlightPulseDark {
+      0% {
+        background-color: rgba(123, 192, 67, 0.28);
+        box-shadow: inset 4px 0 0 #7bc043;
+      }
+      30% {
+        background-color: rgba(123, 192, 67, 0.18);
+        box-shadow: inset 4px 0 0 #7bc043;
+      }
+      70% {
+        background-color: rgba(123, 192, 67, 0.08);
+        box-shadow: inset 3px 0 0 #7bc043;
+      }
+      100% {
+        background-color: transparent;
+        box-shadow: inset 0 0 0 transparent;
+      }
+    }
+
     /* ── Lifecycle States (Loading, Empty, Error) ──────────────────────── */
     .loans-state-card {
       padding: 42px 20px;
@@ -1511,9 +1558,14 @@
     }
     .drawer-summary-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
       margin-top: 14px;
+    }
+    @media (max-width: 640px) {
+      .drawer-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
     .drawer-summary-item {
       padding: 9px 11px;
@@ -2198,7 +2250,11 @@
             <strong id="drawer-customer-name">Loading...</strong>
           </div>
           <div class="drawer-summary-item">
-            <span>Loan Amount</span>
+            <span>Loan ID</span>
+            <strong id="drawer-loan-id">—</strong>
+          </div>
+          <div class="drawer-summary-item">
+            <span>Requested Amount</span>
             <strong id="drawer-loan-amount">—</strong>
           </div>
           <div class="drawer-summary-item">
@@ -2244,7 +2300,7 @@
             </select>
           </div>
           <div class="status-field">
-            <label for="drawer-notes"><i class="fas fa-comment-dots" aria-hidden="true"></i> Remarks / Notes *</label>
+            <label for="drawer-notes" id="drawer-notes-label"><i class="fas fa-comment-dots" aria-hidden="true"></i> Remarks / Notes <span class="badge-optional" style="color:var(--text-muted);font-size:11px;">(Optional)</span></label>
             <textarea id="drawer-notes" class="form-control" rows="4" placeholder="Enter remarks, bank feedback, approval note, or rejection reason."></textarea>
           </div>
         </div>
@@ -2321,6 +2377,8 @@
   let allFilteredLoans = [];
   let currentActiveCardStatus = '';
   let searchDebounceTimer = null;
+  let highlightedLoanId = null;
+  let highlightTimer = null;
 
   const STATUS_PARAM_MAP = {
     'pending': 'Pending',
@@ -2357,12 +2415,60 @@
       .replace(/'/g, '&#39;');
   }
 
+  function formatISTDateTime(isoOrDateStr) {
+    if (!isoOrDateStr) return { dateStr: '—', timeStr: '—' };
+    try {
+      let d;
+      if (typeof isoOrDateStr === 'string') {
+        const s = isoOrDateStr.trim();
+        if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}$/.test(s)) {
+          d = new Date(s.replace(' ', 'T') + '+05:30');
+        } else {
+          d = new Date(s);
+        }
+      } else {
+        d = new Date(isoOrDateStr);
+      }
+      if (isNaN(d.getTime())) return { dateStr: '—', timeStr: '—' };
+
+      const dateStr = d.toLocaleDateString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+
+      const timeStr = d.toLocaleTimeString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }).toUpperCase();
+
+      return { dateStr, timeStr };
+    } catch (e) {
+      return { dateStr: '—', timeStr: '—' };
+    }
+  }
+
   function safeFormatDate(value) {
     if (!value) return '—';
     try {
+      if (typeof value === 'string') {
+        const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (match) {
+          const year = parseInt(match[1], 10);
+          const monthIndex = parseInt(match[2], 10) - 1;
+          const day = parseInt(match[3], 10);
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          const dayStr = String(day).padStart(2, '0');
+          const monthStr = months[monthIndex] || '';
+          return `${dayStr} ${monthStr} ${year}`;
+        }
+      }
       const d = new Date(value);
       if (isNaN(d.getTime())) return '—';
-      return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      return d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric' });
     } catch (e) {
       return '—';
     }
@@ -2678,7 +2784,8 @@
     }
   }
 
-  async function loadLoans() {
+  async function loadLoans(opts = {}) {
+    const { preservePage = false, targetHighlightId = null } = (typeof opts === 'object' && opts !== null) ? opts : {};
     const search   = document.getElementById('search-input').value.trim();
     const area     = document.getElementById('area-filter').value;
     const status   = document.getElementById('status-filter').value;
@@ -2745,8 +2852,25 @@
 
       updateFiltersSummary(search, area, employee, status, period, filteredList.length);
 
-      if (loansPage > Math.ceil(filteredList.length / LOANS_PER_PAGE)) {
-        loansPage = 1;
+      const totalPages = Math.max(1, Math.ceil(filteredList.length / LOANS_PER_PAGE));
+
+      if (targetHighlightId) {
+        const itemIdx = filteredList.findIndex(l => Number(l.id) === Number(targetHighlightId));
+        if (itemIdx !== -1) {
+          loansPage = Math.floor(itemIdx / LOANS_PER_PAGE) + 1;
+          highlightedLoanId = Number(targetHighlightId);
+        } else {
+          if (loansPage > totalPages) loansPage = totalPages;
+          if (loansPage < 1) loansPage = 1;
+          highlightedLoanId = null;
+        }
+      } else if (preservePage) {
+        if (loansPage > totalPages) loansPage = totalPages;
+        if (loansPage < 1) loansPage = 1;
+      } else {
+        if (loansPage > totalPages) {
+          loansPage = 1;
+        }
       }
 
       renderLoansPage();
@@ -2834,9 +2958,10 @@
       const initials = getInitials(l.customer_name);
       const statusSlug = getStatusSlug(l.status);
       const isChecked = selectedLoans.has(l.id) ? 'checked' : '';
+      const isHighlighted = highlightedLoanId && Number(l.id) === Number(highlightedLoanId);
 
       return `
-        <tr>
+        <tr id="loan-row-${l.id}" data-loan-id="${l.id}" class="loan-table-row ${isHighlighted ? 'loan-row-updated-highlight' : ''}">
           <td class="col-td-checkbox" style="${deleteMode ? '' : 'display:none;'}">
             <input type="checkbox" class="loan-checkbox" value="${l.id}" ${isChecked} onchange="updateSelectedCount()" aria-label="Select loan LN-${l.id}" />
           </td>
@@ -2897,6 +3022,20 @@
     }).join('');
 
     document.getElementById('loans-pagination').innerHTML = buildLoansPagination(total, loansPage, totalPages);
+
+    if (highlightedLoanId) {
+      const rowEl = document.getElementById(`loan-row-${highlightedLoanId}`);
+      if (rowEl) {
+        rowEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      clearTimeout(highlightTimer);
+      highlightTimer = setTimeout(() => {
+        if (rowEl) {
+          rowEl.classList.remove('loan-row-updated-highlight');
+        }
+        highlightedLoanId = null;
+      }, 4500);
+    }
   }
 
   function buildLoansPagination(total, current, totalPages) {
@@ -2999,7 +3138,9 @@
     alertEl.textContent = '';
 
     document.getElementById('drawer-customer-name').textContent = 'Loading...';
+    document.getElementById('drawer-loan-id').textContent = 'LN-' + loanId;
     document.getElementById('drawer-loan-amount').textContent = '—';
+    document.getElementById('drawer-current-status').className = 'badge-status-pill status-pending';
     document.getElementById('drawer-current-status').textContent = '—';
     document.getElementById('drawer-new-status').value = 'Pending';
     document.getElementById('drawer-notes').value = '';
@@ -3007,8 +3148,8 @@
     document.getElementById('drawer-upload-date').value = '';
     document.getElementById('drawer-disbursement-date').value = '';
     document.getElementById('drawer-disbursement-amount').value = '';
-    document.getElementById('drawer-history-container').innerHTML = '<div class="no-history">Loading history...</div>';
-    document.getElementById('drawer-history-count').textContent = 'Loading';
+    document.getElementById('drawer-history-container').innerHTML = '<div class="no-history"><div class="spinner-sm" style="display:inline-block;margin-right:8px;"></div>Loading history...</div>';
+    document.getElementById('drawer-history-count').textContent = 'Loading...';
 
     const updateBtn = document.getElementById('drawer-update-btn');
     updateBtn.disabled = false;
@@ -3025,6 +3166,7 @@
       if (!res?.ok) {
         document.getElementById('drawer-customer-name').textContent = 'Error loading loan.';
         document.getElementById('drawer-history-count').textContent = '—';
+        document.getElementById('drawer-history-container').innerHTML = '<div class="no-history text-danger"><i class="fas fa-circle-exclamation" style="margin-right:6px;"></i>Failed to load loan data.</div>';
         return;
       }
 
@@ -3032,8 +3174,12 @@
       if (!loan) return;
 
       document.getElementById('drawer-customer-name').textContent = loan.customer_name || '—';
+      document.getElementById('drawer-loan-id').textContent = 'LN-' + loan.id;
       document.getElementById('drawer-loan-amount').textContent = safeFormatCurrency(loan.amount);
-      document.getElementById('drawer-current-status').textContent = loan.status || 'Pending';
+      const statusSlug = getStatusSlug(loan.status);
+      const curStatusEl = document.getElementById('drawer-current-status');
+      curStatusEl.className = `badge-status-pill status-${statusSlug}`;
+      curStatusEl.textContent = loan.status || 'Pending';
       document.getElementById('drawer-new-status').value = loan.status || 'Pending';
 
       if (loan.login_date) document.getElementById('drawer-login-date').value = loan.login_date.substring(0, 10);
@@ -3051,6 +3197,7 @@
     } catch (e) {
       console.error('Error fetching loan detail:', e);
       document.getElementById('drawer-customer-name').textContent = 'Error loading loan.';
+      document.getElementById('drawer-history-container').innerHTML = '<div class="no-history text-danger"><i class="fas fa-circle-exclamation" style="margin-right:6px;"></i>Network error while loading loan.</div>';
     }
   }
 
@@ -3059,6 +3206,18 @@
     const dateGroup = document.getElementById('disbursement-date-group');
     const amountGroup = document.getElementById('disbursement-amount-group');
     const disbursementInput = document.getElementById('drawer-disbursement-date');
+    const remarksLabel = document.getElementById('drawer-notes-label');
+    const notesInput = document.getElementById('drawer-notes');
+    const isMandatory = ['Rejected', 'Hold', 'Cancelled'].includes(status);
+
+    if (remarksLabel) {
+      remarksLabel.innerHTML = `<i class="fas fa-comment-dots" aria-hidden="true"></i> Remarks / Notes ${isMandatory ? '<span class="text-danger" style="font-weight:700;">* (Mandatory)</span>' : '<span style="color:var(--text-muted);font-weight:400;font-size:11px;">(Optional)</span>'}`;
+    }
+    if (notesInput) {
+      notesInput.placeholder = isMandatory 
+        ? `Mandatory: Enter rejection/hold reason or remarks for "${status}"...` 
+        : 'Enter remarks, bank feedback, approval note, or rejection reason.';
+    }
 
     if (status === 'Loan Disbursed') {
       dateGroup.style.display = 'block';
@@ -3109,7 +3268,7 @@
     const countEl = document.getElementById('drawer-history-count');
     if (!history || !history.length) {
       if (countEl) countEl.textContent = '0 records';
-      container.innerHTML = '<div class="no-history">No history recorded yet.</div>';
+      container.innerHTML = '<div class="no-history"><i class="fas fa-clock-rotate-left" style="margin-right:6px;opacity:0.6;"></i>No status history recorded yet.</div>';
       return;
     }
     if (countEl) countEl.textContent = `${history.length} record${history.length === 1 ? '' : 's'}`;
@@ -3118,21 +3277,14 @@
       <div class="history-timeline">
         ${history.map(h => {
           const dateVal = h.created_at || h.changed_at;
-          const dateStr = safeFormatDate(dateVal);
-          let timeStr = '—';
-          if (dateVal) {
-            try {
-              const d = new Date(dateVal);
-              timeStr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-            } catch (e) {}
-          }
+          const { dateStr, timeStr } = formatISTDateTime(dateVal);
           const changedBy = h.updated_by_name || h.changed_by_name || 'System';
           const remarkVal = h.remark || h.notes || 'Status updated.';
           const status = h.status || 'Other';
           const statusSlug = getStatusSlug(status);
 
           let disbInfo = '';
-          if (status === 'Loan Disbursed') {
+          if (status === 'Loan Disbursed' && (h.disbursement_amount || h.disbursement_date)) {
             const disbDateVal = h.disbursement_date ? safeFormatDate(h.disbursement_date) : '—';
             const disbAmtVal = h.disbursement_amount !== null && h.disbursement_amount !== undefined ? safeFormatCurrency(h.disbursement_amount) : '—';
             disbInfo = `
@@ -3156,7 +3308,7 @@
                 </div>
                 ${disbInfo}
                 <div class="history-note">${escapeHtml(remarkVal)}</div>
-                <div class="history-updated-by">Updated by ${escapeHtml(changedBy)}</div>
+                <div class="history-updated-by"><i class="fas fa-user-pen" aria-hidden="true" style="margin-right:4px;"></i>Updated by ${escapeHtml(changedBy)}</div>
               </div>
             </div>
           `;
@@ -3190,17 +3342,20 @@
     const btnText = document.getElementById('drawer-update-btn-text');
 
     if (['Rejected', 'Hold', 'Cancelled'].includes(status) && !notes) {
-      showDrawerAlert('Please enter remarks before updating this status.', 'error');
+      showDrawerAlert('Please enter remarks explaining this decision before updating status.', 'error');
+      document.getElementById('drawer-notes').focus();
       return;
     }
 
     if (status === 'Loan Disbursed') {
       if (!disbursement_date) {
         showDrawerAlert('Please enter the disbursement date.', 'error');
+        document.getElementById('drawer-disbursement-date').focus();
         return;
       }
       if (disbursement_amount === null || isNaN(disbursement_amount) || amountVal.trim() === '') {
         showDrawerAlert('Please enter the disbursement amount.', 'error');
+        document.getElementById('drawer-disbursement-amount').focus();
         return;
       }
     }
@@ -3209,8 +3364,10 @@
     if (spinner) spinner.style.display = 'inline-block';
     if (btnText) btnText.textContent = 'Updating...';
 
+    const targetLoanId = currentLoanId;
+
     try {
-      const res = await api.patch(`/admin/loans/${currentLoanId}/status`, {
+      const res = await api.patch(`/admin/loans/${targetLoanId}/status`, {
         status, notes, login_date, system_upload_date, disbursement_date, disbursement_amount
       });
 
@@ -3225,8 +3382,9 @@
 
       document.getElementById('status-drawer-overlay').classList.remove('show');
       document.body.style.overflow = '';
+      currentLoanId = null;
       showAlert('page-alert', `Loan status updated to "${status}".`, 'success');
-      loadLoans();
+      loadLoans({ preservePage: true, targetHighlightId: targetLoanId });
     } catch (e) {
       btn.disabled = false;
       if (spinner) spinner.style.display = 'none';

@@ -25,6 +25,9 @@
   </script>
   <link rel="stylesheet" href="/css/styles.css?v=20261008" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
 
   <style>
     /* ═══════════════════════════════════════════════════════════════════════
@@ -781,15 +784,19 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      min-width: 175px;
     }
     .crm-phone-number {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-family: 'Roboto Mono', 'Cascadia Code', 'Segoe UI Mono', Consolas, ui-monospace, monospace;
       font-size: 13.5px;
-      font-weight: 700;
+      font-weight: 600;
       color: var(--text-primary);
-      letter-spacing: 0.5px;
+      letter-spacing: 0.08em;
       white-space: nowrap;
+      font-variant-numeric: tabular-nums lining-nums slashed-zero;
+      font-feature-settings: 'zero' 1, 'tnum' 1;
+      line-height: 1.2;
     }
     .crm-phone-actions {
       display: inline-flex;
@@ -905,6 +912,103 @@
     .crm-table-select.is-dirty {
       border-color: #f59e0b;
       box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+    }
+
+    
+    /* Optgroup & Option high readability in light and dark mode */
+    .crm-table-select optgroup,
+    .crm-filter-select optgroup {
+      font-weight: 700;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      padding: 4px 2px;
+    }
+    .crm-table-select option,
+    .crm-filter-select option {
+      font-weight: 500;
+      color: var(--text-primary);
+      background: var(--bg-card);
+      font-size: 12.5px;
+      padding: 3px 6px;
+    }
+    :root[data-theme='dark'] .crm-table-select optgroup,
+    :root[data-theme='dark'] .crm-filter-select optgroup {
+      background: #182234;
+      color: #94a3b8;
+    }
+    :root[data-theme='dark'] .crm-table-select option,
+    :root[data-theme='dark'] .crm-filter-select option {
+      background: #1e293b;
+      color: #f1f5f9;
+    }
+
+    /* Action Cell and Repeat Last Shortcut */
+    .crm-action-cell-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      justify-content: center;
+    }
+    .crm-repeat-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #2563eb;
+      background: rgba(37, 99, 235, 0.06);
+      border: 1px dashed rgba(37, 99, 235, 0.35);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .crm-repeat-btn:hover:not(:disabled) {
+      color: #fff;
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+    :root[data-theme='dark'] .crm-repeat-btn {
+      color: #60a5fa;
+      background: rgba(96, 165, 250, 0.12);
+      border-color: rgba(96, 165, 250, 0.35);
+    }
+    :root[data-theme='dark'] .crm-repeat-btn:hover:not(:disabled) {
+      color: #fff;
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+    .crm-repeat-btn.is-hidden {
+      display: none !important;
+    }
+    .crm-reuse-toolbar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #047857;
+      background: rgba(16, 185, 129, 0.09);
+      border: 1.5px solid rgba(16, 185, 129, 0.35);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .crm-reuse-toolbar-btn:hover {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: #059669;
+    }
+    :root[data-theme='dark'] .crm-reuse-toolbar-btn {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.14);
+      border-color: rgba(52, 211, 153, 0.4);
     }
 
     /* In-table Notes Input / Textarea */
@@ -1243,20 +1347,163 @@
       100% { background-position: -200% 0; }
     }
 
+    /* ── Compact Assignment Overview Grid ────────────────────────────────── */
+    .assignment-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1024px) {
+      .assignment-overview-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+    }
+    @media (max-width: 600px) {
+      .assignment-overview-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+    }
+    .overview-stat-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .overview-stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow);
+    }
+    .overview-stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 4px;
+      background: var(--accent);
+    }
+    .overview-stat-card:nth-child(1)::before {
+      background: var(--accent);
+    }
+    .overview-stat-card:nth-child(2)::before {
+      background: #0284c7;
+    }
+    .overview-stat-card:nth-child(3)::before {
+      background: #059669;
+    }
+    .overview-stat-card:nth-child(4)::before {
+      background: #d97706;
+    }
+    .overview-stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .overview-stat-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    .overview-stat-icon.icon-workbooks {
+      background: rgba(0, 107, 60, 0.08);
+      color: var(--accent);
+    }
+    :root[data-theme='dark'] .overview-stat-icon.icon-workbooks {
+      background: rgba(0, 107, 60, 0.22);
+      color: #7bc043;
+    }
+    .overview-stat-icon.icon-records {
+      background: rgba(2, 132, 199, 0.08);
+      color: #0284c7;
+    }
+    :root[data-theme='dark'] .overview-stat-icon.icon-records {
+      background: rgba(2, 132, 199, 0.22);
+      color: #38bdf8;
+    }
+    .overview-stat-icon.icon-completed {
+      background: rgba(5, 150, 105, 0.08);
+      color: #059669;
+    }
+    :root[data-theme='dark'] .overview-stat-icon.icon-completed {
+      background: rgba(5, 150, 105, 0.22);
+      color: #34d399;
+    }
+    .overview-stat-icon.icon-pending {
+      background: rgba(217, 119, 6, 0.08);
+      color: #d97706;
+    }
+    :root[data-theme='dark'] .overview-stat-icon.icon-pending {
+      background: rgba(217, 119, 6, 0.22);
+      color: #fbbf24;
+    }
+    .overview-stat-content {
+      min-width: 0;
+      flex: 1;
+    }
+    .overview-stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .overview-stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum' 1;
+    }
+    .overview-stat-value.text-completed {
+      color: #059669;
+    }
+    :root[data-theme='dark'] .overview-stat-value.text-completed {
+      color: #34d399;
+    }
+    .overview-stat-value.text-pending {
+      color: #d97706;
+    }
+    :root[data-theme='dark'] .overview-stat-value.text-pending {
+      color: #fbbf24;
+    }
+
     /* ── Assignment Cards (List View) ───────────────────────────────────── */
     .assign-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
       margin-bottom: 24px;
+    }
+    @media (max-width: 640px) {
+      .assign-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
     }
     .assign-card {
       background: var(--bg-card);
       border: 1.5px solid var(--border);
       border-radius: var(--radius);
-      padding: 22px;
+      padding: 20px 22px;
       box-shadow: var(--shadow-soft);
-      transition: all 0.25s ease;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
       cursor: pointer;
       position: relative;
       overflow: hidden;
@@ -1268,7 +1515,7 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 3px;
-      background: linear-gradient(90deg, var(--accent), #2563eb);
+      background: var(--accent);
     }
     .assign-card:hover {
       transform: translateY(-3px);
@@ -1276,7 +1523,7 @@
       border-color: var(--accent);
     }
     .assign-card.completed::before {
-      background: linear-gradient(90deg, #059669, #10b981);
+      background: #059669;
     }
     .assign-card.completed {
       border-color: rgba(16, 185, 129, 0.35);
@@ -1286,46 +1533,136 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
+    }
+    .assign-card-header-info {
+      min-width: 0;
+      flex: 1;
     }
     .assign-card-title {
       font-size: 15px;
       font-weight: 800;
       color: var(--text-primary);
-      line-height: 1.3;
+      line-height: 1.35;
       word-break: break-word;
     }
     .assign-card-meta {
       font-size: 12px;
       color: var(--text-secondary);
-      margin-top: 4px;
+      margin-top: 6px;
       display: flex;
       align-items: center;
-      gap: 5px;
+      flex-wrap: wrap;
+      gap: 6px;
+      line-height: 1.3;
     }
-    .assign-card-meta svg {
-      width: 13px;
-      height: 13px;
+    .meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .meta-item svg {
+      width: 12px;
+      height: 12px;
       stroke: var(--text-muted);
+      stroke-width: 2;
     }
+    .meta-range {
+      font-weight: 700;
+      color: var(--accent);
+    }
+    :root[data-theme='dark'] .meta-range {
+      color: #7bc043;
+    }
+    .meta-id {
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .meta-sep {
+      opacity: 0.35;
+      font-size: 10px;
+    }
+
+    /* ── Assigned Records Callout ── */
+    .assign-records-callout {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    :root[data-theme='dark'] .assign-records-callout {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    .callout-count-wrap {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .callout-count {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum' 1;
+    }
+    .callout-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .callout-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2.5px 8px;
+      border-radius: 999px;
+      background: rgba(0, 107, 60, 0.08);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    :root[data-theme='dark'] .callout-pill {
+      background: rgba(123, 192, 67, 0.16);
+      color: #7bc043;
+    }
+    .callout-pill.completed {
+      background: rgba(5, 150, 105, 0.12);
+      color: #059669;
+    }
+    :root[data-theme='dark'] .callout-pill.completed {
+      background: rgba(5, 150, 105, 0.22);
+      color: #34d399;
+    }
+
     .assign-stats {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .assign-stat {
       text-align: center;
       background: var(--bg-secondary);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 10px 6px;
+      padding: 9px 6px;
+    }
+    :root[data-theme='dark'] .assign-stat {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.07);
     }
     .assign-stat-val {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 800;
       color: var(--text-primary);
       line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum' 1;
     }
     .assign-stat-lbl {
       font-size: 10px;
@@ -1333,20 +1670,23 @@
       color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.4px;
-      margin-top: 4px;
+      margin-top: 3px;
     }
     .prog-bar {
       height: 6px;
       border-radius: 999px;
       background: var(--bg-secondary);
       overflow: hidden;
-      margin-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    :root[data-theme='dark'] .prog-bar {
+      background: rgba(255, 255, 255, 0.08);
     }
     .prog-fill {
       height: 100%;
       border-radius: 999px;
       background: linear-gradient(90deg, var(--accent), #10b981);
-      transition: width 0.5s ease;
+      transition: width 0.4s ease;
     }
     .prog-row {
       display: flex;
@@ -1354,32 +1694,46 @@
       justify-content: space-between;
       font-size: 12px;
       color: var(--text-secondary);
-      margin-bottom: 16px;
+      margin-bottom: 6px;
       font-weight: 600;
+    }
+    .prog-label strong {
+      color: var(--text-primary);
+    }
+    .prog-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
     }
     .open-btn {
       width: 100%;
-      padding: 10px;
+      padding: 10px 16px;
       font-size: 13px;
       font-weight: 700;
       border: none;
       border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, var(--accent), #2563eb);
-      color: #fff;
+      background: var(--accent);
+      color: #ffffff;
       cursor: pointer;
       transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
       margin-top: auto;
+      box-shadow: 0 2px 8px rgba(0, 107, 60, 0.18);
     }
     .open-btn:hover {
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+      background: var(--accent-hover);
+      box-shadow: 0 4px 14px rgba(0, 107, 60, 0.3);
       transform: translateY(-1px);
     }
     .assign-card.completed .open-btn {
-      background: linear-gradient(135deg, #059669, #10b981);
+      background: #059669;
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.18);
+    }
+    .assign-card.completed .open-btn:hover {
+      background: #047857;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
     }
 
     /* ── Global Search Panel ────────────────────────────────────────────── */
@@ -1615,11 +1969,14 @@
       gap: 10px;
     }
     .gsearch-card-phone {
-      font-family: monospace;
+      font-family: 'Roboto Mono', 'Cascadia Code', 'Segoe UI Mono', Consolas, ui-monospace, monospace;
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 700;
       color: var(--text-primary);
-      letter-spacing: 0.5px;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums lining-nums slashed-zero;
+      font-feature-settings: 'zero' 1, 'tnum' 1;
     }
     .gsearch-card-grid {
       display: grid;
@@ -1781,7 +2138,7 @@
         <a href="/employee/my-customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>My Customers</span></a>
         <a href="/employee/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>My Loans</span></a>
         <a href="/employee/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
-        <a href="/employee/data-excel.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>My Assigned Records</span></a>
+        <a href="/employee/data-excel.html" class="nav-item active" onclick="handleNavMyAssigned(event)"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>My Assigned Records</span></a>
         <a href="/employee/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
       </div>
     </nav>
@@ -1840,6 +2197,65 @@
 
       <!-- ─── View: Assignment List ─────────────────────────────────────── -->
       <div id="view-list">
+
+        <!-- ═══ COMPACT ASSIGNMENT OVERVIEW ═══ -->
+        <section class="assignment-overview-grid" id="assignment-overview-grid" aria-label="Assignment Overview">
+          <div class="overview-stat-card">
+            <div class="overview-stat-icon icon-workbooks">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+            </div>
+            <div class="overview-stat-content">
+              <div class="overview-stat-label">Assigned Workbooks</div>
+              <div class="overview-stat-value" id="overview-total-workbooks">0</div>
+            </div>
+          </div>
+
+          <div class="overview-stat-card">
+            <div class="overview-stat-icon icon-records">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+                <line x1="8" y1="16" x2="13" y2="16"/>
+              </svg>
+            </div>
+            <div class="overview-stat-content">
+              <div class="overview-stat-label">Total Assigned Records</div>
+              <div class="overview-stat-value" id="overview-total-records">0</div>
+            </div>
+          </div>
+
+          <div class="overview-stat-card">
+            <div class="overview-stat-icon icon-completed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <div class="overview-stat-content">
+              <div class="overview-stat-label">Completed Records</div>
+              <div class="overview-stat-value text-completed" id="overview-completed-records">0</div>
+            </div>
+          </div>
+
+          <div class="overview-stat-card">
+            <div class="overview-stat-icon icon-pending">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="overview-stat-content">
+              <div class="overview-stat-label">Pending Records</div>
+              <div class="overview-stat-value text-pending" id="overview-pending-records">0</div>
+            </div>
+          </div>
+        </section>
 
         <!-- ═══ GLOBAL CUSTOMER RECORD / PHONE SEARCH PANEL ═══ -->
         <section id="assignedRecordSearchPanel" class="global-search-panel">
@@ -2103,6 +2519,12 @@
               <option value="all">All Dispositions</option>
             </select>
 
+                        <!-- Reuse Last Selection Shortcut Button -->
+            <button type="button" class="crm-reuse-toolbar-btn" id="crm-reuse-toolbar-btn" onclick="applyReuseToActiveRow()" style="display:none;" title="Apply last saved disposition to active record">
+              <i class="fas fa-history" aria-hidden="true"></i>
+              <span id="crm-reuse-toolbar-label">Repeat Last: —</span>
+            </button>
+
             <!-- Clear Filters Button -->
             <button type="button" class="crm-clear-btn" id="crm-clear-filters-btn" onclick="clearAllFilters()" style="display:none;" title="Clear active filters">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -2252,69 +2674,305 @@
 <script src="/js/api.js?v=20261008"></script>
 <script src="/js/employee-notifications.js?v=20260923"></script>
 <script>
-// ── Master Disposition & Dependent Sub-Disposition Data ───────────────────
-const DISP_OPTIONS = [
-  'Connected',
-  'Not Connected',
-  'Ringing',
-  'Busy',
-  'Switched Off',
-  'Out of Coverage',
-  'Number Invalid',
-  'Wrong Number',
-  'Call Back Requested',
-  'Call Later',
-  'Voice Mail',
-  'No Response',
-  'Customer Interested',
-  'Customer Not Interested',
-  'Follow Up Required',
-  'Loan Inquiry',
-  'Existing Customer',
-  'Duplicate Lead',
-  'Do Not Call',
-  'Language Barrier',
-  'Call Disconnected',
-  'Pending Verification',
-  'Converted',
-  'Rejected',
-  'Not Eligible',
-  'Other'
+// ── Master Disposition Groups & Dependent Sub-Disposition Data ─────────────
+const DISP_GROUPS = [
+  {
+    group: 'Connection Outcome',
+    options: [
+      'Connected',
+      'Not Connected',
+      'Ringing',
+      'Busy',
+      'Switched Off',
+      'Out of Coverage',
+      'Voice Mail',
+      'No Response',
+      'Call Disconnected'
+    ]
+  },
+  {
+    group: 'Follow-up',
+    options: [
+      'Call Back Requested',
+      'Call Later',
+      'Follow Up Required'
+    ]
+  },
+  {
+    group: 'Customer and Loan Outcome',
+    options: [
+      'Customer Interested',
+      'Customer Not Interested',
+      'Loan Inquiry',
+      'Existing Customer',
+      'Converted'
+    ]
+  },
+  {
+    group: 'Data Quality and Eligibility',
+    options: [
+      'Number Invalid',
+      'Wrong Number',
+      'Duplicate Lead',
+      'Pending Verification',
+      'Not Eligible'
+    ]
+  },
+  {
+    group: 'Other',
+    options: [
+      'Do Not Call',
+      'Language Barrier',
+      'Rejected',
+      'Other'
+    ]
+  }
 ];
 
+const DISP_OPTIONS = DISP_GROUPS.flatMap(g => g.options);
+
 const SUB_DISP_MAP = {
-  'Connected':              ['Interested', 'Documents Pending', 'EMI Explained', 'Loan Eligible', 'Follow Up Tomorrow', 'Need Salary Slip', 'Need Bank Statement', 'Other'],
-  'Not Connected':          ['Number Busy', 'Switched Off', 'Out of Network', 'Try Again Later', 'Other'],
-  'Ringing':                ['No Answer', 'Hung Up', 'Left Voicemail', 'Other'],
-  'Busy':                   ['Try Later', 'Scheduled Callback', 'Other'],
-  'Switched Off':           ['Switched Off', 'Unreachable', 'Try Later', 'Other'],
-  'Out of Coverage':        ['Out of Area', 'Network Issue', 'Try Later', 'Other'],
-  'Number Invalid':         ['Wrong Number', 'Non-Existent', 'Other'],
-  'Wrong Number':           ['Person Not Known', 'Wrong Contact', 'Other'],
-  'Call Back Requested':    ['Morning', 'Afternoon', 'Evening', 'Tomorrow', 'Next Week', 'Other'],
-  'Call Later':             ['Customer Busy', 'Driving', 'In Meeting', 'Other'],
-  'Voice Mail':             ['Left Message', 'Full Mailbox', 'Other'],
-  'No Response':            ['No Answer', 'Rang Out', 'Other'],
-  'Customer Interested':    ['Loan Amount Discussed', 'Documents Requested', 'Site Visit Planned', 'Other'],
-  'Customer Not Interested':['Already Taken Loan', 'High Interest Concern', 'Financial Issue', 'Using Another Bank', 'Not Required', 'Other'],
-  'Follow Up Required':     ['After 2 Days', 'After 1 Week', 'End of Month', 'Other'],
-  'Loan Inquiry':           ['Personal Loan', 'Home Loan', 'Business Loan', 'Gold Loan', 'Vehicle Loan', 'Other'],
-  'Existing Customer':      ['Top-up Loan', 'Service Request', 'Complaint', 'Other'],
-  'Duplicate Lead':         ['Already Contacted', 'Assigned to Colleague', 'Other'],
-  'Do Not Call':            ['Requested DNC', 'Abusive', 'Not Interested Ever', 'Other'],
-  'Language Barrier':       ['Hindi Preferred', 'Tamil Preferred', 'Telugu Preferred', 'Kannada Preferred', 'Other'],
-  'Call Disconnected':      ['Immediately Disconnected', 'Disconnected During Pitch', 'Other'],
-  'Pending Verification':   ['Address Check', 'KYC Check', 'Income Check', 'Other'],
-  'Converted':              ['Loan Disbursed', 'Loan Approved', 'Application Submitted', 'Other'],
-  'Rejected':               ['Low CIBIL', 'Insufficient Income', 'Document Issues', 'Other'],
-  'Not Eligible':           ['Low CIBIL', 'Low Income', 'Age / Employment Criteria', 'Out of Service Area', 'Document Criteria Not Met', 'Other'],
-  'Other':                  ['Custom / General', 'Callback', 'Other'],
-  'default':                ['General Follow Up', 'Not Applicable', 'Other']
+  'Customer Interested': [
+    'Loan Amount Discussed',
+    'Interest Rate Discussed',
+    'Eligibility Discussed',
+    'Cash Salary',
+    'Doing Business',
+    'Low CIBIL',
+    'Documents Requested',
+    'Callback Scheduled',
+    'Other'
+  ],
+  'Follow Up Required': [
+    'Morning',
+    'Afternoon',
+    'Evening',
+    'Tomorrow',
+    'Next Week',
+    'Specific Date & Time',
+    'Other'
+  ],
+  'Call Back Requested': [
+    'Morning',
+    'Afternoon',
+    'Evening',
+    'Tomorrow',
+    'Next Week',
+    'Specific Date & Time',
+    'Other'
+  ],
+  'Call Later': [
+    'Customer Busy',
+    'Driving',
+    'In Meeting',
+    'Specific Date & Time',
+    'Other'
+  ],
+  'Customer Not Interested': [
+    'High Interest Rate',
+    'Already Arranged Loan',
+    'Loan Not Required',
+    'Changed Mind',
+    'Using Another Bank',
+    'Financial Issue',
+    'Other'
+  ],
+  'Not Eligible': [
+    'Low CIBIL',
+    'Low Income',
+    'Age / Employment Criteria',
+    'Out of Service Area',
+    'Document Criteria Not Met',
+    'Other'
+  ],
+  'Converted': [
+    'Application Started',
+    'Documents Collected',
+    'Loan Application Submitted',
+    'Loan Approved',
+    'Loan Disbursed',
+    'Other'
+  ],
+  'Connected': [
+    'Interested',
+    'Documents Pending',
+    'EMI Explained',
+    'Loan Eligible',
+    'Follow Up Tomorrow',
+    'Need Salary Slip',
+    'Need Bank Statement',
+    'Other'
+  ],
+  'Not Connected': [
+    'Number Busy',
+    'Switched Off',
+    'Out of Network',
+    'Try Again Later',
+    'Other'
+  ],
+  'Busy': [
+    'Try Later',
+    'Scheduled Callback',
+    'Call in 15 Mins',
+    'Call in 1 Hour',
+    'Other'
+  ],
+  'Ringing': [
+    'No Answer',
+    'Hung Up',
+    'Left Voicemail',
+    'Try Later',
+    'Other'
+  ],
+  'Switched Off': [
+    'Switched Off',
+    'Unreachable',
+    'Try Later',
+    'Other'
+  ],
+  'Out of Coverage': [
+    'Out of Area',
+    'Network Issue',
+    'Try Later',
+    'Other'
+  ],
+  'Voice Mail': [
+    'Left Message',
+    'Full Mailbox',
+    'No Message Left',
+    'Other'
+  ],
+  'No Response': [
+    'No Answer',
+    'Rang Out',
+    'Try Later',
+    'Other'
+  ],
+  'Call Disconnected': [
+    'Immediately Disconnected',
+    'Disconnected During Pitch',
+    'Network Drop',
+    'Other'
+  ],
+  'Loan Inquiry': [
+    'Personal Loan',
+    'Home Loan',
+    'Business Loan',
+    'Gold Loan',
+    'Vehicle Loan',
+    'Other'
+  ],
+  'Existing Customer': [
+    'Top-up Loan',
+    'Service Request',
+    'Complaint',
+    'Other'
+  ],
+  'Number Invalid': [
+    'Wrong Number',
+    'Non-Existent',
+    'Invalid Digits',
+    'Other'
+  ],
+  'Wrong Number': [
+    'Person Not Known',
+    'Wrong Contact',
+    'Number Changed',
+    'Other'
+  ],
+  'Duplicate Lead': [
+    'Already Contacted',
+    'Assigned to Colleague',
+    'Other'
+  ],
+  'Pending Verification': [
+    'Address Check',
+    'KYC Check',
+    'Income Check',
+    'Employment Check',
+    'Other'
+  ],
+  'Do Not Call': [
+    'Requested DNC',
+    'Abusive',
+    'Not Interested Ever',
+    'Other'
+  ],
+  'Language Barrier': [
+    'Hindi Preferred',
+    'Tamil Preferred',
+    'Telugu Preferred',
+    'Kannada Preferred',
+    'English Preferred',
+    'Other'
+  ],
+  'Rejected': [
+    'Low CIBIL',
+    'Insufficient Income',
+    'Document Issues',
+    'Other'
+  ],
+  'Other': [
+    'Custom / General',
+    'Callback',
+    'Other'
+  ],
+  'default': [
+    'General Follow Up',
+    'Not Applicable',
+    'Other'
+  ]
 };
+
+// Real-time backend aggregated usage tracking for smart ordering
+let subDispUsageMap = {};
+
+// Session memory for "Reuse Last Selection" shortcut
+let lastSavedClassification = null; // { disposition: string, sub_disposition: string }
+
+function renderDispositionOptions(selectedDisp) {
+  let html = '<option value="">Select disposition...</option>';
+  const known = new Set(DISP_OPTIONS);
+
+  DISP_GROUPS.forEach(g => {
+    html += `<optgroup label="${escHtml(g.group)}">`;
+    g.options.forEach(opt => {
+      const isSel = selectedDisp === opt ? 'selected' : '';
+      html += `<option value="${escHtml(opt)}" ${isSel}>${escHtml(opt)}</option>`;
+    });
+    html += '</optgroup>';
+  });
+
+  // Preserve non-standard historical disposition if present
+  if (selectedDisp && !known.has(selectedDisp)) {
+    html += `<optgroup label="Other / Historical">`;
+    html += `<option value="${escHtml(selectedDisp)}" selected>${escHtml(selectedDisp)} (Historical)</option>`;
+    html += '</optgroup>';
+  }
+
+  return html;
+}
 
 function getSubDispOptions(disp) {
   if (!disp) return [];
-  return SUB_DISP_MAP[disp] || SUB_DISP_MAP['default'];
+  const baseList = SUB_DISP_MAP[disp] || SUB_DISP_MAP['default'] || ['Other'];
+  const usage = subDispUsageMap[disp] || {};
+
+  // Sort by real usage frequency: higher count first, ties keep sensible default order, 'Other' stays last
+  const sorted = [...baseList].sort((a, b) => {
+    if (a === 'Other') return 1;
+    if (b === 'Other') return -1;
+
+    const cntA = usage[a] || 0;
+    const cntB = usage[b] || 0;
+
+    if (cntB !== cntA) {
+      return cntB - cntA;
+    }
+    return baseList.indexOf(a) - baseList.indexOf(b);
+  });
+
+  return sorted;
 }
 
 function getWhatsAppUrl(phoneStr) {
@@ -2400,8 +3058,16 @@ function closeDeleteNotifModalOnOverlay(e) {
 function populateDispositionFilter() {
   const sel = document.getElementById('crm-disp-filter');
   if (!sel) return;
-  sel.innerHTML = '<option value="all">All Dispositions</option>' +
-    DISP_OPTIONS.map(d => `<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
+  let html = '<option value="all">All Dispositions</option>';
+  DISP_GROUPS.forEach(g => {
+    html += `<optgroup label="${escHtml(g.group)}">`;
+    g.options.forEach(d => {
+      html += `<option value="${escHtml(d)}">${escHtml(d)}</option>`;
+    });
+    html += '</optgroup>';
+  });
+  sel.innerHTML = html;
+  if (dispFilterVal) sel.value = dispFilterVal;
 }
 
 // ── Assignment Workspace State Persistence ────────────────────────────────
@@ -2465,26 +3131,15 @@ async function init() {
     if (savedState && savedState.assignmentId === targetAssignmentId && !targetRecordId && !targetPhone) {
       restoreState = savedState;
     }
-  } else if (savedState && savedState.assignmentId) {
-    const exists = allAssignments.some(a => a.id === savedState.assignmentId);
-    if (exists || allAssignments.length === 0) {
-      targetAssignmentId = savedState.assignmentId;
-      restoreState = savedState;
-      try {
-        history.replaceState(null, '', `/employee/data-excel.html?assignmentId=${targetAssignmentId}`);
-      } catch (err) {}
-    } else {
-      clearActiveAssignmentState();
-    }
-  }
-
-  if (targetAssignmentId) {
     await openSheet(targetAssignmentId, restoreState);
     if (targetRecordId || targetPhone) {
       setTimeout(() => {
         focusRecordInSheet(targetRecordId || null, targetPhone || null);
       }, 300);
     }
+  } else {
+    // Navigated to root My Assigned Records - stay on workbook list
+    clearActiveAssignmentState();
   }
 }
 
@@ -2501,6 +3156,7 @@ async function loadAssignments() {
   try {
     const res = await apiFetch('/excel/my-assignments');
     allAssignments = res.assignments || [];
+    updateOverviewStats();
     renderAssignmentList();
     populateAssignmentSelectFilter();
   } catch (e) {
@@ -2514,6 +3170,23 @@ async function loadAssignments() {
   } finally {
     if (loadingEl) loadingEl.style.display = 'none';
   }
+}
+
+function updateOverviewStats() {
+  const totalWorkbooks = allAssignments.length;
+  const totalRecords = allAssignments.reduce((acc, a) => acc + (Number(a.total_records) || 0), 0);
+  const completedRecords = allAssignments.reduce((acc, a) => acc + (Number(a.completed) || 0), 0);
+  const pendingRecords = allAssignments.reduce((acc, a) => acc + (Number(a.pending) || 0), 0);
+
+  const elWorkbooks = document.getElementById('overview-total-workbooks');
+  const elTotal = document.getElementById('overview-total-records');
+  const elComp = document.getElementById('overview-completed-records');
+  const elPend = document.getElementById('overview-pending-records');
+
+  if (elWorkbooks) elWorkbooks.textContent = totalWorkbooks;
+  if (elTotal) elTotal.textContent = totalRecords;
+  if (elComp) elComp.textContent = completedRecords;
+  if (elPend) elPend.textContent = pendingRecords;
 }
 
 function populateAssignmentSelectFilter() {
@@ -2564,18 +3237,39 @@ function filterAssignmentCards(filter) {
     const pct = a.completion_pct || 0;
     const isCompleted = a.status === 'Completed';
     const badgeCls = isCompleted ? 'crm-badge-completed' : (a.status === 'In Progress' ? 'crm-badge-inprogress' : 'crm-badge-assigned');
+    const rowRangeText = (a.start_row && a.end_row) ? `Rows ${a.start_row}–${a.end_row}` : 'Rows —';
+    const assignedDateText = fmtDate(a.assigned_at);
+
     return `
       <div class="assign-card ${isCompleted ? 'completed' : ''}" onclick="openSheet(${a.id})">
         <div class="assign-card-header">
-          <div>
-            <div class="assign-card-title">${escHtml(a.original_name)}</div>
+          <div class="assign-card-header-info">
+            <div class="assign-card-title" title="${escHtml(a.original_name)}">${escHtml(a.original_name)}</div>
             <div class="assign-card-meta">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <span>Assigned: ${fmtDate(a.assigned_at)}</span>
-              ${(a.start_row && a.end_row) ? `<span style="margin:0 4px; opacity:0.4;">•</span><span style="font-weight:600; color:var(--crm-primary);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:11px;height:11px;display:inline-block;vertical-align:-1px;margin-right:3px;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Rows ${a.start_row}–${a.end_row}</span>` : ''}
+              <span class="meta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>Assigned: ${assignedDateText}</span>
+              </span>
+              <span class="meta-sep">•</span>
+              <span class="meta-item meta-range">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                <span>${rowRangeText}</span>
+              </span>
+              <span class="meta-sep">•</span>
+              <span class="meta-item meta-id">ID #${a.id}</span>
             </div>
           </div>
           <span class="crm-badge ${badgeCls}">${escHtml(a.status)}</span>
+        </div>
+
+        <div class="assign-records-callout">
+          <div class="callout-count-wrap">
+            <span class="callout-count">${a.total_records}</span>
+            <span class="callout-label">Assigned Records</span>
+          </div>
+          <div class="callout-pill ${isCompleted ? 'completed' : ''}">
+            ${isCompleted ? 'Finished' : (pct > 0 ? `${pct}% done` : 'Ready to start')}
+          </div>
         </div>
 
         <div class="assign-stats">
@@ -2584,22 +3278,22 @@ function filterAssignmentCards(filter) {
             <div class="assign-stat-lbl">Total</div>
           </div>
           <div class="assign-stat">
-            <div class="assign-stat-val" style="color:#059669;">${a.completed || 0}</div>
+            <div class="assign-stat-val text-completed">${a.completed || 0}</div>
             <div class="assign-stat-lbl">Completed</div>
           </div>
           <div class="assign-stat">
-            <div class="assign-stat-val" style="color:#d97706;">${a.pending || 0}</div>
+            <div class="assign-stat-val text-pending">${a.pending || 0}</div>
             <div class="assign-stat-lbl">Pending</div>
           </div>
         </div>
 
         <div class="prog-row">
-          <span>${pct}% complete</span>
-          <span style="font-size:11px;color:var(--text-muted);">ID: #${a.id}</span>
+          <span class="prog-label">Progress: <strong>${pct}%</strong></span>
+          <span class="prog-sub">${a.completed || 0} / ${a.total_records}</span>
         </div>
         <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;"></div></div>
 
-        <button class="open-btn" onclick="event.stopPropagation();openSheet(${a.id})">
+        <button class="open-btn" onclick="event.stopPropagation();openSheet(${a.id})" title="Open CRM Workspace for ${escHtml(a.original_name)}">
           <span>${isCompleted ? 'View Completed Sheet' : 'Open CRM Workspace'}</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
@@ -2810,7 +3504,7 @@ function focusRecordInSheet(recordId, phoneNumber) {
 
   let targetIdx = -1;
   if (recordId) {
-    targetIdx = allRecords.findIndex(r => r.id == recordId || r.row_index == recordId);
+    targetIdx = allRecords.findIndex(r => r.id == recordId || r.row_index == recordId || r._seq == recordId);
   }
   if (targetIdx === -1 && phoneNumber) {
     const cleanP = String(phoneNumber).replace(/\D/g, '');
@@ -2885,7 +3579,7 @@ async function openSheet(assignmentId, savedFilterState = null) {
 
   try {
     if (window.location.search !== `?assignmentId=${assignmentId}`) {
-      history.replaceState(null, '', `/employee/data-excel.html?assignmentId=${assignmentId}`);
+      history.pushState(null, '', `/employee/data-excel.html?assignmentId=${assignmentId}`);
     }
   } catch (err) {}
 
@@ -2983,6 +3677,9 @@ async function loadSheetRecords() {
   try {
     const res = await apiFetch(`/excel/assignments/${currentAssignment.id}/records?limit=1000`);
     allRecords = res.records || [];
+    allRecords.forEach((r, idx) => {
+      r._seq = idx + 1;
+    });
 
     // Update metadata
     const metaEl = document.getElementById('sheet-records-meta');
@@ -3149,11 +3846,13 @@ function applyFiltersAndRender() {
     records = records.filter(r => {
       const phone = String(r.phone_number || '').toLowerCase();
       const rowIdx = String(r.row_index || '').toLowerCase();
+      const seqStr = String(r._seq || '');
       const disp = String(r.disposition || '').toLowerCase();
       const subDisp = String(r.sub_disposition || '').toLowerCase();
       const notes = String(r.notes || '').toLowerCase();
       return phone.includes(searchFilterText) ||
         rowIdx === searchFilterText ||
+        seqStr === searchFilterText ||
         disp.includes(searchFilterText) ||
         subDisp.includes(searchFilterText) ||
         notes.includes(searchFilterText);
@@ -3209,12 +3908,12 @@ function renderRecordsTable() {
   emptyArea.style.display = 'none';
   if (pagBar) pagBar.style.display = 'flex';
 
-  tbody.innerHTML = pageItems.map(r => buildCrmRecordRow(r)).join('');
+  tbody.innerHTML = pageItems.map((r, idx) => buildCrmRecordRow(r, start + idx + 1)).join('');
   renderPaginationControls(total, recPage, totalPages, start + 1, end);
 }
 
 // ── Build Single Record Row ───────────────────────────────────────────────
-function buildCrmRecordRow(r) {
+function buildCrmRecordRow(r, displayIndex = null) {
   const pending = pendingChanges[r.id];
   const disp = pending ? pending.disposition : (r.disposition || '');
   const subDisp = pending ? pending.sub_disposition : (r.sub_disposition || '');
@@ -3255,8 +3954,7 @@ function buildCrmRecordRow(r) {
       <select class="crm-table-select ${hasPending && pending.disposition !== r.disposition ? 'is-dirty' : ''}"
         id="disp-sel-${r.id}"
         onchange="handleRowDispChange(${r.id}, this.value)">
-        <option value="">Select disposition...</option>
-        ${DISP_OPTIONS.map(opt => `<option value="${escHtml(opt)}" ${disp === opt ? 'selected' : ''}>${escHtml(opt)}</option>`).join('')}
+        ${renderDispositionOptions(disp)}
       </select>
     `;
 
@@ -3318,9 +4016,11 @@ function buildCrmRecordRow(r) {
         <span>${btnText}</span>
        </button>`;
 
+  const rowNum = displayIndex !== null ? displayIndex : (r._seq || (allRecords.indexOf(r) + 1) || r.row_index);
+
   return `
     <tr class="${rowClasses.join(' ')}" id="rec-row-${r.id}">
-      <td style="text-align: center;"><span class="crm-row-index">${r.row_index}</span></td>
+      <td style="text-align: center;"><span class="crm-row-index" title="Excel Row: ${r.row_index}" data-row-index="${r.row_index}">${rowNum}</span></td>
       <td>
         <div class="crm-phone-cell">
           <span class="crm-phone-number">${phoneClean || '—'}</span>
@@ -3348,7 +4048,20 @@ function buildCrmRecordRow(r) {
           ${tagHtml}
         </div>
       </td>
-      <td style="text-align: center;">${saveActionHtml}</td>
+      <td style="text-align: center;">
+        <div class="crm-action-cell-wrap">
+          ${saveActionHtml}
+          ${!rowLocked ? `
+            <button type="button" class="crm-repeat-btn ${lastSavedClassification ? '' : 'is-hidden'}"
+              id="repeat-btn-${r.id}"
+              onclick="applyReuseToRow(${r.id})"
+              title="${lastSavedClassification ? `Repeat last saved: ${escHtml(lastSavedClassification.disposition)} / ${escHtml(lastSavedClassification.sub_disposition)}` : 'Repeat last saved disposition'}">
+              <i class="fas fa-history" aria-hidden="true"></i>
+              <span>Repeat</span>
+            </button>
+          ` : ''}
+        </div>
+      </td>
     </tr>
   `;
 }
@@ -3368,12 +4081,14 @@ function handleRowDispChange(rId, newDisp) {
     } else {
       subSel.disabled = false;
       const opts = getSubDispOptions(newDisp);
+      const currentSub = pendingChanges[rId].sub_disposition;
+      const isCurrentStillValid = currentSub && opts.includes(currentSub);
+
       subSel.innerHTML = '<option value="">Select sub disposition...</option>' +
         opts.map(o => `<option value="${escHtml(o)}">${escHtml(o)}</option>`).join('');
 
-      // If current sub_disposition is not in the new options, clear it
-      const currentSub = pendingChanges[rId].sub_disposition;
-      if (currentSub && opts.includes(currentSub)) {
+      // Incompatible selection from previous disposition is never silently retained
+      if (isCurrentStillValid) {
         subSel.value = currentSub;
       } else {
         subSel.value = '';
@@ -3524,7 +4239,9 @@ async function saveRow(rId) {
       }
     }
 
-    showToast(`Record #${res.record.row_index || rId} saved successfully.`, 'success');
+    const rObj = allRecords.find(r => r.id === rId);
+    const seqNum = rObj ? (rObj._seq || (allRecords.indexOf(rObj) + 1)) : null;
+    showToast(`Record #${seqNum || res.record?.row_index || rId} saved successfully.`, 'success');
 
   } catch (e) {
     savingSet.delete(rId);
@@ -3538,6 +4255,63 @@ async function saveRow(rId) {
     if (msg === 'Session expired') return;
     showToast('Failed to save record updates. ' + (msg || 'Please retry.'), 'error');
   }
+}
+
+
+// ── Reuse Last Selection Helpers ──────────────────────────────────────────
+function updateReuseUIState() {
+  const toolbarBtn = document.getElementById('crm-reuse-toolbar-btn');
+  const toolbarLabel = document.getElementById('crm-reuse-toolbar-label');
+  if (lastSavedClassification) {
+    if (toolbarBtn) toolbarBtn.style.display = 'inline-flex';
+    if (toolbarLabel) {
+      toolbarLabel.textContent = `Repeat Last: ${lastSavedClassification.disposition}`;
+      toolbarBtn.title = `Repeat last saved: ${lastSavedClassification.disposition} — ${lastSavedClassification.sub_disposition}`;
+    }
+    // Show repeat buttons on all active rows
+    document.querySelectorAll('.crm-repeat-btn').forEach(btn => {
+      btn.classList.remove('is-hidden');
+      btn.title = `Repeat last saved: ${lastSavedClassification.disposition} — ${lastSavedClassification.sub_disposition}`;
+    });
+  } else {
+    if (toolbarBtn) toolbarBtn.style.display = 'none';
+  }
+}
+
+function applyReuseToRow(rId) {
+  if (!lastSavedClassification) {
+    showToast('No previously saved disposition to reuse.', 'info');
+    return;
+  }
+  const { disposition, sub_disposition } = lastSavedClassification;
+  const dispSel = document.getElementById(`disp-sel-${rId}`);
+  if (dispSel) {
+    dispSel.value = disposition;
+    handleRowDispChange(rId, disposition);
+  }
+  const subSel = document.getElementById(`subdisp-sel-${rId}`);
+  if (subSel) {
+    subSel.value = sub_disposition;
+    handleRowSubDispChange(rId, sub_disposition);
+  }
+  showToast(`Applied "${disposition} — ${sub_disposition}". Review and click Save.`, 'info');
+}
+
+function applyReuseToActiveRow() {
+  if (!lastSavedClassification) {
+    showToast('No previously saved disposition to reuse.', 'info');
+    return;
+  }
+  // Find first pending record on the current page
+  const pendingRec = allFilteredRecords.find(r => String(r.status || '').toLowerCase() !== 'completed' && !pendingChanges[r.id]);
+  const targetRec = pendingRec || allFilteredRecords[0];
+  if (!targetRec) {
+    showToast('No records available to apply disposition.', 'warning');
+    return;
+  }
+  applyReuseToRow(targetRec.id);
+  const rowEl = document.getElementById(`rec-row-${targetRec.id}`);
+  if (rowEl) rowEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // ── Copy Phone Helper ─────────────────────────────────────────────────────
@@ -3671,9 +4445,22 @@ function goBackToList() {
   currentAssignment = null;
   document.getElementById('view-sheet').style.display = 'none';
   document.getElementById('view-list').style.display = 'block';
+
+  renderAssignmentList();
+  updateOverviewStats();
+
   try {
-    history.replaceState(null, '', '/employee/data-excel.html');
+    if (window.location.search) {
+      history.pushState(null, '', '/employee/data-excel.html');
+    }
   } catch (err) {}
+}
+
+function handleNavMyAssigned(e) {
+  if (document.getElementById('view-sheet')?.style.display === 'block') {
+    e.preventDefault();
+    goBackToList();
+  }
 }
 
 // ── Workspace State Lifecycle & History Listeners ─────────────────────────
@@ -3713,6 +4500,8 @@ window.addEventListener('popstate', () => {
       currentAssignment = null;
       document.getElementById('view-sheet').style.display = 'none';
       document.getElementById('view-list').style.display = 'block';
+      renderAssignmentList();
+      updateOverviewStats();
     }
   } else if (!currentAssignment || currentAssignment.id !== id) {
     openSheet(id);

@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
-  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
+  <link rel="icon" type="image/png" href="/icons/lenders/dixit-favicon.png" />
+  <link rel="apple-touch-icon" href="/icons/lenders/dixit-favicon.png" />
   <script>
     (function () {
       try {
@@ -27,6 +27,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="/css/calculator-hub.css?v=20260925" />
   <style>
+    :root {
+      color-scheme: light;
+    }
+    :root[data-theme='dark'] {
+      color-scheme: dark;
+    }
+
     /* Tabs Navigation */
     .tabs-navigation {
       display: flex;
@@ -646,16 +653,16 @@
                 <div class="error-msg" id="err-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
               </div>
 
-              <div class="form-group">
+              <div class="form-group lender-select-group">
                 <label for="select-lender">Bank / NBFC</label>
-                <select id="select-lender" class="form-control" onchange="onLenderChange(this.value)">
-                  <option value="">Select Bank / NBFC (Dixit Default)</option>
+                <select id="select-lender" class="form-control lender-select" onchange="onLenderChange(this.value)">
+                  <option value="">NBFC Default</option>
                   <option value="icici_bank">ICICI Bank</option>
                   <option value="hdfc_bank">HDFC Bank</option>
                   <option value="incred_finance">InCred Finance</option>
                   <option value="idfc_first_bank">IDFC FIRST Bank</option>
                 </select>
-                <div id="selected-lender-badge" class="lender-status-hint" style="display:none; font-size:12px; margin-top:6px; font-weight:600; align-items:center; gap:6px;"></div>
+                <div id="selected-lender-badge" class="lender-status-hint" style="display:none;"></div>
               </div>
 
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
@@ -898,16 +905,16 @@
                   <div class="error-msg" id="flat-err-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group lender-select-group">
                   <label for="flat-select-lender">Bank / NBFC</label>
-                  <select id="flat-select-lender" class="form-control" onchange="onFlatLenderChange(this.value)">
-                    <option value="">Select Bank / NBFC (Dixit Default)</option>
+                  <select id="flat-select-lender" class="form-control lender-select" onchange="onFlatLenderChange(this.value)">
+                    <option value="">NBFC Default</option>
                     <option value="icici_bank">ICICI Bank</option>
                     <option value="hdfc_bank">HDFC Bank</option>
                     <option value="incred_finance">InCred Finance</option>
                     <option value="idfc_first_bank">IDFC FIRST Bank</option>
                   </select>
-                  <div id="flat-selected-lender-badge" class="lender-status-hint" style="display:none; font-size:12px; margin-top:6px; font-weight:600; align-items:center; gap:6px;"></div>
+                  <div id="flat-selected-lender-badge" class="lender-status-hint" style="display:none;"></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
@@ -1087,6 +1094,7 @@
                   <h4 style="margin-bottom: 16px; color: var(--accent); display: flex; align-items: center; gap: 6px;">
                     <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);"></span>
                     Loan Option 1
+                    <span id="compare-opt1-badge" class="lender-active-pill" style="display:none; margin-left:auto;"></span>
                   </h4>
 
                   <div class="form-group">
@@ -1110,10 +1118,10 @@
                     <div class="error-msg" id="err-compare-tenure-1" style="color:var(--danger);font-size:12px;margin-top:4px;display:none;"></div>
                   </div>
 
-                  <div class="form-group">
+                  <div class="form-group lender-select-group">
                     <label for="compare-bank-1">Bank / NBFC (Optional)</label>
-                    <select id="compare-bank-1" class="form-control" onchange="onCompareLenderChange()">
-                      <option value="">Select a Bank / NBFC (Optional)</option>
+                    <select id="compare-bank-1" class="form-control lender-select" onchange="onCompareLenderChange()">
+                      <option value="">Select Bank / NBFC (Optional)</option>
                       <option value="icici_bank">ICICI Bank</option>
                       <option value="hdfc_bank">HDFC Bank</option>
                       <option value="incred_finance">InCred Finance</option>
@@ -1148,6 +1156,7 @@
                   <h4 style="margin-bottom: 16px; color: var(--accent-secondary, #2f6fed); display: flex; align-items: center; gap: 6px;">
                     <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent-secondary, #2f6fed);"></span>
                     Loan Option 2
+                    <span id="compare-opt2-badge" class="lender-active-pill" style="display:none; margin-left:auto;"></span>
                   </h4>
 
                   <div class="form-group">
@@ -1171,10 +1180,10 @@
                     <div class="error-msg" id="err-compare-tenure-2" style="color:var(--danger);font-size:12px;margin-top:4px;display:none;"></div>
                   </div>
 
-                  <div class="form-group">
+                  <div class="form-group lender-select-group">
                     <label for="compare-bank-2">Bank / NBFC (Optional)</label>
-                    <select id="compare-bank-2" class="form-control" onchange="onCompareLenderChange()">
-                      <option value="">Select a Bank / NBFC (Optional)</option>
+                    <select id="compare-bank-2" class="form-control lender-select" onchange="onCompareLenderChange()">
+                      <option value="">Select Bank / NBFC (Optional)</option>
                       <option value="icici_bank">ICICI Bank</option>
                       <option value="hdfc_bank">HDFC Bank</option>
                       <option value="incred_finance">InCred Finance</option>
@@ -1356,10 +1365,10 @@
                   <div class="error-msg" id="err-elig-tenure" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;"></div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group lender-select-group">
                   <label for="select-elig-lender">Bank / NBFC</label>
-                  <select id="select-elig-lender" class="form-control" onchange="onEligLenderChange(this.value)">
-                    <option value="">Select Bank / NBFC (Dixit Default)</option>
+                  <select id="select-elig-lender" class="form-control lender-select" onchange="onEligLenderChange(this.value)">
+                    <option value="">NBFC Default</option>
                     <option value="icici_bank">ICICI Bank</option>
                     <option value="hdfc_bank">HDFC Bank</option>
                     <option value="incred_finance">InCred Finance</option>
@@ -1490,10 +1499,10 @@
                   Current Existing Loan
                 </div>
 
-                <div class="form-group">
+                <div class="form-group lender-select-group">
                   <label for="select-transfer-existing-lender">Current Bank / Lender (Existing)</label>
-                  <select id="select-transfer-existing-lender" class="form-control" onchange="onTransferLenderChange()">
-                    <option value="">Current Lender (or Dixit Default)</option>
+                  <select id="select-transfer-existing-lender" class="form-control lender-select" onchange="onTransferLenderChange()">
+                    <option value="">Current Lender (or NBFC Default)</option>
                     <option value="icici_bank">ICICI Bank</option>
                     <option value="hdfc_bank">HDFC Bank</option>
                     <option value="incred_finance">InCred Finance</option>
@@ -1541,10 +1550,10 @@
                   Proposed New Loan (Transfer Target)
                 </div>
 
-                <div class="form-group">
+                <div class="form-group lender-select-group">
                   <label for="select-transfer-new-lender">Target Bank / NBFC (Refinancing Lender)</label>
-                  <select id="select-transfer-new-lender" class="form-control" onchange="onTransferLenderChange()">
-                    <option value="">Select Target Lender (Dixit Default)</option>
+                  <select id="select-transfer-new-lender" class="form-control lender-select" onchange="onTransferLenderChange()">
+                    <option value="">NBFC Default</option>
                     <option value="icici_bank">ICICI Bank</option>
                     <option value="hdfc_bank">HDFC Bank</option>
                     <option value="incred_finance">InCred Finance</option>
@@ -1691,6 +1700,7 @@
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20261008"></script>
 <script src="/js/employee-notifications.js?v=20260923"></script>
+<script src="/js/lender-assets.js?v=20261011"></script>
 <script src="/js/calculator-hub.js?v=20261007"></script>
 <script>
   const user = requireRole('employee');
@@ -1857,6 +1867,9 @@
   };
 
   function getSelectedLenderProfile() {
+    if (typeof window.getLenderProfile === 'function') {
+      return window.getLenderProfile(selectedLender);
+    }
     return LENDER_PROFILES[selectedLender] || LENDER_PROFILES.default;
   }
 
@@ -1870,8 +1883,17 @@
     if (badgeEl) {
       if (selectedLender) {
         badgeEl.style.display = 'flex';
-        badgeEl.style.color = lender.hexPrimary;
-        badgeEl.innerHTML = `<i class="fas fa-building-columns" style="margin-right:5px;"></i>${lender.shortName}`;
+        badgeEl.className = 'lender-status-hint lender-active-pill';
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        badgeEl.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.14)' : (lender.hexBorder || 'var(--border)');
+        badgeEl.style.background = isDark ? 'rgba(14, 21, 30, 0.95)' : (lender.hexLightBg || 'var(--bg-secondary)');
+        badgeEl.innerHTML = `
+          <img src="${lender.faviconUrl || lender.logoUrl}" alt="${lender.shortName}" class="lender-active-logo" />
+          <div class="lender-active-meta">
+            <span class="lender-active-name" style="color:${isDark ? '#f8fafc' : lender.hexPrimary};">${lender.shortName}</span>
+            <span class="lender-active-sub">Active Lender Branding</span>
+          </div>
+        `;
       } else {
         badgeEl.style.display = 'none';
         badgeEl.innerHTML = '';
@@ -1881,14 +1903,23 @@
     if (tableBadgeText) {
       tableBadgeText.textContent = selectedLender ? lender.shortName : 'Dixit Lending Solution';
     }
-    if (tableBadgeIcon) {
-      tableBadgeIcon.style.color = lender.hexPrimary;
-    }
     if (tableBadgeEl) {
+      const lenderIconSrc = lender.faviconUrl || lender.logoUrl || '/icons/lenders/dixit-favicon.png';
+      let imgEl = tableBadgeEl.querySelector('.lender-table-mini-logo');
+      if (!imgEl) {
+        if (tableBadgeIcon) tableBadgeIcon.style.display = 'none';
+        imgEl = document.createElement('img');
+        imgEl.className = 'lender-table-mini-logo';
+        tableBadgeEl.insertBefore(imgEl, tableBadgeText);
+      }
+      imgEl.src = lenderIconSrc;
+      imgEl.alt = lender.shortName;
+
       if (selectedLender) {
-        tableBadgeEl.style.borderColor = lender.hexBorder;
-        tableBadgeEl.style.background = lender.hexLightBg;
-        tableBadgeEl.style.color = lender.hexPrimary;
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        tableBadgeEl.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.14)' : (lender.hexBorder || 'var(--border)');
+        tableBadgeEl.style.background = isDark ? 'rgba(14, 21, 30, 0.95)' : (lender.hexLightBg || 'var(--bg-secondary)');
+        tableBadgeEl.style.color = isDark ? '#f8fafc' : lender.hexPrimary;
       } else {
         tableBadgeEl.style.borderColor = 'var(--border)';
         tableBadgeEl.style.background = 'var(--bg-secondary)';
@@ -1899,6 +1930,7 @@
 
   function onLenderChange(val) {
     selectedLender = val || '';
+    window.selectedLender = selectedLender;
     updateLenderUI();
     saveEmiCalculatorState();
   }
@@ -3062,16 +3094,28 @@
     doc.setFillColor(...secondaryBrand);
     doc.rect(0, 6, 595.28, 2.5, 'F');
 
-    // Header branding: Lender Name & Document Title
+    // Header branding: Lender Logo & Document Title
+    const logoData = lender.faviconBase64 || lender.logoBase64;
+    let titleStartX = 40;
+    if (logoData) {
+      try {
+        const logoSize = 34;
+        doc.addImage(logoData, 'PNG', 40, 20, logoSize, logoSize);
+        titleStartX = 84;
+      } catch (err) {
+        console.warn('Could not embed logo image in PDF:', err);
+      }
+    }
+
     doc.setFont(fontName, 'bold');
     doc.setFontSize(16);
     doc.setTextColor(...primaryBrand);
-    doc.text(lender.name, 40, 36);
+    doc.text(lender.name, titleStartX, 36);
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(13);
     doc.setTextColor(...textDark);
-    doc.text('Loan Repayment Schedule', 40, 52);
+    doc.text('Loan Repayment Schedule', titleStartX, 52);
 
     // Right header metadata
     const formattedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -3195,14 +3239,21 @@
 
       // Running header on continuation pages
       if (i > 1) {
+        let runningTitleX = 40;
+        if (logoData) {
+          try {
+            doc.addImage(logoData, 'PNG', 40, 12, 14, 14);
+            runningTitleX = 58;
+          } catch (e) {}
+        }
         doc.setFont(fontName, 'normal');
         doc.setFontSize(8);
         doc.setTextColor(...textMuted);
-        doc.text(`${lender.name} — Loan Repayment Schedule`, 40, 22);
+        doc.text(`${lender.name} — Loan Repayment Schedule`, runningTitleX, 22);
         doc.text(`Reference: DLS-${lender.fileSlug.toUpperCase()}-${principal}`, 555, 22, { align: 'right' });
         doc.setDrawColor(...borderStroke);
         doc.setLineWidth(0.5);
-        doc.line(40, 26, 555, 26);
+        doc.line(40, 27, 555, 27);
       }
 
       // Footer
@@ -3444,18 +3495,24 @@
       reasonsHtml += `<li><i class="fas fa-wallet" style="color:var(--accent); margin-right:6px;"></i> Lower Total Repayment (saves ₹${Math.round(savings).toLocaleString('en-IN')} overall)</li>`;
     if (!reasonsHtml) reasonsHtml = '<li>Both options have identical financial parameters.</li>';
 
+    const l1Prof = (typeof getLenderProfile === 'function') ? getLenderProfile(opt1.b) : null;
+    const l2Prof = (typeof getLenderProfile === 'function') ? getLenderProfile(opt2.b) : null;
+    const l1Name = (l1Prof && l1Prof.key) ? l1Prof.shortName : (opt1.b || '');
+    const l2Name = (l2Prof && l2Prof.key) ? l2Prof.shortName : (opt2.b || '');
+    const betterName = betterOption === 1 ? (l1Name || 'Option 1') : (l2Name || 'Option 2');
+
     recCard.innerHTML = `
       <div style="font-size:24px; color:var(--success); margin-top:2px;"><i class="fas fa-circle-check"></i></div>
       <div>
         <h4 style="color:var(--success); margin:0 0 8px 0; font-size:16px;">Loan Option ${betterOption} is financially better!</h4>
         <p style="margin:0 0 10px 0; font-size:14px; color:var(--text-secondary);">
-          Choosing <strong>Option ${betterOption}</strong> (${betterOpt.b || 'Option ' + betterOption}) saves you <strong>₹${Math.round(savings).toLocaleString('en-IN')}</strong> in total repayment compared to Option ${worseNum}.
+          Choosing <strong>Option ${betterOption}</strong> (${betterName}) saves you <strong>₹${Math.round(savings).toLocaleString('en-IN')}</strong> in total repayment compared to Option ${worseNum}.
         </p>
         <ul style="margin:0; padding-left:20px; font-size:13px; color:var(--text-secondary); line-height:1.6;">${reasonsHtml}</ul>
       </div>`;
 
-    document.getElementById('table-header-opt1').textContent = `Option 1 ${opt1.b ? '(' + opt1.b + ')' : ''}`;
-    document.getElementById('table-header-opt2').textContent = `Option 2 ${opt2.b ? '(' + opt2.b + ')' : ''}`;
+    document.getElementById('table-header-opt1').textContent = `Option 1 ${l1Name ? '(' + l1Name + ')' : ''}`;
+    document.getElementById('table-header-opt2').textContent = `Option 2 ${l2Name ? '(' + l2Name + ')' : ''}`;
 
     const hClass = (v1, v2, lowerBetter = true) => {
       if (v1 === v2) return 'comp-neutral-val';

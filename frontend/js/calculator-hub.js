@@ -19,6 +19,7 @@
       key: '',
       name: 'DIXIT LENDING SOLUTION',
       shortName: 'Dixit Lending Solution',
+      selectorLabel: 'NBFC Default',
       primaryColor: [15, 39, 71],       // #0F2747 Dixit Navy
       secondaryColor: [15, 139, 113],   // #0F8B71 Forest Teal
       accentColor: [47, 111, 237],      // #2F6FED Royal Blue
@@ -126,21 +127,41 @@
     'Other': { name: 'OTHER BANK / NBFC', shortName: 'Other Bank / NBFC', slug: 'Other_Lender' }
   };
 
+  // Merge external high-res asset bundle if present
+  function enrichProfileWithAssets(p) {
+    if (!p) return p;
+    var assets = (typeof window !== 'undefined' && window.LENDER_ASSETS) ? window.LENDER_ASSETS : {};
+    var a = assets[p.id] || assets[p.key] || assets[p.fileSlug] || assets.default || {};
+    p.logoUrl = p.logoUrl || a.logoUrl || '/icons/lenders/dixit-logo.png';
+    p.faviconUrl = p.faviconUrl || a.faviconUrl || '/icons/lenders/dixit-favicon.png';
+    p.logoBase64 = p.logoBase64 || a.logoBase64 || '';
+    p.faviconBase64 = p.faviconBase64 || a.faviconBase64 || '';
+    p.logoWidth = p.logoWidth || a.logoWidth || 100;
+    p.logoHeight = p.logoHeight || a.logoHeight || 100;
+    p.logoAspect = p.logoAspect || a.logoAspect || 1;
+    return p;
+  }
+
+  // Pre-enrich initial profiles
+  Object.keys(LENDER_PROFILES).forEach(function(k) {
+    enrichProfileWithAssets(LENDER_PROFILES[k]);
+  });
+
   function getLenderProfile(val) {
     if (!val || val === 'default' || val === 'dixit') {
-      return LENDER_PROFILES.default;
+      return enrichProfileWithAssets(LENDER_PROFILES.default);
     }
     var cleanKey = String(val).trim().toLowerCase().replace(/[\s-]+/g, '_');
     if (LENDER_PROFILES[cleanKey]) {
-      return LENDER_PROFILES[cleanKey];
+      return enrichProfileWithAssets(LENDER_PROFILES[cleanKey]);
     }
     if (LENDER_PROFILES[val]) {
-      return LENDER_PROFILES[val];
+      return enrichProfileWithAssets(LENDER_PROFILES[val]);
     }
     // Check known broader list
     if (BROADER_LENDERS[val]) {
       var item = BROADER_LENDERS[val];
-      return {
+      return enrichProfileWithAssets({
         id: cleanKey,
         key: val,
         name: item.name,
@@ -156,7 +177,7 @@
         hexLightBg: '#f8fafc',
         hexBorder: '#d9e3ef',
         fileSlug: item.slug
-      };
+      });
     }
     // Check shortName or name match
     var keys = Object.keys(LENDER_PROFILES);
@@ -164,12 +185,12 @@
       var p = LENDER_PROFILES[keys[i]];
       if (p.name.toLowerCase() === String(val).toLowerCase() ||
           p.shortName.toLowerCase() === String(val).toLowerCase()) {
-        return p;
+        return enrichProfileWithAssets(p);
       }
     }
     // Clean fallback profile
     var safeSlug = String(val).replace(/[^a-zA-Z0-9]/g, '_');
-    return {
+    return enrichProfileWithAssets({
       id: cleanKey,
       key: val,
       name: String(val).toUpperCase(),
@@ -185,7 +206,19 @@
       hexLightBg: '#f8fafc',
       hexBorder: '#d9e3ef',
       fileSlug: safeSlug
-    };
+    });
+  }
+
+  // Browser tab title and favicon remain stable (no dynamic switching on lender selection)
+  function updateTabFavicon() {
+    /* Stable Dixit Lending Solution branding maintained */
+  }
+
+  // Expose centralized lender resolver and favicon updater
+  if (typeof window !== 'undefined') {
+    window.LENDER_PROFILES = LENDER_PROFILES;
+    window.getLenderProfile = getLenderProfile;
+    window.updateTabFavicon = updateTabFavicon;
   }
 
   // ── 2. Standard Legal Disclaimers (Illustrative Estimation Only) ───
@@ -338,6 +371,7 @@
         if (typeof flatPieChartInstance !== 'undefined' && flatPieChartInstance && flatPieChartInstance.resize) flatPieChartInstance.resize();
       } catch (err) {}
     }
+
   }
 
   // ── 6. Flat Rate Calculator Module ───────────────────────────────
@@ -359,8 +393,10 @@
     if (badgeEl) {
       if (flatSelectedLender) {
         badgeEl.style.display = 'inline-flex';
-        badgeEl.style.color = lender.hexPrimary;
-        badgeEl.innerHTML = '<i class="fas fa-building-columns" style="margin-right:5px;"></i>' + lender.shortName;
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        badgeEl.style.color = isDark ? '#f8fafc' : lender.hexPrimary;
+        var logoImg = lender.faviconBase64 ? '<img src="' + lender.faviconBase64 + '" class="lender-active-logo" alt="' + lender.shortName + '"/>' : '<i class="fas fa-building-columns" style="margin-right:5px;"></i>';
+        badgeEl.innerHTML = logoImg + '<span>' + lender.shortName + '</span>';
       } else {
         badgeEl.style.display = 'none';
         badgeEl.innerHTML = '';
@@ -374,9 +410,10 @@
     }
     if (tableBadgeEl) {
       if (flatSelectedLender) {
-        tableBadgeEl.style.borderColor = lender.hexBorder;
-        tableBadgeEl.style.background = lender.hexLightBg;
-        tableBadgeEl.style.color = lender.hexPrimary;
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        tableBadgeEl.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.14)' : lender.hexBorder;
+        tableBadgeEl.style.background = isDark ? 'rgba(14, 21, 30, 0.95)' : lender.hexLightBg;
+        tableBadgeEl.style.color = isDark ? '#f8fafc' : lender.hexPrimary;
       } else {
         tableBadgeEl.style.borderColor = 'var(--border)';
         tableBadgeEl.style.background = 'var(--bg-secondary)';
@@ -445,20 +482,31 @@
     doc.setFillColor.apply(doc, lender.secondaryColor);
     doc.rect(0, 6, 595, 2, 'F');
 
+    var flatLogo = lender.faviconBase64 || lender.logoBase64;
+    var flatTitleX = 40;
+    if (flatLogo) {
+      try {
+        doc.addImage(flatLogo, 'PNG', 40, 20, 34, 34);
+        flatTitleX = 84;
+      } catch (e) {
+        console.warn('Flat PDF logo embedding error:', e);
+      }
+    }
+
     doc.setFont(fontName, 'bold');
-    doc.setFontSize(18);
+    doc.setFontSize(16);
     doc.setTextColor.apply(doc, lender.primaryColor);
-    doc.text(lender.name, 40, 42);
+    doc.text(lender.name, flatTitleX, 36);
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(13);
     doc.setTextColor(16, 32, 51);
-    doc.text('Flat Rate Loan Repayment Schedule', 40, 60);
+    doc.text('Flat Rate Loan Repayment Schedule', flatTitleX, 52);
 
     doc.setFont(fontName, 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(82, 97, 115);
-    doc.text('Illustrative repayment schedule based on flat interest rate methodology', 40, 73);
+    doc.text('Illustrative repayment schedule based on flat interest rate methodology', flatTitleX, 66);
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(8.5);
@@ -560,10 +608,17 @@
     for (var i = 1; i <= totalPages; i++) {
       doc.setPage(i);
       if (i > 1) {
+        var flatRunningX = 40;
+        if (flatLogo) {
+          try {
+            doc.addImage(flatLogo, 'PNG', 40, 13, 14, 14);
+            flatRunningX = 58;
+          } catch (e) {}
+        }
         doc.setFont(fontName, 'bold');
         doc.setFontSize(8.5);
         doc.setTextColor.apply(doc, lender.primaryColor);
-        doc.text(docTitle, 40, 24);
+        doc.text(docTitle, flatRunningX, 24);
         doc.setFont(fontName, 'normal');
         doc.setTextColor(82, 97, 115);
         doc.text('Ref: ' + refCode, 555, 24, { align: 'right' });
@@ -749,6 +804,31 @@
     var b2 = document.getElementById('compare-bank-2') ? document.getElementById('compare-bank-2').value : '';
     var l1 = getLenderProfile(b1);
     var l2 = getLenderProfile(b2);
+
+    var opt1Badge = document.getElementById('compare-opt1-badge');
+    if (opt1Badge) {
+      if (b1) {
+        opt1Badge.style.display = 'inline-flex';
+        var logoImg1 = l1.faviconBase64 ? '<img src="' + l1.faviconBase64 + '" class="lender-active-logo" alt="' + l1.shortName + '"/>' : '';
+        opt1Badge.innerHTML = logoImg1 + '<span>' + l1.shortName + '</span>';
+      } else {
+        opt1Badge.style.display = 'none';
+        opt1Badge.innerHTML = '';
+      }
+    }
+
+    var opt2Badge = document.getElementById('compare-opt2-badge');
+    if (opt2Badge) {
+      if (b2) {
+        opt2Badge.style.display = 'inline-flex';
+        var logoImg2 = l2.faviconBase64 ? '<img src="' + l2.faviconBase64 + '" class="lender-active-logo" alt="' + l2.shortName + '"/>' : '';
+        opt2Badge.innerHTML = logoImg2 + '<span>' + l2.shortName + '</span>';
+      } else {
+        opt2Badge.style.display = 'none';
+        opt2Badge.innerHTML = '';
+      }
+    }
+
     var badgeText = document.getElementById('compare-export-lender-text');
     if (badgeText) {
       if (b1 && b2) {
@@ -799,20 +879,31 @@
     doc.setFillColor.apply(doc, forestTeal);
     doc.rect(0, 6, 595, 2, 'F');
 
+    var compareLogo = (betterLender && (betterLender.faviconBase64 || betterLender.logoBase64)) || (window.LENDER_ASSETS && window.LENDER_ASSETS.dixit && window.LENDER_ASSETS.dixit.logoBase64);
+    var compTitleX = 40;
+    if (compareLogo) {
+      try {
+        doc.addImage(compareLogo, 'PNG', 40, 20, 34, 34);
+        compTitleX = 84;
+      } catch (e) {
+        console.warn('Compare PDF logo error:', e);
+      }
+    }
+
     doc.setFont(fontName, 'bold');
-    doc.setFontSize(18);
+    doc.setFontSize(16);
     doc.setTextColor.apply(doc, brandNavy);
-    doc.text('LOAN COMPARISON', 40, 42);
+    doc.text('LOAN COMPARISON', compTitleX, 36);
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(12);
     doc.setTextColor(16, 32, 51);
-    doc.text('Comparative Analysis: ' + lender1.shortName + ' vs ' + lender2.shortName, 40, 60);
+    doc.text('Comparative Analysis: ' + lender1.shortName + ' vs ' + lender2.shortName, compTitleX, 52);
 
     doc.setFont(fontName, 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(82, 97, 115);
-    doc.text('Side-by-side metric comparison between both loan options', 40, 73);
+    doc.text('Side-by-side metric comparison between both loan options', compTitleX, 66);
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(8.5);
@@ -882,6 +973,24 @@
     var totalPages = doc.getNumberOfPages();
     for (var i = 1; i <= totalPages; i++) {
       doc.setPage(i);
+      if (i > 1) {
+        var compRunningX = 40;
+        if (compareLogo) {
+          try {
+            doc.addImage(compareLogo, 'PNG', 40, 13, 14, 14);
+            compRunningX = 58;
+          } catch (e) {}
+        }
+        doc.setFont(fontName, 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor.apply(doc, brandNavy);
+        doc.text('Loan Comparison - ' + lender1.shortName + ' vs ' + lender2.shortName, compRunningX, 24);
+        doc.setFont(fontName, 'normal');
+        doc.setTextColor(82, 97, 115);
+        doc.text('Ref: ' + refCode, 555, 24, { align: 'right' });
+        doc.setDrawColor(217, 227, 239);
+        doc.line(40, 28, 555, 28);
+      }
       doc.setDrawColor(217, 227, 239);
       doc.line(40, 810, 555, 810);
       doc.setFont(fontName, 'normal');
@@ -1057,7 +1166,8 @@
       if (eligSelectedLender) {
         badgeEl.style.display = 'inline-flex';
         badgeEl.style.color = lender.hexPrimary;
-        badgeEl.innerHTML = '<i class="fas fa-building-columns" style="margin-right:5px;"></i>' + lender.shortName;
+        var logoImg = lender.faviconBase64 ? '<img src="' + lender.faviconBase64 + '" class="lender-active-logo" alt="' + lender.shortName + '"/>' : '<i class="fas fa-building-columns" style="margin-right:5px;"></i>';
+        badgeEl.innerHTML = logoImg + '<span>' + lender.shortName + '</span>';
       } else {
         badgeEl.style.display = 'none';
         badgeEl.innerHTML = '';
@@ -1071,9 +1181,10 @@
     }
     if (tableBadgeEl) {
       if (eligSelectedLender) {
-        tableBadgeEl.style.borderColor = lender.hexBorder;
-        tableBadgeEl.style.background = lender.hexLightBg;
-        tableBadgeEl.style.color = lender.hexPrimary;
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        tableBadgeEl.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.14)' : lender.hexBorder;
+        tableBadgeEl.style.background = isDark ? 'rgba(14, 21, 30, 0.95)' : lender.hexLightBg;
+        tableBadgeEl.style.color = isDark ? '#f8fafc' : lender.hexPrimary;
       } else {
         tableBadgeEl.style.borderColor = 'var(--border)';
         tableBadgeEl.style.background = 'var(--bg-secondary)';
@@ -1375,20 +1486,31 @@
     doc.setFillColor.apply(doc, lender.secondaryColor);
     doc.rect(0, 6, 595, 2, 'F');
 
+    var eligLogo = lender.faviconBase64 || lender.logoBase64;
+    var eligTitleX = 40;
+    if (eligLogo) {
+      try {
+        doc.addImage(eligLogo, 'PNG', 40, 20, 34, 34);
+        eligTitleX = 84;
+      } catch (e) {
+        console.warn('Elig PDF logo error:', e);
+      }
+    }
+
     doc.setFont(fontName, 'bold');
-    doc.setFontSize(18);
+    doc.setFontSize(16);
     doc.setTextColor.apply(doc, lender.primaryColor);
-    doc.text(lender.name, 40, 42);
+    doc.text(lender.name, eligTitleX, 36);
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(13);
     doc.setTextColor(16, 32, 51);
-    doc.text('Loan Eligibility Assessment', 40, 60);
+    doc.text('Loan Eligibility Assessment', eligTitleX, 52);
 
     doc.setFont(fontName, 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(82, 97, 115);
-    doc.text('Borrower income evaluation, debt-to-income benchmark, and borrowing capacity', 40, 73);
+    doc.text('Borrower income evaluation, debt-to-income benchmark, and borrowing capacity', eligTitleX, 66);
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(8.5);
@@ -1662,7 +1784,8 @@
       if (transferNewLender) {
         badgeEl.style.display = 'inline-flex';
         badgeEl.style.color = newLender.hexPrimary;
-        badgeEl.innerHTML = '<i class="fas fa-building-columns" style="margin-right:5px;"></i>' + newLender.shortName;
+        var logoImg = newLender.faviconBase64 ? '<img src="' + newLender.faviconBase64 + '" class="lender-active-logo" alt="' + newLender.shortName + '"/>' : '<i class="fas fa-building-columns" style="margin-right:5px;"></i>';
+        badgeEl.innerHTML = logoImg + '<span>' + newLender.shortName + '</span>';
       } else {
         badgeEl.style.display = 'none';
         badgeEl.innerHTML = '';
@@ -1676,9 +1799,10 @@
     }
     if (tableBadgeEl) {
       if (transferNewLender) {
-        tableBadgeEl.style.borderColor = newLender.hexBorder;
-        tableBadgeEl.style.background = newLender.hexLightBg;
-        tableBadgeEl.style.color = newLender.hexPrimary;
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        tableBadgeEl.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.14)' : newLender.hexBorder;
+        tableBadgeEl.style.background = isDark ? 'rgba(14, 21, 30, 0.95)' : newLender.hexLightBg;
+        tableBadgeEl.style.color = isDark ? '#f8fafc' : newLender.hexPrimary;
       } else {
         tableBadgeEl.style.borderColor = 'var(--border)';
         tableBadgeEl.style.background = 'var(--bg-secondary)';
@@ -1976,20 +2100,31 @@
     doc.setFillColor.apply(doc, newLender.secondaryColor);
     doc.rect(0, 6, 595, 2, 'F');
 
+    var transferLogo = newLender.faviconBase64 || newLender.logoBase64;
+    var transferTitleX = 40;
+    if (transferLogo) {
+      try {
+        doc.addImage(transferLogo, 'PNG', 40, 20, 34, 34);
+        transferTitleX = 84;
+      } catch (e) {
+        console.warn('Transfer PDF logo error:', e);
+      }
+    }
+
     doc.setFont(fontName, 'bold');
-    doc.setFontSize(18);
+    doc.setFontSize(16);
     doc.setTextColor.apply(doc, newLender.primaryColor);
-    doc.text(newLender.name, 40, 42);
+    doc.text(newLender.name, transferTitleX, 36);
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(13);
     doc.setTextColor(16, 32, 51);
-    doc.text('Balance Transfer Benefit Analysis', 40, 60);
+    doc.text('Balance Transfer Benefit Analysis', transferTitleX, 52);
 
     doc.setFont(fontName, 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(82, 97, 115);
-    doc.text('Refinancing savings evaluation: ' + existingLender.shortName + ' -> ' + newLender.shortName, 40, 73);
+    doc.text('Refinancing savings evaluation: ' + existingLender.shortName + ' -> ' + newLender.shortName, transferTitleX, 66);
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(8.5);
@@ -2095,6 +2230,24 @@
     var totalPages = doc.getNumberOfPages();
     for (var i = 1; i <= totalPages; i++) {
       doc.setPage(i);
+      if (i > 1) {
+        var transferRunningX = 40;
+        if (transferLogo) {
+          try {
+            doc.addImage(transferLogo, 'PNG', 40, 13, 14, 14);
+            transferRunningX = 58;
+          } catch (e) {}
+        }
+        doc.setFont(fontName, 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor.apply(doc, newLender.primaryColor);
+        doc.text(newLender.name + ' — Balance Transfer Benefit Analysis', transferRunningX, 24);
+        doc.setFont(fontName, 'normal');
+        doc.setTextColor(82, 97, 115);
+        doc.text('Ref: ' + refCode, 555, 24, { align: 'right' });
+        doc.setDrawColor.apply(doc, newLender.borderStroke);
+        doc.line(40, 28, 555, 28);
+      }
       doc.setDrawColor.apply(doc, newLender.borderStroke);
       doc.line(40, 810, 555, 810);
       doc.setFont(fontName, 'normal');

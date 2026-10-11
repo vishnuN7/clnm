@@ -67,6 +67,7 @@
 }
 
 :root[data-theme='light'] {
+  color-scheme: light;
   --bg-primary: #f7f9f7;
   --bg-secondary: #eff5f0;
   --bg-card: #ffffff;
@@ -232,6 +233,7 @@
 
 /* ── Dark Theme Foundation ── */
 :root[data-theme='dark'] {
+  color-scheme: dark;
   --bg-primary: #0c1219;
   --bg-secondary: #090e14;
   --bg-card: rgba(16, 23, 33, 0.94);

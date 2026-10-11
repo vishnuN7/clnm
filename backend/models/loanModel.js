@@ -246,14 +246,19 @@ const LoanModel = {
       Number(finalDisbursementAmount) !== Number(current.disbursement_amount)
     );
 
-    // Write to history if status has changed, a remark is supplied, or disbursement details changed
-    if (notes || status !== current.status || hasDisbursedDetailsChanged) {
+    const hasDatesChanged = (
+      formattedLoginDate !== getYYYYMMDD(current.login_date) ||
+      formattedUploadDate !== getYYYYMMDD(current.system_upload_date)
+    );
+
+    // Write to history if status has changed, a remark is supplied, or disbursement/date details changed
+    if (notes || status !== current.status || hasDisbursedDetailsChanged || hasDatesChanged) {
       await db.query(
-        'INSERT INTO loan_history (loan_id, status, remark, updated_by, disbursement_date, disbursement_amount) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO loan_history (loan_id, status, remark, updated_by, disbursement_date, disbursement_amount, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())',
         [
           id,
           status,
-          notes || (status === current.status ? 'Details updated.' : 'Status updated.'),
+          notes || (status === current.status ? (hasDisbursedDetailsChanged || hasDatesChanged ? 'Details updated.' : 'Note added.') : 'Status updated.'),
           approved_by,
           status === 'Loan Disbursed' ? formattedDisbursementDate : null,
           status === 'Loan Disbursed' ? finalDisbursementAmount : null
@@ -269,7 +274,7 @@ const LoanModel = {
        FROM loan_history h
        LEFT JOIN users u ON h.updated_by = u.id
        WHERE h.loan_id = ?
-       ORDER BY h.created_at DESC`,
+       ORDER BY h.created_at DESC, h.id DESC`,
       [loanId]
     );
     return rows;

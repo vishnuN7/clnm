@@ -981,3 +981,123 @@ td.td-left {
     padding-bottom: 10px;
   }
 }
+
+:root {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* ── Bank / NBFC Select & Lender Branding Enhancements ── */
+select.form-control.lender-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='%2364748b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: calc(100% - 14px) center !important;
+  background-size: 16px 16px !important;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  padding: 10px 40px 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  line-height: 1.4;
+  color-scheme: light;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+:root[data-theme='dark'] select.form-control.lender-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='%2394a3b8'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: calc(100% - 14px) center !important;
+  background-size: 16px 16px !important;
+  background-color: #0e151e !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color-scheme: dark;
+}
+
+select.form-control.lender-select:focus,
+:root[data-theme='dark'] select.form-control.lender-select:focus {
+  background-repeat: no-repeat !important;
+  background-position: calc(100% - 14px) center !important;
+  background-size: 16px 16px !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--border-focus) !important;
+  outline: none;
+}
+
+select.form-control.lender-select option {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+:root[data-theme='dark'] select.form-control.lender-select option {
+  background-color: #0e151e;
+  color: #f8fafc;
+}
+
+/* Active Lender Pill below selector */
+.lender-active-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  animation: hubFadeIn 0.2s ease forwards;
+}
+
+:root[data-theme='dark'] .lender-active-pill {
+  background: rgba(14, 21, 30, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+.lender-active-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.lender-active-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.lender-active-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+}
+
+.lender-active-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Table Card Lender Badge Mini Logo */
+.lender-table-mini-logo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  border-radius: 3px;
+  background: #ffffff;
+  padding: 1.5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  margin-right: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+

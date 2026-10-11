@@ -23,6 +23,9 @@ router.get(  '/assigned-records/search',                 requireAuth,     ctrl.s
 router.get(  '/assignments/:assignmentId/records',       requireEmployee, ctrl.getAssignmentRecords);
 router.post( '/assignments/:assignmentId/submit',        requireEmployee, ctrl.submitAssignment);
 
+// ── Shared: Disposition Usage Aggregation ──────────────────────────────────
+router.get(  '/disposition-usage',                        requireAuth,     ctrl.getDispositionUsage);
+
 // ── Shared: Update a single record (employee ownership checked in controller)
 router.patch('/records/:recordId',                       requireAuth,     ctrl.updateRecord);
 

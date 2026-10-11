@@ -29,6 +29,130 @@ const COL_ALIASES = {
   'updated at':      ['updated at','updated_at','date','updated on','timestamp','last updated']
 };
 
+// ── Master Disposition & Dependent Sub-Disposition Data ───────────────────
+const VALID_DISPOSITIONS = [
+  'Connected', 'Not Connected', 'Ringing', 'Busy', 'Switched Off', 'Out of Coverage',
+  'Number Invalid', 'Wrong Number', 'Call Back Requested', 'Call Later', 'Voice Mail',
+  'No Response', 'Customer Interested', 'Customer Not Interested', 'Follow Up Required',
+  'Loan Inquiry', 'Existing Customer', 'Duplicate Lead', 'Do Not Call', 'Language Barrier',
+  'Call Disconnected', 'Pending Verification', 'Converted', 'Rejected', 'Not Eligible', 'Other'
+];
+
+const SUB_DISP_MAP = {
+  'Customer Interested': [
+    'Loan Amount Discussed', 'Interest Rate Discussed', 'Eligibility Discussed',
+    'Cash Salary', 'Doing Business', 'Low CIBIL', 'Documents Requested',
+    'Callback Scheduled', 'Other'
+  ],
+  'Follow Up Required': [
+    'Morning', 'Afternoon', 'Evening', 'Tomorrow', 'Next Week',
+    'Specific Date & Time', 'Other'
+  ],
+  'Call Back Requested': [
+    'Morning', 'Afternoon', 'Evening', 'Tomorrow', 'Next Week',
+    'Specific Date & Time', 'Other'
+  ],
+  'Call Later': [
+    'Customer Busy', 'Driving', 'In Meeting', 'Specific Date & Time', 'Other'
+  ],
+  'Customer Not Interested': [
+    'High Interest Rate', 'Already Arranged Loan', 'Loan Not Required',
+    'Changed Mind', 'Using Another Bank', 'Financial Issue', 'Other'
+  ],
+  'Not Eligible': [
+    'Low CIBIL', 'Low Income', 'Age / Employment Criteria',
+    'Out of Service Area', 'Document Criteria Not Met', 'Other'
+  ],
+  'Converted': [
+    'Application Started', 'Documents Collected', 'Loan Application Submitted',
+    'Loan Approved', 'Loan Disbursed', 'Other'
+  ],
+  'Connected': [
+    'Interested', 'Documents Pending', 'EMI Explained', 'Loan Eligible',
+    'Follow Up Tomorrow', 'Need Salary Slip', 'Need Bank Statement', 'Other'
+  ],
+  'Not Connected': [
+    'Number Busy', 'Switched Off', 'Out of Network', 'Try Again Later', 'Other'
+  ],
+  'Busy': [
+    'Try Later', 'Scheduled Callback', 'Call in 15 Mins', 'Call in 1 Hour', 'Other'
+  ],
+  'Ringing': [
+    'No Answer', 'Hung Up', 'Left Voicemail', 'Try Later', 'Other'
+  ],
+  'Switched Off': [
+    'Switched Off', 'Unreachable', 'Try Later', 'Other'
+  ],
+  'Out of Coverage': [
+    'Out of Area', 'Network Issue', 'Try Later', 'Other'
+  ],
+  'Voice Mail': [
+    'Left Message', 'Full Mailbox', 'No Message Left', 'Other'
+  ],
+  'No Response': [
+    'No Answer', 'Rang Out', 'Try Later', 'Other'
+  ],
+  'Call Disconnected': [
+    'Immediately Disconnected', 'Disconnected During Pitch', 'Network Drop', 'Other'
+  ],
+  'Loan Inquiry': [
+    'Personal Loan', 'Home Loan', 'Business Loan', 'Gold Loan', 'Vehicle Loan', 'Other'
+  ],
+  'Existing Customer': [
+    'Top-up Loan', 'Service Request', 'Complaint', 'Other'
+  ],
+  'Number Invalid': [
+    'Wrong Number', 'Non-Existent', 'Invalid Digits', 'Other'
+  ],
+  'Wrong Number': [
+    'Person Not Known', 'Wrong Contact', 'Number Changed', 'Other'
+  ],
+  'Duplicate Lead': [
+    'Already Contacted', 'Assigned to Colleague', 'Other'
+  ],
+  'Pending Verification': [
+    'Address Check', 'KYC Check', 'Income Check', 'Employment Check', 'Other'
+  ],
+  'Do Not Call': [
+    'Requested DNC', 'Abusive', 'Not Interested Ever', 'Other'
+  ],
+  'Language Barrier': [
+    'Hindi Preferred', 'Tamil Preferred', 'Telugu Preferred', 'Kannada Preferred', 'English Preferred', 'Other'
+  ],
+  'Rejected': [
+    'Low CIBIL', 'Insufficient Income', 'Document Issues', 'Other'
+  ],
+  'Other': [
+    'Custom / General', 'Callback', 'Other'
+  ],
+  'default': [
+    'General Follow Up', 'Not Applicable', 'Other'
+  ]
+};
+
+async function getAggregatedDispositionUsage() {
+  try {
+    const [rows] = await db.query(
+      `SELECT disposition, sub_disposition, COUNT(id) as cnt
+       FROM excel_records
+       WHERE disposition IS NOT NULL AND disposition != ''
+         AND sub_disposition IS NOT NULL AND sub_disposition != ''
+       GROUP BY disposition, sub_disposition
+       ORDER BY cnt DESC`
+    );
+    const usage = {};
+    for (const r of rows) {
+      if (!usage[r.disposition]) usage[r.disposition] = {};
+      usage[r.disposition][r.sub_disposition] = r.cnt;
+    }
+    return usage;
+  } catch (err) {
+    console.warn('[Excel] getAggregatedDispositionUsage error:', err.message);
+    return {};
+  }
+}
+
+
 function resolveColumns(headerRow) {
   const result = {};
   if (!Array.isArray(headerRow)) return result;
@@ -1001,12 +1125,15 @@ exports.getAssignmentRecords = async (req, res) => {
       args
     );
 
+    const subDispUsage = await getAggregatedDispositionUsage();
+
     res.json({
       success: true,
       assignment: { ...asgn, completed: comp },
       file,
       records,
       total,
+      sub_disposition_usage: subDispUsage,
       page: parseInt(page),
       limit: parseInt(limit)
     });
@@ -1015,6 +1142,18 @@ exports.getAssignmentRecords = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to fetch records.' });
   }
 };
+
+// ── Shared: Get Aggregated Disposition & Sub-Disposition Usage ──────────────
+exports.getDispositionUsage = async (req, res) => {
+  try {
+    const usage = await getAggregatedDispositionUsage();
+    return res.json({ success: true, usage });
+  } catch (err) {
+    console.error('[Excel] getDispositionUsage:', err.message);
+    return res.status(500).json({ success: false, message: 'Failed to fetch disposition usage.' });
+  }
+};
+
 
 // ── Shared: Update a Record (Strict Row-Level IDOR Protection) ─────────────
 exports.updateRecord = async (req, res) => {
@@ -1061,10 +1200,31 @@ exports.updateRecord = async (req, res) => {
       }
     }
 
-    const oldDisp    = record.disposition;
-    const oldSubDisp = record.sub_disposition;
-    const newDisp    = disposition    !== undefined ? disposition    : oldDisp;
-    const newSubDisp = sub_disposition !== undefined ? sub_disposition : oldSubDisp;
+    const oldDisp    = record.disposition ? String(record.disposition).trim() : '';
+    const oldSubDisp = record.sub_disposition ? String(record.sub_disposition).trim() : '';
+    let newDisp      = disposition !== undefined ? (disposition ? String(disposition).trim() : '') : oldDisp;
+    let newSubDisp   = sub_disposition !== undefined ? (sub_disposition ? String(sub_disposition).trim() : '') : oldSubDisp;
+
+    // Validate disposition and sub-disposition combination
+    if (newDisp) {
+      if (!VALID_DISPOSITIONS.includes(newDisp) && newDisp !== oldDisp) {
+        return res.status(400).json({ success: false, message: `Invalid disposition: "${newDisp}".` });
+      }
+      if (newSubDisp) {
+        const allowedSubs = SUB_DISP_MAP[newDisp] || SUB_DISP_MAP['default'] || [];
+        const isHistoricalAllowed = (newSubDisp === oldSubDisp && newDisp === oldDisp);
+        if (!allowedSubs.includes(newSubDisp) && !isHistoricalAllowed) {
+          return res.status(400).json({
+            success: false,
+            message: `Sub disposition "${newSubDisp}" is not valid for disposition "${newDisp}".`
+          });
+        }
+      }
+    } else {
+      // Disallow orphan sub_disposition if disposition is empty
+      newSubDisp = '';
+    }
+
     const newNotes   = notes !== undefined ? (notes ? String(notes).trim() : null) : record.notes;
     let newStatus    = (newDisp && newSubDisp) ? 'Completed' : 'Pending';
     if (req.body.status !== undefined && req.body.status) {

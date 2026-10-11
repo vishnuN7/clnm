@@ -618,7 +618,9 @@ const employeeController = {
 
   async updateLoanStatus(req, res) {
     const { id } = req.params;
-    const { status, notes, login_date, system_upload_date, disbursement_date, disbursement_amount } = req.body;
+    const { status, login_date, system_upload_date, disbursement_date, disbursement_amount } = req.body;
+    const rawNotes = req.body.notes !== undefined ? req.body.notes : req.body.remarks;
+    const notes = rawNotes !== undefined && rawNotes !== null ? String(rawNotes) : '';
     console.log(`[Employee] Incoming status update request - Loan ID: ${id}, Employee ID: ${req?.user?.id}, Payload:`, req.body);
 
     try {
@@ -689,7 +691,14 @@ const employeeController = {
         }
       }
 
-      return res.json({ success: true, message: `Loan status updated to ${status}.` });
+      const updatedLoan = await LoanModel.findById(id);
+      const history = await LoanModel.getHistory(id);
+
+      return res.json({
+        success: true,
+        message: `Loan status updated to ${status}.`,
+        data: { loan: updatedLoan, history }
+      });
     } catch (err) {
       console.error(`[Employee] Error updating status for Loan ID ${id}:`, err.stack || err);
       let errMsg = 'Failed to update loan status.';
