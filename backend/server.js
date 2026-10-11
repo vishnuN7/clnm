@@ -124,6 +124,7 @@ app.use('/api/profile',       require('./routes/profile'));
 app.use('/api/documents',     require('./routes/documents'));
 app.use('/api/notifications',  require('./routes/notifications'));
 app.use('/api/employee/notifications', require('./routes/notifications'));
+app.use('/api/whatsapp',       require('./routes/whatsapp'));
 app.use('/uploads/profile_pics', express.static(path.join(__dirname, 'uploads', 'profile_pics')));
 app.use('/uploads/kyc_docs', express.static(path.join(__dirname, 'uploads', 'kyc_docs')));
 
