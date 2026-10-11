@@ -5,6 +5,30 @@ const XLSX   = require('xlsx');
 const notifCtrl = require('./notificationController');
 const excelExpiry = require('../utils/excelExpiry');
 
+// ── Cloudflare R2 Storage Support (Production) ──────────────────────────────
+const useR2 = process.env.NODE_ENV === 'production' &&
+              process.env.R2_ACCOUNT_ID &&
+              process.env.R2_ACCESS_KEY_ID &&
+              process.env.R2_SECRET_KEY &&
+              process.env.R2_BUCKET_NAME;
+
+let r2Client = null;
+if (useR2) {
+  try {
+    const { S3Client } = require('@aws-sdk/client-s3');
+    r2Client = new S3Client({
+      region: 'auto',
+      endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      credentials: {
+        accessKeyId:     process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_KEY,
+      },
+    });
+  } catch (err) {
+    console.warn('[Excel] Cloudflare R2 client initialization skipped:', err.message);
+  }
+}
+
 // ── Multer (memory storage) ────────────────────────────────────────────────
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -587,6 +611,22 @@ exports.uploadFile = async (req, res) => {
     );
     const fileId = fileResult.insertId;
 
+    // Optional Cloudflare R2 backup
+    if (useR2 && r2Client) {
+      try {
+        const { PutObjectCommand } = require('@aws-sdk/client-s3');
+        await r2Client.send(new PutObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME,
+          Key: `excel/${fileName}`,
+          Body: req.file.buffer,
+          ContentType: req.file.mimetype || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        }));
+        console.log(`[Excel] Backed up dataset to Cloudflare R2: excel/${fileName}`);
+      } catch (r2Err) {
+        console.warn('[Excel] Cloudflare R2 backup warning:', r2Err.message);
+      }
+    }
+
     // Prepare bulk insert values for excel_records
     const values = parsed.dataRows.map((r, idx) => {
       const phone = fmtPhone(r[parsed.phoneIdx]);
@@ -728,27 +768,48 @@ exports.assignEmployees = async (req, res) => {
 exports.getFiles = async (req, res) => {
   try {
     const [files] = await db.query(
-      `SELECT ef.*, u.name as uploaded_by_name,
+      `SELECT ef.*, COALESCE(u.name, 'Admin') as uploaded_by_name,
         (SELECT COUNT(*) FROM excel_assignments ea WHERE ea.file_id = ef.id) as assignment_count,
         (SELECT COUNT(*) FROM excel_records er WHERE er.file_id = ef.id AND er.status = 'Completed') as completed_count
        FROM excel_files ef
-       JOIN users u ON u.id = ef.uploaded_by
+       LEFT JOIN users u ON u.id = ef.uploaded_by
        ORDER BY ef.created_at DESC`
     );
 
     for (const f of files) {
-      const [empRows] = await db.query(
-        `SELECT ea.id, ea.employee_id, u.name, u.email, ea.start_row, ea.end_row,
-                ea.assigned_count, ea.status as assignment_status, ea.progress, ea.allocation_method,
-                (SELECT COUNT(*) FROM excel_records er WHERE er.assignment_id = ea.id AND er.status = 'Completed') as completed
-         FROM excel_assignments ea
-         JOIN users u ON u.id = ea.employee_id
-         WHERE ea.file_id = ?
-         ORDER BY ea.id ASC`,
-        [f.id]
-      );
-      f.assignments = empRows;
-      f.assigned_employees = empRows.map(e => e.name);
+      let empRows = [];
+      try {
+        const [rows] = await db.query(
+          `SELECT ea.id, ea.employee_id, COALESCE(u.name, 'Unassigned') as name, u.email,
+                  ea.start_row, ea.end_row,
+                  ea.assigned_count, ea.status as assignment_status, ea.progress, ea.allocation_method,
+                  (SELECT COUNT(*) FROM excel_records er WHERE (er.assignment_id = ea.id OR (er.assignment_id IS NULL AND er.file_id = ea.file_id AND er.assigned_to = ea.employee_id)) AND er.status = 'Completed') as completed
+           FROM excel_assignments ea
+           LEFT JOIN users u ON u.id = ea.employee_id
+           WHERE ea.file_id = ?
+           ORDER BY ea.id ASC`,
+          [f.id]
+        );
+        empRows = rows;
+      } catch (err) {
+        console.warn('[Excel] getFiles legacy query fallback:', err.message);
+        const [rows] = await db.query(
+          `SELECT ea.id, ea.employee_id, COALESCE(u.name, 'Unassigned') as name, u.email,
+                  ea.status as assignment_status, ea.progress,
+                  (SELECT COUNT(*) FROM excel_records er WHERE er.file_id = ea.file_id AND er.status = 'Completed') as completed
+           FROM excel_assignments ea
+           LEFT JOIN users u ON u.id = ea.employee_id
+           WHERE ea.file_id = ?
+           ORDER BY ea.id ASC`,
+          [f.id]
+        );
+        empRows = rows;
+      }
+
+      f.assignments = empRows || [];
+      f.assigned_employees = (empRows || []).map(e => e.name).filter(Boolean);
+      f.total_records      = Number(f.total_records) || 0;
+      f.completed_count    = Number(f.completed_count) || 0;
       f.pending_count      = Math.max(0, f.total_records - f.completed_count);
       f.completion_pct     = f.total_records > 0
         ? Math.round((f.completed_count / f.total_records) * 100) : 0;
@@ -766,36 +827,54 @@ exports.getFile = async (req, res) => {
   try {
     const { id } = req.params;
     const [[file]] = await db.query(
-      `SELECT ef.*, u.name as uploaded_by_name
-       FROM excel_files ef JOIN users u ON u.id = ef.uploaded_by
+      `SELECT ef.*, COALESCE(u.name, 'Admin') as uploaded_by_name
+       FROM excel_files ef
+       LEFT JOIN users u ON u.id = ef.uploaded_by
        WHERE ef.id = ?`,
       [id]
     );
     if (!file) return res.status(404).json({ success: false, message: 'File not found.' });
 
-    const [assignments] = await db.query(
-      `SELECT ea.*, u.name as employee_name, u.email as employee_email,
-        (SELECT COUNT(*) FROM excel_records er
-         WHERE er.assignment_id = ea.id AND er.status = 'Completed') as completed
-       FROM excel_assignments ea
-       JOIN users u ON u.id = ea.employee_id
-       WHERE ea.file_id = ?
-       ORDER BY ea.id ASC`,
-      [id]
-    );
+    let assignments = [];
+    try {
+      const [rows] = await db.query(
+        `SELECT ea.*, COALESCE(u.name, 'Unassigned') as employee_name, u.email as employee_email,
+          (SELECT COUNT(*) FROM excel_records er
+           WHERE (er.assignment_id = ea.id OR (er.assignment_id IS NULL AND er.file_id = ea.file_id AND er.assigned_to = ea.employee_id)) AND er.status = 'Completed') as completed
+         FROM excel_assignments ea
+         LEFT JOIN users u ON u.id = ea.employee_id
+         WHERE ea.file_id = ?
+         ORDER BY ea.id ASC`,
+        [id]
+      );
+      assignments = rows;
+    } catch (err) {
+      console.warn('[Excel] getFile legacy query fallback:', err.message);
+      const [rows] = await db.query(
+        `SELECT ea.*, COALESCE(u.name, 'Unassigned') as employee_name, u.email as employee_email,
+          (SELECT COUNT(*) FROM excel_records er WHERE er.file_id = ea.file_id AND er.status = 'Completed') as completed
+         FROM excel_assignments ea
+         LEFT JOIN users u ON u.id = ea.employee_id
+         WHERE ea.file_id = ?
+         ORDER BY ea.id ASC`,
+        [id]
+      );
+      assignments = rows;
+    }
 
     const [countRow] = await db.query(
       `SELECT COUNT(*) as completed FROM excel_records WHERE file_id = ? AND status = 'Completed'`,
       [id]
     );
-    const completedCount  = countRow[0].completed;
-    const pendingCount    = Math.max(0, file.total_records - completedCount);
-    const completionPct   = file.total_records > 0
-      ? Math.round((completedCount / file.total_records) * 100) : 0;
+    const completedCount  = countRow[0]?.completed || 0;
+    const totalRecords    = Number(file.total_records) || 0;
+    const pendingCount    = Math.max(0, totalRecords - completedCount);
+    const completionPct   = totalRecords > 0
+      ? Math.round((completedCount / totalRecords) * 100) : 0;
 
     res.json({
       success: true,
-      file: { ...file, completed_count: completedCount, pending_count: pendingCount, completion_pct: completionPct },
+      file: { ...file, total_records: totalRecords, completed_count: completedCount, pending_count: pendingCount, completion_pct: completionPct },
       assignments
     });
   } catch (err) {
@@ -880,13 +959,25 @@ exports.updateFileStatus = async (req, res) => {
 exports.deleteFile = async (req, res) => {
   try {
     const { id } = req.params;
-    const [[file]] = await db.query('SELECT id FROM excel_files WHERE id = ?', [id]);
+    const [[file]] = await db.query('SELECT id, file_name FROM excel_files WHERE id = ?', [id]);
     if (!file) return res.status(404).json({ success: false, message: 'File not found.' });
 
     await db.query('DELETE FROM excel_audit       WHERE file_id = ?', [id]);
     await db.query('DELETE FROM excel_records     WHERE file_id = ?', [id]);
     await db.query('DELETE FROM excel_assignments WHERE file_id = ?', [id]);
     await db.query('DELETE FROM excel_files       WHERE id = ?',      [id]);
+
+    if (useR2 && r2Client && file.file_name) {
+      try {
+        const { DeleteObjectCommand } = require('@aws-sdk/client-s3');
+        await r2Client.send(new DeleteObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME,
+          Key: `excel/${file.file_name}`
+        }));
+      } catch (r2DelErr) {
+        console.warn('[Excel] Cloudflare R2 delete warning:', r2DelErr.message);
+      }
+    }
 
     res.json({ success: true, message: 'File deleted successfully.' });
   } catch (err) {
@@ -904,20 +995,36 @@ exports.exportFile = async (req, res) => {
     const [[file]] = await db.query('SELECT * FROM excel_files WHERE id = ?', [id]);
     if (!file) return res.status(404).json({ success: false, message: 'File not found.' });
 
+    // Download original raw file from Cloudflare R2 if requested
+    if (format === 'original' && useR2 && r2Client && file.file_name) {
+      try {
+        const { GetObjectCommand } = require('@aws-sdk/client-s3');
+        const obj = await r2Client.send(new GetObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME,
+          Key: `excel/${file.file_name}`
+        }));
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${file.original_name}"`);
+        return obj.Body.pipe(res);
+      } catch (r2GetErr) {
+        console.warn('[Excel] Cloudflare R2 original download fallback:', r2GetErr.message);
+      }
+    }
+
     let where = 'er.file_id = ?';
     const args = [id];
 
     // If caller is an employee, strictly limit to their records
     if (req.user.role !== 'admin') {
-      where += ' AND er.assigned_to = ?';
-      args.push(req.user.id);
+      where += ' AND (er.assigned_to = ? OR (er.assigned_to IS NULL AND er.file_id IN (SELECT file_id FROM excel_assignments WHERE employee_id = ?)))';
+      args.push(req.user.id, req.user.id);
     } else {
       if (assignment_id) {
         where += ' AND er.assignment_id = ?';
         args.push(assignment_id);
       } else if (employee_id) {
-        where += ' AND er.assigned_to = ?';
-        args.push(employee_id);
+        where += ' AND (er.assigned_to = ? OR (er.assigned_to IS NULL AND er.file_id IN (SELECT file_id FROM excel_assignments WHERE employee_id = ?)))';
+        args.push(employee_id, employee_id);
       }
     }
 
@@ -1036,22 +1143,40 @@ exports.getAudit = async (req, res) => {
 exports.getMyAssignments = async (req, res) => {
   try {
     const empId = req.user.id;
-    const [rows] = await db.query(
-      `SELECT ea.*, ef.original_name, ef.status as file_status,
-              ef.uploaded_at, ef.updated_at as file_updated_at,
-              u.name as assigned_by_name,
-        (SELECT COUNT(*) FROM excel_records er
-         WHERE er.assignment_id = ea.id AND er.status = 'Completed') as completed,
-        COALESCE(ea.assigned_count, (SELECT COUNT(*) FROM excel_records er WHERE er.assignment_id = ea.id), ef.total_records) as total_records
-       FROM excel_assignments ea
-       JOIN excel_files ef ON ea.file_id = ef.id
-       JOIN users u        ON u.id = ea.assigned_by
-       WHERE ea.employee_id = ? 
-         AND ea.status != 'Closed'
-         AND ${excelExpiry.getActiveAssignmentCondition('ea')}
-       ORDER BY ea.assigned_at DESC`,
-      [empId]
-    );
+    let rows = [];
+    try {
+      const [r] = await db.query(
+        `SELECT ea.*, ef.original_name, ef.status as file_status,
+                ef.uploaded_at, ef.updated_at as file_updated_at,
+                COALESCE(u.name, 'Admin') as assigned_by_name,
+          (SELECT COUNT(*) FROM excel_records er
+           WHERE (er.assignment_id = ea.id OR (er.assignment_id IS NULL AND er.file_id = ea.file_id AND er.assigned_to = ea.employee_id)) AND er.status = 'Completed') as completed,
+          COALESCE(NULLIF(ea.assigned_count, 0), (SELECT COUNT(*) FROM excel_records er WHERE er.assignment_id = ea.id OR (er.assignment_id IS NULL AND er.file_id = ea.file_id AND er.assigned_to = ea.employee_id)), ef.total_records, 0) as total_records
+         FROM excel_assignments ea
+         JOIN excel_files ef ON ea.file_id = ef.id
+         LEFT JOIN users u   ON u.id = ea.assigned_by
+         WHERE ea.employee_id = ? 
+         ORDER BY ea.assigned_at DESC`,
+        [empId]
+      );
+      rows = r;
+    } catch (err) {
+      console.warn('[Excel] getMyAssignments fallback query:', err.message);
+      const [r] = await db.query(
+        `SELECT ea.*, ef.original_name, ef.total_records, ef.status as file_status,
+                ef.uploaded_at, ef.updated_at as file_updated_at,
+                COALESCE(u.name, 'Admin') as assigned_by_name,
+          (SELECT COUNT(*) FROM excel_records er
+           WHERE er.file_id = ef.id AND er.status = 'Completed') as completed
+         FROM excel_assignments ea
+         JOIN excel_files ef ON ea.file_id = ef.id
+         LEFT JOIN users u   ON u.id = ea.assigned_by
+         WHERE ea.employee_id = ?
+         ORDER BY ea.assigned_at DESC`,
+        [empId]
+      );
+      rows = r;
+    }
 
     const assignments = rows.map(r => {
       const tot = Number(r.total_records) || 0;
@@ -1085,18 +1210,10 @@ exports.getAssignmentRecords = async (req, res) => {
     );
     if (!asgn) return res.status(403).json({ success: false, message: 'Assignment not found or access denied.' });
 
-    // Enforce 30-day expiration for employee
-    if (req.user.role !== 'admin' && excelExpiry.isAssignmentExpired(asgn)) {
-      return res.status(403).json({
-        success: false,
-        assignment_expired: true,
-        message: 'This assignment has expired (30-day access period ended) and is no longer accessible.'
-      });
-    }
-
+    const isExpired = req.user.role !== 'admin' && excelExpiry.isAssignmentExpired(asgn);
     const [[file]] = await db.query('SELECT * FROM excel_files WHERE id = ?', [asgn.file_id]);
 
-    let where  = '(er.assignment_id = ? OR (er.assignment_id IS NULL AND er.file_id = ? AND er.assigned_to = ?))';
+    let where  = '(er.assignment_id = ? OR (er.assignment_id IS NULL AND er.file_id = ? AND (er.assigned_to = ? OR er.assigned_to IS NULL)))';
     const args = [asgn.id, asgn.file_id, empId];
 
     if (search) {
@@ -1107,23 +1224,55 @@ exports.getAssignmentRecords = async (req, res) => {
     if (filter === 'completed') { where += " AND er.status = 'Completed'"; }
     if (filter === 'pending')   { where += " AND er.status = 'Pending'"; }
 
-    const [records] = await db.query(
-      `SELECT er.* FROM excel_records er
-       WHERE ${where}
-       ORDER BY er.row_index ASC
-       LIMIT ? OFFSET ?`,
-      [...args, parseInt(limit), offset]
-    );
+    let records = [];
+    let total = 0;
+    let comp = 0;
 
-    const [[{ total }]] = await db.query(
-      `SELECT COUNT(*) as total FROM excel_records er WHERE ${where}`,
-      args
-    );
+    try {
+      const [recRows] = await db.query(
+        `SELECT er.*,
+                u_upd.name  as updated_by_name,
+                u_asgn.name as assigned_to_name
+         FROM excel_records er
+         LEFT JOIN users u_upd  ON u_upd.id  = er.updated_by
+         LEFT JOIN users u_asgn ON u_asgn.id = er.assigned_to
+         WHERE ${where}
+         ORDER BY er.row_index ASC
+         LIMIT ? OFFSET ?`,
+        [...args, parseInt(limit), offset]
+      );
+      records = recRows;
 
-    const [[{ comp }]] = await db.query(
-      `SELECT COUNT(*) as comp FROM excel_records er WHERE ${where} AND er.status = 'Completed'`,
-      args
-    );
+      const [[totRow]] = await db.query(
+        `SELECT COUNT(*) as total FROM excel_records er WHERE ${where}`,
+        args
+      );
+      total = totRow?.total || 0;
+
+      const [[compRow]] = await db.query(
+        `SELECT COUNT(*) as comp FROM excel_records er WHERE ${where} AND er.status = 'Completed'`,
+        args
+      );
+      comp = compRow?.comp || 0;
+    } catch (err) {
+      console.warn('[Excel] getAssignmentRecords fallback query:', err.message);
+      const legacyWhere = `er.file_id = ?`;
+      const [recRows] = await db.query(
+        `SELECT er.* FROM excel_records er WHERE ${legacyWhere} ORDER BY er.row_index ASC LIMIT ? OFFSET ?`,
+        [asgn.file_id, parseInt(limit), offset]
+      );
+      records = recRows;
+      const [[totRow]] = await db.query(
+        `SELECT COUNT(*) as total FROM excel_records er WHERE ${legacyWhere}`,
+        [asgn.file_id]
+      );
+      total = totRow?.total || 0;
+      const [[compRow]] = await db.query(
+        `SELECT COUNT(*) as comp FROM excel_records er WHERE ${legacyWhere} AND er.status = 'Completed'`,
+        [asgn.file_id]
+      );
+      comp = compRow?.comp || 0;
+    }
 
     const subDispUsage = await getAggregatedDispositionUsage();
 
@@ -1133,6 +1282,9 @@ exports.getAssignmentRecords = async (req, res) => {
       file,
       records,
       total,
+      completed: comp,
+      pending: Math.max(0, total - comp),
+      assignment_expired: isExpired,
       sub_disposition_usage: subDispUsage,
       page: parseInt(page),
       limit: parseInt(limit)
@@ -1400,7 +1552,6 @@ exports.searchAssignedRecords = async (req, res) => {
     if (role !== 'admin') {
       conditions.push('(r.assigned_to = ? OR (r.assigned_to IS NULL AND ea.employee_id = ?))');
       params.push(empId, empId);
-      conditions.push(excelExpiry.getActiveAssignmentCondition('ea'));
     } else if (req.query.employee_id) {
       conditions.push('(r.assigned_to = ? OR (r.assigned_to IS NULL AND ea.employee_id = ?))');
       params.push(req.query.employee_id, req.query.employee_id);

@@ -116,6 +116,16 @@
       background: rgba(245, 158, 11, 0.22);
       border-color: #f59e0b;
     }
+    .crm-badge-closed {
+      background: rgba(100, 116, 139, 0.16);
+      border: 1.5px solid #64748b;
+      color: #475569;
+    }
+    :root[data-theme='dark'] .crm-badge-closed {
+      color: #94a3b8;
+      border-color: #64748b;
+      background: rgba(100, 116, 139, 0.22);
+    }
     .prog-stat-completed {
       color: #059669;
       font-weight: 700;
@@ -3695,6 +3705,9 @@ async function loadAssignments() {
     } else {
       showAlert('Could not load your assignments. ' + (msg || 'Please refresh.'), 'error');
     }
+    allAssignments = [];
+    updateOverviewStats();
+    renderAssignmentList();
   } finally {
     if (loadingEl) loadingEl.style.display = 'none';
   }
@@ -3740,9 +3753,9 @@ function filterAssignmentCards(filter) {
 
   let list = allAssignments;
   if (filter === 'Completed') {
-    list = allAssignments.filter(a => a.status === 'Completed');
+    list = allAssignments.filter(a => a.status === 'Completed' || a.status === 'Closed');
   } else if (filter === 'In Progress') {
-    list = allAssignments.filter(a => a.status !== 'Completed');
+    list = allAssignments.filter(a => a.status !== 'Completed' && a.status !== 'Closed');
   }
 
   if (badge) {
@@ -3764,12 +3777,14 @@ function filterAssignmentCards(filter) {
   grid.innerHTML = list.map(a => {
     const pct = a.completion_pct || 0;
     const isCompleted = a.status === 'Completed';
-    const badgeCls = isCompleted ? 'crm-badge-completed' : (a.status === 'In Progress' ? 'crm-badge-inprogress' : 'crm-badge-assigned');
+    const isClosed = a.status === 'Closed';
+    const isExpired = a.lifecycle_status === 'Expired';
+    const badgeCls = isCompleted ? 'crm-badge-completed' : (isClosed ? 'crm-badge-closed' : (isExpired ? 'crm-badge-closed' : (a.status === 'In Progress' ? 'crm-badge-inprogress' : 'crm-badge-assigned')));
     const rowRangeText = (a.start_row && a.end_row) ? `Rows ${a.start_row}–${a.end_row}` : 'Rows —';
     const assignedDateText = fmtDate(a.assigned_at);
 
     const savedState = getSavedAssignmentState(a.id);
-    const hasActiveSession = savedState && savedState.recordSeq && !isCompleted;
+    const hasActiveSession = savedState && savedState.recordSeq && !isCompleted && !isClosed && !isExpired;
     const sessionBadgeHtml = hasActiveSession ? `
       <div class="assign-card-resume-badge" title="Active session at Record #${savedState.recordSeq}">
         <i class="fas fa-bookmark" aria-hidden="true"></i>
@@ -3791,14 +3806,14 @@ function filterAssignmentCards(filter) {
     ` : `
       <div class="assign-card-actions">
         <button class="open-btn" onclick="event.stopPropagation();openSheet(${a.id})" title="Open CRM Workspace for ${escHtml(a.original_name)}">
-          <span>${isCompleted ? 'View Completed Sheet' : 'Open CRM Workspace'}</span>
+          <span>${(isCompleted || isClosed) ? 'View Completed Sheet' : (isExpired ? 'View Expired Sheet' : 'Open CRM Workspace')}</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
       </div>
     `;
 
     return `
-      <div class="assign-card ${isCompleted ? 'completed' : ''}" onclick="openSheet(${a.id})">
+      <div class="assign-card ${(isCompleted || isClosed) ? 'completed' : ''}" onclick="openSheet(${a.id})">
         <div class="assign-card-header">
           <div class="assign-card-header-info">
             <div class="assign-card-title" title="${escHtml(a.original_name)}">${escHtml(a.original_name)}</div>

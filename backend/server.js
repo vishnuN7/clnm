@@ -809,6 +809,19 @@ async function ensureNotificationTables() {
 
 async function ensureExcelModule() {
   try {
+    // Helper to safely check column existence across MySQL versions
+    async function hasColumn(table, column) {
+      try {
+        const [rows] = await db.query(
+          `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
+          [table, column]
+        );
+        return rows.length > 0;
+      } catch (err) {
+        return false;
+      }
+    }
+
     await db.query(`
       CREATE TABLE IF NOT EXISTS excel_files (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -861,19 +874,69 @@ async function ensureExcelModule() {
       )
     `);
 
-    // Ensure 30-day expiration columns exist
-    const [expCols] = await db.query("SHOW COLUMNS FROM excel_assignments LIKE 'expires_at'");
-    if (expCols.length === 0) {
+    // Ensure 30-day expiration columns exist on excel_assignments
+    if (!await hasColumn('excel_assignments', 'expires_at')) {
       await db.query("ALTER TABLE excel_assignments ADD COLUMN expires_at TIMESTAMP NULL AFTER assigned_at");
     }
-    const [lifeCols] = await db.query("SHOW COLUMNS FROM excel_assignments LIKE 'lifecycle_status'");
-    if (lifeCols.length === 0) {
+    if (!await hasColumn('excel_assignments', 'lifecycle_status')) {
       await db.query("ALTER TABLE excel_assignments ADD COLUMN lifecycle_status VARCHAR(30) NOT NULL DEFAULT 'Active' AFTER status");
     }
-    // Backfill expires_at for legacy assignments
+
+    // Ensure master allocation columns exist on excel_assignments
+    if (!await hasColumn('excel_assignments', 'start_row')) {
+      await db.query("ALTER TABLE excel_assignments ADD COLUMN start_row INT NULL AFTER employee_id");
+    }
+    if (!await hasColumn('excel_assignments', 'end_row')) {
+      await db.query("ALTER TABLE excel_assignments ADD COLUMN end_row INT NULL AFTER start_row");
+    }
+    if (!await hasColumn('excel_assignments', 'assigned_count')) {
+      await db.query("ALTER TABLE excel_assignments ADD COLUMN assigned_count INT NOT NULL DEFAULT 0 AFTER end_row");
+    }
+    if (!await hasColumn('excel_assignments', 'allocation_method')) {
+      await db.query("ALTER TABLE excel_assignments ADD COLUMN allocation_method VARCHAR(50) NULL DEFAULT 'full' AFTER assigned_count");
+    }
+
+    // Ensure master allocation & notes columns exist on excel_records
+    if (!await hasColumn('excel_records', 'assignment_id')) {
+      await db.query("ALTER TABLE excel_records ADD COLUMN assignment_id INT NULL AFTER file_id, ADD INDEX idx_er_assignment (assignment_id)");
+    }
+    if (!await hasColumn('excel_records', 'assigned_to')) {
+      await db.query("ALTER TABLE excel_records ADD COLUMN assigned_to INT NULL AFTER assignment_id, ADD INDEX idx_er_assigned_to (assigned_to)");
+    }
+    if (!await hasColumn('excel_records', 'source_employee_name')) {
+      await db.query("ALTER TABLE excel_records ADD COLUMN source_employee_name VARCHAR(150) NULL AFTER assigned_to");
+    }
+    if (!await hasColumn('excel_records', 'notes')) {
+      await db.query('ALTER TABLE excel_records ADD COLUMN notes TEXT NULL AFTER sub_disposition');
+    }
+
+    // Backfill legacy assignments and records if present
+    try {
+      const [assignments] = await db.query(`SELECT id, file_id, employee_id, assigned_count, start_row, end_row FROM excel_assignments ORDER BY id ASC`);
+      for (const asgn of assignments) {
+        const [recs] = await db.query(`SELECT id FROM excel_records WHERE file_id = ?`, [asgn.file_id]);
+        const total = recs.length;
+
+        if (!asgn.assigned_count || asgn.assigned_count === 0 || !asgn.start_row) {
+          await db.query(
+            `UPDATE excel_assignments SET start_row = 1, end_row = ?, assigned_count = ?, allocation_method = 'full' WHERE id = ?`,
+            [total, total, asgn.id]
+          );
+        }
+
+        await db.query(
+          `UPDATE excel_records SET assignment_id = ?, assigned_to = ? WHERE file_id = ? AND assignment_id IS NULL`,
+          [asgn.id, asgn.employee_id, asgn.file_id]
+        );
+      }
+    } catch (bfErr) {
+      console.warn('[Excel] Backfill warning:', bfErr.message);
+    }
+
+    // Backfill assignment timestamps
+    await db.query("UPDATE excel_assignments SET assigned_at = created_at WHERE assigned_at IS NULL AND created_at IS NOT NULL");
+    await db.query("UPDATE excel_assignments SET assigned_at = NOW() WHERE assigned_at IS NULL");
     await db.query("UPDATE excel_assignments SET expires_at = DATE_ADD(assigned_at, INTERVAL 30 DAY) WHERE expires_at IS NULL");
-    // Mark expired assignments
-    await db.query("UPDATE excel_assignments SET lifecycle_status = 'Expired' WHERE expires_at <= NOW() AND lifecycle_status = 'Active'");
 
     await db.query(`
       CREATE TABLE IF NOT EXISTS excel_audit (
@@ -892,13 +955,7 @@ async function ensureExcelModule() {
         FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
-    // Add notes column to excel_records if missing (for existing databases)
-    const [notesCol] = await db.query("SHOW COLUMNS FROM excel_records LIKE 'notes'");
-    if (!notesCol.length) {
-      await db.query('ALTER TABLE excel_records ADD COLUMN notes TEXT NULL AFTER sub_disposition');
-      console.log("Added 'notes' column to 'excel_records' table.");
-    }
-    console.log('Excel module tables initialized successfully.');
+    console.log('Excel module tables and schema initialized successfully.');
   } catch (err) {
     console.error('Failed to initialize Excel module tables:', err.message);
   }

@@ -2470,6 +2470,9 @@ async function loadFiles() {
     const msg = e.message || '';
     if (msg === 'Session expired') return;
     showAlert('Failed to load dataset files: ' + (msg || 'Please try again.'), 'error');
+    allFiles = [];
+    updateKPIs();
+    renderFilesTable();
   } finally {
     if (loading) loading.style.display = 'none';
   }
