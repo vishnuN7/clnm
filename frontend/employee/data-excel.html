@@ -2110,6 +2110,309 @@
       background: var(--accent);
       color: #fff;
     }
+
+    /* ── Resume Where You Left Off Banner ─────────────────────────────────── */
+    .crm-resume-banner {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(37, 99, 235, 0.07) 100%);
+      border: 1.5px solid rgba(16, 185, 129, 0.35);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.08);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    :root[data-theme='dark'] .crm-resume-banner {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(37, 99, 235, 0.12) 100%);
+      border-color: rgba(52, 211, 153, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    .crm-resume-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      min-width: 260px;
+    }
+    .crm-resume-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .crm-resume-icon-wrap svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.4;
+      fill: #fff;
+    }
+    .crm-resume-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .crm-resume-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+    .crm-resume-badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    :root[data-theme='dark'] .crm-resume-badge-live {
+      background: rgba(16, 185, 129, 0.25);
+      color: #34d399;
+      border-color: rgba(52, 211, 153, 0.4);
+    }
+    .crm-resume-time {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .crm-resume-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0 0 3px 0;
+      line-height: 1.3;
+    }
+    .crm-resume-subtitle {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.4;
+    }
+    .crm-resume-subtitle strong {
+      color: var(--text-primary);
+    }
+    .crm-resume-phone {
+      font-family: monospace;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--bg-card);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .crm-resume-banner-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .crm-resume-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(16, 185, 129, 0.25);
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .crm-resume-btn-primary:hover {
+      background: linear-gradient(135deg, #047857, #059669);
+      box-shadow: 0 5px 16px rgba(16, 185, 129, 0.4);
+      transform: translateY(-1px);
+    }
+    .crm-resume-btn-primary svg {
+      width: 14px;
+      height: 14px;
+      fill: #fff;
+    }
+    .crm-resume-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid rgba(16, 185, 129, 0.35);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .crm-resume-close-btn:hover {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: #ef4444;
+      color: #dc2626;
+      transform: scale(1.06);
+    }
+    .crm-resume-close-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+    }
+    :root[data-theme='dark'] .crm-resume-close-btn {
+      background: rgba(30, 41, 59, 0.85);
+      border-color: rgba(52, 211, 153, 0.35);
+      color: #94a3b8;
+    }
+    :root[data-theme='dark'] .crm-resume-close-btn:hover {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: #f87171;
+      color: #f87171;
+    }
+
+    /* ── Assigned Card Actions & Resume Button ───────────────────────────── */
+    .assign-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 12px;
+      width: 100%;
+    }
+    .assign-card-resume-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #059669;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 999px;
+      margin-top: 8px;
+    }
+    :root[data-theme='dark'] .assign-card-resume-badge {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(52, 211, 153, 0.3);
+    }
+    .card-resume-btn {
+      flex: 1;
+      padding: 9px 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+      transition: all 0.2s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .card-resume-btn:hover {
+      background: linear-gradient(135deg, #047857, #059669);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      transform: translateY(-1px);
+    }
+    .open-btn.open-btn-compact {
+      width: auto;
+      flex: 1;
+      margin-top: 0;
+      padding: 9px 12px;
+      font-size: 12.5px;
+    }
+    .open-btn.open-btn-outline {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1.5px solid var(--border);
+      box-shadow: none;
+    }
+    .open-btn.open-btn-outline:hover {
+      background: var(--bg-card);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* ── Resume Row Highlight & Active Row Styles ───────────────────────── */
+    table.crm-table tbody tr.row-resumed-highlight {
+      position: relative;
+      animation: resumeRowPulse 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes resumeRowPulse {
+      0% {
+        background-color: rgba(16, 185, 129, 0.38) !important;
+        box-shadow: inset 0 0 0 2px #059669, 0 0 20px rgba(16, 185, 129, 0.28);
+      }
+      70% {
+        background-color: rgba(16, 185, 129, 0.18) !important;
+        box-shadow: inset 0 0 0 1.5px rgba(16, 185, 129, 0.5);
+      }
+      100% {
+        box-shadow: none;
+      }
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.row-resumed-highlight {
+      animation: resumeRowPulseDark 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes resumeRowPulseDark {
+      0% {
+        background-color: rgba(52, 211, 153, 0.36) !important;
+        box-shadow: inset 0 0 0 2px #10b981, 0 0 22px rgba(16, 185, 129, 0.35);
+      }
+      70% {
+        background-color: rgba(52, 211, 153, 0.18) !important;
+        box-shadow: inset 0 0 0 1.5px rgba(52, 211, 153, 0.5);
+      }
+      100% {
+        box-shadow: none;
+      }
+    }
+
+    table.crm-table tbody tr.crm-record-row.is-active-row td {
+      border-top: 1.5px solid rgba(16, 185, 129, 0.45);
+      border-bottom: 1.5px solid rgba(16, 185, 129, 0.45);
+      background-color: rgba(16, 185, 129, 0.05);
+    }
+    table.crm-table tbody tr.crm-record-row.is-active-row td:first-child {
+      border-left: 4.5px solid #059669 !important;
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.crm-record-row.is-active-row td {
+      border-top: 1.5px solid rgba(52, 211, 153, 0.4);
+      border-bottom: 1.5px solid rgba(52, 211, 153, 0.4);
+      background-color: rgba(16, 185, 129, 0.08);
+    }
+    :root[data-theme='dark'] table.crm-table tbody tr.crm-record-row.is-active-row td:first-child {
+      border-left: 4.5px solid #10b981 !important;
+    }
   </style>
 </head>
 <body>
@@ -2197,6 +2500,9 @@
 
       <!-- ─── View: Assignment List ─────────────────────────────────────── -->
       <div id="view-list">
+
+        <!-- ═══ RESUME WHERE YOU LEFT OFF BANNER ═══ -->
+        <div id="crm-resume-banner-container" style="display:none; margin-bottom: 22px;"></div>
 
         <!-- ═══ COMPACT ASSIGNMENT OVERVIEW ═══ -->
         <section class="assignment-overview-grid" id="assignment-overview-grid" aria-label="Assignment Overview">
@@ -3071,10 +3377,14 @@ function populateDispositionFilter() {
 }
 
 // ── Assignment Workspace State Persistence ────────────────────────────────
-function getAssignmentStateStorageKey() {
-  const u = (typeof getUser === 'function' ? getUser() : null) || (typeof user !== 'undefined' ? user : null);
-  const uid = u?.id || 'default';
-  return `employee_${uid}_active_assignment_state`;
+let activeRecordId = null;
+
+function getAssignmentStateKey(uid, assignmentId) {
+  return `cln_asgn_state_${uid}_${assignmentId}`;
+}
+
+function getLastActiveAssignmentKey(uid) {
+  return `cln_last_active_asgn_${uid}`;
 }
 
 function saveActiveAssignmentState() {
@@ -3082,10 +3392,41 @@ function saveActiveAssignmentState() {
   const sheetView = document.getElementById('view-sheet');
   if (sheetView && sheetView.style.display !== 'block') return;
 
+  const u = (typeof getUser === 'function' ? getUser() : null) || (typeof user !== 'undefined' ? user : null);
+  const uid = u?.id || 'default';
+
   try {
     const searchInp = document.getElementById('crm-search-input');
+    
+    // Find active record details
+    let recObj = null;
+    let recSeq = null;
+    let recPhone = null;
+    if (activeRecordId && Array.isArray(allRecords)) {
+      recObj = allRecords.find(r => r.id === activeRecordId);
+      if (recObj) {
+        recSeq = recObj._seq || (allRecords.indexOf(recObj) + 1);
+        recPhone = recObj.phone_number ? String(recObj.phone_number).trim() : '';
+      }
+    }
+    // If no row explicitly clicked yet, default to first visible record on current page
+    if (!recSeq && Array.isArray(allFilteredRecords) && allFilteredRecords.length > 0) {
+      const pageStartIdx = Math.max(0, ((recPage || 1) - 1) * (recPerPage || 100));
+      recObj = allFilteredRecords[pageStartIdx] || allFilteredRecords[0];
+      if (recObj) {
+        recSeq = recObj._seq || (allFilteredRecords.indexOf(recObj) + 1);
+        recPhone = recObj.phone_number ? String(recObj.phone_number).trim() : '';
+        activeRecordId = recObj.id;
+      }
+    }
+
     const state = {
+      employeeId: uid,
       assignmentId: currentAssignment.id,
+      fileName: currentAssignment.original_name || 'Workbook',
+      recordId: activeRecordId || null,
+      recordSeq: recSeq,
+      phoneNumber: recPhone,
       search: searchInp ? searchInp.value : (searchFilterText || ''),
       statusFilter: statusFilterVal || 'all',
       dispFilter: dispFilterVal || 'all',
@@ -3094,23 +3435,212 @@ function saveActiveAssignmentState() {
       scrollY: window.scrollY || document.documentElement.scrollTop || 0,
       updatedAt: Date.now()
     };
-    localStorage.setItem(getAssignmentStateStorageKey(), JSON.stringify(state));
+
+    localStorage.setItem(getAssignmentStateKey(uid, currentAssignment.id), JSON.stringify(state));
+
+    // Pointer to most recently active assignment
+    localStorage.setItem(getLastActiveAssignmentKey(uid), JSON.stringify({
+      employeeId: uid,
+      assignmentId: currentAssignment.id,
+      recordId: activeRecordId || null,
+      recordSeq: recSeq,
+      phoneNumber: recPhone,
+      fileName: currentAssignment.original_name || 'Workbook',
+      updatedAt: Date.now()
+    }));
   } catch (err) {}
 }
 
-function clearActiveAssignmentState() {
+function clearActiveAssignmentState(assignmentId = null) {
   try {
-    localStorage.removeItem(getAssignmentStateStorageKey());
+    const u = (typeof getUser === 'function' ? getUser() : null) || (typeof user !== 'undefined' ? user : null);
+    const uid = u?.id || 'default';
+    if (assignmentId) {
+      localStorage.removeItem(getAssignmentStateKey(uid, assignmentId));
+      const last = getLastActiveAssignment();
+      if (last && last.assignmentId === assignmentId) {
+        localStorage.removeItem(getLastActiveAssignmentKey(uid));
+      }
+    } else {
+      const last = getLastActiveAssignment();
+      if (last && last.assignmentId) {
+        localStorage.removeItem(getAssignmentStateKey(uid, last.assignmentId));
+      }
+      localStorage.removeItem(getLastActiveAssignmentKey(uid));
+      localStorage.removeItem(`employee_${uid}_active_assignment_state`);
+    }
   } catch (err) {}
 }
 
-function getSavedAssignmentState() {
+function getSavedAssignmentState(assignmentId = null) {
   try {
-    const raw = localStorage.getItem(getAssignmentStateStorageKey());
+    const u = (typeof getUser === 'function' ? getUser() : null) || (typeof user !== 'undefined' ? user : null);
+    const uid = u?.id || 'default';
+    if (assignmentId) {
+      const raw = localStorage.getItem(getAssignmentStateKey(uid, assignmentId));
+      if (raw) return JSON.parse(raw);
+    }
+    const last = getLastActiveAssignment();
+    if (last && last.assignmentId && (!assignmentId || last.assignmentId === assignmentId)) {
+      const raw = localStorage.getItem(getAssignmentStateKey(uid, last.assignmentId));
+      if (raw) return JSON.parse(raw);
+    }
+    const legacy = localStorage.getItem(`employee_${uid}_active_assignment_state`);
+    return legacy ? JSON.parse(legacy) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+function getLastActiveAssignment() {
+  try {
+    const u = (typeof getUser === 'function' ? getUser() : null) || (typeof user !== 'undefined' ? user : null);
+    const uid = u?.id || 'default';
+    const raw = localStorage.getItem(getLastActiveAssignmentKey(uid));
     return raw ? JSON.parse(raw) : null;
   } catch (err) {
     return null;
   }
+}
+
+function handleRowActivate(recordId, shouldSave = true) {
+  if (!recordId) return;
+  activeRecordId = recordId;
+
+  document.querySelectorAll('.crm-record-row.is-active-row').forEach(el => {
+    if (el.id !== `rec-row-${recordId}`) el.classList.remove('is-active-row');
+  });
+  const row = document.getElementById(`rec-row-${recordId}`);
+  if (row) row.classList.add('is-active-row');
+
+  if (shouldSave) {
+    saveActiveAssignmentState();
+  }
+}
+
+function bringRecordIntoView(recordId, seqNum, announceToast = false) {
+  const row = document.getElementById(`rec-row-${recordId}`);
+  if (row) {
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    row.classList.remove('row-resumed-highlight');
+    void row.offsetWidth;
+    row.classList.add('row-resumed-highlight');
+
+    document.querySelectorAll('.crm-record-row.is-active-row').forEach(el => {
+      if (el.id !== `rec-row-${recordId}`) el.classList.remove('is-active-row');
+    });
+    row.classList.add('is-active-row');
+
+    setTimeout(() => {
+      row.classList.remove('row-resumed-highlight');
+    }, 3200);
+
+    if (announceToast) {
+      showToast(`Resumed at Record #${seqNum}`, 'info');
+    }
+  }
+}
+
+function dismissResumeBanner(e) {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  const lastActive = getLastActiveAssignment();
+  const asgnId = lastActive ? lastActive.assignmentId : null;
+
+  // Clear active session and pointer
+  clearActiveAssignmentState(asgnId);
+
+  const bannerContainer = document.getElementById('crm-resume-banner-container');
+  if (bannerContainer) {
+    bannerContainer.style.display = 'none';
+    bannerContainer.innerHTML = '';
+  }
+
+  // Refresh assignment cards
+  if (typeof renderAssignmentList === 'function') {
+    renderAssignmentList();
+  }
+
+  showToast('Resume session closed.', 'info');
+}
+
+function renderResumeBanner() {
+  const bannerContainer = document.getElementById('crm-resume-banner-container');
+  if (!bannerContainer) return;
+
+  const lastActive = getLastActiveAssignment();
+  if (!lastActive || !lastActive.assignmentId) {
+    bannerContainer.style.display = 'none';
+    bannerContainer.innerHTML = '';
+    return;
+  }
+
+  // Check if assignment exists in current employee assignments
+  const asgn = allAssignments.find(a => a.id === lastActive.assignmentId);
+  if (!asgn || asgn.status === 'Completed') {
+    bannerContainer.style.display = 'none';
+    bannerContainer.innerHTML = '';
+    return;
+  }
+
+  let timeStr = 'Recently';
+  if (lastActive.updatedAt) {
+    const diffMin = Math.round((Date.now() - lastActive.updatedAt) / 60000);
+    if (diffMin < 1) timeStr = 'Just now';
+    else if (diffMin === 1) timeStr = '1 min ago';
+    else if (diffMin < 60) timeStr = `${diffMin} mins ago`;
+    else {
+      const diffHours = Math.round(diffMin / 60);
+      if (diffHours === 1) timeStr = '1 hour ago';
+      else if (diffHours < 24) timeStr = `${diffHours} hours ago`;
+      else timeStr = 'Yesterday';
+    }
+  }
+
+  const recordSeqText = lastActive.recordSeq ? `Record #${lastActive.recordSeq}` : (asgn && asgn.total_records ? 'Record #1' : 'Workspace');
+  const fileNameText = escHtml(asgn.original_name || lastActive.fileName || 'Workbook');
+  const phoneText = lastActive.phoneNumber ? escHtml(lastActive.phoneNumber) : '';
+
+  bannerContainer.innerHTML = `
+    <div class="crm-resume-banner" role="region" aria-label="Resume active workbook">
+      <div class="crm-resume-banner-left">
+        <div class="crm-resume-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
+        <div class="crm-resume-info">
+          <div class="crm-resume-header-row">
+            <span class="crm-resume-badge-live">
+              <i class="fas fa-history" style="font-size:10px;"></i>
+              Resume Where You Left Off
+            </span>
+            <span class="crm-resume-time">• ${timeStr}</span>
+          </div>
+          <h3 class="crm-resume-title">${fileNameText}</h3>
+          <p class="crm-resume-subtitle">
+            Assignment <strong>#${asgn.id}</strong> • Working on <strong>${recordSeqText}</strong>
+            ${phoneText ? ` • <span class="crm-resume-phone"><i class="fas fa-phone-alt"></i> ${phoneText}</span>` : ''}
+          </p>
+        </div>
+      </div>
+      <div class="crm-resume-banner-actions">
+        <button class="crm-resume-btn-primary" onclick="openSheet(${asgn.id})" title="Resume at ${recordSeqText}">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Resume at ${recordSeqText}</span>
+        </button>
+        <button class="crm-resume-close-btn" onclick="dismissResumeBanner(event)" title="Close Resume record" aria-label="Close Resume record">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `;
+  bannerContainer.style.display = 'block';
 }
 
 // ── Init & URL Query Parameter Handling ────────────────────────────────────
@@ -3122,16 +3652,13 @@ async function init() {
   const targetPhone = urlParams.get('phone');
   const targetRecordId = parseInt(urlParams.get('recordId'), 10);
 
-  const savedState = getSavedAssignmentState();
-
-  let targetAssignmentId = targetId;
-  let restoreState = null;
-
-  if (targetAssignmentId) {
-    if (savedState && savedState.assignmentId === targetAssignmentId && !targetRecordId && !targetPhone) {
+  if (targetId) {
+    const savedState = getSavedAssignmentState(targetId);
+    let restoreState = null;
+    if (savedState && !targetRecordId && !targetPhone) {
       restoreState = savedState;
     }
-    await openSheet(targetAssignmentId, restoreState);
+    await openSheet(targetId, restoreState);
     if (targetRecordId || targetPhone) {
       setTimeout(() => {
         focusRecordInSheet(targetRecordId || null, targetPhone || null);
@@ -3139,7 +3666,8 @@ async function init() {
     }
   } else {
     // Navigated to root My Assigned Records - stay on workbook list
-    clearActiveAssignmentState();
+    // Preserve existing saved assignment state and display top Resume banner
+    renderResumeBanner();
   }
 }
 
@@ -3240,6 +3768,35 @@ function filterAssignmentCards(filter) {
     const rowRangeText = (a.start_row && a.end_row) ? `Rows ${a.start_row}–${a.end_row}` : 'Rows —';
     const assignedDateText = fmtDate(a.assigned_at);
 
+    const savedState = getSavedAssignmentState(a.id);
+    const hasActiveSession = savedState && savedState.recordSeq && !isCompleted;
+    const sessionBadgeHtml = hasActiveSession ? `
+      <div class="assign-card-resume-badge" title="Active session at Record #${savedState.recordSeq}">
+        <i class="fas fa-bookmark" aria-hidden="true"></i>
+        <span>Session: Record #${savedState.recordSeq}</span>
+      </div>
+    ` : '';
+
+    const actionsHtml = hasActiveSession ? `
+      <div class="assign-card-actions">
+        <button class="card-resume-btn" onclick="event.stopPropagation();openSheet(${a.id})" title="Resume at Record #${savedState.recordSeq}">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Resume at Record #${savedState.recordSeq}</span>
+        </button>
+        <button class="open-btn open-btn-compact open-btn-outline" onclick="event.stopPropagation();openSheet(${a.id})" title="Open CRM Workspace for ${escHtml(a.original_name)}">
+          <span>Open Sheet</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:13px;height:13px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    ` : `
+      <div class="assign-card-actions">
+        <button class="open-btn" onclick="event.stopPropagation();openSheet(${a.id})" title="Open CRM Workspace for ${escHtml(a.original_name)}">
+          <span>${isCompleted ? 'View Completed Sheet' : 'Open CRM Workspace'}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    `;
+
     return `
       <div class="assign-card ${isCompleted ? 'completed' : ''}" onclick="openSheet(${a.id})">
         <div class="assign-card-header">
@@ -3258,6 +3815,7 @@ function filterAssignmentCards(filter) {
               <span class="meta-sep">•</span>
               <span class="meta-item meta-id">ID #${a.id}</span>
             </div>
+            ${sessionBadgeHtml}
           </div>
           <span class="crm-badge ${badgeCls}">${escHtml(a.status)}</span>
         </div>
@@ -3293,10 +3851,7 @@ function filterAssignmentCards(filter) {
         </div>
         <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;"></div></div>
 
-        <button class="open-btn" onclick="event.stopPropagation();openSheet(${a.id})" title="Open CRM Workspace for ${escHtml(a.original_name)}">
-          <span>${isCompleted ? 'View Completed Sheet' : 'Open CRM Workspace'}</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
+        ${actionsHtml}
       </div>
     `;
   }).join('');
@@ -3608,8 +4163,8 @@ async function openSheet(assignmentId, savedFilterState = null) {
     }
   }
 
-  // Restore or Reset filters
-  const activeState = savedFilterState || (getSavedAssignmentState()?.assignmentId === assignmentId ? getSavedAssignmentState() : null);
+  // Restore or Reset filters and working position
+  const activeState = savedFilterState || getSavedAssignmentState(assignmentId);
 
   if (activeState) {
     searchFilterText = (activeState.search || '').trim().toLowerCase();
@@ -3617,11 +4172,13 @@ async function openSheet(assignmentId, savedFilterState = null) {
     dispFilterVal = activeState.dispFilter || 'all';
     recPage = activeState.recPage || 1;
     if (activeState.recPerPage) recPerPage = activeState.recPerPage;
+    activeRecordId = activeState.recordId || null;
   } else {
     searchFilterText = '';
     statusFilterVal = 'all';
     dispFilterVal = 'all';
     recPage = 1;
+    activeRecordId = null;
   }
 
   const searchInp = document.getElementById('crm-search-input');
@@ -3648,13 +4205,45 @@ async function openSheet(assignmentId, savedFilterState = null) {
 
   await loadSheetRecords();
 
-  saveActiveAssignmentState();
+  // Restore employee working record position
+  if (activeState && (activeState.recordId || activeState.recordSeq)) {
+    const targetRec = allRecords.find(r => 
+      (activeState.recordId && r.id === activeState.recordId) ||
+      (activeState.recordSeq && r._seq === activeState.recordSeq)
+    );
 
-  if (activeState && typeof activeState.scrollY === 'number' && activeState.scrollY > 0) {
+    if (targetRec) {
+      activeRecordId = targetRec.id;
+      const filteredIdx = allFilteredRecords.findIndex(r => r.id === targetRec.id);
+      if (filteredIdx !== -1) {
+        const correctPage = Math.floor(filteredIdx / recPerPage) + 1;
+        if (recPage !== correctPage) {
+          recPage = correctPage;
+          renderRecordsTable();
+        }
+        setTimeout(() => {
+          bringRecordIntoView(targetRec.id, targetRec._seq || (filteredIdx + 1), false);
+        }, 220);
+      } else {
+        showToast(`Resumed assignment. Previous record #${targetRec._seq || activeState.recordSeq} is currently hidden by active filters.`, 'info');
+        if (typeof activeState.scrollY === 'number' && activeState.scrollY > 0) {
+          setTimeout(() => {
+            window.scrollTo({ top: activeState.scrollY, behavior: 'auto' });
+          }, 150);
+        }
+      }
+    } else if (typeof activeState.scrollY === 'number' && activeState.scrollY > 0) {
+      setTimeout(() => {
+        window.scrollTo({ top: activeState.scrollY, behavior: 'auto' });
+      }, 150);
+    }
+  } else if (activeState && typeof activeState.scrollY === 'number' && activeState.scrollY > 0) {
     setTimeout(() => {
       window.scrollTo({ top: activeState.scrollY, behavior: 'auto' });
     }, 150);
   }
+
+  saveActiveAssignmentState();
 }
 
 // ── Load Records for Sheet Workspace ──────────────────────────────────────
@@ -3941,6 +4530,9 @@ function buildCrmRecordRow(r, displayIndex = null) {
   if (hasPending) {
     rowClasses.push('is-dirty');
   }
+  if (activeRecordId && r.id === activeRecordId) {
+    rowClasses.push('is-active-row');
+  }
 
   // Phone actions
   const rawPhone = r.phone_number ? String(r.phone_number).trim() : '';
@@ -3953,6 +4545,7 @@ function buildCrmRecordRow(r, displayIndex = null) {
     : `
       <select class="crm-table-select ${hasPending && pending.disposition !== r.disposition ? 'is-dirty' : ''}"
         id="disp-sel-${r.id}"
+        onfocus="handleRowActivate(${r.id})"
         onchange="handleRowDispChange(${r.id}, this.value)">
         ${renderDispositionOptions(disp)}
       </select>
@@ -3965,6 +4558,7 @@ function buildCrmRecordRow(r, displayIndex = null) {
     : `
       <select class="crm-table-select ${hasPending && pending.sub_disposition !== r.sub_disposition ? 'is-dirty' : ''}"
         id="subdisp-sel-${r.id}"
+        onfocus="handleRowActivate(${r.id})"
         onchange="handleRowSubDispChange(${r.id}, this.value)"
         ${isSubDisabled ? 'disabled' : ''}>
         <option value="">${disp ? 'Select sub disposition...' : 'Select disposition first'}</option>
@@ -3978,6 +4572,7 @@ function buildCrmRecordRow(r, displayIndex = null) {
       id="notes-inp-${r.id}"
       rows="2"
       placeholder="Add call notes..."
+      onfocus="handleRowActivate(${r.id})"
       oninput="handleRowNotesChange(${r.id}, this.value)"
       ${rowLocked ? 'readonly' : ''}>${escHtml(notes)}</textarea>
   `;
@@ -4019,7 +4614,7 @@ function buildCrmRecordRow(r, displayIndex = null) {
   const rowNum = displayIndex !== null ? displayIndex : (r._seq || (allRecords.indexOf(r) + 1) || r.row_index);
 
   return `
-    <tr class="${rowClasses.join(' ')}" id="rec-row-${r.id}">
+    <tr class="${rowClasses.join(' ')}" id="rec-row-${r.id}" onclick="handleRowActivate(${r.id})">
       <td style="text-align: center;"><span class="crm-row-index" title="Excel Row: ${r.row_index}" data-row-index="${r.row_index}">${rowNum}</span></td>
       <td>
         <div class="crm-phone-cell">
@@ -4068,6 +4663,7 @@ function buildCrmRecordRow(r, displayIndex = null) {
 
 // ── In-Row Change Handlers ────────────────────────────────────────────────
 function handleRowDispChange(rId, newDisp) {
+  handleRowActivate(rId);
   initPendingForRecord(rId);
   pendingChanges[rId].disposition = newDisp;
 
@@ -4101,12 +4697,14 @@ function handleRowDispChange(rId, newDisp) {
 }
 
 function handleRowSubDispChange(rId, newSubDisp) {
+  handleRowActivate(rId);
   initPendingForRecord(rId);
   pendingChanges[rId].sub_disposition = newSubDisp;
   markRowDirty(rId);
 }
 
 function handleRowNotesChange(rId, newNotes) {
+  handleRowActivate(rId);
   initPendingForRecord(rId);
   pendingChanges[rId].notes = newNotes;
   markRowDirty(rId);
@@ -4241,6 +4839,7 @@ async function saveRow(rId) {
 
     const rObj = allRecords.find(r => r.id === rId);
     const seqNum = rObj ? (rObj._seq || (allRecords.indexOf(rObj) + 1)) : null;
+    handleRowActivate(rId, true);
     showToast(`Record #${seqNum || res.record?.row_index || rId} saved successfully.`, 'success');
 
   } catch (e) {
@@ -4421,7 +5020,7 @@ async function doSubmit() {
 
     await loadAssignments();
     await loadSheetRecords();
-    saveActiveAssignmentState();
+    clearActiveAssignmentState(currentAssignment.id);
   } catch (e) {
     closeModal('submit-modal');
     const msg = e.message || '';
@@ -4440,14 +5039,17 @@ function goBackToList() {
   if (Object.keys(pendingChanges).length > 0) {
     if (!confirm('You have unsaved changes in this sheet. Are you sure you want to exit without saving?')) return;
   }
+  // Save current position state before leaving the sheet workspace
+  saveActiveAssignmentState();
   pendingChanges = {};
-  clearActiveAssignmentState();
   currentAssignment = null;
+  activeRecordId = null;
   document.getElementById('view-sheet').style.display = 'none';
   document.getElementById('view-list').style.display = 'block';
 
   renderAssignmentList();
   updateOverviewStats();
+  renderResumeBanner();
 
   try {
     if (window.location.search) {
@@ -4495,17 +5097,38 @@ window.addEventListener('popstate', () => {
   const id = parseInt(params.get('assignmentId'), 10);
   if (!id) {
     if (document.getElementById('view-sheet')?.style.display === 'block') {
-      clearActiveAssignmentState();
+      saveActiveAssignmentState();
       pendingChanges = {};
       currentAssignment = null;
+      activeRecordId = null;
       document.getElementById('view-sheet').style.display = 'none';
       document.getElementById('view-list').style.display = 'block';
       renderAssignmentList();
       updateOverviewStats();
+      renderResumeBanner();
     }
   } else if (!currentAssignment || currentAssignment.id !== id) {
     openSheet(id);
   }
+});
+
+// Protect unsaved changes and persist working state on sidebar navigation
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.sidebar-nav a').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href') || '';
+      if (href.includes('data-excel.html')) return;
+      if (typeof pendingChanges !== 'undefined' && Object.keys(pendingChanges).length > 0) {
+        if (!confirm('You have unsaved changes in this sheet. Are you sure you want to leave without saving?')) {
+          e.preventDefault();
+          return;
+        }
+      }
+      if (currentAssignment && document.getElementById('view-sheet')?.style.display === 'block') {
+        saveActiveAssignmentState();
+      }
+    });
+  });
 });
 
 // ── Helper & UI Rendering Utilities ───────────────────────────────────────

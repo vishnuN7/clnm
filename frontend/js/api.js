@@ -1375,10 +1375,17 @@ const clearSession = () => {
     sessionStorage.removeItem('cln_quick_paste_details');
     sessionStorage.removeItem('cln_auto_loan_data');
     sessionStorage.removeItem('login_error');
-    ['password', 'userPassword', 'employeePassword', 'savedPassword', 'loginPassword', 'credentials', 'savedCredentials'].forEach(k => {
-      localStorage.removeItem(k);
-      sessionStorage.removeItem(k);
-    });
+    // Clear employee assignment resume states for session isolation
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('cln_asgn_state_') || k.startsWith('cln_last_active_asgn_') || k.startsWith('employee_'))) {
+          keysToRemove.push(k);
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
+    } catch (e) {}
   } catch (err) {}
 };
 

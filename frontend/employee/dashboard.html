@@ -1612,11 +1612,49 @@
   const loadDashboard = loadDashboardData;
   window.loadDashboard = loadDashboardData;
 
+  function renderResumeWorkWidget() {
+    try {
+      const u = (typeof getUser === 'function' ? getUser() : null) || user;
+      if (!u || !u.id) return;
+      const raw = localStorage.getItem(`cln_last_active_asgn_${u.id}`);
+      if (!raw) return;
+      const asgn = JSON.parse(raw);
+      if (!asgn || !asgn.assignmentId) return;
+
+      const grid = document.querySelector('.quick-actions-grid');
+      if (!grid) return;
+      if (document.getElementById('qa-resume-card')) return;
+
+      const card = document.createElement('a');
+      card.id = 'qa-resume-card';
+      card.href = `/employee/data-excel.html?assignmentId=${asgn.assignmentId}`;
+      card.className = 'quick-action-card';
+      card.style.borderLeft = '3.5px solid #10b981';
+
+      const fileName = asgn.fileName ? asgn.fileName.replace(/</g, '&lt;').replace(/>/g, '&gt;') : 'Assigned Workbook';
+      const recordSeq = asgn.recordSeq ? `Record #${asgn.recordSeq}` : 'Previous record';
+
+      card.innerHTML = `
+        <div class="quick-action-icon" style="--qa-accent:#10b981; --qa-bg:rgba(16,185,129,0.12);">
+          <i class="fas fa-play" aria-hidden="true"></i>
+        </div>
+        <div class="quick-action-content">
+          <h3>Resume Calling — ${fileName}</h3>
+          <p>Resume calling from ${recordSeq} in Assignment #${asgn.assignmentId}</p>
+        </div>
+        <i class="fas fa-arrow-right quick-action-arrow" aria-hidden="true"></i>
+      `;
+
+      grid.prepend(card);
+    } catch (e) {}
+  }
+
   function initDashboard() {
     if (!user) return;
     renderSidebarUser();
     const greetingEl = document.getElementById('greeting');
     if (greetingEl) greetingEl.textContent = `Welcome back, ${user.name}!`;
+    renderResumeWorkWidget();
     loadDashboardData();
   }
 
