@@ -43,21 +43,8 @@ async function closeActiveSessions(employeeId) {
   }
 }
 
-async function cleanupOldCompletedBreakRecords() {
-  const [result] = await db.query(`
-    DELETE FROM break_records
-    WHERE end_time IS NOT NULL
-      AND start_time < DATE_SUB(NOW(), INTERVAL 24 HOUR)
-  `);
-
-  if (result.affectedRows > 0) {
-    console.log(`[Scheduler] Deleted ${result.affectedRows} completed break record(s) older than 24 hours.`);
-  }
-}
-
 async function checkAndProcessSchedules() {
   try {
-    await cleanupOldCompletedBreakRecords();
     await excelExpiry.processExpiredAssignments();
     await notifCtrl.checkExpiringAssignments().catch(() => {});
 
@@ -180,6 +167,5 @@ function startScheduler() {
 
 module.exports = {
   startScheduler,
-  checkAndProcessSchedules,
-  cleanupOldCompletedBreakRecords
+  checkAndProcessSchedules
 };
