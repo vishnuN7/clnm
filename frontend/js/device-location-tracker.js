@@ -18,6 +18,19 @@
     }
   }
 
+  // Build the backend URL. On localhost the backend serves this page, so a relative
+  // path works. In production the frontend (Netlify) and backend (Render) are on
+  // different hosts, so we must use API_BASE from api.js (which already ends in /api).
+  function apiUrl(path) {
+    if (typeof API_BASE !== 'undefined' && API_BASE) {
+      return String(API_BASE).replace(/\/$/, '') + path;
+    }
+    if (window.__CLN_API_BASE__) {
+      return String(window.__CLN_API_BASE__).replace(/\/$/, '') + '/api' + path;
+    }
+    return '/api' + path;
+  }
+
   function getAuthToken() {
     return sessionStorage.getItem('cln_token') || localStorage.getItem('cln_token') || '';
   }
@@ -88,8 +101,14 @@
     const token = getAuthToken();
     if (!token) return { success: false, message: 'Unauthenticated' };
 
+    // The backend's allowed capture_status values use 'permission_denied';
+    // 'denied' would be silently stored as 'pending'.
+    if (payload && payload.capture_status === 'denied') {
+      payload = { ...payload, capture_status: 'permission_denied' };
+    }
+
     try {
-      const res = await fetch('/api/login-activity/record-location', {
+      const res = await fetch(apiUrl('/login-activity/record-location'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -317,6 +336,14 @@
           capture_status: 'captured'
         });
 
+        // Only report success if the server actually saved the location
+        if (!res || !res.success) {
+          removeModal();
+          showToast('Could not save your location. Please check your connection and retry.', 'error');
+          notifyLocationUpdate({ permission_status: 'granted', capture_status: 'error' });
+          return;
+        }
+
         if (sessionId) {
           sessionStorage.setItem('cln_loc_captured_' + sessionId, 'true');
         }
@@ -477,7 +504,7 @@
       const token = getAuthToken();
       if (!token) return null;
       try {
-        const res = await fetch('/api/login-activity/my-status', {
+        const res = await fetch(apiUrl('/login-activity/my-status'), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
