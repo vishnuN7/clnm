@@ -997,6 +997,7 @@ async function runMigrations() {
     await require('./migrations/create_private_communication_tables')();
     await require('./migrations/upgrade_private_communication_tables')();
     await require('./migrations/create_login_tracking_tables')();
+    await require('./migrations/ensure_login_activity_schema')();
   } catch (err) {
     console.error('Migration error:', err.message);
   }

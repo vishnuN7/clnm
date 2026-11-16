@@ -72,9 +72,15 @@ module.exports = async function createLoginTrackingTables() {
     `);
     console.log('✅ Table location_audit_logs verified / created.');
 
-    // 3. Backfill from existing attendance_logs if login_activities is empty
+    // 3. Backfill from existing attendance_logs if login_activities is empty.
+    //    Skipped (not fatal) when attendance_logs does not exist yet.
     const [existing] = await db.query('SELECT COUNT(*) AS count FROM login_activities');
-    if (existing[0].count === 0) {
+    const [attTable] = await db.query(
+      "SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'attendance_logs' LIMIT 1"
+    );
+    if (existing[0].count === 0 && attTable.length === 0) {
+      console.warn('[Migration] attendance_logs table not found - skipping login_activities backfill.');
+    } else if (existing[0].count === 0) {
       console.log('[Migration] Backfilling login_activities from attendance_logs...');
       // Sample recent records from attendance_logs
       const [logs] = await db.query(`
