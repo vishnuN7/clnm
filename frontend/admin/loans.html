@@ -142,28 +142,39 @@
       .page-content { padding: 14px 14px 30px; }
     }
 
-    /* ── Cohesive Application Overview Section ────────────────────────── */
+    /* ── Cohesive Application Overview Section (Compact & Responsive) ── */
     .loan-overview-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 18px 22px;
-      margin-bottom: 20px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
     :root[data-theme='dark'] .loan-overview-card {
       background: rgba(16, 23, 33, 0.94);
       border-color: rgba(123, 192, 67, 0.14);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(0, 107, 60, 0.08);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.32), 0 0 14px rgba(0, 107, 60, 0.08);
+    }
+    .loan-overview-card.is-collapsed {
+      padding-bottom: 12px;
+    }
+    .loan-overview-card.is-collapsed .overview-header {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .loan-overview-card.is-collapsed .overview-status-row {
+      display: none !important;
     }
     .overview-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 16px;
-      padding-bottom: 14px;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
       border-bottom: 1px solid var(--border);
       flex-wrap: wrap;
     }
@@ -173,19 +184,19 @@
     .overview-title-group {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       min-width: 0;
     }
     .overview-icon-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
       background: var(--accent-soft);
       color: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 14px;
       flex-shrink: 0;
     }
     :root[data-theme='dark'] .overview-icon-badge {
@@ -194,35 +205,40 @@
     }
     .overview-title {
       margin: 0;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 800;
       color: var(--text-primary);
       letter-spacing: -0.2px;
-      line-height: 1.25;
+      line-height: 1.2;
     }
     :root[data-theme='dark'] .overview-title {
       color: #f8fafc;
     }
     .overview-subtitle {
-      margin: 2px 0 0;
-      font-size: 12px;
+      margin: 1px 0 0;
+      font-size: 11px;
       color: var(--text-secondary);
-      line-height: 1.35;
+      line-height: 1.25;
     }
     :root[data-theme='dark'] .overview-subtitle {
       color: #94a3b8;
     }
+    .overview-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     .overview-total-box {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 7px 14px;
-      border-radius: 10px;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 8px;
       background: #f8fafc;
       border: 1px solid var(--border);
       cursor: pointer;
       user-select: none;
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
     }
     :root[data-theme='dark'] .overview-total-box {
       background: rgba(20, 29, 41, 0.95);
@@ -251,14 +267,14 @@
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       color: var(--text-secondary);
     }
     :root[data-theme='dark'] .overview-total-box .total-label {
       color: #cbd5e1;
     }
     .overview-total-box .total-value {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 800;
       color: var(--accent);
       line-height: 1;
@@ -266,25 +282,54 @@
     :root[data-theme='dark'] .overview-total-box .total-value {
       color: var(--accent);
     }
+    .overview-toggle-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-size: 12px;
+    }
+    .overview-toggle-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    :root[data-theme='dark'] .overview-toggle-btn {
+      background: rgba(20, 29, 41, 0.95);
+      border-color: rgba(123, 192, 67, 0.16);
+      color: #cbd5e1;
+    }
+    :root[data-theme='dark'] .overview-toggle-btn:hover {
+      border-color: var(--accent);
+      color: #6ee7b7;
+      background: rgba(0, 107, 60, 0.2);
+    }
 
     /* ── Compact Status Items Row ─────────────────────────────────────── */
     .overview-status-row {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
+      gap: 8px;
     }
-    @media (max-width: 1024px) {
+    @media (max-width: 1200px) {
       .overview-status-row {
         grid-template-columns: repeat(4, 1fr);
       }
     }
-    @media (max-width: 640px) {
+    @media (max-width: 768px) {
       .overview-status-row {
         grid-template-columns: repeat(2, 1fr);
       }
     }
     .overview-status-item {
-      padding: 10px 12px;
+      padding: 8px 10px;
       border-radius: 8px;
       background: #f8fafc;
       border: 1px solid var(--border);
@@ -293,7 +338,7 @@
       transition: all 0.18s ease;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 3px;
       min-width: 0;
     }
     :root[data-theme='dark'] .overview-status-item {
@@ -302,13 +347,13 @@
     }
     .overview-status-item:hover {
       border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
     :root[data-theme='dark'] .overview-status-item:hover {
       border-color: var(--accent);
       background: rgba(0, 107, 60, 0.16);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
     }
     .overview-status-item.active {
       border-color: var(--accent);
@@ -323,21 +368,23 @@
     .status-item-header {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
     }
     .status-accent-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .dot-pending   { background: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
-    .dot-approved  { background: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
-    .dot-rejected  { background: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
-    .dot-disbursed { background: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
-    .dot-hold      { background: #d97706; box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2); }
-    .dot-abnd      { background: #64748b; box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.2); }
-    .dot-other     { background: #94a3b8; box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.2); }
+    .dot-pending       { background: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25); }
+    .dot-under-review  { background: #8b5cf6; box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25); }
+    .dot-docs-pending  { background: #0ea5e9; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.25); }
+    .dot-approved      { background: #10b981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25); }
+    .dot-disbursed     { background: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25); }
+    .dot-rejected      { background: #ef4444; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25); }
+    .dot-hold          { background: #d97706; box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25); }
+    .dot-abnd          { background: #64748b; box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.25); }
+    .dot-other         { background: #94a3b8; box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.25); }
 
     .overview-status-item .status-label {
       font-size: 11px;
@@ -351,7 +398,7 @@
       color: #cbd5e1;
     }
     .overview-status-item .status-count {
-      font-size: 20px;
+      font-size: 17px;
       font-weight: 800;
       color: var(--text-primary);
       line-height: 1;
@@ -360,98 +407,49 @@
       color: #f8fafc;
     }
 
-    /* ── Single Unified Filter Panel (Fixed Dark Mode Contrast) ──────── */
+    /* ── Compact Filter Toolbar (Single Responsive Row) ─────────────── */
     .loan-filters-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 20px 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
       transition: all 0.2s ease;
     }
     :root[data-theme='dark'] .loan-filters-card {
       background: rgba(16, 23, 33, 0.94);
       border: 1px solid rgba(123, 192, 67, 0.14);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(0, 107, 60, 0.08);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
-    .filters-card-header {
+    .filters-toolbar-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    :root[data-theme='dark'] .filters-card-header {
-      border-bottom-color: rgba(123, 192, 67, 0.12);
-    }
-    .filters-card-title {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--text-primary);
-      display: inline-flex;
-      align-items: center;
       gap: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
+      flex-wrap: wrap;
     }
-    :root[data-theme='dark'] .filters-card-title {
-      color: #f8fafc;
-    }
-    .filters-card-title i {
-      color: var(--accent);
-      font-size: 13px;
-    }
-    :root[data-theme='dark'] .filters-card-title i {
-      color: var(--accent);
-    }
-
-    .filters-active-indicator {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: rgba(37, 99, 235, 0.1);
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 700;
-      border: 1px solid rgba(37, 99, 235, 0.2);
-    }
-    :root[data-theme='dark'] .filters-active-indicator {
-      background: rgba(0, 107, 60, 0.18);
-      color: #6ee7b7;
-      border-color: rgba(123, 192, 67, 0.28);
-    }
-
-    /* Search input row */
-    .filter-search-wrap {
-      margin-bottom: 16px;
-    }
-    .search-input-box {
+    .filter-search-box {
       position: relative;
-      width: 100%;
+      flex: 1 1 240px;
+      min-width: 190px;
     }
     .search-box-icon {
       position: absolute;
-      left: 14px;
+      left: 12px;
       top: 50%;
       transform: translateY(-50%);
       color: #64748b;
-      font-size: 14px;
+      font-size: 13px;
       pointer-events: none;
-      transition: color 0.15s ease;
     }
     :root[data-theme='dark'] .search-box-icon {
       color: var(--accent);
     }
     .loan-search-input {
       width: 100%;
-      height: 42px;
-      padding-left: 40px;
-      padding-right: 36px;
+      height: 36px;
+      padding-left: 36px;
+      padding-right: 32px;
       border-radius: 8px;
       border: 1px solid #cbd5e1;
       background: #f8fafc;
@@ -483,19 +481,18 @@
       background: rgba(22, 33, 46, 0.98);
       box-shadow: 0 0 0 3px rgba(0, 107, 60, 0.2);
     }
-
     .search-clear-btn {
       position: absolute;
-      right: 11px;
+      right: 8px;
       top: 50%;
       transform: translateY(-50%);
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       border: none;
       background: rgba(0, 0, 0, 0.08);
       color: #475569;
-      font-size: 11px;
+      font-size: 10px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -513,59 +510,36 @@
       background: rgba(255, 255, 255, 0.25);
     }
 
-    /* ── Controls Row (City, Employee, Status, Period) ──────────────── */
-    .filters-controls-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
+    .filter-select-wrap {
+      flex: 0 1 145px;
+      min-width: 120px;
     }
-    @media (max-width: 960px) {
-      .filters-controls-grid {
-        grid-template-columns: repeat(2, 1fr);
+    @media (max-width: 1100px) {
+      .filter-select-wrap {
+        flex: 1 1 calc(25% - 8px);
+        min-width: 110px;
       }
     }
-    @media (max-width: 600px) {
-      .filters-controls-grid {
-        grid-template-columns: 1fr;
+    @media (max-width: 768px) {
+      .filter-select-wrap {
+        flex: 1 1 calc(50% - 8px);
+      }
+    }
+    @media (max-width: 480px) {
+      .filter-select-wrap {
+        flex: 1 1 100%;
       }
     }
 
-    .filter-control-item {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 0;
-    }
-    .filter-control-item label {
-      font-size: 12px;
-      font-weight: 700;
-      color: #334155;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      line-height: 1;
-    }
-    :root[data-theme='dark'] .filter-control-item label {
-      color: #cbd5e1;
-    }
-    .filter-control-item label i {
-      color: var(--accent);
-      font-size: 11px;
-    }
-    :root[data-theme='dark'] .filter-control-item label i {
-      color: #60a5fa;
-    }
-
-    /* Custom select styling with native appearance override & chevron */
-    .filter-control-item select {
-      height: 40px;
+    .filter-select {
+      height: 36px;
       border-radius: 8px;
       border: 1px solid #cbd5e1;
       background-color: #f8fafc;
       color: #0f172a;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
-      padding: 0 34px 0 12px;
+      padding: 0 30px 0 10px;
       font-family: inherit;
       width: 100%;
       box-sizing: border-box;
@@ -575,102 +549,87 @@
       -moz-appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569' stroke-width='2.2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 14px 14px;
+      background-position: right 10px center;
+      background-size: 13px 13px;
       transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
     }
-    .filter-control-item select:focus {
+    .filter-select:focus {
       border-color: #2563eb;
       outline: none;
       background-color: #ffffff;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
-    :root[data-theme='dark'] .filter-control-item select {
+    :root[data-theme='dark'] .filter-select {
       background-color: rgba(20, 29, 41, 0.96);
       border-color: rgba(123, 192, 67, 0.18);
       color: #f8fafc;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2382968a' stroke-width='2.2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
     }
-    :root[data-theme='dark'] .filter-control-item select:focus {
+    :root[data-theme='dark'] .filter-select:focus {
       border-color: var(--accent);
       background-color: rgba(22, 33, 46, 0.98);
       color: #ffffff;
       box-shadow: 0 0 0 3px rgba(0, 107, 60, 0.2);
     }
-
-    /* Dropdown Options styling */
-    .filter-control-item select option {
+    .filter-select option {
       background-color: #ffffff;
       color: #0f172a;
       padding: 8px 12px;
     }
-    :root[data-theme='dark'] .filter-control-item select option {
+    :root[data-theme='dark'] .filter-select option {
       background-color: #0c1219;
       color: #f8fafc;
       padding: 8px 12px;
     }
-    .filter-control-item select option:checked {
+    .filter-select option:checked {
       background-color: #2563eb;
       color: #ffffff;
     }
-    :root[data-theme='dark'] .filter-control-item select option:checked {
+    :root[data-theme='dark'] .filter-select option:checked {
       background-color: #006b3c;
       color: #ffffff;
     }
 
-    /* ── Bottom Filter Actions Row (Reset & Status Indicator) ────────── */
-    .filters-bottom-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-      flex-wrap: wrap;
-    }
-    :root[data-theme='dark'] .filters-bottom-row {
-      border-top-color: rgba(123, 192, 67, 0.12);
-    }
-    .filters-status-summary {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
+    .filters-active-indicator {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-    }
-    :root[data-theme='dark'] .filters-status-summary {
-      color: #cbd5e1;
-    }
-    .filters-status-summary i {
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(37, 99, 235, 0.1);
       color: var(--accent);
       font-size: 11px;
+      font-weight: 700;
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      white-space: nowrap;
+      flex: 0 0 auto;
     }
-    :root[data-theme='dark'] .filters-status-summary i {
-      color: #60a5fa;
+    :root[data-theme='dark'] .filters-active-indicator {
+      background: rgba(0, 107, 60, 0.18);
+      color: #6ee7b7;
+      border-color: rgba(123, 192, 67, 0.28);
     }
 
     .filter-reset-btn {
-      height: 38px;
-      padding: 0 16px;
+      height: 36px;
+      padding: 0 12px;
       border-radius: 8px;
       border: 1px solid #cbd5e1;
       background: #f1f5f9;
       color: #334155;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
       transition: all 0.18s ease;
       white-space: nowrap;
-      margin-left: auto;
+      flex: 0 0 auto;
     }
     .filter-reset-btn i {
-      font-size: 12px;
+      font-size: 11px;
       transition: transform 0.2s ease;
     }
     .filter-reset-btn:hover {
@@ -692,10 +651,10 @@
       color: #6ee7b7;
     }
 
-    /* Custom Date Range Collapsible */
+    /* Custom Date Range Collapsible Strip */
     .custom-date-container {
-      margin-top: 14px;
-      padding: 14px 16px;
+      margin-top: 8px;
+      padding: 10px 14px;
       border-radius: 8px;
       background: #f8fafc;
       border: 1px dashed var(--border);
@@ -706,36 +665,42 @@
     }
     .custom-date-row {
       display: flex;
-      align-items: flex-end;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
       flex-wrap: wrap;
     }
     .date-pick-field {
       display: flex;
-      flex-direction: column;
-      gap: 5px;
-      min-width: 160px;
+      align-items: center;
+      gap: 6px;
     }
     .date-pick-field label {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       color: #334155;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
     }
     :root[data-theme='dark'] .date-pick-field label {
       color: #cbd5e1;
     }
+    .date-pick-field label i {
+      color: var(--accent);
+      font-size: 10px;
+    }
+    :root[data-theme='dark'] .date-pick-field label i {
+      color: var(--accent);
+    }
     .date-pick-field input[type="date"] {
-      height: 38px;
-      border-radius: 8px;
+      height: 32px;
+      border-radius: 6px;
       border: 1px solid #cbd5e1;
       background: #ffffff;
       color: #0f172a;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
-      padding: 0 10px;
+      padding: 0 8px;
       font-family: inherit;
       color-scheme: light;
     }
@@ -746,22 +711,18 @@
       color-scheme: dark;
     }
     .date-pick-sep {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
       font-weight: 700;
-      height: 38px;
-      display: inline-flex;
-      align-items: center;
     }
     .date-pick-actions {
       display: flex;
-      gap: 8px;
-      height: 38px;
+      gap: 6px;
       align-items: center;
     }
     .custom-date-error-msg {
-      margin-top: 8px;
-      font-size: 12px;
+      margin-top: 6px;
+      font-size: 11px;
       color: var(--danger, #dc2626);
       font-weight: 600;
     }
@@ -773,7 +734,7 @@
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
       overflow: hidden;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     :root[data-theme='dark'] .loan-records-card {
       background: rgba(16, 23, 33, 0.94);
@@ -783,8 +744,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      padding: 16px 20px;
+      gap: 12px;
+      padding: 10px 16px;
       border-bottom: 1px solid var(--border);
       flex-wrap: wrap;
     }
@@ -965,7 +926,7 @@
       table-layout: fixed;
     }
     .loans-data-table thead th {
-      padding: 12px 10px;
+      padding: 9px 10px;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.4px;
@@ -983,7 +944,7 @@
       color: #82968a;
     }
     .loans-data-table tbody td {
-      padding: 12px 10px;
+      padding: 8px 10px;
       font-size: 12px;
       color: #334155;
       border-bottom: 1px solid #e2e8f0;
@@ -1925,6 +1886,9 @@
         <a href="/admin/loans.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> Loan Applications</a>
         <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> EMI Calculator</a>
         <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> Data Excel Document</a>
+        <a href="/admin/banking-partner-portal.html" class="nav-item"><span class="nav-icon"><i class="fas fa-landmark" aria-hidden="true"></i></span> Banking Partner Portal</a>
+        <a href="/admin/private-communication.html" class="nav-item"><span class="nav-icon"><i class="fas fa-comments" aria-hidden="true"></i></span> Private Communication</a>
+          <a href="/admin/login-activity.html" class="nav-item"><span class="nav-icon"><i class="fas fa-location-dot" aria-hidden="true"></i></span> <span>Login Activity</span></a>
         <a href="/admin/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> APR</a>
       </div>
     </nav>
@@ -1964,7 +1928,7 @@
       <div id="page-alert" class="alert" style="display:none;"></div>
 
       <!-- ── 1. Unified Application Overview ── -->
-      <section class="loan-overview-card" aria-label="Application Overview">
+      <section class="loan-overview-card" id="loan-overview-card" aria-label="Application Overview">
         <div class="overview-header">
           <div class="overview-title-group">
             <div class="overview-icon-badge" aria-hidden="true">
@@ -1975,19 +1939,40 @@
               <p class="overview-subtitle">Real-time status breakdown across all loan applications</p>
             </div>
           </div>
-          <div class="overview-total-box clickable-status active" data-status="all" onclick="filterByCardStatus('')" role="button" tabindex="0" title="Show all applications" aria-label="Show all applications">
-            <span class="total-label">Total Applications</span>
-            <span class="total-value" id="s-total">—</span>
+          <div class="overview-header-actions">
+            <div class="overview-total-box clickable-status active" data-status="all" onclick="filterByCardStatus('')" role="button" tabindex="0" title="Show all applications" aria-label="Show all applications">
+              <span class="total-label">Total</span>
+              <span class="total-value" id="s-total">—</span>
+            </div>
+            <button type="button" class="overview-toggle-btn" id="overview-toggle-btn" onclick="toggleOverviewCollapse()" title="Collapse / Expand status breakdown" aria-label="Collapse / Expand status breakdown" aria-expanded="true">
+              <i class="fas fa-chevron-up" id="overview-toggle-icon" aria-hidden="true"></i>
+            </button>
           </div>
         </div>
 
-        <div class="overview-status-row">
+        <div class="overview-status-row" id="overview-status-row">
           <div class="overview-status-item clickable-status" data-status="Pending" onclick="filterByCardStatus('Pending')" role="button" tabindex="0" title="Filter by Pending" aria-label="Filter by Pending">
             <div class="status-item-header">
               <span class="status-accent-dot dot-pending" aria-hidden="true"></span>
               <span class="status-label">Pending</span>
             </div>
             <span class="status-count" id="s-pending">—</span>
+          </div>
+
+          <div class="overview-status-item clickable-status" data-status="Under Review" onclick="filterByCardStatus('Under Review')" role="button" tabindex="0" title="Filter by Under Review" aria-label="Filter by Under Review">
+            <div class="status-item-header">
+              <span class="status-accent-dot dot-under-review" aria-hidden="true"></span>
+              <span class="status-label">Under Review</span>
+            </div>
+            <span class="status-count" id="s-under-review">—</span>
+          </div>
+
+          <div class="overview-status-item clickable-status" data-status="Documents Pending" onclick="filterByCardStatus('Documents Pending')" role="button" tabindex="0" title="Filter by Documents Pending" aria-label="Filter by Documents Pending">
+            <div class="status-item-header">
+              <span class="status-accent-dot dot-docs-pending" aria-hidden="true"></span>
+              <span class="status-label">Docs Pending</span>
+            </div>
+            <span class="status-count" id="s-docs-pending">—</span>
           </div>
 
           <div class="overview-status-item clickable-status" data-status="Approved" onclick="filterByCardStatus('Approved')" role="button" tabindex="0" title="Filter by Approved" aria-label="Filter by Approved">
@@ -1998,14 +1983,6 @@
             <span class="status-count" id="s-approved">—</span>
           </div>
 
-          <div class="overview-status-item clickable-status" data-status="Rejected" onclick="filterByCardStatus('Rejected')" role="button" tabindex="0" title="Filter by Rejected" aria-label="Filter by Rejected">
-            <div class="status-item-header">
-              <span class="status-accent-dot dot-rejected" aria-hidden="true"></span>
-              <span class="status-label">Rejected</span>
-            </div>
-            <span class="status-count" id="s-rejected">—</span>
-          </div>
-
           <div class="overview-status-item clickable-status" data-status="Loan Disbursed" onclick="filterByCardStatus('Loan Disbursed')" role="button" tabindex="0" title="Filter by Disbursed" aria-label="Filter by Disbursed">
             <div class="status-item-header">
               <span class="status-accent-dot dot-disbursed" aria-hidden="true"></span>
@@ -2014,20 +1991,12 @@
             <span class="status-count" id="s-disbursed">—</span>
           </div>
 
-          <div class="overview-status-item clickable-status" data-status="Hold" onclick="filterByCardStatus('Hold')" role="button" tabindex="0" title="Filter by Hold" aria-label="Filter by Hold">
+          <div class="overview-status-item clickable-status" data-status="Rejected" onclick="filterByCardStatus('Rejected')" role="button" tabindex="0" title="Filter by Rejected" aria-label="Filter by Rejected">
             <div class="status-item-header">
-              <span class="status-accent-dot dot-hold" aria-hidden="true"></span>
-              <span class="status-label">Hold</span>
+              <span class="status-accent-dot dot-rejected" aria-hidden="true"></span>
+              <span class="status-label">Rejected</span>
             </div>
-            <span class="status-count" id="s-hold">—</span>
-          </div>
-
-          <div class="overview-status-item clickable-status" data-status="ABND" onclick="filterByCardStatus('ABND')" role="button" tabindex="0" title="Filter by ABND" aria-label="Filter by ABND">
-            <div class="status-item-header">
-              <span class="status-accent-dot dot-abnd" aria-hidden="true"></span>
-              <span class="status-label">ABND</span>
-            </div>
-            <span class="status-count" id="s-abnd">—</span>
+            <span class="status-count" id="s-rejected">—</span>
           </div>
 
           <div class="overview-status-item clickable-status" data-status="Other" onclick="filterByCardStatus('Other')" role="button" tabindex="0" title="Filter by Other" aria-label="Filter by Other">
@@ -2040,112 +2009,95 @@
         </div>
       </section>
 
-      <!-- ── 2. Unified Filter Section ── -->
+      <!-- ── 2. Unified Filter Toolbar ── -->
       <section class="loan-filters-card" aria-label="Filter loan applications">
-        <div class="filters-card-header">
-          <div class="filters-card-title">
-            <i class="fas fa-sliders" aria-hidden="true"></i>
-            <span>Filters</span>
-          </div>
-          <div id="filter-active-pills" class="filters-active-indicator" style="display:none;">
-            <i class="fas fa-filter" aria-hidden="true"></i>
-            <span id="filters-active-count-text">0 filters active</span>
-          </div>
-        </div>
-
-        <div class="filters-card-body">
+        <div class="filters-toolbar-row">
           <!-- Search field -->
-          <div class="filter-search-wrap">
-            <div class="search-input-box">
-              <i class="fas fa-search search-box-icon" aria-hidden="true"></i>
-              <input type="text" id="search-input" class="loan-search-input" placeholder="Search customer, phone, loan ID..." autocomplete="off" oninput="onSearchInput()" />
-              <button type="button" id="search-clear-btn" class="search-clear-btn" style="display:none;" onclick="clearSearch()" title="Clear search" aria-label="Clear search">
-                <i class="fas fa-times" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Controls grid: City, Employee, Status, Period -->
-          <div class="filters-controls-grid">
-            <!-- City -->
-            <div class="filter-control-item">
-              <label for="area-filter"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> City</label>
-              <select id="area-filter" onchange="onFilterChange()">
-                <option value="">All Cities</option>
-              </select>
-            </div>
-
-            <!-- Employee -->
-            <div class="filter-control-item">
-              <label for="employee-filter"><i class="fas fa-user-tie" aria-hidden="true"></i> Employee</label>
-              <select id="employee-filter" onchange="onFilterChange()">
-                <option value="">All Employees</option>
-              </select>
-            </div>
-
-            <!-- Status -->
-            <div class="filter-control-item">
-              <label for="status-filter"><i class="fas fa-check-circle" aria-hidden="true"></i> Status</label>
-              <select id="status-filter" onchange="onStatusSelectChange()">
-                <option value="">All Statuses</option>
-                <option value="Pending">Pending</option>
-                <option value="Under Review">Under Review</option>
-                <option value="Documents Pending">Documents Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-                <option value="Loan Disbursed">Loan Disbursed</option>
-                <option value="Cancelled">Cancelled</option>
-                <option value="Hold">Hold</option>
-                <option value="ABND">ABND</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-
-            <!-- Period -->
-            <div class="filter-control-item">
-              <label for="period-filter"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Period</label>
-              <select id="period-filter" onchange="onPeriodChange()">
-                <option value="">All Time</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="year">This Year</option>
-                <option value="custom">Custom Range</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Custom Date Range collapsible -->
-          <div id="custom-date-container" class="custom-date-container" style="display:none;">
-            <div class="custom-date-row">
-              <div class="date-pick-field">
-                <label for="start-date"><i class="fas fa-calendar-day" aria-hidden="true"></i> From</label>
-                <input type="date" id="start-date" onchange="validateCustomDates()" />
-              </div>
-              <span class="date-pick-sep">to</span>
-              <div class="date-pick-field">
-                <label for="end-date"><i class="fas fa-calendar-day" aria-hidden="true"></i> To</label>
-                <input type="date" id="end-date" onchange="validateCustomDates()" />
-              </div>
-              <div class="date-pick-actions">
-                <button type="button" class="btn btn-primary btn-sm" onclick="applyCustomRange()">Apply</button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="cancelCustomRange()">Cancel</button>
-              </div>
-            </div>
-            <div id="custom-date-error" class="custom-date-error-msg" style="display:none;"></div>
-          </div>
-
-          <!-- Bottom Action Row: Summary on left, Reset on right -->
-          <div class="filters-bottom-row">
-            <div class="filters-status-summary" id="filters-status-summary">
-              <i class="fas fa-info-circle" aria-hidden="true"></i>
-              <span id="filters-summary-text">Showing all loan records</span>
-            </div>
-            <button type="button" class="filter-reset-btn" id="filter-reset-btn" onclick="resetFilters()" title="Reset loan filters" aria-label="Reset loan filters">
-              <i class="fas fa-rotate-left" aria-hidden="true"></i>
-              <span>Reset Filters</span>
+          <div class="filter-search-box">
+            <i class="fas fa-search search-box-icon" aria-hidden="true"></i>
+            <input type="text" id="search-input" class="loan-search-input" placeholder="Search customer, phone, loan ID..." autocomplete="off" oninput="onSearchInput()" aria-label="Search loans" />
+            <button type="button" id="search-clear-btn" class="search-clear-btn" style="display:none;" onclick="clearSearch()" title="Clear search" aria-label="Clear search">
+              <i class="fas fa-times" aria-hidden="true"></i>
             </button>
           </div>
+
+          <!-- City -->
+          <div class="filter-select-wrap">
+            <select id="area-filter" class="filter-select" onchange="onFilterChange()" aria-label="Filter by City">
+              <option value="">All Cities</option>
+            </select>
+          </div>
+
+          <!-- Employee -->
+          <div class="filter-select-wrap">
+            <select id="employee-filter" class="filter-select" onchange="onFilterChange()" aria-label="Filter by Employee">
+              <option value="">All Employees</option>
+            </select>
+          </div>
+
+          <!-- Status -->
+          <div class="filter-select-wrap">
+            <select id="status-filter" class="filter-select" onchange="onStatusSelectChange()" aria-label="Filter by Status">
+              <option value="">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Documents Pending">Documents Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Loan Disbursed">Loan Disbursed</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Hold">Hold</option>
+              <option value="ABND">ABND</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- Period -->
+          <div class="filter-select-wrap">
+            <select id="period-filter" class="filter-select" onchange="onPeriodChange()" aria-label="Filter by Period">
+              <option value="">All Time</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="year">This Year</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+
+          <!-- Active indicator badge -->
+          <div id="filter-active-pills" class="filters-active-indicator" style="display:none;" title="Active filters">
+            <i class="fas fa-filter" aria-hidden="true"></i>
+            <span id="filters-active-count-text">0 active</span>
+          </div>
+
+          <!-- Reset button -->
+          <button type="button" class="filter-reset-btn" id="filter-reset-btn" onclick="resetFilters()" title="Reset all loan filters" aria-label="Reset all loan filters">
+            <i class="fas fa-rotate-left" aria-hidden="true"></i>
+            <span>Reset</span>
+          </button>
         </div>
+
+        <!-- Custom Date Range collapsible strip -->
+        <div id="custom-date-container" class="custom-date-container" style="display:none;">
+          <div class="custom-date-row">
+            <div class="date-pick-field">
+              <label for="start-date"><i class="fas fa-calendar-day" aria-hidden="true"></i> From</label>
+              <input type="date" id="start-date" onchange="validateCustomDates()" />
+            </div>
+            <span class="date-pick-sep">to</span>
+            <div class="date-pick-field">
+              <label for="end-date"><i class="fas fa-calendar-day" aria-hidden="true"></i> To</label>
+              <input type="date" id="end-date" onchange="validateCustomDates()" />
+            </div>
+            <div class="date-pick-actions">
+              <button type="button" class="btn btn-primary btn-sm" onclick="applyCustomRange()">Apply</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="cancelCustomRange()">Cancel</button>
+            </div>
+          </div>
+          <div id="custom-date-error" class="custom-date-error-msg" style="display:none;"></div>
+        </div>
+
+        <!-- Hidden summary text for backward compatibility -->
+        <span id="filters-summary-text" style="display:none;"></span>
       </section>
 
       <!-- ── 3. Loan Records Section ── -->
@@ -2368,6 +2320,7 @@
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20261008"></script>
+<script src="/js/employee-notifications.js?v=20261111"></script>
 <script>
   let currentLoanId = null;
   let deleteMode = false;
@@ -2507,9 +2460,39 @@
     return 'other';
   }
 
+  function toggleOverviewCollapse() {
+    const card = document.getElementById('loan-overview-card');
+    const toggleBtn = document.getElementById('overview-toggle-btn');
+    const toggleIcon = document.getElementById('overview-toggle-icon');
+    if (!card) return;
+    const isCollapsed = card.classList.toggle('is-collapsed');
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', !isCollapsed);
+    if (toggleIcon) {
+      toggleIcon.className = isCollapsed ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+    }
+    try {
+      localStorage.setItem('cln_loans_overview_collapsed', isCollapsed ? '1' : '0');
+    } catch (e) {}
+  }
+
+  function initOverviewCollapse() {
+    try {
+      const saved = localStorage.getItem('cln_loans_overview_collapsed');
+      if (saved === '1') {
+        const card = document.getElementById('loan-overview-card');
+        const toggleBtn = document.getElementById('overview-toggle-btn');
+        const toggleIcon = document.getElementById('overview-toggle-icon');
+        if (card) card.classList.add('is-collapsed');
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+        if (toggleIcon) toggleIcon.className = 'fas fa-chevron-down';
+      }
+    } catch (e) {}
+  }
+
   const user = requireRole('admin');
   if (user) {
     renderSidebarUser();
+    initOverviewCollapse();
 
     // Set live topbar date
     const dateEl = document.getElementById('current-date') || document.getElementById('topbar-date-text');
@@ -2772,7 +2755,8 @@
 
     if (activeFilters.length > 0) {
       if (indicator && indicatorText) {
-        indicatorText.textContent = `${activeFilters.length} filter${activeFilters.length > 1 ? 's' : ''} active`;
+        indicatorText.textContent = `${activeFilters.length} active`;
+        indicator.title = activeFilters.join(' • ');
         indicator.style.display = 'inline-flex';
       }
       if (summaryText) {
@@ -2819,21 +2803,21 @@
       // Calculate reconciled status breakdown
       const totalCount = allLoans.length;
       const pendingCount = allLoans.filter(l => l.status === 'Pending').length;
+      const underReviewCount = allLoans.filter(l => l.status === 'Under Review').length;
+      const docsPendingCount = allLoans.filter(l => l.status === 'Documents Pending').length;
       const approvedCount = allLoans.filter(l => l.status === 'Approved').length;
-      const rejectedCount = allLoans.filter(l => l.status === 'Rejected').length;
       const disbursedCount = allLoans.filter(l => l.status === 'Loan Disbursed').length;
-      const holdCount = allLoans.filter(l => l.status === 'Hold').length;
-      const abndCount = allLoans.filter(l => l.status === 'ABND').length;
-      const otherCount = allLoans.filter(l => !['Pending', 'Approved', 'Rejected', 'Loan Disbursed', 'Hold', 'ABND'].includes(l.status)).length;
+      const rejectedCount = allLoans.filter(l => l.status === 'Rejected').length;
+      const otherCount = allLoans.filter(l => !['Pending', 'Under Review', 'Documents Pending', 'Approved', 'Loan Disbursed', 'Rejected'].includes(l.status)).length;
 
-      document.getElementById('s-total').textContent = totalCount;
-      document.getElementById('s-pending').textContent = pendingCount;
-      document.getElementById('s-approved').textContent = approvedCount;
-      document.getElementById('s-rejected').textContent = rejectedCount;
-      document.getElementById('s-disbursed').textContent = disbursedCount;
-      document.getElementById('s-hold').textContent = holdCount;
-      document.getElementById('s-abnd').textContent = abndCount;
-      document.getElementById('s-other').textContent = otherCount;
+      if (document.getElementById('s-total')) document.getElementById('s-total').textContent = totalCount;
+      if (document.getElementById('s-pending')) document.getElementById('s-pending').textContent = pendingCount;
+      if (document.getElementById('s-under-review')) document.getElementById('s-under-review').textContent = underReviewCount;
+      if (document.getElementById('s-docs-pending')) document.getElementById('s-docs-pending').textContent = docsPendingCount;
+      if (document.getElementById('s-approved')) document.getElementById('s-approved').textContent = approvedCount;
+      if (document.getElementById('s-disbursed')) document.getElementById('s-disbursed').textContent = disbursedCount;
+      if (document.getElementById('s-rejected')) document.getElementById('s-rejected').textContent = rejectedCount;
+      if (document.getElementById('s-other')) document.getElementById('s-other').textContent = otherCount;
 
       syncActiveCardHighlight(status);
 
@@ -2841,7 +2825,7 @@
       let filteredList = allLoans;
       if (status) {
         if (status === 'Other') {
-          filteredList = allLoans.filter(l => !['Pending', 'Approved', 'Rejected', 'Loan Disbursed', 'Hold', 'ABND'].includes(l.status));
+          filteredList = allLoans.filter(l => !['Pending', 'Under Review', 'Documents Pending', 'Approved', 'Loan Disbursed', 'Rejected'].includes(l.status));
         } else {
           filteredList = allLoans.filter(l => l.status === status);
         }

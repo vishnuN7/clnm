@@ -830,9 +830,12 @@ const breakTimeController = {
           COUNT(al.id) AS total_sessions,
           ROUND(SUM(CASE
             WHEN al.logout_time IS NOT NULL
-            THEN TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time) / 3600.0
-            ELSE TIMESTAMPDIFF(SECOND, al.login_time, NOW()) / 3600.0
-          END), 2) AS total_working_hours,
+              THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time), 12 * 3600))
+            WHEN DATE(al.login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+              THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, NOW()), 12 * 3600))
+            ELSE
+              GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, COALESCE(u.last_active_at, al.login_time)), 12 * 3600))
+          END) / 3600.0, 2) AS total_working_hours,
           (SELECT ROUND(SUM(br.duration)/3600.0, 2)
            FROM break_records br
            WHERE br.employee_id = u.id
@@ -971,9 +974,12 @@ const breakTimeController = {
           MAX(CASE WHEN al.logout_time IS NOT NULL THEN al.logout_time END) AS last_logout,
           ROUND(SUM(CASE
             WHEN al.logout_time IS NOT NULL
-            THEN TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time)/3600.0
-            ELSE TIMESTAMPDIFF(SECOND, al.login_time, NOW())/3600.0
-          END), 2) AS working_hours
+              THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time), 12 * 3600))
+            WHEN DATE(al.login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+              THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, NOW()), 12 * 3600))
+            ELSE
+              GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, COALESCE(u.last_active_at, al.login_time)), 12 * 3600))
+          END) / 3600.0, 2) AS working_hours
         FROM attendance_logs al
         JOIN users u ON u.id = al.employee_id
         WHERE DATE(al.login_time) = ?
@@ -1189,9 +1195,12 @@ const breakTimeController = {
           `SELECT u.name AS employee_name,
              ROUND(SUM(CASE
                WHEN al.logout_time IS NOT NULL
-               THEN TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time) / 3600.0
-               ELSE TIMESTAMPDIFF(SECOND, al.login_time, NOW()) / 3600.0
-             END), 2) AS total_hours
+                 THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time), 12 * 3600))
+               WHEN DATE(al.login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                 THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, NOW()), 12 * 3600))
+               ELSE
+                 GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, COALESCE(u.last_active_at, al.login_time)), 12 * 3600))
+             END) / 3600.0, 2) AS total_hours
            FROM attendance_logs al
            JOIN users u ON u.id = al.employee_id
            WHERE DATE(al.login_time) = ?

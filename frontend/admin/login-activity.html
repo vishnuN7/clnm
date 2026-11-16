@@ -1,0 +1,2362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dixit Lending Solution — Login Activity & Location Tracking</title>
+  <meta name="theme-color" content="#0f2747" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261111b" />
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
+
+  <style>
+    /* ── Topbar Centered Header ── */
+    .admin-page .topbar {
+      display: flex !important;
+      align-items: center !important;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      min-height: 64px;
+      height: auto;
+      padding: 10px 24px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    :root[data-theme='dark'] .admin-page .topbar {
+      background: rgba(12, 18, 25, 0.95);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
+    }
+    .admin-page .topbar-title {
+      position: absolute !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      text-align: center !important;
+      max-width: min(720px, calc(100% - 240px)) !important;
+      pointer-events: auto !important;
+      margin: 0 !important;
+    }
+    .admin-page .topbar-title h2 {
+      margin: 0 !important;
+      font-size: 18px !important;
+      font-weight: 800 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      color: var(--text-primary) !important;
+      letter-spacing: -0.2px !important;
+    }
+    .admin-page .topbar-title p {
+      margin: 2px 0 0 !important;
+      font-size: 12px !important;
+      color: var(--text-muted) !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+      flex: 0 0 auto;
+    }
+
+    /* ── KPI Cards ── */
+    .tracking-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1280px) {
+      .tracking-kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .tracking-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .tracking-kpi-grid { grid-template-columns: 1fr; }
+    }
+
+    .kpi-card {
+      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.98) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(16,32,51,0.04);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+    }
+    :root[data-theme='dark'] .kpi-card {
+      background: linear-gradient(135deg, rgba(16, 23, 33, 0.94) 0%, rgba(12, 18, 25, 0.98) 100%);
+      border-color: rgba(123, 192, 67, 0.14);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--kpi-accent, #0284c7);
+      opacity: 0.9;
+    }
+    .kpi-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .kpi-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+    .kpi-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--kpi-bg, rgba(2, 132, 199, 0.12));
+      color: var(--kpi-accent, #0284c7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+    .kpi-value {
+      font-size: 25px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .kpi-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── Security Advisory Banner ── */
+    .security-banner {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(239, 68, 68, 0.08) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    :root[data-theme='dark'] .security-banner {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(239, 68, 68, 0.12) 100%);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    .security-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .security-banner-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.2);
+      color: #d97706;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    :root[data-theme='dark'] .security-banner-icon {
+      color: #fbbf24;
+    }
+    .security-banner-text h4 {
+      margin: 0 0 2px;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .security-banner-text p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ── Filter Toolbar ── */
+    .filter-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(16,32,51,0.03);
+    }
+    :root[data-theme='dark'] .filter-card {
+      background: rgba(16, 23, 33, 0.94);
+      border-color: rgba(123, 192, 67, 0.14);
+    }
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 2.2fr 1.3fr 1.2fr 1.1fr 1.1fr 1.1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    @media (max-width: 1400px) {
+      .filter-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .filter-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .filter-grid { grid-template-columns: 1fr; }
+    }
+    .filter-input-wrap {
+      position: relative;
+    }
+    .filter-input-wrap i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .filter-input-wrap input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .filter-select, .filter-date {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .filter-actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .date-range-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+    .date-range-group input {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 12px;
+    }
+    .btn-group-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn-act {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .btn-act:hover:not(:disabled) {
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+    .btn-act:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .btn-act-primary {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #fff;
+      border: none;
+    }
+    .btn-act-primary:hover:not(:disabled) {
+      background: #0284c7;
+      color: #fff;
+    }
+    .btn-act-excel {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .btn-act-excel:hover:not(:disabled) {
+      background: #059669;
+      color: #fff;
+    }
+    .btn-act-csv {
+      background: rgba(59, 130, 246, 0.12);
+      color: #2563eb;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    .btn-act-csv:hover:not(:disabled) {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    /* ── Table Card ── */
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(16,32,51,0.03);
+      margin-bottom: 24px;
+    }
+    :root[data-theme='dark'] .table-card {
+      background: rgba(16, 23, 33, 0.94);
+      border-color: rgba(123, 192, 67, 0.14);
+    }
+    .table-responsive {
+      overflow-x: auto;
+      width: 100%;
+    }
+    .login-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    .login-table th {
+      background: rgba(248, 250, 252, 0.9);
+      padding: 12px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    :root[data-theme='dark'] .login-table th {
+      background: rgba(15, 23, 42, 0.8);
+    }
+    .login-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      color: var(--text-primary);
+    }
+    .login-table tr:hover td {
+      background: rgba(2, 132, 199, 0.03);
+    }
+    :root[data-theme='dark'] .login-table tr:hover td {
+      background: rgba(56, 189, 248, 0.04);
+    }
+
+    /* Employee cell */
+    .emp-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .emp-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #10b981);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .emp-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .emp-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .emp-email {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: #059669; }
+    :root[data-theme='dark'] .badge-success { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .badge-warning { background: rgba(245, 158, 11, 0.15); color: #d97706; }
+    :root[data-theme='dark'] .badge-warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .badge-danger { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+    :root[data-theme='dark'] .badge-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .badge-info { background: rgba(2, 132, 199, 0.15); color: #0284c7; }
+    :root[data-theme='dark'] .badge-info { background: rgba(2, 132, 199, 0.2); color: #38bdf8; }
+    .badge-purple { background: rgba(139, 92, 246, 0.15); color: #7c3aed; }
+    :root[data-theme='dark'] .badge-purple { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+    .badge-muted { background: rgba(148, 163, 184, 0.15); color: #64748b; }
+    :root[data-theme='dark'] .badge-muted { background: rgba(148, 163, 184, 0.2); color: #94a3b8; }
+
+    /* Active Pulse */
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      display: inline-block;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulseGreen 1.8s infinite;
+    }
+    @keyframes pulseGreen {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* IP code */
+    .ip-code-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ip-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11.5px;
+      background: var(--bg-secondary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    .ip-copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px;
+      transition: color 0.2s;
+    }
+    .ip-copy-btn:hover {
+      color: #0284c7;
+    }
+
+    /* Table Actions */
+    .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+    .btn-row-action {
+      padding: 5px 9px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-row-action * {
+      pointer-events: none;
+    }
+    .btn-row-action:hover {
+      border-color: #0284c7;
+      color: #0284c7;
+      transform: translateY(-1px);
+    }
+    .btn-row-action:active {
+      transform: translateY(0);
+    }
+    .btn-action-terminate:hover {
+      border-color: #ef4444 !important;
+      color: #ef4444 !important;
+      background: rgba(239, 68, 68, 0.1) !important;
+    }
+    .btn-action-review:hover {
+      border-color: #d97706 !important;
+      color: #d97706 !important;
+      background: rgba(245, 158, 11, 0.1) !important;
+    }
+    .btn-row-action:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Pagination */
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background: rgba(248, 250, 252, 0.6);
+      border-top: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    :root[data-theme='dark'] .table-footer {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pg-btn {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .pg-btn:hover:not(:disabled) {
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+    .pg-btn.active {
+      background: #0284c7;
+      border-color: #0284c7;
+      color: #fff;
+    }
+    .pg-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ── Modal Dialogs ── */
+    .modal-overlay {
+      position: fixed !important;
+      inset: 0 !important;
+      background: rgba(10, 17, 26, 0.72) !important;
+      backdrop-filter: blur(6px) !important;
+      -webkit-backdrop-filter: blur(6px) !important;
+      z-index: 99999 !important;
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 20px !important;
+      transition: opacity 0.25s ease, visibility 0.25s ease !important;
+    }
+    .modal-overlay.active,
+    .modal-overlay.show {
+      display: flex !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+    }
+    .modal-box {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      max-width: 680px;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.28);
+      border: 1px solid var(--border);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+    :root[data-theme='dark'] .modal-box {
+      background: #101721;
+      border-color: rgba(123, 192, 67, 0.2);
+    }
+    .modal-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .modal-close-btn:hover {
+      color: var(--text-primary);
+    }
+    .modal-body {
+      padding: 20px 22px;
+      overflow-y: auto;
+    }
+    .modal-footer {
+      padding: 14px 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-secondary);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    #modal-map-container {
+      height: 380px;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .map-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .map-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .map-meta-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-muted);
+    }
+    .map-meta-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body class="admin-page">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+          <div class="dixit-mark-wrap">
+            <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
+          </div>
+          <div class="dixit-brand-text">
+            <h2 class="dixit-title">DIXIT</h2>
+            <span class="dixit-subtitle">LENDING SOLUTION</span>
+            <div class="dixit-accent-line"></div>
+            <span class="dixit-workspace-badge">Admin Console</span>
+          </div>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="/admin/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+          <a href="/admin/employees.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users" aria-hidden="true"></i></span> <span>Employees</span></a>
+          <a href="/admin/customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Customers</span></a>
+          <a href="/admin/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>Loan Applications</span></a>
+          <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+          <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>Data Excel Document</span></a>
+          <a href="/admin/banking-partner-portal.html" class="nav-item"><span class="nav-icon"><i class="fas fa-landmark" aria-hidden="true"></i></span> <span>Banking Partner Portal</span></a>
+          <a href="/admin/private-communication.html" class="nav-item"><span class="nav-icon"><i class="fas fa-comments" aria-hidden="true"></i></span> <span>Private Communication</span></a>
+          <a href="/admin/login-activity.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-location-dot" aria-hidden="true"></i></span> <span>Login Activity</span></a>
+          <a href="/admin/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="sidebar-user-avatar">A</div>
+          <div class="user-details"><p id="sidebar-user-name">Admin</p><span id="sidebar-user-role">admin</span></div>
+        </div>
+        <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
+      </div>
+    </aside>
+
+    <!-- Mobile overlay -->
+    <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+    <main class="main-content">
+      <div class="topbar">
+        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+          <i class="fas fa-bars" aria-hidden="true"></i> <span>Menu</span>
+        </button>
+        <div class="topbar-title">
+          <h2><i class="fas fa-location-crosshairs" aria-hidden="true"></i> <span>Login Activity & Location Tracking</span></h2>
+          <p>Real-time employee login audit trail, device fingerprinting, and geolocation verification.</p>
+        </div>
+        <div class="topbar-actions">
+          <div class="topbar-date-badge">
+            <i class="fas fa-calendar-day" aria-hidden="true"></i>
+            <span id="topbar-date-label"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content" style="padding: 24px;">
+
+        <!-- 5 Real-Time KPI Cards -->
+        <div class="tracking-kpi-grid">
+          <div class="kpi-card" style="--kpi-accent:#0284c7; --kpi-bg:rgba(2,132,199,0.12);">
+            <div class="kpi-head">
+              <span class="kpi-label">Total Logins</span>
+              <span class="kpi-icon"><i class="fas fa-fingerprint"></i></span>
+            </div>
+            <div class="kpi-value" id="kpi-total">—</div>
+            <div class="kpi-sub">Total recorded employee logins</div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-accent:#10b981; --kpi-bg:rgba(16,185,129,0.12);">
+            <div class="kpi-head">
+              <span class="kpi-label">Locations Captured</span>
+              <span class="kpi-icon"><i class="fas fa-location-crosshairs"></i></span>
+            </div>
+            <div class="kpi-value" id="kpi-captured">—</div>
+            <div class="kpi-sub" id="kpi-rate-sub"><i class="fas fa-chart-pie"></i> 0.0% capture success rate</div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-accent:#f59e0b; --kpi-bg:rgba(245,158,11,0.12);">
+            <div class="kpi-head">
+              <span class="kpi-label">Permission Denied</span>
+              <span class="kpi-icon"><i class="fas fa-ban"></i></span>
+            </div>
+            <div class="kpi-value" id="kpi-denied">—</div>
+            <div class="kpi-sub">Employee opted out or blocked GPS</div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-accent:#64748b; --kpi-bg:rgba(100,116,139,0.12);">
+            <div class="kpi-head">
+              <span class="kpi-label">Unavailable</span>
+              <span class="kpi-icon"><i class="fas fa-triangle-exclamation"></i></span>
+            </div>
+            <div class="kpi-value" id="kpi-unavailable">—</div>
+            <div class="kpi-sub">Timeout or position unavailable</div>
+          </div>
+
+          <div class="kpi-card" style="--kpi-accent:#8b5cf6; --kpi-bg:rgba(139,92,246,0.12);">
+            <div class="kpi-head">
+              <span class="kpi-label">Active Sessions</span>
+              <span class="kpi-icon"><i class="fas fa-circle-dot"></i></span>
+            </div>
+            <div class="kpi-value" id="kpi-active">—</div>
+            <div class="kpi-sub" id="kpi-active-sub">Active authenticated employees</div>
+          </div>
+        </div>
+
+        <!-- Security Advisory Alert Banner -->
+        <div class="security-banner" id="security-advisory-banner" style="display: none;">
+          <div class="security-banner-content">
+            <div class="security-banner-icon">
+              <i class="fas fa-shield-virus"></i>
+            </div>
+            <div class="security-banner-text">
+              <h4 id="sec-banner-title">Security Advisory: Unusual Logins Detected</h4>
+              <p id="sec-banner-desc">One or more logins exhibited unexpected geographical shifts (>100 km) or unseen device signatures.</p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-act" id="btn-view-unusual" onclick="filterByUnusualAttempts()" style="border-color:#d97706; color:#d97706; background:rgba(245,158,11,0.1);">
+              <i class="fas fa-magnifying-glass"></i> View Unusual Attempts
+            </button>
+            <button class="btn-act" id="btn-return-security" onclick="clearSecurityFilter()" style="display: none; border-color: var(--border); color: var(--text-primary); background: var(--bg-card);">
+              <i class="fas fa-arrow-rotate-left"></i> Return to All Security
+            </button>
+            <button class="btn-act" id="btn-investigate-modal" onclick="openAlertsModal()" title="View full modal advisory summary" style="border-color: var(--border); color: var(--text-secondary); background: transparent;">
+              <i class="fas fa-table-list"></i> Summary List
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="filter-card">
+          <div class="filter-grid">
+            <div class="filter-input-wrap">
+              <i class="fas fa-search"></i>
+              <input type="text" id="search-input" placeholder="Search employee, email, IP, device, session..." onkeyup="debounceSearch()" />
+            </div>
+
+            <div>
+              <select id="employee-filter" class="filter-select" onchange="onFilterChange()" title="Filter by Employee">
+                <option value="all">All Employees</option>
+              </select>
+            </div>
+
+            <div>
+              <select id="status-filter" class="filter-select" onchange="onFilterChange()" title="Filter by Capture Status">
+                <option value="all">All Captures</option>
+                <option value="captured">Successfully Captured</option>
+                <option value="denied">Permission Denied</option>
+                <option value="unavailable">Location Unavailable</option>
+                <option value="pending">Pending / Not Captured</option>
+              </select>
+            </div>
+
+            <div>
+              <select id="device-filter" class="filter-select" onchange="onFilterChange()" title="Filter by Device Type">
+                <option value="all">All Devices</option>
+                <option value="Desktop">Desktop</option>
+                <option value="Mobile">Mobile</option>
+                <option value="Tablet">Tablet</option>
+                <option value="Unknown">Unknown</option>
+              </select>
+            </div>
+
+            <div>
+              <select id="session-filter" class="filter-select" onchange="onFilterChange()" title="Filter by Session Status">
+                <option value="all">All Sessions</option>
+                <option value="Active">Active</option>
+                <option value="Logged Out">Logged Out</option>
+                <option value="Expired">Expired</option>
+                <option value="Terminated">Terminated</option>
+              </select>
+            </div>
+
+            <div>
+              <select id="security-filter" class="filter-select" onchange="onFilterChange()" title="Filter by Security Classification">
+                <option value="all">All Security</option>
+                <option value="normal">Normal Logins</option>
+                <option value="unusual">Unusual Logins Only</option>
+                <option value="Pending Review">Pending Review</option>
+                <option value="Reviewed">Reviewed</option>
+              </select>
+            </div>
+
+            <div>
+              <button class="btn-act" onclick="resetFilters()" title="Reset all filters">
+                <i class="fas fa-rotate-left"></i> Reset
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-actions-row">
+            <div class="date-range-group">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Date:</span>
+              <input type="date" id="from-date" onchange="onDateChange()" title="From Date" />
+              <span>to</span>
+              <input type="date" id="to-date" onchange="onDateChange()" title="To Date" />
+            </div>
+
+            <div class="btn-group-actions">
+              <button class="btn-act" id="btn-refresh" onclick="loadAll()" title="Refresh table data">
+                <i class="fas fa-arrows-rotate" id="refresh-icon"></i> <span>Refresh</span>
+              </button>
+              <button class="btn-act btn-act-excel" id="btn-export-excel" onclick="exportData('excel')" title="Export filtered records as formatted Excel (.xlsx)">
+                <i class="fas fa-file-excel"></i> <span>Export Excel</span>
+              </button>
+              <button class="btn-act btn-act-csv" id="btn-export-csv" onclick="exportData('csv')" title="Export filtered records as CSV">
+                <i class="fas fa-file-csv"></i> <span>Export CSV</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Table Card -->
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="login-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Employee</th>
+                  <th>Login Time</th>
+                  <th>Device & OS</th>
+                  <th>IP Address</th>
+                  <th>Location & Accuracy</th>
+                  <th>Session Status</th>
+                  <th>Security</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="login-records-tbody">
+                <tr>
+                  <td colspan="9" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 20px;"></i>
+                    <p style="margin: 8px 0 0;">Loading login records from database...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-footer">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span id="pagination-info">Showing 0 to 0 of 0 records</span>
+              <select id="page-size-select" onchange="onPageSizeChange()" style="padding:4px 8px; border-radius:6px; border:1px solid var(--border); background:var(--bg-card); font-size:12px; color:var(--text-primary);">
+                <option value="10">10 per page</option>
+                <option value="20" selected>20 per page</option>
+                <option value="50">50 per page</option>
+                <option value="100">100 per page</option>
+              </select>
+            </div>
+            <div class="pagination-controls" id="pagination-btns">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ── 1. Leaflet Map Modal ── -->
+  <div class="modal-overlay" id="map-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fas fa-map-location-dot" style="color:#0284c7;"></i> Employee Login Location</h3>
+        <button class="modal-close-btn" onclick="closeMapModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-map-container"></div>
+        <div id="modal-map-unavailable" style="display: none; padding: 28px 20px; text-align: center; background: var(--bg-secondary); border-radius: 12px; border: 1px dashed var(--border); margin-bottom: 14px;">
+          <i class="fas fa-location-crosshairs" style="font-size: 34px; color: var(--text-muted); margin-bottom: 10px; display: block; opacity: 0.6;"></i>
+          <h4 style="margin: 0 0 6px; font-size: 15px; color: var(--text-primary);" id="map-unavail-title">No GPS Coordinates Captured</h4>
+          <p style="margin: 0 0 8px; font-size: 12.5px; color: var(--text-muted); max-width: 480px; margin-inline: auto;" id="map-unavail-reason">
+            Location coordinates were not captured for this login session. The employee may have blocked location access or positioning was unavailable.
+          </p>
+          <div id="map-unavail-badge-wrap"></div>
+        </div>
+
+        <div class="map-meta-grid">
+          <div class="map-meta-item">
+            <span class="map-meta-label">Employee</span>
+            <span class="map-meta-val" id="map-emp-name">—</span>
+          </div>
+          <div class="map-meta-item">
+            <span class="map-meta-label">Coordinates</span>
+            <span class="map-meta-val" id="map-coords-text">—</span>
+          </div>
+          <div class="map-meta-item">
+            <span class="map-meta-label">Reported Accuracy</span>
+            <span class="map-meta-val" id="map-accuracy-text">—</span>
+          </div>
+          <div class="map-meta-item">
+            <span class="map-meta-label">Login Time</span>
+            <span class="map-meta-val" id="map-time-text">—</span>
+          </div>
+        </div>
+
+        <p style="font-size: 11.5px; color: var(--text-muted); margin: 6px 0 0; line-height: 1.45;">
+          <i class="fas fa-circle-info"></i> Coordinates captured via browser Geolocation API at time of login. Accuracy represents device positioning confidence.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-act" id="btn-copy-coords" onclick="copyMapCoordinates()">
+          <i class="fas fa-copy"></i> Copy Coordinates
+        </button>
+        <button class="btn-act" id="btn-copy-ip-map" style="display: none;">
+          <i class="fas fa-copy"></i> Copy IP Address
+        </button>
+        <div style="display: flex; gap: 8px;">
+          <a id="btn-google-maps" href="#" target="_blank" rel="noopener noreferrer" class="btn-act btn-act-primary">
+            <i class="fas fa-arrow-up-right-from-square"></i> Open in Google Maps
+          </a>
+          <button class="btn-act" onclick="closeMapModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Session Audit Details Modal ── -->
+  <div class="modal-overlay" id="details-modal">
+    <div class="modal-box" style="max-width: 620px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-shield-halved" style="color:#10b981;"></i> Session Audit Details</h3>
+        <button class="modal-close-btn" onclick="closeDetailsModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="details-modal-body">
+        <!-- Dynamically injected -->
+      </div>
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button class="btn-act" onclick="closeDetailsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Employee History Modal ── -->
+  <div class="modal-overlay" id="history-modal">
+    <div class="modal-box" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-clock-rotate-left" style="color:#0284c7;"></i> <span id="history-emp-title">Employee Login History</span></h3>
+        <button class="modal-close-btn" onclick="closeHistoryModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="history-modal-body">
+        <!-- Dynamically injected -->
+      </div>
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button class="btn-act" onclick="closeHistoryModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. Unusual Logins Investigation Modal ── -->
+  <div class="modal-overlay" id="alerts-modal">
+    <div class="modal-box" style="max-width: 860px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-shield-virus" style="color:#d97706;"></i> Security Advisory — Unusual Logins</h3>
+        <button class="modal-close-btn" onclick="closeAlertsModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="alerts-modal-body">
+        <!-- Dynamically injected -->
+      </div>
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button class="btn-act" onclick="closeAlertsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. Review Alert Form Modal ── -->
+  <div class="modal-overlay" id="review-modal">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-user-shield" style="color:#0284c7;"></i> Review Security Alert</h3>
+        <button class="modal-close-btn" onclick="closeReviewModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="review-form" onsubmit="submitAlertReview(event)">
+          <input type="hidden" id="review-record-id" />
+
+          <div style="margin-bottom: 14px;">
+            <label style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Alert Summary</label>
+            <div id="review-alert-summary" style="padding:10px 12px; background:var(--bg-secondary); border-radius:8px; border:1px solid var(--border); font-size:13px;"></div>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <label for="review-status-select" style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Review Status</label>
+            <select id="review-status-select" class="filter-select" style="width:100%;">
+              <option value="Reviewed">Mark as Reviewed (Investigated & Cleared)</option>
+              <option value="Dismissed">Dismiss Alert (Known False Positive)</option>
+              <option value="Pending Review">Keep as Pending Review</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="review-notes" style="display:block; font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Investigation Notes</label>
+            <textarea id="review-notes" rows="4" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg-secondary); color:var(--text-primary); font-family:inherit; font-size:13px;" placeholder="Add verification details (e.g. verified with employee, authorized travel, VPN usage, etc.)..."></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button type="button" class="btn-act" onclick="closeReviewModal()">Cancel</button>
+            <button type="submit" class="btn-act btn-act-primary" id="btn-save-review">
+              <i class="fas fa-check"></i> Save Review
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. Terminate Active Session Confirmation Modal ── -->
+  <div class="modal-overlay" id="terminate-modal">
+    <div class="modal-box" style="max-width: 480px;">
+      <div class="modal-header" style="border-bottom-color: rgba(239,68,68,0.2);">
+        <h3 style="color: #ef4444;"><i class="fas fa-triangle-exclamation"></i> Terminate Active Session</h3>
+        <button class="modal-close-btn" onclick="closeTerminateModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="terminate-record-id" />
+        <div style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
+          <p style="margin: 0; font-size: 13px; line-height: 1.5; color: var(--text-primary);">
+            Are you sure you want to terminate the active authenticated session for <strong id="terminate-emp-name">Employee</strong>?
+          </p>
+          <p style="margin: 6px 0 0; font-size: 12px; color: #ef4444;">
+            <i class="fas fa-shield-halved"></i> The employee will be immediately logged out and must log in again with credentials.
+          </p>
+        </div>
+        <div id="terminate-session-meta" style="font-size: 12px; color: var(--text-muted); line-height: 1.6; background: var(--bg-secondary); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);"></div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button type="button" class="btn-act" onclick="closeTerminateModal()">Cancel</button>
+        <button type="button" class="btn-act" id="btn-confirm-terminate" onclick="confirmTerminateSession()" style="background: #ef4444; color: #fff; border-color: #ef4444;">
+          <i class="fas fa-power-off"></i> Terminate Session
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/runtime-config.js?v=20260523a"></script>
+  <script src="/js/api.js?v=20261008"></script>
+  <script src="/js/employee-notifications.js?v=20261111b"></script>
+  <script src="/vendor/leaflet/leaflet.js"></script>
+
+  <script>
+    'use strict';
+    const user = requireRole('admin');
+
+    let currentPage = 1;
+    let pageSize = 20;
+    let totalRecords = 0;
+    let searchTimeout = null;
+    let isRefreshing = false;
+    let currentMap = null;
+    let currentMarker = null;
+    let currentCircle = null;
+    let activeModalCoords = null;
+    let autoRefreshTimer = null;
+    const recordsMap = new Map();
+
+    function renderSidebarUser() {
+      if (!user) return;
+      const avatarEl = document.getElementById('sidebar-user-avatar');
+      const nameEl = document.getElementById('sidebar-user-name');
+      const roleEl = document.getElementById('sidebar-user-role');
+      if (avatarEl) avatarEl.textContent = (user.name || 'A').charAt(0).toUpperCase();
+      if (nameEl) nameEl.textContent = user.name || 'Admin';
+      if (roleEl) roleEl.textContent = user.role || 'admin';
+    }
+
+    function updateTopbarDate() {
+      const el = document.getElementById('topbar-date-label');
+      if (el) {
+        const now = new Date();
+        el.textContent = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    }
+
+    function toggleMobileSidebar() {
+      document.body.classList.toggle('sidebar-open');
+    }
+
+    function filterByUnusualAttempts() {
+      const secSelect = document.getElementById('security-filter');
+      if (secSelect) secSelect.value = 'unusual';
+      syncSecurityFilterUI();
+      currentPage = 1;
+      loadData();
+    }
+
+    function clearSecurityFilter() {
+      const secSelect = document.getElementById('security-filter');
+      if (secSelect) secSelect.value = 'all';
+      syncSecurityFilterUI();
+      currentPage = 1;
+      loadData();
+    }
+
+    function syncSecurityFilterUI() {
+      const secSelect = document.getElementById('security-filter');
+      const returnBtn = document.getElementById('btn-return-security');
+      const viewBtn = document.getElementById('btn-view-unusual');
+      const isUnusual = secSelect && (secSelect.value === 'unusual' || secSelect.value === 'Pending Review');
+      if (returnBtn) returnBtn.style.display = isUnusual ? 'inline-flex' : 'none';
+      if (viewBtn) {
+        viewBtn.style.background = isUnusual ? '#d97706' : 'rgba(245,158,11,0.1)';
+        viewBtn.style.color = isUnusual ? '#ffffff' : '#d97706';
+      }
+    }
+
+    // ── 1. Fetch and Render Real-Time KPI Stats ──
+    async function loadStats() {
+      try {
+        const token = getToken();
+        const res = await fetch('/api/login-activity/stats', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.stats) {
+          const s = data.stats;
+          document.getElementById('kpi-total').textContent = (s.total_logins || 0).toLocaleString();
+          document.getElementById('kpi-captured').textContent = (s.locations_captured || 0).toLocaleString();
+          document.getElementById('kpi-rate-sub').innerHTML = `<i class="fas fa-chart-pie"></i> ${s.capture_rate}% capture success rate`;
+          document.getElementById('kpi-denied').textContent = (s.permission_denied || 0).toLocaleString();
+          document.getElementById('kpi-unavailable').textContent = (s.location_unavailable || 0).toLocaleString();
+          document.getElementById('kpi-active').textContent = (s.active_sessions || 0).toLocaleString();
+
+          const activeSub = document.getElementById('kpi-active-sub');
+          if (s.active_sessions > 0) {
+            activeSub.innerHTML = `<span class="pulse-dot"></span> ${s.active_sessions} active authenticated employee${s.active_sessions > 1 ? 's' : ''}`;
+          } else {
+            activeSub.textContent = 'No active employee sessions';
+          }
+
+          const banner = document.getElementById('security-advisory-banner');
+          if (s.unusual_logins > 0) {
+            banner.style.display = 'flex';
+            const countText = s.unreviewed_alerts > 0 ? `${s.unreviewed_alerts} Unreviewed (${s.unusual_logins} Total)` : `${s.unusual_logins} Total`;
+            document.getElementById('sec-banner-title').textContent = `Security Advisory: ${countText} Unusual Login Attempt${s.unusual_logins > 1 ? 's' : ''}`;
+          } else {
+            banner.style.display = 'none';
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load stats:', err);
+      }
+    }
+
+    // ── 2. Populate Employees Dropdown from DB ──
+    async function loadEmployeesDropdown() {
+      try {
+        const token = getToken();
+        const res = await fetch('/api/employees', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const select = document.getElementById('employee-filter');
+        if (data.success && Array.isArray(data.employees)) {
+          const curVal = select.value;
+          select.innerHTML = '<option value="all">All Employees</option>';
+          data.employees.forEach(emp => {
+            const opt = document.createElement('option');
+            opt.value = emp.id;
+            opt.textContent = `${emp.name} (${emp.email})`;
+            select.appendChild(opt);
+          });
+          select.value = curVal || 'all';
+        }
+      } catch (err) {
+        console.warn('Failed to load employees for filter:', err);
+      }
+    }
+
+    // ── 3. Load Filtered Paginated Records ──
+    async function loadData(silent = false) {
+      const tbody = document.getElementById('login-records-tbody');
+      if (tbody && !silent && (!tbody.children || !tbody.children.length || tbody.querySelector('.fa-spinner'))) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:32px;"><i class="fas fa-spinner fa-spin"></i> Loading records...</td></tr>';
+      }
+
+      try {
+        const search = document.getElementById('search-input').value.trim();
+        const empId = document.getElementById('employee-filter').value;
+        const capStatus = document.getElementById('status-filter').value;
+        const devType = document.getElementById('device-filter').value;
+        const sessStatus = document.getElementById('session-filter').value;
+        const secFilter = document.getElementById('security-filter').value;
+        const fromDate = document.getElementById('from-date').value;
+        const toDate = document.getElementById('to-date').value;
+
+        const params = new URLSearchParams({
+          page: currentPage,
+          limit: pageSize
+        });
+        if (search) params.append('search', search);
+        if (empId && empId !== 'all') params.append('employee_id', empId);
+        if (capStatus && capStatus !== 'all') params.append('capture_status', capStatus);
+        if (devType && devType !== 'all') params.append('device_type', devType);
+        if (sessStatus && sessStatus !== 'all') params.append('session_status', sessStatus);
+        if (fromDate) params.append('from_date', fromDate);
+        if (toDate) params.append('to_date', toDate);
+
+        if (secFilter === 'unusual') {
+          params.append('is_unusual', 'true');
+        } else if (secFilter === 'normal') {
+          params.append('is_unusual', 'false');
+        } else if (secFilter === 'Pending Review' || secFilter === 'Reviewed') {
+          params.append('review_status', secFilter);
+        }
+
+        const token = getToken();
+        const res = await fetch(`/api/login-activity/records?${params.toString()}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.records)) {
+          totalRecords = data.total || 0;
+          renderTable(data.records);
+          renderPagination(data.total, data.page, data.totalPages);
+        } else {
+          tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:32px; color:#ef4444;"><i class="fas fa-circle-exclamation"></i> Failed to load records: ${escapeHtml(data.message || 'Unknown error')}</td></tr>`;
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:32px; color:#ef4444;"><i class="fas fa-triangle-exclamation"></i> Network error: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    // ── Master Refresh ──
+    async function loadAll() {
+      if (isRefreshing) return;
+      isRefreshing = true;
+      const refreshIcon = document.getElementById('refresh-icon');
+      const btnRefresh = document.getElementById('btn-refresh');
+      if (refreshIcon) refreshIcon.classList.add('fa-spin');
+      if (btnRefresh) btnRefresh.disabled = true;
+
+      try {
+        await Promise.all([loadStats(), loadData()]);
+      } finally {
+        isRefreshing = false;
+        if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+        if (btnRefresh) btnRefresh.disabled = false;
+      }
+    }
+
+    function renderTable(records) {
+      recordsMap.clear();
+      const tbody = document.getElementById('login-records-tbody');
+      if (!records || records.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align:center; padding:44px 20px; color:var(--text-muted);">
+              <i class="fas fa-folder-open" style="font-size:32px; margin-bottom:10px; opacity:0.5; display:block;"></i>
+              <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-bottom:4px;">No Login Activity Found</div>
+              <div style="font-size:12px;">No login records match your current filter and search criteria.</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      let html = '';
+      records.forEach((r, idx) => {
+        recordsMap.set(Number(r.id), r);
+        const seq = (currentPage - 1) * pageSize + idx + 1;
+        const empInitial = (r.employee_name || 'E').charAt(0).toUpperCase();
+        const loginDate = r.login_at ? new Date(r.login_at) : null;
+        const timeFormatted = loginDate ? loginDate.toLocaleString([], {
+          month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) : '—';
+        const relativeTime = loginDate ? getRelativeTime(loginDate) : '';
+
+        // Device Icon
+        const devTypeLower = (r.device_type || '').toLowerCase();
+        const isMobile = devTypeLower === 'mobile';
+        const isTablet = devTypeLower === 'tablet';
+        const devIcon = isMobile ? 'fa-mobile-screen' : (isTablet ? 'fa-tablet-screen-button' : 'fa-laptop');
+
+        // Geolocation badge & representation
+        let locBadge = '';
+        const hasValidCoords = r.latitude != null && r.longitude != null && !isNaN(Number(r.latitude)) && !isNaN(Number(r.longitude));
+
+        if (r.capture_status === 'captured' && hasValidCoords) {
+          const lat = Number(r.latitude).toFixed(4);
+          const lng = Number(r.longitude).toFixed(4);
+          const acc = r.accuracy ? ` ±${Math.round(r.accuracy)}m` : '';
+
+          let sourceLabel = '';
+          if (r.location_source === 'test_fixture') {
+            sourceLabel = '<span style="font-size:9.5px; opacity:0.8; margin-left:4px;">[Test]</span>';
+          } else if (r.location_source === 'legacy_backfill') {
+            sourceLabel = '<span style="font-size:9.5px; opacity:0.8; margin-left:4px;">[Legacy]</span>';
+          }
+
+          locBadge = `<span class="badge badge-success" title="Accuracy: ${acc} • Source: ${r.location_source || 'GPS'}"><i class="fas fa-location-dot"></i> ${lat}, ${lng}${sourceLabel}</span>`;
+        } else if (r.capture_status === 'permission_denied' || r.permission_status === 'denied') {
+          locBadge = `<span class="badge badge-danger" title="Employee denied location access"><i class="fas fa-ban"></i> Denied</span>`;
+        } else if (r.capture_status === 'unavailable' || r.capture_status === 'timeout' || r.capture_status === 'error') {
+          locBadge = `<span class="badge badge-warning" title="${escapeHtml(r.error_message || 'Location unavailable')}"><i class="fas fa-triangle-exclamation"></i> Unavailable</span>`;
+        } else {
+          locBadge = `<span class="badge badge-muted" title="Pending initial capture"><i class="fas fa-clock"></i> Pending</span>`;
+        }
+
+        // Session status badge
+        const isActive = r.session_status === 'Active';
+        const isExpired = r.session_status === 'Expired';
+        const isTerminated = r.session_status === 'Terminated';
+        let sessionBadge = '';
+        if (isActive) {
+          sessionBadge = `<span class="badge badge-success"><span class="pulse-dot"></span> Active</span>`;
+        } else if (isTerminated) {
+          sessionBadge = `<span class="badge badge-danger" title="Terminated by Administrator"><i class="fas fa-power-off"></i> Terminated</span>`;
+        } else if (isExpired) {
+          sessionBadge = `<span class="badge badge-muted" title="Session expired after TTL"><i class="fas fa-hourglass-end"></i> Expired</span>`;
+        } else {
+          sessionBadge = `<span class="badge badge-muted" title="Logged out cleanly"><i class="fas fa-arrow-right-from-bracket"></i> Logged Out</span>`;
+        }
+
+        // Security badge
+        let secBadge = '';
+        if (r.is_unusual) {
+          const revStatus = r.review_status || 'Pending Review';
+          if (revStatus === 'Reviewed') {
+            secBadge = `<span class="badge badge-info" title="Reviewed: ${escapeHtml(r.investigation_notes || 'Cleared')}"><i class="fas fa-shield-check"></i> Reviewed</span>`;
+          } else if (revStatus === 'Dismissed') {
+            secBadge = `<span class="badge badge-muted" title="Dismissed"><i class="fas fa-shield-slash"></i> Dismissed</span>`;
+          } else {
+            secBadge = `<span class="badge badge-warning" title="${escapeHtml(r.unusual_reason || 'Unusual login pattern')}"><i class="fas fa-shield-virus"></i> Unusual</span>`;
+          }
+        } else {
+          secBadge = `<span class="badge badge-muted" title="Normal institutional session"><i class="fas fa-check"></i> Normal</span>`;
+        }
+
+        const safeDisplayIp = r.display_ip || r.ip_address || '—';
+
+        html += `
+          <tr>
+            <td style="font-weight:700; color:var(--text-muted);">${seq}</td>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar">${empInitial}</div>
+                <div class="emp-info">
+                  <span class="emp-name">${escapeHtml(r.employee_name || 'Employee #' + r.employee_id)}</span>
+                  <span class="emp-email">${escapeHtml(r.employee_email || '')}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="font-weight:600;">${timeFormatted}</div>
+              <div style="font-size:11px; color:var(--text-muted);">${relativeTime}</div>
+            </td>
+            <td>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <i class="fas ${devIcon}" style="color:var(--text-muted);"></i>
+                <span style="font-weight:600;">${escapeHtml(r.browser || 'Unknown')}</span>
+              </div>
+              <div style="font-size:11px; color:var(--text-muted);">${escapeHtml(r.operating_system || '')} • ${escapeHtml(r.device_type || 'Desktop')}</div>
+            </td>
+            <td>
+              <div class="ip-code-wrap">
+                <span class="ip-code">${escapeHtml(safeDisplayIp)}</span>
+                <button type="button" class="ip-copy-btn" data-action="copy-ip" data-ip="${escapeHtml(r.ip_address || '')}" title="Copy IP Address">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </td>
+            <td>
+              <div>${locBadge}</div>
+              ${r.accuracy && hasValidCoords ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Accuracy: ±${Math.round(r.accuracy)}m</div>` : ''}
+            </td>
+            <td>${sessionBadge}</td>
+            <td>${secBadge}</td>
+            <td style="text-align: right;">
+              <div class="row-actions" style="justify-content: flex-end;">
+                <button type="button" class="btn-row-action" data-action="map" data-id="${r.id}" title="${hasValidCoords ? 'View interactive location map' : 'Location coordinates unavailable (view capture status)'}">
+                  <i class="fas fa-map-marked-alt" style="${hasValidCoords ? 'color:#0284c7;' : 'color:var(--text-muted);'}"></i>
+                  <span>Map</span>
+                </button>
+
+                <button type="button" class="btn-row-action" data-action="details" data-id="${r.id}" title="View session trace & device audit">
+                  <i class="fas fa-circle-info"></i>
+                </button>
+
+                <button type="button" class="btn-row-action" data-action="history" data-id="${r.id}" data-employee-id="${r.employee_id}" title="View employee login history">
+                  <i class="fas fa-clock-rotate-left"></i>
+                </button>
+
+                ${r.is_unusual ? `
+                  <button type="button" class="btn-row-action btn-action-review" data-action="review" data-id="${r.id}" title="Review security advisory" style="border-color:#f59e0b; color:#d97706;">
+                    <i class="fas fa-user-shield"></i>
+                  </button>
+                ` : ''}
+
+                ${isActive ? `
+                  <button type="button" class="btn-row-action btn-action-terminate" data-action="terminate" data-id="${r.id}" title="Terminate active session" style="border-color:#ef4444; color:#ef4444;">
+                    <i class="fas fa-power-off"></i>
+                  </button>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+    function renderPagination(total, page, totalPages) {
+      const infoEl = document.getElementById('pagination-info');
+      const btnsEl = document.getElementById('pagination-btns');
+
+      const start = total === 0 ? 0 : (page - 1) * pageSize + 1;
+      const end = Math.min(page * pageSize, total);
+      infoEl.textContent = `Showing ${start.toLocaleString()} to ${end.toLocaleString()} of ${total.toLocaleString()} records`;
+
+      if (totalPages <= 1) {
+        btnsEl.innerHTML = '';
+        return;
+      }
+
+      let btnHtml = `
+        <button class="pg-btn" ${page <= 1 ? 'disabled' : ''} onclick="goToPage(${page - 1})" title="Previous Page">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      `;
+
+      const maxButtons = 5;
+      let startPage = Math.max(1, page - 2);
+      let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+      if (endPage - startPage < maxButtons - 1) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+      }
+
+      for (let p = startPage; p <= endPage; p++) {
+        btnHtml += `
+          <button class="pg-btn ${p === page ? 'active' : ''}" onclick="goToPage(${p})">${p}</button>
+        `;
+      }
+
+      btnHtml += `
+        <button class="pg-btn" ${page >= totalPages ? 'disabled' : ''} onclick="goToPage(${page + 1})" title="Next Page">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      `;
+
+      btnsEl.innerHTML = btnHtml;
+    }
+
+    function goToPage(p) {
+      currentPage = p;
+      loadData();
+    }
+
+    function onFilterChange() {
+      syncSecurityFilterUI();
+      currentPage = 1;
+      loadData();
+    }
+
+    function onPageSizeChange() {
+      const select = document.getElementById('page-size-select');
+      pageSize = parseInt(select.value, 10) || 20;
+      currentPage = 1;
+      loadData();
+    }
+
+    function onDateChange() {
+      const fromEl = document.getElementById('from-date');
+      const toEl = document.getElementById('to-date');
+      if (fromEl.value && toEl.value && toEl.value < fromEl.value) {
+        alert('End date cannot be earlier than start date.');
+        toEl.value = fromEl.value;
+      }
+      onFilterChange();
+    }
+
+    function debounceSearch() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        currentPage = 1;
+        loadData();
+      }, 300);
+    }
+
+    function resetFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('employee-filter').value = 'all';
+      document.getElementById('status-filter').value = 'all';
+      document.getElementById('device-filter').value = 'all';
+      document.getElementById('session-filter').value = 'all';
+      document.getElementById('security-filter').value = 'all';
+      document.getElementById('from-date').value = '';
+      document.getElementById('to-date').value = '';
+      syncSecurityFilterUI();
+      currentPage = 1;
+      loadAll();
+    }
+
+    // ── Export Functions ──
+    async function exportData(format) {
+      const btnId = format === 'excel' ? 'btn-export-excel' : 'btn-export-csv';
+      const btn = document.getElementById(btnId);
+      const originalHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generating ${format.toUpperCase()}...`;
+      }
+
+      try {
+        const search = document.getElementById('search-input').value.trim();
+        const empId = document.getElementById('employee-filter').value;
+        const capStatus = document.getElementById('status-filter').value;
+        const devType = document.getElementById('device-filter').value;
+        const sessStatus = document.getElementById('session-filter').value;
+        const secFilter = document.getElementById('security-filter').value;
+        const fromDate = document.getElementById('from-date').value;
+        const toDate = document.getElementById('to-date').value;
+
+        const params = new URLSearchParams({ format });
+        if (search) params.append('search', search);
+        if (empId && empId !== 'all') params.append('employee_id', empId);
+        if (capStatus && capStatus !== 'all') params.append('capture_status', capStatus);
+        if (devType && devType !== 'all') params.append('device_type', devType);
+        if (sessStatus && sessStatus !== 'all') params.append('session_status', sessStatus);
+        if (fromDate) params.append('from_date', fromDate);
+        if (toDate) params.append('to_date', toDate);
+
+        if (secFilter === 'unusual') {
+          params.append('is_unusual', 'true');
+        } else if (secFilter === 'normal') {
+          params.append('is_unusual', 'false');
+        } else if (secFilter === 'Pending Review' || secFilter === 'Reviewed') {
+          params.append('review_status', secFilter);
+        }
+
+        const token = getToken();
+        const res = await fetch(`/api/login-activity/export?${params.toString()}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+          throw new Error('Export request failed. Status: ' + res.status);
+        }
+
+        const blob = await res.blob();
+        let filename = `Dixit_Lending_Login_Activity_${new Date().toISOString().slice(0,10)}.${format === 'excel' ? 'xlsx' : 'csv'}`;
+
+        const dispo = res.headers.get('content-disposition');
+        if (dispo && dispo.includes('filename=')) {
+          const m = dispo.match(/filename="?([^"]+)"?/);
+          if (m && m[1]) filename = m[1];
+        }
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        alert('Export error: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
+      }
+    }
+
+    // ── Modal Helper Utilities ──
+    const ALL_MODAL_IDS = ['map-modal', 'details-modal', 'history-modal', 'alerts-modal', 'review-modal', 'terminate-modal'];
+
+    function openModal(idOrEl) {
+      const el = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
+      if (el) {
+        el.classList.add('active', 'show');
+      }
+    }
+
+    function closeModal(idOrEl) {
+      const el = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
+      if (el) {
+        el.classList.remove('active', 'show');
+      }
+    }
+
+    function closeAllModals() {
+      ALL_MODAL_IDS.forEach(id => closeModal(id));
+    }
+
+    function closeMapModal() { closeModal('map-modal'); }
+    function closeDetailsModal() { closeModal('details-modal'); }
+    function closeHistoryModal() { closeModal('history-modal'); }
+    function closeAlertsModal() { closeModal('alerts-modal'); }
+    function closeReviewModal() { closeModal('review-modal'); }
+    function closeTerminateModal() { closeModal('terminate-modal'); }
+
+    // ── 1. Map Modal Handler ──
+    function openMapModalForRecord(recordId, record) {
+      if (!record) record = recordsMap.get(recordId);
+      if (!record) return;
+
+      openModal('map-modal');
+
+      const empName = record.employee_name || ('Employee #' + record.employee_id);
+      const timeFormatted = record.login_at ? new Date(record.login_at).toLocaleString([], {
+        month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      }) : '—';
+      const displayIp = record.display_ip || record.ip_address || '—';
+
+      document.getElementById('map-emp-name').textContent = empName;
+      document.getElementById('map-time-text').innerHTML = `${escapeHtml(timeFormatted)} <br><span class="ip-code" style="font-size:11px;">${escapeHtml(displayIp)}</span>`;
+
+      const mapContainer = document.getElementById('modal-map-container');
+      const unavailWrap = document.getElementById('modal-map-unavailable');
+      const copyBtn = document.getElementById('btn-copy-coords');
+      const gmapBtn = document.getElementById('btn-google-maps');
+      const copyIpBtn = document.getElementById('btn-copy-ip-map');
+
+      const hasValidCoords = record.latitude != null && record.longitude != null && !isNaN(Number(record.latitude)) && !isNaN(Number(record.longitude));
+
+      if (hasValidCoords) {
+        const lat = Number(record.latitude);
+        const lng = Number(record.longitude);
+        const acc = record.accuracy ? Number(record.accuracy) : 30;
+
+        activeModalCoords = { lat, lng };
+        mapContainer.style.display = 'block';
+        unavailWrap.style.display = 'none';
+        copyBtn.style.display = 'inline-flex';
+        gmapBtn.style.display = 'inline-flex';
+        if (copyIpBtn) copyIpBtn.style.display = 'none';
+
+        document.getElementById('map-coords-text').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+        let sourceLabel = 'Browser GPS';
+        if (record.location_source === 'test_fixture') sourceLabel = 'Test Fixture';
+        else if (record.location_source === 'legacy_backfill') sourceLabel = 'Legacy Backfill';
+        document.getElementById('map-accuracy-text').innerHTML = `±${Math.round(acc)}m <span style="font-size:11px; opacity:0.8;">(${sourceLabel})</span>`;
+
+        gmapBtn.href = `https://www.google.com/maps?q=${lat},${lng}`;
+
+        setTimeout(() => {
+          initOrUpdateMap(lat, lng, acc, empName, timeFormatted);
+        }, 120);
+      } else {
+        activeModalCoords = null;
+        mapContainer.style.display = 'none';
+        unavailWrap.style.display = 'block';
+        copyBtn.style.display = 'none';
+        gmapBtn.style.display = 'none';
+        if (copyIpBtn) {
+          copyIpBtn.style.display = 'inline-flex';
+          copyIpBtn.onclick = () => copyIp(record.ip_address);
+        }
+
+        let statusTitle = 'GPS Coordinates Unavailable';
+        let statusBadge = '<span class="badge badge-warning">Unavailable</span>';
+        let statusReason = record.error_message || 'Device coordinates were not recorded for this login.';
+
+        if (record.capture_status === 'permission_denied' || record.permission_status === 'denied') {
+          statusTitle = 'Location Permission Denied';
+          statusBadge = '<span class="badge badge-danger"><i class="fas fa-ban"></i> Permission Denied</span>';
+          statusReason = 'The employee blocked or opted out of location permission in their browser upon logging in.';
+        } else if (record.capture_status === 'pending') {
+          statusTitle = 'Location Capture Pending';
+          statusBadge = '<span class="badge badge-muted"><i class="fas fa-clock"></i> Pending Capture</span>';
+          statusReason = 'Location capture request has not returned coordinates yet.';
+        }
+
+        document.getElementById('map-unavail-title').textContent = statusTitle;
+        document.getElementById('map-unavail-reason').textContent = statusReason;
+        document.getElementById('map-unavail-badge-wrap').innerHTML = statusBadge;
+
+        document.getElementById('map-coords-text').textContent = 'Not Captured (No GPS)';
+        document.getElementById('map-accuracy-text').textContent = 'Position Unavailable';
+      }
+    }
+
+    function initOrUpdateMap(lat, lng, accuracy, empName, timeFormatted) {
+      if (typeof L !== 'undefined' && L.Icon && L.Icon.Default) {
+        L.Icon.Default.imagePath = '/vendor/leaflet/images/';
+      }
+      const container = document.getElementById('modal-map-container');
+      if (!currentMap) {
+        currentMap = L.map('modal-map-container', {
+          zoomControl: true,
+          attributionControl: true
+        }).setView([lat, lng], 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(currentMap);
+      } else {
+        currentMap.setView([lat, lng], 14);
+        currentMap.invalidateSize();
+      }
+
+      if (currentMarker) currentMap.removeLayer(currentMarker);
+      if (currentCircle) currentMap.removeLayer(currentCircle);
+
+      currentMarker = L.marker([lat, lng])
+        .addTo(currentMap)
+        .bindPopup(`<b>${escapeHtml(empName)}</b><br>Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}<br>Logged in: ${escapeHtml(timeFormatted)}`)
+        .openPopup();
+
+      currentCircle = L.circle([lat, lng], {
+        radius: Math.max(accuracy, 20),
+        color: '#0284c7',
+        fillColor: '#38bdf8',
+        fillOpacity: 0.18,
+        weight: 1.5
+      }).addTo(currentMap);
+    }
+
+    function copyCoordinates(lat, lng) {
+      const text = `${lat}, ${lng}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Coordinates copied: ' + text);
+      }).catch(() => {
+        prompt('Coordinates:', text);
+      });
+    }
+
+    function copyMapCoordinates() {
+      if (activeModalCoords) {
+        copyCoordinates(activeModalCoords.lat, activeModalCoords.lng);
+      }
+    }
+
+    function copyIp(ip) {
+      if (!ip) return;
+      navigator.clipboard.writeText(ip).then(() => {
+        alert('IP copied to clipboard: ' + ip);
+      }).catch(() => {
+        prompt('IP Address:', ip);
+      });
+    }
+
+    // ── 2. Session Details Modal Handler ──
+    async function openDetailsModal(recordId) {
+      openModal('details-modal');
+      const body = document.getElementById('details-modal-body');
+      body.innerHTML = '<div style="text-align:center; padding:36px;"><i class="fas fa-spinner fa-spin" style="font-size:24px; color:#0284c7; margin-bottom:8px; display:block;"></i>Loading session trace...</div>';
+
+      try {
+        const token = getToken();
+        const res = await fetch(`/api/login-activity/records/${recordId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.record) {
+          const r = data.record;
+          const loginDt = r.login_at ? new Date(r.login_at).toLocaleString() : '—';
+          const logoutDt = r.logout_at ? new Date(r.logout_at).toLocaleString() : (r.session_status === 'Active' ? '<span class="badge badge-success"><span class="pulse-dot"></span> Active Session</span>' : 'Logged Out');
+
+          let durationText = '—';
+          if (r.login_at && r.logout_at) {
+            const diffMs = new Date(r.logout_at) - new Date(r.login_at);
+            const mins = Math.floor(diffMs / 60000);
+            if (mins < 60) durationText = `${mins}m`;
+            else durationText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+          } else if (r.session_status === 'Active' && r.login_at) {
+            const diffMs = Date.now() - new Date(r.login_at);
+            const mins = Math.floor(diffMs / 60000);
+            durationText = mins < 60 ? `${mins}m (ongoing)` : `${Math.floor(mins / 60)}h ${mins % 60}m (ongoing)`;
+          }
+
+          const hasCoords = r.latitude != null && r.longitude != null && !isNaN(Number(r.latitude));
+          const coordsText = hasCoords ? `${Number(r.latitude).toFixed(6)}, ${Number(r.longitude).toFixed(6)} (±${Math.round(r.accuracy || 0)}m)` : '<span style="color:var(--text-muted);">None captured</span>';
+
+          body.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:14px; font-size:13px;">
+              <div style="background:var(--bg-secondary); padding:12px 14px; border-radius:10px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <div>
+                  <div style="font-weight:700; font-size:15px; color:var(--text-primary);">${escapeHtml(r.employee_name)}</div>
+                  <div style="color:var(--text-muted); font-size:12px;">${escapeHtml(r.employee_email)} • ID: #${r.employee_id} • Dept: ${escapeHtml(r.department || 'Operations')}</div>
+                </div>
+                <div>
+                  ${r.is_unusual ? '<span class="badge badge-warning"><i class="fas fa-shield-virus"></i> Unusual Login</span>' : '<span class="badge badge-muted"><i class="fas fa-check"></i> Normal Login</span>'}
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border);">
+                <div><span style="color:var(--text-muted); font-size:11.5px; display:block;">Session Status</span><strong>${escapeHtml(r.session_status)}</strong></div>
+                <div><span style="color:var(--text-muted); font-size:11.5px; display:block;">Session Duration</span><strong>${durationText}</strong></div>
+                <div><span style="color:var(--text-muted); font-size:11.5px; display:block;">Login Time</span>${loginDt}</div>
+                <div><span style="color:var(--text-muted); font-size:11.5px; display:block;">Logout Time</span>${logoutDt}</div>
+                <div><span style="color:var(--text-muted); font-size:11.5px; display:block;">IP Address</span><span class="ip-code">${escapeHtml(r.display_ip || r.ip_address || '—')}</span></div>
+                <div><span style="color:var(--text-muted); font-size:11.5px; display:block;">Device / OS</span>${escapeHtml(r.device_type)} (${escapeHtml(r.operating_system)})</div>
+                <div><span style="color:var(--text-muted); font-size:11.5px; display:block;">Browser</span>${escapeHtml(r.browser)}</div>
+                <div><span style="color:var(--text-muted); font-size:11.5px; display:block;">Permission Status</span>${escapeHtml(r.permission_status || 'prompt')}</div>
+                <div><span style="color:var(--text-muted); font-size:11.5px; display:block;">Capture Status</span>${escapeHtml(r.capture_status || 'pending')}</div>
+                <div><span style="color:var(--text-muted); font-size:11.5px; display:block;">Location Source</span>${escapeHtml(r.location_source || 'browser_verified')}</div>
+                <div style="grid-column: span 2;"><span style="color:var(--text-muted); font-size:11.5px; display:block;">Coordinates</span><strong>${coordsText}</strong></div>
+                ${r.distance_from_last_km != null ? `<div style="grid-column: span 2;"><span style="color:var(--text-muted); font-size:11.5px; display:block;">Distance Shift</span><strong>${r.distance_from_last_km} km</strong> from previous login</div>` : ''}
+              </div>
+
+              ${r.is_unusual ? `
+                <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); padding:12px 14px; border-radius:8px;">
+                  <div style="font-weight:700; color:#d97706; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+                    <i class="fas fa-triangle-exclamation"></i> Security Advisory Reason:
+                  </div>
+                  <div style="color:var(--text-primary); font-size:12.5px; margin-bottom:8px;">${escapeHtml(r.unusual_reason || 'Unusual login pattern')}</div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; font-size:12px; border-top:1px dashed rgba(245,158,11,0.3); padding-top:8px;">
+                    <div><strong>Review Status:</strong> ${escapeHtml(r.review_status || 'Pending Review')} ${r.reviewed_by_name ? `by <em>${escapeHtml(r.reviewed_by_name)}</em>` : ''}</div>
+                    ${r.reviewed_at ? `<div><strong>Reviewed:</strong> ${new Date(r.reviewed_at).toLocaleString()}</div>` : ''}
+                  </div>
+                  ${r.investigation_notes ? `<div style="margin-top:6px; font-size:12px; background:rgba(255,255,255,0.6); padding:6px 10px; border-radius:6px; border:1px solid rgba(245,158,11,0.2);"><strong>Notes:</strong> "${escapeHtml(r.investigation_notes)}"</div>` : ''}
+                </div>
+              ` : ''}
+
+              <div>
+                <span style="color:var(--text-muted); font-size:11.5px; display:block; margin-bottom:2px;">User-Agent Fingerprint</span>
+                <pre style="margin:0; padding:8px 10px; background:var(--bg-secondary); border-radius:6px; font-size:11px; white-space:pre-wrap; word-break:break-all; border:1px solid var(--border); font-family:monospace;">${escapeHtml(r.user_agent || 'N/A')}</pre>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px; flex-wrap:wrap;">
+                <button class="btn-act" onclick="closeModal('details-modal'); openMapModalForRecord(${r.id})">
+                  <i class="fas fa-map-location-dot" style="color:#0284c7;"></i> Location Map
+                </button>
+                <button class="btn-act" onclick="closeModal('details-modal'); openEmployeeHistory(${r.employee_id}, '${escapeHtml(r.employee_name)}')">
+                  <i class="fas fa-clock-rotate-left"></i> History
+                </button>
+                ${r.is_unusual ? `
+                  <button class="btn-act" onclick="closeModal('details-modal'); openReviewModalForRecord(${r.id})" style="border-color:#f59e0b; color:#d97706;">
+                    <i class="fas fa-user-shield"></i> Security Review
+                  </button>
+                ` : ''}
+                ${r.session_status === 'Active' ? `
+                  <button class="btn-act" onclick="closeModal('details-modal'); openTerminateModalForRecord(${r.id})" style="border-color:#ef4444; color:#ef4444;">
+                    <i class="fas fa-power-off"></i> Terminate
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        } else {
+          body.innerHTML = `<div style="color:#ef4444; padding:20px;">Failed to load details: ${escapeHtml(data.message || 'Error')}</div>`;
+        }
+      } catch (err) {
+        body.innerHTML = `<div style="color:#ef4444; padding:20px;">Error: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    // ── 3. Employee Session History Modal Handler ──
+    async function openEmployeeHistory(employeeId, employeeName) {
+      openModal('history-modal');
+      document.getElementById('history-emp-title').textContent = `${employeeName || 'Employee'} — Session History`;
+      const body = document.getElementById('history-modal-body');
+      body.innerHTML = '<div style="text-align:center; padding:36px;"><i class="fas fa-spinner fa-spin" style="font-size:24px; color:#0284c7; margin-bottom:8px; display:block;"></i>Loading employee session history...</div>';
+
+      try {
+        const token = getToken();
+        const res = await fetch(`/api/login-activity/employee/${employeeId}?limit=50`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && Array.isArray(data.records)) {
+          if (data.records.length === 0) {
+            body.innerHTML = '<div style="text-align:center; padding:36px; color:var(--text-muted);"><i class="fas fa-folder-open" style="font-size:32px; margin-bottom:8px; display:block; opacity:0.5;"></i>No historical session records found for this employee.</div>';
+            return;
+          }
+
+          let rowsHtml = '';
+          data.records.forEach((rec, i) => {
+            const loginDate = rec.login_at ? new Date(rec.login_at) : null;
+            const timeFormatted = loginDate ? loginDate.toLocaleString([], {
+              month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            }) : '—';
+
+            let durationText = '—';
+            if (rec.login_at && rec.logout_at) {
+              const diffMs = new Date(rec.logout_at) - new Date(rec.login_at);
+              const mins = Math.floor(diffMs / 60000);
+              if (mins < 60) durationText = `${mins}m`;
+              else durationText = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+            } else if (rec.session_status === 'Active' && rec.login_at) {
+              const diffMs = Date.now() - new Date(rec.login_at);
+              const mins = Math.floor(diffMs / 60000);
+              durationText = mins < 60 ? `${mins}m (ongoing)` : `${Math.floor(mins / 60)}h ${mins % 60}m (ongoing)`;
+            }
+
+            const coords = rec.latitude && rec.longitude ? `${Number(rec.latitude).toFixed(4)}, ${Number(rec.longitude).toFixed(4)}` : '<span style="color:var(--text-muted);">No GPS</span>';
+            const unusualBadge = rec.is_unusual ? '<span class="badge badge-warning">Unusual</span>' : '<span class="badge badge-muted">Normal</span>';
+            const sessionBadge = rec.session_status === 'Active' ? '<span class="badge badge-success"><span class="pulse-dot"></span> Active</span>' : `<span class="badge badge-muted">${escapeHtml(rec.session_status || 'Logged Out')}</span>`;
+
+            rowsHtml += `
+              <tr>
+                <td style="font-weight:700; color:var(--text-muted);">${i + 1}</td>
+                <td><strong>${timeFormatted}</strong></td>
+                <td>${durationText}</td>
+                <td>${escapeHtml(rec.device_type || 'Desktop')} (${escapeHtml(rec.browser || 'Unknown')})</td>
+                <td><span class="ip-code">${escapeHtml(rec.display_ip || rec.ip_address || '—')}</span></td>
+                <td>${coords}</td>
+                <td>${sessionBadge}</td>
+                <td>${unusualBadge}</td>
+              </tr>
+            `;
+          });
+
+          body.innerHTML = `
+            <div style="font-size:12.5px; margin-bottom:12px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
+              <span>Showing recent <strong>${data.records.length}</strong> of <strong>${data.total}</strong> total recorded sessions.</span>
+              <span style="font-size:11.5px;">Employee ID: #${employeeId}</span>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="login-table" style="font-size:12px;">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Login Time</th>
+                    <th>Duration</th>
+                    <th>Device & Browser</th>
+                    <th>IP Address</th>
+                    <th>Coordinates</th>
+                    <th>Status</th>
+                    <th>Security</th>
+                  </tr>
+                </thead>
+                <tbody>${rowsHtml}</tbody>
+              </table>
+            </div>
+          `;
+        } else {
+          body.innerHTML = `<div style="color:#ef4444; padding:20px;">Failed to load history: ${escapeHtml(data.message || 'Error')}</div>`;
+        }
+      } catch (err) {
+        body.innerHTML = `<div style="color:#ef4444; padding:20px;">Network error: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    // ── 4. Security Review Modal Handler ──
+    function openReviewModalForRecord(recordId, record) {
+      if (!record) record = recordsMap.get(recordId);
+
+      document.getElementById('review-record-id').value = recordId;
+      const empName = record?.employee_name || 'Employee';
+      const reason = record?.unusual_reason || (record?.distance_from_last_km != null ? `Shift of ${record.distance_from_last_km} km` : 'Unusual login pattern');
+
+      document.getElementById('review-alert-summary').innerHTML = `
+        <strong>${escapeHtml(empName)}:</strong> ${escapeHtml(reason)}
+        ${record?.distance_from_last_km != null ? `<div style="font-size:11.5px; color:#d97706; margin-top:2px;"><i class="fas fa-location-arrow"></i> Reported distance shift: <strong>${record.distance_from_last_km} km</strong></div>` : ''}
+      `;
+
+      document.getElementById('review-status-select').value = record?.review_status || 'Reviewed';
+      document.getElementById('review-notes').value = record?.investigation_notes || '';
+
+      openModal('review-modal');
+    }
+
+    async function submitAlertReview(e) {
+      e.preventDefault();
+      const recordId = document.getElementById('review-record-id').value;
+      const status = document.getElementById('review-status-select').value;
+      const notes = document.getElementById('review-notes').value.trim();
+      const btn = document.getElementById('btn-save-review');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+      try {
+        const token = getToken();
+        const res = await fetch(`/api/login-activity/alerts/${recordId}/review`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            review_status: status,
+            notes: notes
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Alert review saved successfully.');
+          closeModal('review-modal');
+          loadAll();
+        } else {
+          alert('Error: ' + (data.message || 'Failed to update review'));
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Save Review';
+      }
+    }
+
+    // ── 5. Terminate Active Session Modal Handler ──
+    function openTerminateModalForRecord(recordId, record) {
+      if (!record) record = recordsMap.get(recordId);
+
+      document.getElementById('terminate-record-id').value = recordId;
+      document.getElementById('terminate-emp-name').textContent = record?.employee_name || 'Employee';
+
+      const timeFormatted = record?.login_at ? new Date(record.login_at).toLocaleString() : '—';
+      const displayIp = record?.display_ip || record?.ip_address || '—';
+
+      document.getElementById('terminate-session-meta').innerHTML = `
+        <div><strong>Employee Email:</strong> ${escapeHtml(record?.employee_email || '—')}</div>
+        <div><strong>Session ID:</strong> <span class="ip-code" style="font-size:11px;">${escapeHtml(record?.session_id || String(recordId))}</span></div>
+        <div><strong>Logged In At:</strong> ${escapeHtml(timeFormatted)}</div>
+        <div><strong>IP Address:</strong> <span class="ip-code">${escapeHtml(displayIp)}</span></div>
+        <div><strong>Device:</strong> ${escapeHtml(record?.device_type || 'Desktop')} (${escapeHtml(record?.browser || 'Browser')})</div>
+      `;
+
+      openModal('terminate-modal');
+    }
+
+    async function confirmTerminateSession() {
+      const recordId = document.getElementById('terminate-record-id').value;
+      const btn = document.getElementById('btn-confirm-terminate');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Terminating...';
+
+      try {
+        const token = getToken();
+        const res = await fetch(`/api/login-activity/records/${recordId}/terminate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('terminate-modal');
+          alert(data.message || 'Session terminated successfully.');
+          loadAll();
+        } else {
+          alert('Error terminating session: ' + (data.message || 'Operation failed'));
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-power-off"></i> Terminate Session';
+      }
+    }
+
+    // ── 6. Unusual Alerts Investigation Summary Modal ──
+    async function openAlertsModal() {
+      openModal('alerts-modal');
+      const body = document.getElementById('alerts-modal-body');
+      body.innerHTML = '<div style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Loading unusual login advisories...</div>';
+
+      try {
+        const token = getToken();
+        const res = await fetch('/api/login-activity/alerts', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && Array.isArray(data.alerts)) {
+          if (data.alerts.length === 0) {
+            body.innerHTML = '<div style="text-align:center; padding:36px; color:var(--text-muted);"><i class="fas fa-shield-check" style="font-size:32px; color:#10b981; margin-bottom:10px; display:block;"></i>No unusual logins currently detected. All active employee logins are consistent with historical patterns.</div>';
+            return;
+          }
+
+          let itemsHtml = '';
+          data.alerts.forEach((alt) => {
+            const loginDt = alt.login_at ? new Date(alt.login_at).toLocaleString() : '—';
+            const dist = alt.distance_from_last_km != null ? `<strong>${alt.distance_from_last_km} km</strong> shift` : 'Location shift';
+            const rev = alt.review_status || 'Pending Review';
+
+            let statusBadge = '';
+            if (rev === 'Reviewed') statusBadge = '<span class="badge badge-info"><i class="fas fa-check"></i> Reviewed</span>';
+            else if (rev === 'Dismissed') statusBadge = '<span class="badge badge-muted">Dismissed</span>';
+            else statusBadge = '<span class="badge badge-warning"><i class="fas fa-clock"></i> Pending Review</span>';
+
+            itemsHtml += `
+              <div style="background:var(--bg-secondary); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+                  <div>
+                    <div style="font-weight:700; font-size:14px; color:var(--text-primary);">${escapeHtml(alt.employee_name)} <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">(${escapeHtml(alt.employee_email)})</span></div>
+                    <div style="font-size:11.5px; color:var(--text-muted);">${loginDt} • IP: <span class="ip-code">${escapeHtml(alt.ip_address || '—')}</span></div>
+                  </div>
+                  <div>${statusBadge}</div>
+                </div>
+
+                <div style="font-size:13px; color:#d97706; margin-bottom:8px;">
+                  <i class="fas fa-triangle-exclamation"></i> <strong>Advisory Reason:</strong> ${escapeHtml(alt.unusual_reason || dist)}
+                </div>
+
+                ${alt.latitude && alt.longitude ? `
+                  <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
+                    Coordinates: ${Number(alt.latitude).toFixed(4)}, ${Number(alt.longitude).toFixed(4)} (±${Math.round(alt.accuracy || 0)}m) • Device: ${escapeHtml(alt.browser || '')} on ${escapeHtml(alt.operating_system || '')}
+                  </div>
+                ` : ''}
+
+                ${alt.investigation_notes ? `
+                  <div style="font-size:12px; background:rgba(2,132,199,0.06); padding:6px 10px; border-radius:6px; border:1px solid rgba(2,132,199,0.15); margin-bottom:10px;">
+                    <strong>Investigation Note:</strong> "${escapeHtml(alt.investigation_notes)}" ${alt.reviewed_by_name ? `— <em>${escapeHtml(alt.reviewed_by_name)}</em>` : ''}
+                  </div>
+                ` : ''}
+
+                <div style="display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap;">
+                  <button class="btn-row-action" onclick="closeModal('alerts-modal'); openMapModalForRecord(${alt.id}, ${JSON.stringify(alt).replace(/"/g, '&quot;')})">
+                    <i class="fas fa-map-location-dot"></i> View on Map
+                  </button>
+                  <button class="btn-row-action" onclick="closeModal('alerts-modal'); openEmployeeHistory(${alt.employee_id}, '${escapeHtml(alt.employee_name)}')">
+                    <i class="fas fa-clock-rotate-left"></i> History
+                  </button>
+                  <button class="btn-row-action" onclick="closeModal('alerts-modal'); openReviewModalForRecord(${alt.id}, ${JSON.stringify(alt).replace(/"/g, '&quot;')})" style="border-color:#0284c7; color:#0284c7;">
+                    <i class="fas fa-user-shield"></i> Review Alert
+                  </button>
+                </div>
+              </div>
+            `;
+          });
+
+          body.innerHTML = itemsHtml;
+        } else {
+          body.innerHTML = `<div style="color:#ef4444; padding:20px;">Failed to load alerts: ${escapeHtml(data.message || 'Error')}</div>`;
+        }
+      } catch (err) {
+        body.innerHTML = `<div style="color:#ef4444; padding:20px;">Network error: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    // ── Table Event Delegation ──
+    function initTableActionDelegation() {
+      const tbody = document.getElementById('login-records-tbody');
+      if (!tbody || tbody._delegationAttached) return;
+      tbody._delegationAttached = true;
+
+      tbody.addEventListener('click', (e) => {
+        const copyIpBtn = e.target.closest('[data-action="copy-ip"]');
+        if (copyIpBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          copyIp(copyIpBtn.dataset.ip);
+          return;
+        }
+
+        const actionBtn = e.target.closest('[data-action]');
+        if (!actionBtn) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const action = actionBtn.dataset.action;
+        const recordId = Number(actionBtn.dataset.id);
+        const employeeId = Number(actionBtn.dataset.employeeId);
+        const record = recordsMap.get(recordId);
+
+        if (action === 'map') {
+          openMapModalForRecord(recordId, record);
+        } else if (action === 'details') {
+          openDetailsModal(recordId);
+        } else if (action === 'history') {
+          openEmployeeHistory(employeeId, record?.employee_name || 'Employee');
+        } else if (action === 'review') {
+          openReviewModalForRecord(recordId, record);
+        } else if (action === 'terminate') {
+          openTerminateModalForRecord(recordId, record);
+        }
+      });
+    }
+
+    // ── Utilities ──
+    function getRelativeTime(d) {
+      const diffMs = Date.now() - d.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours}h ago`;
+      const diffDays = Math.floor(diffHours / 24);
+      return `${diffDays}d ago`;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Close modals on escape key or clicking backdrop
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeAllModals();
+      }
+    });
+
+    ALL_MODAL_IDS.forEach(id => {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal(id);
+        });
+      }
+    });
+    // ── Auto-Refresh Background Polling ──
+    function startAutoRefresh() {
+      stopAutoRefresh();
+      autoRefreshTimer = setInterval(async () => {
+        try {
+          await loadStats();
+          const anyModalActive = document.querySelector('.modal-overlay.active');
+          const isSearching = document.activeElement === document.getElementById('search-input');
+          if (!anyModalActive && !isSearching && !isRefreshing) {
+            await loadData(true);
+          }
+        } catch (e) {
+          // ignore silent background sync errors
+        }
+      }, 20000);
+    }
+
+    function stopAutoRefresh() {
+      if (autoRefreshTimer) {
+        clearInterval(autoRefreshTimer);
+        autoRefreshTimer = null;
+      }
+    }
+
+    window.addEventListener('beforeunload', stopAutoRefresh);
+
+    // ── Init ──
+    function init() {
+      renderSidebarUser();
+      updateTopbarDate();
+      initTableActionDelegation();
+      loadStats();
+      loadEmployeesDropdown();
+      loadData();
+      startAutoRefresh();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>

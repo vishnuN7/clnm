@@ -1,6 +1,6 @@
 // ── API Base URL ──────────────────────────────────────────────
 // Dynamically detect API URL to support different environments
-const API_BASE = (() => {
+var API_BASE = window.API_BASE || (() => {
   const { protocol, hostname, host } = window.location;
   const configuredBase = window.__CLN_API_BASE__;
 
@@ -27,10 +27,12 @@ const API_BASE = (() => {
 })();
 
 // Base URL for serving uploads (same host as API without the /api suffix)
-const UPLOADS_BASE = API_BASE.replace(/\/api$/i, '');
+var UPLOADS_BASE = window.UPLOADS_BASE || API_BASE.replace(/\/api$/i, '');
+window.UPLOADS_BASE = UPLOADS_BASE;
 
 // ── Theme controls ─────────────────────────────────────────────
-const THEME_STORAGE_KEY = 'cln_theme';
+var THEME_STORAGE_KEY = 'cln_theme';
+window.THEME_STORAGE_KEY = THEME_STORAGE_KEY;
 
 function getStoredTheme() {
   try {
@@ -1119,6 +1121,7 @@ function toggleTheme(event) {
   const current = document.documentElement.getAttribute('data-theme') || 'dark';
   applyTheme(current === 'dark' ? 'light' : 'dark', { animate: true });
 }
+window.toggleTheme = toggleTheme;
 
 function createThemeToggleButton() {
   const btn = document.createElement('button');
@@ -1131,7 +1134,14 @@ function createThemeToggleButton() {
 }
 
 function mountThemeToggle() {
-  if (document.body && (document.body.classList.contains('login-page') || document.querySelector('#theme-toggle-btn'))) {
+  if (document.body && document.body.classList.contains('login-page')) {
+    return;
+  }
+  const existingToggle = document.querySelector('#theme-toggle-btn') || document.querySelector('.theme-toggle');
+  if (existingToggle && !existingToggle._orbitBound) {
+    existingToggle._orbitBound = true;
+    existingToggle.addEventListener('click', toggleTheme);
+    updateThemeToggleButtons();
     return;
   }
   if (document.querySelector('.topbar')) {
@@ -1332,15 +1342,16 @@ if (document.readyState === 'loading') {
 registerServiceWorker();
 
 // ── Token helpers ─────────────────────────────────────────────
-const getToken = () => {
+var getToken = () => {
   try {
     return sessionStorage.getItem('cln_token') || localStorage.getItem('cln_token') || null;
   } catch (e) {
     return null;
   }
 };
+window.getToken = getToken;
 
-const getUser = () => {
+var getUser = () => {
   try {
     const raw = sessionStorage.getItem('cln_user') || localStorage.getItem('cln_user');
     return raw ? JSON.parse(raw) : null;
@@ -1348,8 +1359,9 @@ const getUser = () => {
     return null;
   }
 };
+window.getUser = getUser;
 
-const setSession = (token, user, keepSignedIn = false) => {
+var setSession = (token, user, keepSignedIn = false) => {
   try {
     if (keepSignedIn) {
       localStorage.setItem('cln_token', token);
@@ -1364,14 +1376,19 @@ const setSession = (token, user, keepSignedIn = false) => {
     }
   } catch (err) {}
 };
+window.setSession = setSession;
 
-const clearSession = () => {
+var clearSession = () => {
   try {
     localStorage.removeItem('cln_token');
     localStorage.removeItem('cln_user');
+    localStorage.removeItem('cln_session_id');
+    localStorage.removeItem('cln_activity_id');
     localStorage.removeItem('login_error');
     sessionStorage.removeItem('cln_token');
     sessionStorage.removeItem('cln_user');
+    sessionStorage.removeItem('cln_session_id');
+    sessionStorage.removeItem('cln_activity_id');
     sessionStorage.removeItem('cln_quick_paste_details');
     sessionStorage.removeItem('cln_auto_loan_data');
     sessionStorage.removeItem('login_error');
@@ -1388,6 +1405,7 @@ const clearSession = () => {
     } catch (e) {}
   } catch (err) {}
 };
+window.clearSession = clearSession;
 
 // ── Secure document viewer ──────────────────────────────────────
 // Documents (Aadhaar, PAN, loan files) are no longer reachable via a
@@ -1408,9 +1426,18 @@ async function openSecureDocument(docId) {
     }
     const blob = await res.blob();
     const blobUrl = URL.createObjectURL(blob);
-    window.open(blobUrl, '_blank');
+    const opened = window.open(blobUrl, '_blank');
+    if (!opened) {
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
     // Release the memory a little while after opening
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 120000);
   } catch (err) {
     console.error('[openSecureDocument] error:', err);
     alert('Unable to open this document. Please try again.');
@@ -1559,9 +1586,181 @@ function renderSidebarUser() {
     });
   }
 
-  // Note: profile picture is read from the cached cln_user object in localStorage.
-  // Call refreshSidebarAvatar() from profile pages after uploading a new avatar.
+  // Sync Banking Partner Portal & Private Communication
+  if (user && user.role === 'employee') {
+    syncBankingPartnerNav();
+    syncPrivateCommunicationNav();
+  } else if (user && user.role === 'admin') {
+    syncAdminPrivateCommunicationNav();
+  }
 }
+
+// ── Banking Partner Portal Navigation Sync ──────────────────────
+async function syncBankingPartnerNav() {
+  const user = getUser();
+  if (!user || user.role !== 'employee') return;
+
+  try {
+    const res = await api.get('/banking-partners/employee/status');
+    const data = res?.data || res || {};
+    const hasAccess = Boolean(res?.ok && data.success && data.hasAccess);
+    const existingNav = document.getElementById('nav-banking-partner');
+
+    if (hasAccess) {
+      if (!existingNav) {
+        // Find My Assigned Records nav item
+        const allNavItems = document.querySelectorAll('.sidebar-nav .nav-item');
+        let anchorItem = null;
+        for (const item of allNavItems) {
+          const href = item.getAttribute('href') || '';
+          if (href.includes('data-excel.html')) {
+            anchorItem = item;
+            break;
+          }
+        }
+        if (anchorItem && anchorItem.parentNode) {
+          const a = document.createElement('a');
+          a.id = 'nav-banking-partner';
+          a.href = '/employee/banking-partner-portal.html';
+          const isCurrentPage = window.location.pathname.includes('banking-partner-portal.html');
+          a.className = `nav-item${isCurrentPage ? ' active' : ''}`;
+          a.innerHTML = '<span class="nav-icon"><i class="fas fa-landmark" aria-hidden="true"></i></span> <span>Banking Partner Portal</span>';
+          anchorItem.after(a);
+        }
+      } else {
+        const isCurrentPage = window.location.pathname.includes('banking-partner-portal.html');
+        if (isCurrentPage) {
+          existingNav.classList.add('active');
+        }
+      }
+    } else {
+      if (existingNav) {
+        existingNav.remove();
+      }
+      if (window.location.pathname.includes('/employee/banking-partner-portal.html')) {
+        alert('You do not have permission to access the Banking Partner Portal.');
+        window.location.replace('/employee/dashboard.html');
+      }
+    }
+  } catch (err) {
+    const existingNav = document.getElementById('nav-banking-partner');
+    if (existingNav) existingNav.remove();
+    if (window.location.pathname.includes('/employee/banking-partner-portal.html')) {
+      window.location.replace('/employee/dashboard.html');
+    }
+  }
+}
+window.syncBankingPartnerNav = syncBankingPartnerNav;
+
+// ── Private Communication Navigation Sync ──────────────────────
+async function syncPrivateCommunicationNav() {
+  const user = getUser();
+  if (!user || user.role !== 'employee') return;
+
+  try {
+    const res = await api.get('/private-communication/employee/status');
+    const data = res?.data || res || {};
+    const hasAccess = Boolean(res?.ok && data.success && data.has_access);
+    let existingNav = document.getElementById('nav-private-communication');
+
+    if (hasAccess) {
+      if (!existingNav) {
+        // Position immediately below Banking Partner Portal (or data-excel if BP not present)
+        const bpNav = document.getElementById('nav-banking-partner');
+        let anchorItem = bpNav;
+
+        if (!anchorItem) {
+          const allNavItems = document.querySelectorAll('.sidebar-nav .nav-item');
+          for (const item of allNavItems) {
+            const href = item.getAttribute('href') || '';
+            if (href.includes('data-excel.html')) {
+              anchorItem = item;
+              break;
+            }
+          }
+        }
+
+        if (anchorItem && anchorItem.parentNode) {
+          const a = document.createElement('a');
+          a.id = 'nav-private-communication';
+          a.href = '/employee/private-communication.html';
+          const isCurrentPage = window.location.pathname.includes('private-communication.html');
+          a.className = `nav-item${isCurrentPage ? ' active' : ''}`;
+          a.innerHTML = '<span class="nav-icon"><i class="fas fa-comments" aria-hidden="true"></i></span> <span>Private Communication</span>';
+          anchorItem.after(a);
+          existingNav = a;
+        }
+      } else {
+        const isCurrentPage = window.location.pathname.includes('private-communication.html');
+        if (isCurrentPage) {
+          existingNav.classList.add('active');
+        }
+      }
+
+      // Sync unread badge on employee sidebar
+      if (existingNav) {
+        const unreadCount = Number(data.unread_count || 0);
+        let badge = existingNav.querySelector('.comm-nav-badge');
+        if (unreadCount > 0) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'comm-nav-badge';
+            existingNav.appendChild(badge);
+          }
+          badge.textContent = unreadCount;
+        } else if (badge) {
+          badge.remove();
+        }
+      }
+    } else {
+      if (existingNav) {
+        existingNav.remove();
+      }
+      if (window.location.pathname.includes('/employee/private-communication.html')) {
+        alert('You do not have permission to access Private Communication.');
+        window.location.replace('/employee/dashboard.html');
+      }
+    }
+  } catch (err) {
+    const existingNav = document.getElementById('nav-private-communication');
+    if (existingNav) existingNav.remove();
+    if (window.location.pathname.includes('/employee/private-communication.html')) {
+      window.location.replace('/employee/dashboard.html');
+    }
+  }
+}
+window.syncPrivateCommunicationNav = syncPrivateCommunicationNav;
+
+// ── Admin Private Communication Navigation Sync ─────────────────
+async function syncAdminPrivateCommunicationNav() {
+  const user = getUser();
+  if (!user || user.role !== 'admin') return;
+
+  try {
+    const res = await api.get('/private-communication/admin/conversations');
+    const data = res?.data || res || {};
+    if (res?.ok && data.success) {
+      const totalUnread = Number(data.total_unread_count || 0);
+      const allNavLinks = document.querySelectorAll('.sidebar-nav a[href*="private-communication.html"]');
+      allNavLinks.forEach(a => {
+        let badge = a.querySelector('.comm-nav-badge');
+        if (totalUnread > 0) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'comm-nav-badge';
+            a.appendChild(badge);
+          }
+          badge.textContent = totalUnread;
+        } else if (badge) {
+          badge.remove();
+        }
+      });
+    }
+  } catch (err) {
+    // Non-critical navigation badge sync error
+  }
+}
+window.syncAdminPrivateCommunicationNav = syncAdminPrivateCommunicationNav;
 
 // ── Refresh sidebar avatar from session cache ─────────────────
 function refreshSidebarAvatar(profilePicUrl) {
@@ -1763,3 +1962,56 @@ function buildQueryString(params) {
   const qs = Object.entries(params).filter(([,v]) => v).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
   return qs ? `?${qs}` : '';
 }
+
+// ── Automatic Employee Activity & Keep-Alive Heartbeat ─────────────
+(function initEmployeeActivityHeartbeat() {
+  let lastActivityTs = Date.now();
+  let heartbeatInFlight = false;
+
+  function recordActivity() {
+    lastActivityTs = Date.now();
+  }
+
+  if (typeof window !== 'undefined') {
+    ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'].forEach(evt => {
+      window.addEventListener(evt, recordActivity, { passive: true });
+    });
+
+    async function sendHeartbeat() {
+      if (heartbeatInFlight) return;
+      const token = typeof getToken === 'function' ? getToken() : null;
+      const user = typeof getUser === 'function' ? getUser() : null;
+      if (!token || !user || user.role !== 'employee') return;
+
+      const idleMs = Date.now() - lastActivityTs;
+      const status = idleMs > 5 * 60 * 1000 ? 'Idle' : 'Available';
+
+      heartbeatInFlight = true;
+      try {
+        if (typeof api !== 'undefined' && api.post) {
+          await api.post('/break-time/heartbeat', { status });
+        }
+      } catch (e) {
+        // Silent fail: transient network error will not interrupt user experience
+      } finally {
+        heartbeatInFlight = false;
+      }
+    }
+
+    // Periodic heartbeat every 45 seconds while employee is logged in
+    setInterval(sendHeartbeat, 45000);
+
+    // Immediate heartbeat when employee tab becomes visible or focused
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        recordActivity();
+        sendHeartbeat();
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      recordActivity();
+      sendHeartbeat();
+    });
+  }
+})();

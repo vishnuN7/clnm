@@ -202,6 +202,20 @@ const employeeController = {
       // WhatsApp workflow trigger: Lead Created (Welcome Message)
       whatsappService.sendWorkflowMessage('Welcome Message', id, { employee_id: req.user.id });
 
+      // Dispatch Admin Notification for new customer
+      try {
+        const notifService = require('../services/notificationService');
+        await notifService.notifyAdminCustomerCreated({
+          employeeId: req.user.id,
+          employeeName: req.user.name || 'Employee',
+          customerId: id,
+          customerName: name,
+          phone
+        });
+      } catch (custNotifErr) {
+        console.warn('[Customer] notifyAdmin error:', custNotifErr.message);
+      }
+
       // Employee Notification Center trigger
       notifCtrl.createCustomerNotification({
         employeeId: req.user.id,
@@ -460,6 +474,21 @@ const employeeController = {
         });
       }
 
+      // Dispatch Admin Notification for uploaded documents
+      try {
+        const notifService = require('../services/notificationService');
+        await notifService.notifyAdminDocumentUploaded({
+          employeeId: req.user.id,
+          employeeName: req.user.name || 'Employee',
+          customerId,
+          customerName: customer.name,
+          docType: uploadedDocuments.map(d => d.document?.doc_type || 'document').join(', '),
+          fileName: files.map(f => f.originalname).join(', ')
+        });
+      } catch (docNotifErr) {
+        console.warn('[Document] notifyAdmin error:', docNotifErr.message);
+      }
+
       return res.status(201).json({
         success: true,
         message: rejectedFiles.length
@@ -593,6 +622,21 @@ const employeeController = {
         message: `Application #LN-${id} for ${customer.name} (₹${Number(numAmount).toLocaleString('en-IN')}) submitted.`,
         priority: 'normal'
       }).catch(e => console.error('[Employee] Loan notification error:', e.message));
+
+      // Dispatch Admin Notification for new loan application
+      try {
+        const notifService = require('../services/notificationService');
+        await notifService.notifyAdminLoanSubmitted({
+          employeeId: req.user.id,
+          employeeName: req.user.name || 'Employee',
+          loanId: id,
+          loanNumber: 'LN-' + id,
+          amount: numAmount,
+          customerName: customer.name
+        });
+      } catch (loanNotifErr) {
+        console.warn('[Loan] notifyAdmin error:', loanNotifErr.message);
+      }
 
       return res.status(201).json({
         success: true,

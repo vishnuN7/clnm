@@ -1,46 +1,90 @@
 /**
- * CLN Lending Suite - Shared Employee Notification Center
- * Reusable across all Employee Workspace pages:
- *   - /employee/dashboard.html
- *   - /employee/add-customer.html
- *   - /employee/my-customers.html
- *   - /employee/loans.html
- *   - /employee/emi-calculator.html
- *   - /employee/apr.html
- *   - /employee/data-excel.html
- *   - /employee/profile.html
+ * CLN Lending Suite - Centralized Real-Time Notification & Communication System
+ * Unified Architecture for Admin Console & Employee Workspace
+ * 
+ * Features:
+ * - Real-Time Server-Sent Events (SSE) Stream with Auto-Reconnect & Heartbeat
+ * - Confirmed Delivery & Read Lifecycle Tracking (Sent -> Delivered -> Read)
+ * - Multi-Tab Synchronization via BroadcastChannel API
+ * - Tabbed Notification Center (All, Unread, Read) with Search & Pagination
+ * - WhatsApp-Inspired Bottom-Right Toast Alerts for New Messages & Submissions
+ * - Web Audio API Synthetic Chimes (Urgent / Important / Normal)
+ * - Admin Announcement & Message Composer (All / Selected / Individual Employees)
+ * - Admin Live Delivery & Read Audit Tracker Modal
+ * - Notification Preferences Modal (Sound, Browser Notifications, Alert types)
+ * - Automatic Deep-Linking with In-Page Row Focus Highlighting
  */
 
-(function() {
+(function(window) {
   'use strict';
 
-  // Professional SVG Icon definitions (No emojis - Pure FinTech SaaS UI/UX)
-  const NOTIF_ICONS = {
+  // --- FinTech SVG Icon Registry ---
+  const ICONS = {
     bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>`,
     bellSlash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0 1 18 8"/><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 7-3 9h14"/><path d="M18 8a6 6 0 0 0-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
-    phone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3.1 5.2 2 2 0 0 1 5.1 3h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L9.1 10.6a16 16 0 0 0 4.3 4.3l1.2-1.2a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6A2 2 0 0 1 22 16.9z"/></svg>`,
-    clipboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8 11h8"/><path d="M8 15h6"/></svg>`,
+    check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    checkCheck: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>`,
     checkCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
-    cancelled: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
-    zap: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-    alertCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
-    calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
-    trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
+    clipboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8 11h8"/><path d="M8 15h6"/></svg>`,
     user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
     coins: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>`,
-    clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-    check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+    fileText: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+    alertCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+    megaphone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>`,
+    send: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+    trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
+    settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+    x: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`
   };
 
-  // State
+  // --- Internal State ---
   let allNotifications = [];
+  let currentTab = 'all'; // 'all' | 'unread' | 'read'
   let notifDropdownOpen = false;
   let lastUnreadCount = 0;
-  let notifPollInterval = null;
-  let pendingDeleteNotifId = null;
   let isInitialized = false;
+  let eventSource = null;
+  let isSSEConnected = false;
+  let pollInterval = null;
+  let broadcastBus = null;
+  let activePreferences = {
+    sound_enabled: 1,
+    browser_notifications_enabled: 0,
+    announcement_alerts: 1,
+    task_alerts: 1
+  };
 
-  // Helper: Escape HTML to avoid XSS
+  // --- Session & Auth Helpers ---
+  function getUser() {
+    try {
+      const u = sessionStorage.getItem('cln_user') || localStorage.getItem('cln_user') || localStorage.getItem('user');
+      return u ? JSON.parse(u) : null;
+    } catch (_) { return null; }
+  }
+
+  function getToken() {
+    if (typeof window.getToken === 'function') {
+      try { const t = window.getToken(); if (t) return t; } catch (_) {}
+    }
+    try {
+      return sessionStorage.getItem('cln_token') || localStorage.getItem('cln_token') || localStorage.getItem('token') || '';
+    } catch (_) { return ''; }
+  }
+
+  function getUserRole() {
+    const u = getUser();
+    if (u && u.role) return u.role.toLowerCase();
+    if (window.location.pathname.includes('/admin/')) return 'admin';
+    return 'employee';
+  }
+
+  function getApiBaseUrl() {
+    if (window.api && window.api.base) return window.api.base;
+    if (typeof API_BASE !== 'undefined' && API_BASE) return API_BASE;
+    if (window.API_BASE) return window.API_BASE;
+    return '/api';
+  }
+
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -51,343 +95,653 @@
       .replace(/'/g, '&#39;');
   }
 
-  // Helper: Today in IST (YYYY-MM-DD)
-  function getTodayIST() {
-    try {
-      return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-    } catch (e) {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    }
-  }
-
-  // Helper: Format relative timestamp with Asia/Kolkata context
   function timeAgo(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return '';
     const now = new Date();
     const diff = Math.floor((now - d) / 1000);
-    if (diff < 50) return 'just now';
+    if (diff < 45) return 'just now';
     if (diff < 3600) return `${Math.max(1, Math.floor(diff / 60))}m ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     if (diff < 172800) return 'yesterday';
     return d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' });
   }
 
-  // Helper: Parse date to YYYY-MM-DD
-  function parseYMD(dateVal) {
-    if (!dateVal) return '';
-    let str = String(dateVal);
-    if (str.includes('T')) str = str.split('T')[0];
-    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
-    const d = new Date(dateVal);
-    if (isNaN(d.getTime())) return '';
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
+  // --- Web Audio Synthetic Chime (Zero External Audio File Dependency) ---
+  function playNotificationChime(priority) {
+    if (!activePreferences.sound_enabled) return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      const now = ctx.currentTime;
+      if (priority === 'urgent' || priority === 'critical') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.setValueAtTime(880.00, now + 0.12); // A5
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      } else if (priority === 'important') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440.00, now); // A4
+        osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+        osc.start(now);
+        osc.stop(now + 0.38);
+      } else {
+        // Standard gentle SaaS chime (C5 -> G5)
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(783.99, now + 0.09); // G5
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+        osc.start(now);
+        osc.stop(now + 0.32);
+      }
+    } catch (_) {}
   }
 
-  // Helper: Callback Due tag formatting
-  function callbackDueLabel(callbackDate, callbackPeriod) {
-    const ymd = parseYMD(callbackDate);
-    if (!ymd) return '';
+  // --- HTML5 Desktop Browser Notification ---
+  function showBrowserDesktopNotification(n) {
+    if (!activePreferences.browser_notifications_enabled) return;
+    if (!('Notification' in window)) return;
 
-    const todayIST = getTodayIST();
-    const periodStr = callbackPeriod && callbackPeriod !== 'anytime' ? ` (${callbackPeriod})` : '';
-
-    const parts = ymd.split('-');
-    const dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-    const dateFormatted = !isNaN(dateObj.getTime())
-      ? dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
-      : ymd;
-
-    if (ymd === todayIST) {
-      return `<span class="notif-tag tag-due">${NOTIF_ICONS.zap} Due Today${periodStr} &bull; ${dateFormatted}</span>`;
+    if (Notification.permission === 'granted') {
+      try {
+        const title = `[CLN] ${n.title || 'Notification'}`;
+        // Prevent leaking confidential borrower details
+        const safeBody = (n.message || '').length > 90 ? (n.message.substring(0, 87) + '...') : n.message;
+        const desktopNotif = new Notification(title, {
+          body: safeBody,
+          icon: '/icons/dixit-official-logo.png',
+          tag: `cln-notif-${n.id}`
+        });
+        desktopNotif.onclick = () => {
+          window.focus();
+          handleNotifClick(n.id, n.action_url || n.link_url);
+        };
+      } catch (_) {}
     }
-    if (ymd < todayIST) {
-      return `<span class="notif-tag tag-overdue">${NOTIF_ICONS.alertCircle} Overdue${periodStr} &bull; ${dateFormatted}</span>`;
-    }
-    return `<span class="notif-tag tag-upcoming">${NOTIF_ICONS.calendar} Upcoming${periodStr} &bull; ${dateFormatted}</span>`;
   }
 
-  // Build a single notification item HTML
-  function buildNotifItemHtml(n) {
-    const isCallback = n.type === 'callback_reminder';
-    const isCancelled = n.title && n.title.toLowerCase().includes('cancel');
-    const isSuccess = n.type === 'work_completed' || (n.title && n.title.toLowerCase().includes('completed'));
-    const isAssignment = n.type === 'work_assigned' || n.type === 'assignment' || n.reference_type === 'assignment' || (n.title && n.title.toLowerCase().includes('assignment'));
-    const isExpiring = n.type === 'assignment_expiring' || n.type === 'assignment_expired' || (n.title && n.title.toLowerCase().includes('expir'));
-    const isCustomer = n.type === 'customer' || (n.title && n.title.toLowerCase().includes('customer') && !isCallback);
-    const isLoan = n.type === 'loan' || (n.title && n.title.toLowerCase().includes('loan'));
-    const unreadClass = (n.is_read || n.isRead) ? '' : ' unread';
+  // --- Real-time SSE Stream ---
+  function connectRealtimeStream() {
+    const token = getToken();
+    if (!token) return;
 
+    if (eventSource) {
+      try { eventSource.close(); } catch (_) {}
+      eventSource = null;
+    }
+
+    const streamUrl = `${getApiBaseUrl()}/notifications/stream?token=${encodeURIComponent(token)}`;
+
+    try {
+      eventSource = new EventSource(streamUrl);
+
+      eventSource.onopen = () => {
+        isSSEConnected = true;
+        updateLiveIndicator(true);
+      };
+
+      eventSource.addEventListener('connected', () => {
+        isSSEConnected = true;
+        updateLiveIndicator(true);
+      });
+
+      eventSource.addEventListener('notification:new', (evt) => {
+        try {
+          const notif = JSON.parse(evt.data);
+          onNewNotificationReceived(notif);
+        } catch (err) {
+          console.error('[NotificationEngine] parse new notif error:', err);
+        }
+      });
+
+      eventSource.addEventListener('notification:read', (evt) => {
+        try {
+          const data = JSON.parse(evt.data);
+          syncReadStateLocally(data.notificationId, data.unreadCount);
+        } catch (_) {}
+      });
+
+      eventSource.addEventListener('notification:read_all', () => {
+        syncAllReadLocally();
+      });
+
+      eventSource.addEventListener('notification:delivery_ack', (evt) => {
+        try {
+          const data = JSON.parse(evt.data);
+          onRemoteDeliveryAck(data);
+        } catch (_) {}
+      });
+
+      eventSource.onerror = () => {
+        isSSEConnected = false;
+        updateLiveIndicator(false);
+      };
+    } catch (e) {
+      console.warn('[NotificationEngine] SSE init failed, will use fallback:', e.message);
+    }
+  }
+
+  // --- BroadcastChannel for Multi-Tab Sync ---
+  function initBroadcastChannel() {
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        broadcastBus = new BroadcastChannel('cln_notification_bus');
+        broadcastBus.onmessage = (e) => {
+          const msg = e.data || {};
+          if (msg.action === 'MARK_READ') {
+            syncReadStateLocally(msg.id, msg.unreadCount, false);
+          } else if (msg.action === 'MARK_ALL_READ') {
+            syncAllReadLocally(false);
+          } else if (msg.action === 'NEW_NOTIF') {
+            onNewNotificationReceived(msg.notif, false); // Don't re-chime in sibling tabs
+          } else if (msg.action === 'REFRESH') {
+            fetchNotifications(false);
+          }
+        };
+      } catch (_) {}
+    }
+  }
+
+  // Broadcast to other open browser tabs
+  function postBroadcast(action, data = {}) {
+    if (broadcastBus) {
+      try {
+        broadcastBus.postMessage({ action, ...data });
+      } catch (_) {}
+    }
+  }
+
+  // --- Confirmed Delivery Acknowledgment ---
+  async function acknowledgeDelivery(notifId) {
+    if (!notifId) return;
+    try {
+      const token = getToken();
+      const base = getApiBaseUrl();
+      fetch(`${base}/notifications/${notifId}/delivered`, {
+        method: 'POST',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      }).catch(() => {});
+    } catch (_) {}
+  }
+
+  // --- Handle New Incoming Notification ---
+  function onNewNotificationReceived(notif, shouldChime = true) {
+    if (!notif || !notif.id) return;
+
+    // Check duplicate in memory
+    const existingIdx = allNotifications.findIndex(n => n.id === notif.id);
+    if (existingIdx !== -1) {
+      allNotifications[existingIdx] = { ...allNotifications[existingIdx], ...notif };
+    } else {
+      allNotifications.unshift(notif);
+    }
+
+    renderNotificationCenter();
+    triggerBellAnimation();
+
+    if (shouldChime) {
+      playNotificationChime(notif.priority);
+      showBrowserDesktopNotification(notif);
+      showWhatsAppToast(notif);
+      postBroadcast('NEW_NOTIF', { notif });
+    }
+
+    // Immediately send Confirmed Delivery ack to server
+    acknowledgeDelivery(notif.id);
+  }
+
+  // --- Render Notification Center Item HTML ---
+  function renderNotifItemHtml(n) {
+    const isRead = Boolean(n.is_read || n.isRead);
+    const unreadClass = isRead ? '' : ' unread';
+    const prio = (n.priority || 'normal').toLowerCase();
+
+    // Icon selection
+    let iconSvg = ICONS.clipboard;
     let iconClass = 'notif-icon-work';
-    let iconSvg = NOTIF_ICONS.clipboard;
 
-    if (isCancelled) {
-      iconClass = 'notif-icon-cancelled';
-      iconSvg = NOTIF_ICONS.cancelled;
-    } else if (isExpiring) {
-      iconClass = 'notif-icon-urgent';
-      iconSvg = NOTIF_ICONS.clock;
-    } else if (isCallback) {
-      iconClass = 'notif-icon-callback';
-      iconSvg = NOTIF_ICONS.phone;
-    } else if (isLoan) {
-      iconClass = 'notif-icon-loan';
-      iconSvg = NOTIF_ICONS.coins;
-    } else if (isCustomer) {
+    if (n.type === 'admin_announcement' || n.type === 'admin_message') {
+      iconSvg = ICONS.megaphone;
       iconClass = 'notif-icon-customer';
-      iconSvg = NOTIF_ICONS.user;
-    } else if (isSuccess) {
+    } else if (n.type === 'employee_submission') {
+      iconSvg = ICONS.checkCircle;
       iconClass = 'notif-icon-success';
-      iconSvg = NOTIF_ICONS.checkCircle;
+    } else if (n.type === 'customer_created') {
+      iconSvg = ICONS.user;
+      iconClass = 'notif-icon-customer';
+    } else if (n.type === 'loan_application_submitted' || n.type === 'loan') {
+      iconSvg = ICONS.coins;
+      iconClass = 'notif-icon-loan';
+    } else if (n.type === 'document_uploaded') {
+      iconSvg = ICONS.fileText;
+      iconClass = 'notif-icon-work';
     }
 
-    let tagHtml = '';
-    if (isCallback && n.callback_date && n.reminder_status !== 'completed' && n.reminder_status !== 'cancelled') {
-      tagHtml = callbackDueLabel(n.callback_date, n.callback_period);
-    } else if (isCallback && (n.reminder_status === 'completed' || n.reminder_status === 'cancelled')) {
-      const statusText = n.reminder_status === 'completed' ? 'Completed' : 'Cancelled';
-      const icon = n.reminder_status === 'completed' ? NOTIF_ICONS.checkCircle : NOTIF_ICONS.cancelled;
-      tagHtml = `<span class="notif-tag tag-completed">${icon} ${statusText}</span>`;
-    } else if (isExpiring) {
-      tagHtml = `<span class="notif-tag tag-overdue">${NOTIF_ICONS.alertCircle} Expiring</span>`;
-    } else if (isAssignment && n.assignment_id) {
-      tagHtml = `<span class="notif-tag" style="background:rgba(59,130,246,0.12);color:#2563eb;border:1px solid rgba(59,130,246,0.2);">${NOTIF_ICONS.clipboard} Assignment #${n.assignment_id}</span>`;
-    } else if (isLoan && n.loan_id) {
-      tagHtml = `<span class="notif-tag" style="background:rgba(168,85,247,0.12);color:#9333ea;border:1px solid rgba(168,85,247,0.2);">${NOTIF_ICONS.coins} Loan #LN-${n.loan_id}</span>`;
-    } else if (isCustomer && n.customer_id) {
-      tagHtml = `<span class="notif-tag" style="background:rgba(14,165,233,0.12);color:#0284c7;border:1px solid rgba(14,165,233,0.2);">${NOTIF_ICONS.user} Customer #${n.customer_id}</span>`;
-    }
+    if (prio === 'urgent') iconClass = 'notif-icon-urgent';
 
     // Priority pill
-    let priorityHtml = '';
-    const prio = (n.priority || 'normal').toLowerCase();
+    let priorityPill = '';
     if (prio === 'urgent' || prio === 'critical') {
-      priorityHtml = `<span class="notif-priority-pill notif-priority-urgent">${prio}</span>`;
+      priorityPill = `<span class="notif-priority-pill notif-priority-urgent">Urgent</span>`;
     } else if (prio === 'important') {
-      priorityHtml = `<span class="notif-priority-pill notif-priority-important">important</span>`;
+      priorityPill = `<span class="notif-priority-pill notif-priority-important">Important</span>`;
     }
 
-    const dismissBtn = (isCallback && n.reminder_status === 'pending')
-      ? `<button class="notif-dismiss-btn" onclick="event.stopPropagation();CLNNotifications.dismissReminder(${n.id})" title="Mark callback done">${NOTIF_ICONS.checkCircle} Done</button>`
-      : '';
-
-    const deleteBtn = `<button class="notif-delete-btn" onclick="event.stopPropagation();CLNNotifications.confirmDelete(${n.id})" title="Delete notification" aria-label="Delete notification">${NOTIF_ICONS.trash}</button>`;
-
-    // Build smart link URL
-    let linkUrl = n.link_url || n.linkUrl || '';
-    if (!linkUrl) {
-      if (n.assignment_id && n.record_id) {
-        linkUrl = `/employee/data-excel.html?assignmentId=${encodeURIComponent(n.assignment_id)}&recordId=${encodeURIComponent(n.record_id)}`;
-      } else if (n.assignment_id) {
-        linkUrl = `/employee/data-excel.html?assignmentId=${encodeURIComponent(n.assignment_id)}`;
-      } else if (n.customer_id) {
-        linkUrl = `/employee/my-customers.html?customerId=${encodeURIComponent(n.customer_id)}`;
-      } else if (n.loan_id) {
-        linkUrl = `/employee/loans.html?loanId=${encodeURIComponent(n.loan_id)}`;
-      } else {
-        linkUrl = '/employee/dashboard.html';
-      }
+    // Category / Context Tag
+    let categoryTag = '';
+    if (n.sender_role === 'admin') {
+      categoryTag = `<span class="notif-tag" style="background:rgba(37,211,102,0.12);color:#128c7e;border:1px solid rgba(37,211,102,0.25);">Official Announcement</span>`;
+    } else if (n.type === 'employee_submission') {
+      categoryTag = `<span class="notif-tag" style="background:rgba(16,185,129,0.12);color:#059669;border:1px solid rgba(16,185,129,0.25);">Assigned Records Submission</span>`;
+    } else if (n.type === 'customer_created') {
+      categoryTag = `<span class="notif-tag" style="background:rgba(14,165,233,0.12);color:#0284c7;border:1px solid rgba(14,165,233,0.25);">New Customer</span>`;
+    } else if (n.type === 'loan_application_submitted') {
+      categoryTag = `<span class="notif-tag" style="background:rgba(168,85,247,0.12);color:#9333ea;border:1px solid rgba(168,85,247,0.25);">Loan Application</span>`;
     }
+
+    const actionUrl = n.action_url || n.link_url || n.linkUrl || '';
 
     return `
-      <div class="notif-item${unreadClass}" id="notif-item-${n.id}" onclick="CLNNotifications.handleClick(${n.id}, '${escapeHtml(linkUrl)}')">
+      <div class="notif-item${unreadClass}" id="notif-card-${n.id}" onclick="CLNNotifications.handleClick(${n.id}, '${escapeHtml(actionUrl)}')">
         <div class="notif-icon-wrap ${iconClass}">${iconSvg}</div>
         <div class="notif-content">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px;">
             <div class="notif-title">${escapeHtml(n.title)}</div>
-            ${priorityHtml}
+            ${priorityPill}
           </div>
           <div class="notif-body">${escapeHtml(n.message || n.body || '')}</div>
           <div class="notif-meta-bar">
-            ${tagHtml}
+            ${categoryTag}
             <span class="notif-time">${timeAgo(n.created_at || n.createdAt)}</span>
           </div>
         </div>
         <div class="notif-item-actions">
-          ${dismissBtn}
-          ${deleteBtn}
+          ${!isRead ? `<button class="notif-dismiss-btn" onclick="event.stopPropagation();CLNNotifications.markOneRead(${n.id})" title="Mark read">${ICONS.check}</button>` : ''}
+          <button class="notif-delete-btn" onclick="event.stopPropagation();CLNNotifications.deleteSingle(${n.id})" title="Archive notification">${ICONS.trash}</button>
         </div>
       </div>
     `;
   }
 
-  // Ensure bell HTML exists in topbar
-  function ensureBellMarkup() {
+  // --- WhatsApp-Inspired Toast Card (Bottom-Right) ---
+  function showWhatsAppToast(n) {
+    const container = document.getElementById('cln-whatsapp-toast-container');
+    if (!container) return;
+
+    const toastId = `wa-toast-${n.id}-${Date.now()}`;
+    const prio = (n.priority || 'normal').toLowerCase();
+    const prioClass = prio === 'urgent' ? ' toast-urgent' : (prio === 'important' ? ' toast-important' : '');
+    const senderName = n.sender_name || (n.sender_role === 'admin' ? 'Dixit Lending Admin' : 'System Alert');
+    const actionUrl = n.action_url || n.link_url || n.linkUrl || '';
+
+    const toastEl = document.createElement('div');
+    toastEl.className = `cln-whatsapp-toast${prioClass}`;
+    toastEl.id = toastId;
+    toastEl.innerHTML = `
+      <div class="wa-toast-icon-wrap">
+        ${n.type === 'admin_announcement' ? ICONS.megaphone : (n.type === 'employee_submission' ? ICONS.checkCircle : ICONS.bell)}
+      </div>
+      <div class="wa-toast-content">
+        <div class="wa-toast-header">
+          <span class="wa-toast-sender">${escapeHtml(senderName)}</span>
+          <span class="wa-toast-time">just now</span>
+        </div>
+        <div class="wa-toast-title">${escapeHtml(n.title)}</div>
+        <div class="wa-toast-body">${escapeHtml(n.message || n.body || '')}</div>
+        <div class="wa-toast-actions">
+          ${actionUrl ? `<button class="wa-toast-btn wa-toast-btn-primary" onclick="CLNNotifications.handleClick(${n.id}, '${escapeHtml(actionUrl)}'); CLNNotifications.closeToast('${toastId}')">View Details</button>` : `<button class="wa-toast-btn wa-toast-btn-primary" onclick="CLNNotifications.markOneRead(${n.id}); CLNNotifications.closeToast('${toastId}')">Mark Read</button>`}
+          <button class="wa-toast-btn wa-toast-btn-dismiss" onclick="CLNNotifications.closeToast('${toastId}')">Dismiss</button>
+        </div>
+      </div>
+      <button class="wa-toast-close" onclick="CLNNotifications.closeToast('${toastId}')" aria-label="Close">${ICONS.x}</button>
+    `;
+
+    container.appendChild(toastEl);
+
+    // Auto dismiss after 7.5 seconds
+    setTimeout(() => {
+      closeWhatsAppToast(toastId);
+    }, 7500);
+  }
+
+  function closeWhatsAppToast(toastId) {
+    const el = document.getElementById(toastId);
+    if (!el) return;
+    el.classList.add('hide');
+    setTimeout(() => { el.remove(); }, 280);
+  }
+
+  // --- Ensure DOM Elements Exist in Topbar & Body ---
+  function ensureDOM() {
+    // 1. Toast container
+    if (!document.getElementById('cln-whatsapp-toast-container')) {
+      const tc = document.createElement('div');
+      tc.id = 'cln-whatsapp-toast-container';
+      tc.className = 'cln-whatsapp-toast-container';
+      document.body.appendChild(tc);
+    }
+
+    // 2. Bell Wrap in Topbar
     let wrap = document.getElementById('notif-bell-wrap');
-    if (wrap) return wrap;
+    if (!wrap) {
+      const topbarActions = document.querySelector('.topbar-actions') || document.querySelector('.topbar');
+      if (topbarActions) {
+        wrap = document.createElement('div');
+        wrap.className = 'notif-bell-wrap';
+        wrap.id = 'notif-bell-wrap';
 
-    const topbar = document.querySelector('.topbar');
-    if (!topbar) return null;
+        const role = getUserRole();
+        const composeBtnHtml = role === 'admin'
+          ? `<button class="notif-header-btn compose-btn" onclick="CLNNotifications.openComposer()" title="Compose Announcement" aria-label="Compose Announcement"><span class="compose-icon-box">${ICONS.send}</span><span class="compose-btn-text">Compose</span></button>`
+          : '';
 
-    let actions = topbar.querySelector('.topbar-actions');
-    if (!actions) {
-      actions = document.createElement('div');
-      actions.className = 'topbar-actions';
-      topbar.appendChild(actions);
-    }
-
-    wrap = document.createElement('div');
-    wrap.className = 'notif-bell-wrap';
-    wrap.id = 'notif-bell-wrap';
-    wrap.innerHTML = `
-      <button class="notif-bell-btn" id="notif-bell-btn" onclick="CLNNotifications.toggleDropdown()" aria-label="Notifications" title="Notifications" tabindex="0">
-        ${NOTIF_ICONS.bell}
-        <span id="notif-bell-badge" class="notif-badge" style="display:none;">0</span>
-      </button>
-      <div class="notif-dropdown" id="notif-dropdown" role="region" aria-label="Notifications Panel">
-        <div class="notif-dd-header">
-          <div class="notif-dd-title-wrap">
-            ${NOTIF_ICONS.bell}
-            <h4>Notifications</h4>
+        wrap.innerHTML = `
+          <button class="notif-bell-btn" id="notif-bell-btn" onclick="CLNNotifications.toggleDropdown()" aria-label="Notifications" title="Notifications" tabindex="0">
+            ${ICONS.bell}
+            <span id="notif-bell-badge" class="notif-badge" style="display:none;">0</span>
+          </button>
+          <div class="notif-dropdown" id="notif-dropdown" role="region" aria-label="Notification Center">
+            <div class="notif-dd-header">
+              <div class="notif-dd-title-wrap">
+                ${ICONS.bell}
+                <h4>Notifications</h4>
+                <span class="notif-realtime-pill" id="notif-live-pill"><span class="dot"></span> Live</span>
+              </div>
+              <div class="notif-dd-actions">
+                ${composeBtnHtml}
+                <button class="notif-header-btn" onclick="CLNNotifications.markAllRead()" title="Mark all read">${ICONS.checkCheck}</button>
+                <button class="notif-header-btn" onclick="CLNNotifications.openPreferences()" title="Notification Settings">${ICONS.settings}</button>
+              </div>
+            </div>
+            <div class="notif-tabs-bar">
+              <button class="notif-tab-btn active" id="notif-tab-all" onclick="CLNNotifications.setTab('all')">All <span class="notif-tab-count" id="count-tab-all">0</span></button>
+              <button class="notif-tab-btn" id="notif-tab-unread" onclick="CLNNotifications.setTab('unread')">Unread <span class="notif-tab-count" id="count-tab-unread">0</span></button>
+              <button class="notif-tab-btn" id="notif-tab-read" onclick="CLNNotifications.setTab('read')">Read <span class="notif-tab-count" id="count-tab-read">0</span></button>
+            </div>
+            <div class="notif-list" id="notif-dd-list">
+              <div class="notif-empty">
+                <p style="font-size:13px;color:var(--text-secondary);margin:0;">Loading notifications...</p>
+              </div>
+            </div>
           </div>
-          <button class="notif-dd-link" onclick="CLNNotifications.markAllRead()">Mark all read</button>
-        </div>
-        <div class="notif-list" id="notif-dd-list"><div class="notif-empty">Loading notifications…</div></div>
-      </div>
-    `;
+        `;
 
-    // Insert before theme toggle if present, otherwise append
-    const themeToggle = actions.querySelector('.theme-toggle');
-    if (themeToggle) {
-      actions.insertBefore(wrap, themeToggle);
+        const themeToggle = topbarActions.querySelector('.theme-toggle');
+        if (themeToggle) {
+          topbarActions.insertBefore(wrap, themeToggle);
+        } else {
+          topbarActions.prepend(wrap);
+        }
+      }
     } else {
-      actions.prepend(wrap);
+      // If already hardcoded in HTML, enhance it with live pill and tabs if missing
+      const header = wrap.querySelector('.notif-dd-header');
+      if (header && !wrap.querySelector('.notif-tabs-bar')) {
+        const role = getUserRole();
+        const composeBtnHtml = role === 'admin'
+          ? `<button class="notif-header-btn compose-btn" onclick="CLNNotifications.openComposer()" title="Compose Announcement" aria-label="Compose Announcement"><span class="compose-icon-box">${ICONS.send}</span><span class="compose-btn-text">Compose</span></button>`
+          : '';
+
+        header.innerHTML = `
+          <div class="notif-dd-title-wrap">
+            ${ICONS.bell}
+            <h4>Notifications</h4>
+            <span class="notif-realtime-pill" id="notif-live-pill"><span class="dot"></span> Live</span>
+          </div>
+          <div class="notif-dd-actions">
+            ${composeBtnHtml}
+            <button class="notif-header-btn" onclick="CLNNotifications.markAllRead()" title="Mark all read">${ICONS.checkCheck}</button>
+            <button class="notif-header-btn" onclick="CLNNotifications.openPreferences()" title="Notification Settings">${ICONS.settings}</button>
+          </div>
+        `;
+
+        const tabsBar = document.createElement('div');
+        tabsBar.className = 'notif-tabs-bar';
+        tabsBar.innerHTML = `
+          <button class="notif-tab-btn active" id="notif-tab-all" onclick="CLNNotifications.setTab('all')">All <span class="notif-tab-count" id="count-tab-all">0</span></button>
+          <button class="notif-tab-btn" id="notif-tab-unread" onclick="CLNNotifications.setTab('unread')">Unread <span class="notif-tab-count" id="count-tab-unread">0</span></button>
+          <button class="notif-tab-btn" id="notif-tab-read" onclick="CLNNotifications.setTab('read')">Read <span class="notif-tab-count" id="count-tab-read">0</span></button>
+        `;
+        header.insertAdjacentElement('afterend', tabsBar);
+      }
     }
 
-    return wrap;
+    // 3. Modals (Composer, Preferences, Audit)
+    ensureModals();
   }
 
-  // Ensure modal & toast markup exists in body
-  function ensureModalMarkup() {
-    if (!document.getElementById('delete-notif-modal')) {
-      const modal = document.createElement('div');
-      modal.className = 'modal-overlay';
-      modal.id = 'delete-notif-modal';
-      modal.onclick = (e) => CLNNotifications.closeDeleteModalOnOverlay(e);
-      modal.innerHTML = `
-        <div class="modal" style="max-width:380px;text-align:center;padding:26px 22px;">
-          <div style="width:48px;height:48px;border-radius:50%;background:rgba(239,68,68,0.12);color:#ef4444;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-            ${NOTIF_ICONS.trash}
+  // --- Ensure Modals (Composer, Preferences, Audit) ---
+  function ensureModals() {
+    if (!document.getElementById('notif-composer-modal')) {
+      const comp = document.createElement('div');
+      comp.className = 'notif-modal-overlay';
+      comp.id = 'notif-composer-modal';
+      comp.innerHTML = `
+        <div class="notif-modal-card">
+          <div class="notif-modal-header">
+            <div class="notif-modal-header-left">
+              <div class="composer-header-icon-box" aria-hidden="true">
+                ${ICONS.send}
+              </div>
+              <div class="composer-header-text-wrap">
+                <h3 class="composer-modal-title">Compose Broadcast Announcement</h3>
+                <p class="composer-modal-subtitle">Send important updates and announcements directly to your employees.</p>
+              </div>
+            </div>
+            <button class="notif-modal-close-btn" onclick="CLNNotifications.closeComposer()" aria-label="Close modal" title="Close">${ICONS.x}</button>
           </div>
-          <h4 style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Delete Notification?</h4>
-          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;line-height:1.4;">This notification will be permanently removed from your feed.</p>
-          <div style="display:flex;gap:10px;">
-            <button class="btn btn-secondary" onclick="CLNNotifications.closeDeleteModal()" style="flex:1;">Cancel</button>
-            <button class="btn btn-danger" id="confirm-delete-notif-btn" style="flex:1;">Delete</button>
+          <div class="notif-modal-body">
+            <div class="composer-field-group">
+              <label class="composer-field-label">Target Audience</label>
+              <div class="audience-selector-grid">
+                <label class="audience-opt-label active" id="lbl-aud-all">
+                  <input type="radio" name="ann-audience" value="all" checked onchange="CLNNotifications.onAudienceChange('all')">
+                  <span>All Employees</span>
+                </label>
+                <label class="audience-opt-label" id="lbl-aud-selected">
+                  <input type="radio" name="ann-audience" value="selected" onchange="CLNNotifications.onAudienceChange('selected')">
+                  <span>Selected</span>
+                </label>
+                <label class="audience-opt-label" id="lbl-aud-individual">
+                  <input type="radio" name="ann-audience" value="individual" onchange="CLNNotifications.onAudienceChange('individual')">
+                  <span>Individual</span>
+                </label>
+              </div>
+            </div>
+
+            <div id="composer-emp-selection-wrap" class="composer-field-group" style="display:none;">
+              <label class="composer-field-label">Recipient Employee(s)</label>
+              <div id="composer-emp-list" class="composer-emp-list-container">
+                <span style="font-size:12px;color:var(--text-secondary);">Loading employees...</span>
+              </div>
+            </div>
+
+            <div class="composer-field-group">
+              <label class="composer-field-label">Priority Level</label>
+              <div class="priority-selector-bar">
+                <button type="button" class="priority-pill-btn active prio-normal" id="btn-prio-normal" onclick="CLNNotifications.setPriority('normal')">Normal</button>
+                <button type="button" class="priority-pill-btn prio-important" id="btn-prio-important" onclick="CLNNotifications.setPriority('important')">Important</button>
+                <button type="button" class="priority-pill-btn prio-urgent" id="btn-prio-urgent" onclick="CLNNotifications.setPriority('urgent')">Urgent</button>
+              </div>
+            </div>
+
+            <div class="composer-field-group">
+              <label class="composer-field-label" for="composer-title">Announcement Title</label>
+              <input type="text" id="composer-title" class="composer-input" placeholder="e.g. Mandatory Branch Operations Update">
+            </div>
+
+            <div class="composer-field-group">
+              <label class="composer-field-label" for="composer-message">Message Body</label>
+              <textarea id="composer-message" rows="3" class="composer-textarea" placeholder="Write announcement details..."></textarea>
+            </div>
+
+            <div class="composer-field-group">
+              <label class="composer-field-label" for="composer-link">Action Link (Optional)</label>
+              <input type="text" id="composer-link" class="composer-input" placeholder="e.g. /employee/data-excel.html">
+            </div>
+          </div>
+          <div class="notif-modal-footer">
+            <button class="composer-cancel-btn" onclick="CLNNotifications.closeComposer()">Cancel</button>
+            <button class="composer-send-btn" id="btn-send-announcement" onclick="CLNNotifications.sendAnnouncement()">
+              ${ICONS.send}
+              <span>Send Now</span>
+            </button>
           </div>
         </div>
       `;
-      document.body.appendChild(modal);
+      document.body.appendChild(comp);
     }
 
-    if (!document.getElementById('notif-toast')) {
-      const toast = document.createElement('div');
-      toast.id = 'notif-toast';
-      toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.2);z-index:9999;display:none;align-items:center;gap:8px;';
-      document.body.appendChild(toast);
+    // Preferences modal
+    if (!document.getElementById('notif-prefs-modal')) {
+      const pm = document.createElement('div');
+      pm.className = 'notif-modal-overlay';
+      pm.id = 'notif-prefs-modal';
+      pm.innerHTML = `
+        <div class="notif-modal-card" style="max-width:440px;">
+          <div class="notif-modal-header">
+            <h3>${ICONS.settings} Notification Preferences</h3>
+            <button class="notif-modal-close-btn" onclick="CLNNotifications.closePreferences()">${ICONS.x}</button>
+          </div>
+          <div class="notif-modal-body">
+            <div class="pref-row">
+              <div class="pref-label-wrap">
+                <span class="pref-title">Notification Sound</span>
+                <span class="pref-desc">Play gentle chime on incoming notifications</span>
+              </div>
+              <label class="cln-switch">
+                <input type="checkbox" id="pref-sound" onchange="CLNNotifications.savePreference('sound_enabled', this.checked)">
+                <span class="cln-slider"></span>
+              </label>
+            </div>
+
+            <div class="pref-row">
+              <div class="pref-label-wrap">
+                <span class="pref-title">Desktop Browser Alerts</span>
+                <span class="pref-desc">Show notification when app is in background</span>
+              </div>
+              <label class="cln-switch">
+                <input type="checkbox" id="pref-browser" onchange="CLNNotifications.toggleBrowserPermission(this.checked)">
+                <span class="cln-slider"></span>
+              </label>
+            </div>
+
+            <div class="pref-row">
+              <div class="pref-label-wrap">
+                <span class="pref-title">Announcement Alerts</span>
+                <span class="pref-desc">WhatsApp-inspired floating toast alerts</span>
+              </div>
+              <label class="cln-switch">
+                <input type="checkbox" id="pref-announcement" checked onchange="CLNNotifications.savePreference('announcement_alerts', this.checked)">
+                <span class="cln-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="notif-modal-footer">
+            <button class="btn btn-primary" onclick="CLNNotifications.closePreferences()" style="background:#2563eb;color:#fff;">Done</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(pm);
     }
   }
 
-  // Filter out client-side expired items
-  function filterActiveNotifications(list) {
-    const now = Date.now();
-    return (list || []).filter(n => {
-      if (n.status === 'expired') return false;
-      if (n.expires_at || n.expiresAt) {
-        const expTime = new Date(n.expires_at || n.expiresAt).getTime();
-        if (!isNaN(expTime) && expTime <= now) return false;
-      }
-      return true;
-    });
+  // --- Live Status Indicator ---
+  function updateLiveIndicator(isOnline) {
+    const pill = document.getElementById('notif-live-pill');
+    if (!pill) return;
+    if (isOnline) {
+      pill.className = 'notif-realtime-pill';
+      pill.innerHTML = '<span class="dot"></span> Live';
+    } else {
+      pill.className = 'notif-realtime-pill offline';
+      pill.innerHTML = '<span class="dot"></span> Reconnecting';
+    }
   }
 
-  // Render notifications to dropdown & update badge
-  function renderNotifications() {
-    const ddList    = document.getElementById('notif-dd-list');
-    const bellBadge = document.getElementById('notif-bell-badge');
-    const bellBtn   = document.getElementById('notif-bell-btn');
+  // --- Bell Shake Animation ---
+  function triggerBellAnimation() {
+    const btn = document.getElementById('notif-bell-btn');
+    if (!btn) return;
+    btn.classList.remove('shake');
+    void btn.offsetWidth;
+    btn.classList.add('shake');
+    setTimeout(() => btn.classList.remove('shake'), 650);
+  }
 
-    // Filter active (non-expired)
-    const active = filterActiveNotifications(allNotifications);
-    const unread = active.filter(n => !n.is_read && !n.isRead).length;
+  // --- Render Notification Center List & Tab Counts ---
+  function renderNotificationCenter() {
+    const ddList = document.getElementById('notif-dd-list');
+    const badge = document.getElementById('notif-bell-badge');
+
+    const unreadItems = allNotifications.filter(n => !n.is_read && !n.isRead);
+    const readItems   = allNotifications.filter(n => n.is_read || n.isRead);
+
+    const unreadCount = unreadItems.length;
 
     // Update bell badge
-    if (bellBadge) {
-      if (unread > 0) {
-        bellBadge.textContent = unread > 99 ? '99+' : unread;
-        bellBadge.style.display = 'flex';
-        if (unread > lastUnreadCount && bellBtn) {
-          bellBtn.classList.remove('shake');
-          void bellBtn.offsetWidth;
-          bellBtn.classList.add('shake');
-          setTimeout(() => bellBtn?.classList.remove('shake'), 700);
-        }
+    if (badge) {
+      if (unreadCount > 0) {
+        badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        badge.style.display = 'flex';
       } else {
-        bellBadge.style.display = 'none';
-        bellBadge.textContent = '0';
+        badge.style.display = 'none';
+        badge.textContent = '0';
       }
     }
-    lastUnreadCount = unread;
+    lastUnreadCount = unreadCount;
+
+    // Update tab counts
+    const cAll = document.getElementById('count-tab-all');
+    const cUnread = document.getElementById('count-tab-unread');
+    const cRead = document.getElementById('count-tab-read');
+    if (cAll) cAll.textContent = allNotifications.length;
+    if (cUnread) cUnread.textContent = unreadCount;
+    if (cRead) cRead.textContent = readItems.length;
 
     if (!ddList) return;
 
-    if (active.length === 0) {
+    let displayList = allNotifications;
+    if (currentTab === 'unread') displayList = unreadItems;
+    if (currentTab === 'read') displayList = readItems;
+
+    if (displayList.length === 0) {
+      const emptyMsg = currentTab === 'unread'
+        ? 'No unread notifications'
+        : (currentTab === 'read' ? 'No read notifications' : "You're all caught up");
       ddList.innerHTML = `
         <div class="notif-empty">
-          ${NOTIF_ICONS.bellSlash}
-          <p style="font-weight:600;margin:0 0 4px;color:var(--text-primary);">You're all caught up</p>
-          <span style="font-size:12px;color:var(--text-secondary);">No new notifications right now.</span>
-        </div>`;
+          ${ICONS.bellSlash}
+          <p style="font-weight:600;margin:0 0 4px;color:var(--text-primary);">${emptyMsg}</p>
+          <span style="font-size:12px;color:var(--text-secondary);">No notifications in this view.</span>
+        </div>
+      `;
       return;
     }
 
-    ddList.innerHTML = active.map(n => buildNotifItemHtml(n)).join('');
+    ddList.innerHTML = displayList.map(renderNotifItemHtml).join('');
   }
 
-  // Helper: Retrieve active API client
-  function getApiClient() {
-    if (typeof window !== 'undefined' && window.api && typeof window.api.get === 'function') {
-      return window.api;
-    }
-    if (typeof api !== 'undefined' && api && typeof api.get === 'function') {
-      return api;
-    }
-    return null;
-  }
-
-  // Helper: Retrieve employee auth token
-  function getAuthToken() {
-    if (typeof getToken === 'function') {
-      try {
-        const t = getToken();
-        if (t) return t;
-      } catch (e) {}
-    }
-    try {
-      return sessionStorage.getItem('cln_token') || localStorage.getItem('cln_token') || localStorage.getItem('token') || '';
-    } catch (e) {
-      return '';
-    }
-  }
-
-  // Helper: Retrieve API base URL
-  function getApiBaseUrl() {
-    const client = getApiClient();
-    if (client && client.base) return client.base;
-    if (typeof API_BASE !== 'undefined' && API_BASE) return API_BASE;
-    if (typeof window !== 'undefined' && window.API_BASE) return window.API_BASE;
-    return '/api';
-  }
-
-  // Load notifications from API
-  async function loadNotifications() {
+  // --- Fetch Notifications from Backend ---
+  async function fetchNotifications(renderLoading = true) {
     const ddList = document.getElementById('notif-dd-list');
-    if (allNotifications.length === 0 && ddList && notifDropdownOpen) {
+    if (renderLoading && allNotifications.length === 0 && ddList && notifDropdownOpen) {
       ddList.innerHTML = `
         <div class="notif-empty">
           <p style="font-size:13px;color:var(--text-secondary);margin:0;">Loading notifications...</p>
@@ -395,129 +749,151 @@
     }
 
     try {
-      let res = null;
-      const client = getApiClient();
-
-      // Primary: Use standard CLN API client if available
-      if (client && typeof client.get === 'function') {
-        res = await client.get('/notifications');
-        if (!res?.ok) res = await client.get('/employee/notifications');
-      }
-
-      // Secondary: Direct authenticated fetch with token and proper API_BASE
-      if (!res?.ok) {
-        const token = getAuthToken();
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-        const base = getApiBaseUrl();
-
-        const fetchRes = await fetch(`${base}/notifications`, { headers }).catch(() => null);
-        if (fetchRes && fetchRes.ok) {
-          const data = await fetchRes.json().catch(() => ({}));
-          res = { ok: true, data };
-        } else {
-          const altRes = await fetch(`${base}/employee/notifications`, { headers }).catch(() => null);
-          if (altRes && altRes.ok) {
-            const data = await altRes.json().catch(() => ({}));
-            res = { ok: true, data };
-          }
+      const token = getToken();
+      const base = getApiBaseUrl();
+      const res = await fetch(`${base}/notifications?tab=all&limit=100`, {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
         }
-      }
+      });
 
-      if (res?.ok) {
-        const rawData = res.data || {};
-        const items = Array.isArray(rawData)
-          ? rawData
-          : (rawData.notifications || rawData.data || []);
-        allNotifications = filterActiveNotifications(items);
-        renderNotifications();
-      } else {
-        if (allNotifications.length === 0 && ddList) {
-          ddList.innerHTML = `
-            <div class="notif-empty">
-              ${NOTIF_ICONS.alertCircle}
-              <p style="font-weight:600;margin:6px 0 2px;color:var(--text-primary);">Unable to load notifications.</p>
-              <button class="notif-dd-link" onclick="CLNNotifications.load()" style="margin-top:6px;">Try again</button>
-            </div>`;
-        }
+      if (res.ok) {
+        const data = await res.json();
+        allNotifications = data.notifications || [];
+        renderNotificationCenter();
       }
     } catch (e) {
-      console.error('[CLNNotifications] load error:', e);
-      if (allNotifications.length === 0 && ddList) {
-        ddList.innerHTML = `
-          <div class="notif-empty">
-            ${NOTIF_ICONS.alertCircle}
-            <p style="font-weight:600;margin:6px 0 2px;color:var(--text-primary);">Unable to load notifications.</p>
-            <button class="notif-dd-link" onclick="CLNNotifications.load()" style="margin-top:6px;">Try again</button>
-          </div>`;
-      }
+      console.warn('[NotificationEngine] fetch error:', e.message);
     }
   }
 
-  // Dropdown toggle
-  function toggleNotifDropdown() {
-    const dd = document.getElementById('notif-dropdown');
-    const btn = document.getElementById('notif-bell-btn');
-    notifDropdownOpen = !notifDropdownOpen;
-    dd?.classList.toggle('open', notifDropdownOpen);
-    btn?.classList.toggle('active', notifDropdownOpen);
-    if (notifDropdownOpen) {
-      loadNotifications();
+  // --- Mark Single Notification Read ---
+  async function markOneRead(id) {
+    syncReadStateLocally(id);
+    postBroadcast('MARK_READ', { id, unreadCount: lastUnreadCount });
+
+    try {
+      const token = getToken();
+      const base = getApiBaseUrl();
+      await fetch(`${base}/notifications/${id}/read`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (e) {
+      console.warn('[NotificationEngine] markOneRead error:', e);
     }
   }
 
-  function closeNotifDropdown() {
-    const dd = document.getElementById('notif-dropdown');
-    const btn = document.getElementById('notif-bell-btn');
-    dd?.classList.remove('open');
-    btn?.classList.remove('active');
-    notifDropdownOpen = false;
+  // --- Mark All Read ---
+  async function markAllRead() {
+    syncAllReadLocally();
+    postBroadcast('MARK_ALL_READ');
+
+    try {
+      const token = getToken();
+      const base = getApiBaseUrl();
+      await fetch(`${base}/notifications/mark-all-read`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (e) {
+      console.warn('[NotificationEngine] markAllRead error:', e);
+    }
   }
 
-  // Handle click on a notification item: marks read, navigates, and smart focuses
-  async function handleNotifClick(id, url) {
-    closeNotifDropdown();
-
-    // Optimistically mark read in UI
+  // --- Local State Synchronization ---
+  function syncReadStateLocally(id, unreadCount = null, render = true) {
     allNotifications = allNotifications.map(n =>
-      n.id === id ? { ...n, is_read: 1, isRead: true, status: 'read' } : n
+      n.id === id ? { ...n, is_read: 1, isRead: true } : n
     );
-    renderNotifications();
+    if (render) renderNotificationCenter();
+  }
 
-    // Call server to persist read status
-    markOneReadOnServer(id).catch(e => console.error('[CLNNotifications] markOneRead error:', e));
+  function syncAllReadLocally(render = true) {
+    allNotifications = allNotifications.map(n => ({ ...n, is_read: 1, isRead: true }));
+    if (render) renderNotificationCenter();
+  }
+
+  function onRemoteDeliveryAck(data) {
+    console.log('[NotificationEngine] Delivery confirmed for recipient:', data.employeeName);
+  }
+
+  // --- Delete / Archive Notification ---
+  async function deleteSingle(id) {
+    allNotifications = allNotifications.filter(n => n.id !== id);
+    renderNotificationCenter();
+
+    try {
+      const token = getToken();
+      const base = getApiBaseUrl();
+      await fetch(`${base}/notifications/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (e) {
+      console.warn('[NotificationEngine] delete error:', e);
+    }
+  }
+
+  // --- Click to Navigate with In-Page Focus ---
+  async function handleNotifClick(id, url) {
+    closeDropdown();
+    markOneRead(id);
 
     if (!url) return;
 
-    // Check if destination is on the current page
     const currentPath = window.location.pathname.toLowerCase();
     const parsedTarget = new URL(url, window.location.origin);
     const targetPath = parsedTarget.pathname.toLowerCase();
 
+    // Check same page navigation
     if (currentPath === targetPath) {
-      // Same page in-place handling
-      const targetParams = parsedTarget.searchParams;
+      const params = parsedTarget.searchParams;
 
-      if (currentPath.includes('data-excel.html')) {
-        const asgnId = parseInt(targetParams.get('assignmentId'), 10);
-        const recId = parseInt(targetParams.get('recordId'), 10);
-        const phone = targetParams.get('phone');
+      // Admin data-excel handling
+      if (currentPath.includes('admin/data-excel.html')) {
+        const fileId = parseInt(params.get('fileId'), 10);
+        if (fileId && typeof window.showAssignmentDetailModal === 'function') {
+          window.showAssignmentDetailModal(fileId);
+          return;
+        }
+      }
 
+      // Employee data-excel handling
+      if (currentPath.includes('employee/data-excel.html')) {
+        const asgnId = parseInt(params.get('assignmentId'), 10);
+        const recId = parseInt(params.get('recordId'), 10);
         if (asgnId && typeof window.openSheet === 'function') {
           await window.openSheet(asgnId);
-          if ((recId || phone) && typeof window.focusRecordInSheet === 'function') {
-            setTimeout(() => window.focusRecordInSheet(recId || null, phone || null), 250);
+          if (recId && typeof window.focusRecordInSheet === 'function') {
+            setTimeout(() => window.focusRecordInSheet(recId), 250);
           }
           return;
         }
-      } else if (currentPath.includes('my-customers.html')) {
-        const custId = parseInt(targetParams.get('customerId'), 10);
+      }
+
+      // Customers page handling
+      if (currentPath.includes('customers.html')) {
+        const custId = parseInt(params.get('customerId'), 10);
         if (custId && typeof window.focusCustomerInTable === 'function') {
           window.focusCustomerInTable(custId);
           return;
         }
-      } else if (currentPath.includes('loans.html')) {
-        const loanId = parseInt(targetParams.get('loanId'), 10);
+      }
+
+      // Loans page handling
+      if (currentPath.includes('loans.html')) {
+        const loanId = parseInt(params.get('loanId'), 10);
         if (loanId && typeof window.focusLoanInTable === 'function') {
           window.focusLoanInTable(loanId);
           return;
@@ -525,267 +901,347 @@
       }
     }
 
-    // Different page or standard navigation
+    // Standard cross-page navigation
     window.location.href = url;
   }
 
-  // Server mark read helper
-  async function markOneReadOnServer(id) {
-    try {
-      const client = getApiClient();
-      let ok = false;
-      if (client && typeof client.patch === 'function') {
-        const res = await client.patch(`/notifications/${id}/read`, {});
-        ok = res?.ok;
-      }
-      if (!ok) {
-        const token = getAuthToken();
-        const base = getApiBaseUrl();
-        await fetch(`${base}/notifications/${id}/read`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          }
-        });
-      }
-    } catch (e) {
-      console.error('[CLNNotifications] markOneReadOnServer error:', e);
+  // --- Dropdown Toggling ---
+  function toggleDropdown() {
+    const dd = document.getElementById('notif-dropdown');
+    const btn = document.getElementById('notif-bell-btn');
+    notifDropdownOpen = !notifDropdownOpen;
+    dd?.classList.toggle('open', notifDropdownOpen);
+    btn?.classList.toggle('active', notifDropdownOpen);
+    if (notifDropdownOpen) {
+      fetchNotifications(false);
     }
   }
 
-  // Mark all as read (Optimistic & Server Synchronized)
-  async function markAllRead() {
-    allNotifications = allNotifications.map(n => ({ ...n, is_read: 1, isRead: true, status: 'read' }));
-    renderNotifications();
-
-    try {
-      const client = getApiClient();
-      let ok = false;
-      if (client && typeof client.patch === 'function') {
-        const res = await client.patch('/notifications/mark-all-read', {});
-        ok = res?.ok;
-      }
-      if (!ok) {
-        const token = getAuthToken();
-        const base = getApiBaseUrl();
-        await fetch(`${base}/notifications/mark-all-read`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          }
-        });
-      }
-      showNotifToast('All notifications marked as read');
-    } catch (e) {
-      console.error('[CLNNotifications] markAllRead error:', e);
-    }
+  function closeDropdown() {
+    const dd = document.getElementById('notif-dropdown');
+    const btn = document.getElementById('notif-bell-btn');
+    dd?.classList.remove('open');
+    btn?.classList.remove('active');
+    notifDropdownOpen = false;
   }
 
-  // Dismiss a callback reminder
-  async function dismissReminder(notifId) {
-    allNotifications = allNotifications.map(n =>
-      n.id === notifId ? { ...n, is_read: 1, isRead: true, reminder_status: 'completed', status: 'read' } : n
-    );
-    renderNotifications();
-
-    try {
-      const client = getApiClient();
-      let ok = false;
-      if (client && typeof client.patch === 'function') {
-        const res = await client.patch(`/notifications/${notifId}/dismiss`, {});
-        ok = res?.ok;
-      }
-      if (!ok) {
-        const token = getAuthToken();
-        const base = getApiBaseUrl();
-        await fetch(`${base}/notifications/${notifId}/dismiss`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          }
-        });
-      }
-      showNotifToast('Callback marked completed');
-      await loadNotifications();
-    } catch (e) {
-      console.error('[CLNNotifications] dismissReminder error:', e);
-    }
+  function setTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.notif-tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`notif-tab-${tab}`)?.classList.add('active');
+    renderNotificationCenter();
   }
 
-  // Delete notification confirmation modal
-  function confirmDeleteNotif(id) {
-    pendingDeleteNotifId = id;
-    const modal = document.getElementById('delete-notif-modal');
-    const confirmBtn = document.getElementById('confirm-delete-notif-btn');
+  // --- Admin Announcement Composer ---
+  let selectedAudience = 'all';
+  let selectedPriority = 'normal';
+
+  function openComposer() {
+    closeDropdown();
+    const modal = document.getElementById('notif-composer-modal');
     if (!modal) return;
     modal.classList.add('show');
-    if (confirmBtn) {
-      confirmBtn.onclick = async function() {
-        const deleteId = pendingDeleteNotifId;
-        closeDeleteNotifModal();
-        if (deleteId) await deleteSingleNotif(deleteId);
-      };
+    loadEligibleEmployeesForComposer();
+  }
+
+  function closeComposer() {
+    document.getElementById('notif-composer-modal')?.classList.remove('show');
+  }
+
+  function onAudienceChange(aud) {
+    selectedAudience = aud;
+    document.querySelectorAll('.audience-opt-label').forEach(l => l.classList.remove('active'));
+    document.getElementById(`lbl-aud-${aud}`)?.classList.add('active');
+
+    const empWrap = document.getElementById('composer-emp-selection-wrap');
+    if (empWrap) {
+      empWrap.style.display = (aud === 'all') ? 'none' : 'block';
     }
   }
 
-  function closeDeleteNotifModal() {
-    document.getElementById('delete-notif-modal')?.classList.remove('show');
-    pendingDeleteNotifId = null;
+  function setPriority(prio) {
+    selectedPriority = prio;
+    document.querySelectorAll('.priority-pill-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`btn-prio-${prio}`)?.classList.add('active');
   }
 
-  function closeDeleteNotifModalOnOverlay(e) {
-    if (e.target && e.target.id === 'delete-notif-modal') closeDeleteNotifModal();
-  }
-
-  // Delete single notification
-  async function deleteSingleNotif(notifId) {
-    allNotifications = allNotifications.filter(n => n.id !== notifId);
-    renderNotifications();
+  async function loadEligibleEmployeesForComposer() {
+    const container = document.getElementById('composer-emp-list');
+    if (!container) return;
 
     try {
-      let ok = false;
-      const client = getApiClient();
-      if (client && typeof client.delete === 'function') {
-        const res = await client.delete(`/notifications/${notifId}`);
-        ok = res?.ok;
+      const token = getToken();
+      const base = getApiBaseUrl();
+      const res = await fetch(`${base}/notifications/recipients/employees`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const emps = data.employees || [];
+        if (emps.length === 0) {
+          container.innerHTML = '<span style="font-size:12px;color:var(--text-secondary);">No active employees found.</span>';
+          return;
+        }
+        container.innerHTML = emps.map(e => `
+          <label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12.5px;cursor:pointer;">
+            <input type="checkbox" class="composer-emp-chk" value="${e.id}">
+            <span><strong>${escapeHtml(e.name)}</strong> (${escapeHtml(e.email)})</span>
+          </label>
+        `).join('');
       }
-      if (!ok) {
-        const token = getAuthToken();
-        const base = getApiBaseUrl();
-        const res = await fetch(`${base}/notifications/${notifId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          }
-        });
-        ok = res.ok;
-      }
+    } catch (_) {}
+  }
 
-      if (ok) {
-        showNotifToast('Notification deleted');
-      } else {
-        await loadNotifications();
+  async function sendAnnouncement() {
+    const title = document.getElementById('composer-title')?.value || '';
+    const message = document.getElementById('composer-message')?.value || '';
+    const actionUrl = document.getElementById('composer-link')?.value || '';
+
+    if (!title.trim() || !message.trim()) {
+      alert('Please enter both announcement title and message body.');
+      return;
+    }
+
+    const selectedEmployeeIds = [];
+    if (selectedAudience !== 'all') {
+      document.querySelectorAll('.composer-emp-chk:checked').forEach(chk => {
+        selectedEmployeeIds.push(Number(chk.value));
+      });
+      if (selectedEmployeeIds.length === 0) {
+        alert('Please select at least one employee recipient.');
+        return;
       }
-    } catch (err) {
-      console.error('[CLNNotifications] delete error:', err);
-      await loadNotifications();
+    }
+
+    const sendBtn = document.getElementById('btn-send-announcement');
+    if (sendBtn) {
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = `<span>Dispatching...</span>`;
+    }
+
+    try {
+      const token = getToken();
+      const base = getApiBaseUrl();
+      const res = await fetch(`${base}/notifications/announcements`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          message: message.trim(),
+          priority: selectedPriority,
+          actionUrl: actionUrl.trim() || null,
+          audience: selectedAudience,
+          employeeIds: selectedEmployeeIds
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        closeComposer();
+        // Reset form
+        document.getElementById('composer-title').value = '';
+        document.getElementById('composer-message').value = '';
+        document.getElementById('composer-link').value = '';
+
+        // Show confirmation toast
+        showWhatsAppToast({
+          id: data.notificationId || Date.now(),
+          title: 'Announcement Dispatched',
+          message: data.message || `Dispatched to ${data.recipientCount} employee(s). Confirmed delivery tracking active.`,
+          priority: selectedPriority,
+          sender_name: 'Dixit Lending Admin',
+          sender_role: 'admin',
+          type: 'admin_announcement'
+        });
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert(err.message || 'Failed to dispatch announcement.');
+      }
+    } catch (e) {
+      alert('Network error while dispatching announcement.');
+    } finally {
+      if (sendBtn) {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = `${ICONS.send} <span>Send Now</span>`;
+      }
     }
   }
 
-  // Show floating toast
-  function showNotifToast(message) {
-    const toast = document.getElementById('notif-toast');
-    if (!toast) return;
-    toast.innerHTML = `${NOTIF_ICONS.check} ${escapeHtml(message)}`;
-    toast.style.display = 'flex';
-    setTimeout(() => { toast.style.display = 'none'; }, 2200);
+  // --- Notification Preferences ---
+  function openPreferences() {
+    closeDropdown();
+    const modal = document.getElementById('notif-prefs-modal');
+    if (!modal) return;
+    modal.classList.add('show');
+
+    // Populate checkboxes
+    const soundChk = document.getElementById('pref-sound');
+    const browserChk = document.getElementById('pref-browser');
+    const annChk = document.getElementById('pref-announcement');
+
+    if (soundChk) soundChk.checked = Boolean(activePreferences.sound_enabled);
+    if (browserChk) browserChk.checked = Boolean(activePreferences.browser_notifications_enabled);
+    if (annChk) annChk.checked = Boolean(activePreferences.announcement_alerts);
   }
 
-  // Polling & focus auto-refresh (Every 35 seconds, clean single interval)
-  function setupNotificationPolling() {
-    if (notifPollInterval) clearInterval(notifPollInterval);
-    notifPollInterval = setInterval(loadNotifications, 35000);
+  function closePreferences() {
+    document.getElementById('notif-prefs-modal')?.classList.remove('show');
+  }
 
-    document.addEventListener('visibilitychange', function() {
+  async function loadPreferences() {
+    try {
+      const token = getToken();
+      const base = getApiBaseUrl();
+      const res = await fetch(`${base}/notifications/preferences`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.preferences) {
+          activePreferences = { ...activePreferences, ...data.preferences };
+        }
+      }
+    } catch (_) {}
+  }
+
+  async function savePreference(key, value) {
+    activePreferences[key] = value ? 1 : 0;
+    try {
+      const token = getToken();
+      const base = getApiBaseUrl();
+      await fetch(`${base}/notifications/preferences`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(activePreferences)
+      });
+    } catch (_) {}
+  }
+
+  async function toggleBrowserPermission(enable) {
+    if (enable && 'Notification' in window) {
+      const perm = await Notification.requestPermission();
+      if (perm === 'granted') {
+        savePreference('browser_notifications_enabled', 1);
+      } else {
+        document.getElementById('pref-browser').checked = false;
+        savePreference('browser_notifications_enabled', 0);
+      }
+    } else {
+      savePreference('browser_notifications_enabled', 0);
+    }
+  }
+
+  // --- Periodic Smart Polling Fallback (Every 18s) ---
+  function setupPollingFallback() {
+    if (pollInterval) clearInterval(pollInterval);
+    pollInterval = setInterval(() => {
+      // If SSE is connected, light unread check; if disconnected, full fetch
+      if (!isSSEConnected) {
+        fetchNotifications(false);
+      }
+    }, 18000);
+
+    // Refresh on tab focus & visibility change
+    document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        loadNotifications();
+        fetchNotifications(false);
       }
     });
 
-    window.addEventListener('focus', function() {
-      loadNotifications();
-    });
-
-    // Cleanup interval on page unload to prevent leaks
-    window.addEventListener('beforeunload', function() {
-      if (notifPollInterval) {
-        clearInterval(notifPollInterval);
-        notifPollInterval = null;
-      }
+    window.addEventListener('focus', () => {
+      fetchNotifications(false);
     });
   }
 
-  // Initialize
+  // --- Main Init ---
   function init() {
     if (isInitialized) return;
-    document.querySelector('.app-layout')?.classList.add('employee-page');
-    ensureBellMarkup();
-    ensureModalMarkup();
 
-    // Close on outside click
-    document.addEventListener('click', function(e) {
+    ensureDOM();
+    loadPreferences();
+    fetchNotifications(true);
+    connectRealtimeStream();
+    initBroadcastChannel();
+    setupPollingFallback();
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
       if (!document.getElementById('notif-bell-wrap')?.contains(e.target)) {
-        closeNotifDropdown();
+        closeDropdown();
       }
     });
 
     // Close on Escape
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && notifDropdownOpen) {
-        closeNotifDropdown();
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (notifDropdownOpen) closeDropdown();
+        closeComposer();
+        closePreferences();
       }
     });
 
-    // Enter / Space accessibility on bell button
-    document.getElementById('notif-bell-btn')?.addEventListener('keydown', function(e) {
+    // Accessibility on bell button
+    document.getElementById('notif-bell-btn')?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        toggleNotifDropdown();
+        toggleDropdown();
       }
     });
 
-    loadNotifications();
-    setupNotificationPolling();
     isInitialized = true;
+    console.log('[CLNNotifications] Centralized Real-Time Notification Engine initialized.');
   }
 
-  // Auto-init when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     setTimeout(init, 0);
   }
 
-  // Public API
+  // Public Interface
   const CLNNotifications = {
     init,
-    load: loadNotifications,
-    render: renderNotifications,
-    toggleDropdown: toggleNotifDropdown,
-    closeDropdown: closeNotifDropdown,
+    load: fetchNotifications,
+    render: renderNotificationCenter,
+    toggleDropdown,
+    closeDropdown,
+    setTab,
+    switchTab: setTab,
     handleClick: handleNotifClick,
-    markOneRead: markOneReadOnServer,
+    markOneRead,
     markAllRead,
-    dismissReminder,
-    confirmDelete: confirmDeleteNotif,
-    closeDeleteModal: closeDeleteNotifModal,
-    closeDeleteModalOnOverlay: closeDeleteNotifModalOnOverlay,
-    deleteSingle: deleteSingleNotif,
-    showToast: showNotifToast,
+    deleteSingle,
+    closeToast: closeWhatsAppToast,
+    openComposer,
+    closeComposer,
+    onAudienceChange,
+    setPriority,
+    sendAnnouncement,
+    openPreferences,
+    closePreferences,
+    savePreference,
+    toggleBrowserPermission,
     getNotifications: () => allNotifications,
-    getUnreadCount: () => filterActiveNotifications(allNotifications).filter(n => !n.is_read && !n.isRead).length
+    getUnreadCount: () => allNotifications.filter(n => !n.is_read && !n.isRead).length
   };
 
-  // Expose to window
   window.CLNNotifications = CLNNotifications;
 
-  // Backward-compatible global aliases
-  window.toggleNotifDropdown = toggleNotifDropdown;
-  window.closeNotifDropdown = closeNotifDropdown;
+  // Backward compatibility global aliases
+  window.toggleNotifDropdown = toggleDropdown;
+  window.closeNotifDropdown = closeDropdown;
   window.markAllRead = markAllRead;
-  window.loadNotifications = loadNotifications;
-  window.renderNotifications = renderNotifications;
+  window.loadNotifications = fetchNotifications;
+  window.renderNotifications = renderNotificationCenter;
   window.handleNotifClick = handleNotifClick;
-  window.markOneRead = markOneReadOnServer;
-  window.dismissReminder = dismissReminder;
-  window.confirmDeleteNotif = confirmDeleteNotif;
-  window.closeDeleteNotifModal = closeDeleteNotifModal;
-  window.closeDeleteNotifModalOnOverlay = closeDeleteNotifModalOnOverlay;
-  window.deleteSingleNotif = deleteSingleNotif;
-  window.showNotifToast = showNotifToast;
+  window.markOneRead = markOneRead;
+  window.deleteSingleNotif = deleteSingle;
+  window.showNotifToast = (msg) => showWhatsAppToast({ id: Date.now(), title: 'Alert', message: msg, priority: 'normal' });
 
-})();
+})(window);

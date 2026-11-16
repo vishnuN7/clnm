@@ -1523,6 +1523,25 @@ exports.submitAssignment = async (req, res) => {
       );
     }
 
+    // Dispatch real-time Admin notification for completed assigned records submission
+    try {
+      const [[empUser]] = await db.query('SELECT name FROM users WHERE id = ?', [empId]);
+      const [[fileRecord]] = await db.query('SELECT original_name FROM excel_files WHERE id = ?', [asgn.file_id]);
+      const [[{ recCount }]] = await db.query('SELECT COUNT(*) as recCount FROM excel_records WHERE assignment_id = ?', [assignmentId]);
+
+      const notifService = require('../services/notificationService');
+      await notifService.notifyAdminSubmission({
+        employeeId: empId,
+        employeeName: empUser?.name || 'Employee',
+        assignmentId: Number(assignmentId),
+        fileId: asgn.file_id,
+        fileName: fileRecord?.original_name || ('File #' + asgn.file_id),
+        recordCount: recCount || asgn.assigned_records || 0
+      });
+    } catch (notifErr) {
+      console.warn('[Excel] notifyAdminSubmission error:', notifErr.message);
+    }
+
     res.json({ success: true, message: 'Assignment submitted successfully.' });
   } catch (err) {
     console.error('[Excel] submitAssignment:', err.message);

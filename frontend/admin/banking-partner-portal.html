@@ -1,0 +1,3553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dixit Lending Solution — Banking Partner Portal</title>
+  <meta name="description" content="Manage bank and NBFC portal links and control employee access." />
+  <meta name="theme-color" content="#0f2747" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    /* ═══ Scoped styles for Banking Partner Portal ══════════════════════ */
+    .content-area,
+    .page-content {
+      padding: 20px 24px 36px;
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    @media (max-width: 768px) {
+      .content-area,
+      .page-content {
+        padding: 16px 14px 28px;
+      }
+    }
+    .bpp-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    .main-content {
+      min-width: 0;
+      max-width: calc(100vw - var(--sidebar-width, 260px));
+      overflow-x: hidden;
+    }
+    @media (max-width: 900px) {
+      .main-content {
+        max-width: 100vw;
+      }
+    }
+
+    /* Topbar branding */
+    .admin-page .topbar {
+      display: flex !important;
+      align-items: center !important;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      min-height: 64px;
+      height: auto;
+      padding: 10px 24px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    :root[data-theme='dark'] .admin-page .topbar {
+      background: rgba(12, 18, 25, 0.95);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
+    }
+    .admin-page .topbar-title {
+      position: absolute !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      text-align: center !important;
+      max-width: min(720px, calc(100% - 240px)) !important;
+      pointer-events: auto !important;
+      margin: 0 !important;
+    }
+    .admin-page .topbar-title h2 {
+      margin: 0 !important;
+      font-size: 18px !important;
+      font-weight: 800 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1.25 !important;
+      color: var(--text-primary) !important;
+      letter-spacing: -0.2px;
+    }
+    .admin-page .topbar-title h2 i {
+      color: var(--accent);
+      margin-right: 8px;
+      font-size: 17px;
+    }
+    .admin-page .topbar-title p {
+      margin: 2px 0 0 !important;
+      font-size: 12px !important;
+      color: var(--text-secondary) !important;
+      line-height: 1.35 !important;
+      text-align: center !important;
+      white-space: normal !important;
+    }
+    .admin-page .topbar-actions {
+      margin-left: auto !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      flex-shrink: 0 !important;
+      position: relative;
+      z-index: 2;
+    }
+    .topbar-date-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-body);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .topbar-date-badge i {
+      color: var(--accent);
+      font-size: 11px;
+    }
+    .mobile-menu-btn {
+      display: none !important;
+    }
+    @media (max-width: 900px) {
+      .mobile-menu-btn {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+        cursor: pointer;
+      }
+    }
+
+    /* KPI Summary Cards Grid */
+    .bpp-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      width: 100%;
+    }
+    .bpp-kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .bpp-kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-color: var(--accent);
+    }
+    .bpp-kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .bpp-kpi-icon.blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+    .bpp-kpi-icon.green { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+    .bpp-kpi-icon.amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+    .bpp-kpi-icon.purple { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+    .bpp-kpi-info h3 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.1;
+    }
+    .bpp-kpi-info p {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin: 4px 0 0;
+    }
+
+    /* Tabs Styling */
+    .bpp-tab-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0;
+      margin-top: 4px;
+    }
+    .bpp-tab-btn {
+      padding: 10px 20px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border-radius: 6px 6px 0 0;
+    }
+    .bpp-tab-btn:hover {
+      color: var(--accent);
+      background: var(--bg-hover, rgba(0,0,0,0.02));
+    }
+    .bpp-tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: transparent;
+    }
+    .bpp-tab-panel {
+      display: none;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .bpp-tab-panel.active {
+      display: flex;
+    }
+
+    /* Action bar / filters */
+    .bpp-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+    .bpp-filters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+      min-width: 0;
+    }
+    .bpp-search-input {
+      position: relative;
+      min-width: 220px;
+      flex: 1 1 260px;
+    }
+    .bpp-search-input input {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px 0 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      transition: border-color 0.2s;
+    }
+    .bpp-search-input input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .bpp-search-input i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+    .bpp-select {
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+    .bpp-select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .bpp-select option,
+    .bpp-form-group select option {
+      background-color: #ffffff;
+      color: #0f172a;
+    }
+    :root[data-theme='dark'] .bpp-select,
+    :root[data-theme='dark'] .bpp-form-group select {
+      background-color: #0d1522;
+      color: #f1f5f9;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    :root[data-theme='dark'] .bpp-select option,
+    :root[data-theme='dark'] .bpp-form-group select option {
+      background-color: #0d1522;
+      color: #f1f5f9;
+    }
+    :root[data-theme='light'] .bpp-select,
+    :root[data-theme='light'] .bpp-form-group select {
+      background-color: #ffffff;
+      color: #0f172a;
+      border-color: #cbd5e1;
+    }
+    :root[data-theme='light'] .bpp-select option,
+    :root[data-theme='light'] .bpp-form-group select option {
+      background-color: #ffffff;
+      color: #0f172a;
+    }
+    .bpp-btn-primary {
+      height: 38px;
+      padding: 0 18px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.2s ease, transform 0.1s ease;
+      white-space: nowrap;
+    }
+    .bpp-btn-primary:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+    .bpp-btn-secondary {
+      height: 38px;
+      padding: 0 14px;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+      white-space: nowrap;
+    }
+    .bpp-btn-secondary:hover {
+      background: var(--bg-hover, rgba(0,0,0,0.05));
+    }
+
+    /* Table Card */
+    .bpp-table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+    }
+    .bpp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+      min-width: 900px;
+    }
+    .bpp-table th {
+      background: var(--bg-body);
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .bpp-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .bpp-table tr:last-child td {
+      border-bottom: none;
+    }
+    .bpp-table tr:hover td {
+      background: var(--bg-hover, rgba(0,0,0,0.015));
+    }
+
+    /* Bank Logo badge in table */
+    .bpp-logo-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .bpp-logo-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .bpp-bank-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .bpp-bank-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .bpp-bank-name {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+    .bpp-location-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(14, 165, 233, 0.12);
+      color: #0284c7;
+      border: 1px solid rgba(14, 165, 233, 0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    :root[data-theme='dark'] .bpp-location-pill {
+      background: rgba(14, 165, 233, 0.18);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .bpp-bank-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+      max-width: 320px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bpp-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .bpp-badge.bank { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
+    .bpp-badge.nbfc { background: rgba(139, 92, 246, 0.12); color: #7c3aed; }
+    .bpp-badge.active { background: rgba(16, 185, 129, 0.12); color: #059669; }
+    .bpp-badge.inactive { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
+
+    /* Switch toggle */
+    .bpp-switch {
+      position: relative;
+      display: inline-block;
+      width: 42px;
+      height: 22px;
+    }
+    .bpp-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .bpp-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 22px;
+    }
+    .bpp-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .bpp-slider {
+      background-color: var(--accent, #10b981);
+    }
+    input:checked + .bpp-slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Modal styling */
+    .bpp-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(3px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .bpp-modal-overlay.show {
+      display: flex;
+    }
+    .bpp-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 760px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      animation: bppFadeIn 0.2s ease-out;
+    }
+    @keyframes bppFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .bpp-modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .bpp-modal-header h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .bpp-modal-close {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+    .bpp-modal-body {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .bpp-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+    }
+    .bpp-form-grid .full-width {
+      grid-column: 1 / -1;
+    }
+    @media (max-width: 640px) {
+      .bpp-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .bpp-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .bpp-form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .bpp-form-group input[type="text"],
+    .bpp-form-group input[type="url"],
+    .bpp-form-group input[type="number"],
+    .bpp-form-group textarea,
+    .bpp-form-group select {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .bpp-form-group textarea {
+      height: 72px;
+      padding: 8px 12px;
+      resize: vertical;
+    }
+    .bpp-form-group input:focus,
+    .bpp-form-group textarea:focus,
+    .bpp-form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .bpp-input-error {
+      color: #ef4444;
+      font-size: 11.5px;
+      font-weight: 500;
+      display: none;
+    }
+    .bpp-modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      background: var(--bg-body);
+      border-radius: 0 0 14px 14px;
+    }
+
+    /* Logo presets in modal */
+    .bpp-preset-logos {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .bpp-preset-item {
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+    .bpp-preset-item:hover, .bpp-preset-item.selected {
+      border-color: var(--accent);
+      background: rgba(16, 185, 129, 0.05);
+    }
+    .bpp-preset-item img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    /* ═══ REDESIGNED PER-BANK PERMISSIONS PANEL ═════════════════════════ */
+    .bpp-perm-dialog {
+      max-width: 620px;
+      width: 100%;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .bpp-perm-modal-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--bg-card);
+      flex-shrink: 0;
+    }
+    .bpp-perm-header-title-wrap h3 {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .bpp-perm-header-title-wrap h3 i {
+      color: var(--accent);
+      font-size: 16px;
+    }
+    .bpp-perm-modal-body {
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      background: var(--bg-card);
+    }
+    .bpp-perm-emp-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .bpp-perm-emp-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent, #10b981), #059669);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 107, 60, 0.2);
+    }
+    .bpp-perm-emp-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .bpp-perm-emp-meta h4 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bpp-perm-emp-meta span {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bpp-perm-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .bpp-perm-toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .bpp-perm-toolbar-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .bpp-perm-count-badge {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--accent);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 2px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      font-family: monospace;
+    }
+    .bpp-perm-toolbar-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bpp-perm-btn-action {
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .bpp-perm-btn-action:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--bg-hover);
+    }
+    :root[data-theme='dark'] .bpp-perm-btn-action {
+      background: rgba(16, 23, 33, 0.9);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .bpp-perm-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      overflow-y: auto;
+      max-height: 380px;
+      padding: 2px 4px 6px 2px;
+    }
+    @media (max-width: 540px) {
+      .bpp-perm-grid {
+        grid-template-columns: 1fr;
+        max-height: 48vh;
+      }
+    }
+    .bpp-perm-tile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
+      min-height: 54px;
+      box-sizing: border-box;
+    }
+    .bpp-perm-tile:hover {
+      border-color: var(--accent);
+      background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+    }
+    .bpp-perm-tile.is-selected {
+      background: rgba(16, 185, 129, 0.06);
+      border-color: rgba(16, 185, 129, 0.45);
+      box-shadow: 0 1px 4px rgba(16, 185, 129, 0.08);
+    }
+    :root[data-theme='dark'] .bpp-perm-tile.is-selected {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(52, 211, 153, 0.45);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+    .bpp-perm-tile-logo-wrap {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .bpp-perm-tile-logo-wrap img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+    .bpp-perm-tile-logo-wrap i {
+      font-size: 16px;
+      color: var(--text-secondary);
+    }
+    .bpp-perm-tile-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+      min-width: 0;
+    }
+    .bpp-perm-tile-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25;
+    }
+    .bpp-perm-tile-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 4px;
+      align-self: flex-start;
+      line-height: 1.2;
+    }
+    .bpp-perm-tile-check {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding-left: 4px;
+    }
+    .bpp-perm-tile-check input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: var(--accent, #10b981);
+    }
+    .bpp-perm-modal-footer {
+      padding: 14px 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      background: var(--bg-body);
+      border-radius: 0 0 14px 14px;
+      flex-shrink: 0;
+    }
+
+    /* ── Two-Tier Permission Banner ──────────────────────────────────── */
+    .bpp-permission-banner {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .bpp-perm-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+    .bpp-perm-banner-icon {
+      font-size: 20px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .bpp-perm-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .bpp-perm-pill {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ── Activity Log Overview KPI Strip ─────────────────────────────── */
+    .bpp-log-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      width: 100%;
+    }
+    .bpp-log-kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      transition: all 0.15s ease;
+    }
+    .bpp-log-kpi-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    }
+    .bpp-log-kpi-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+    .bpp-log-kpi-icon.blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+    .bpp-log-kpi-icon.green { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+    .bpp-log-kpi-icon.purple { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+    .bpp-log-kpi-icon.amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+    .bpp-log-kpi-info h3,
+    .bpp-log-kpi-info h4 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.1;
+    }
+    .bpp-log-kpi-info p,
+    .bpp-log-kpi-info span {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin: 3px 0 0;
+      display: block;
+    }
+
+    /* ── Date Pickers & Filter Bar Enhancements ───────────────────────── */
+    .bpp-date-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .bpp-date-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .bpp-date-input {
+      height: 38px;
+      width: 140px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .bpp-date-input:focus {
+      border-color: var(--accent);
+    }
+
+    /* ── Activity Table Styling ──────────────────────────────────────── */
+    .bpp-log-table {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .bpp-log-table th.col-timestamp,
+    .bpp-log-table td.col-timestamp {
+      width: 15%;
+      min-width: 135px;
+    }
+    .bpp-log-table th.col-admin,
+    .bpp-log-table td.col-admin {
+      width: 15%;
+      min-width: 135px;
+    }
+    .bpp-log-table th.col-action,
+    .bpp-log-table td.col-action {
+      width: 13%;
+      min-width: 130px;
+    }
+    .bpp-log-table th.col-item,
+    .bpp-log-table td.col-item {
+      width: 16%;
+      min-width: 150px;
+    }
+    .bpp-log-table th.col-summary,
+    .bpp-log-table td.col-summary {
+      width: 29%;
+      min-width: 200px;
+    }
+    .bpp-log-table th.col-details,
+    .bpp-log-table td.col-details {
+      width: 12%;
+      min-width: 90px;
+      text-align: right;
+    }
+    .bpp-audit-item-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow: hidden;
+    }
+    .bpp-audit-item-cell strong {
+      color: var(--text-primary);
+      font-size: 13.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bpp-item-meta {
+      font-size: 11px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bpp-summary-cell {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    /* Action Pills (semantic & restrained) */
+    .bpp-action-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .bpp-action-pill.created { background: rgba(16, 185, 129, 0.12); color: #059669; }
+    .bpp-action-pill.updated { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
+    .bpp-action-pill.status { background: rgba(245, 158, 11, 0.14); color: #d97706; }
+    .bpp-action-pill.deleted { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
+    .bpp-action-pill.access-grant { background: rgba(16, 185, 129, 0.12); color: #059669; }
+    .bpp-action-pill.access-revoke { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
+    .bpp-action-pill.permissions { background: rgba(6, 182, 212, 0.12); color: #0891b2; }
+    .bpp-action-pill.bulk { background: rgba(139, 92, 246, 0.12); color: #7c3aed; }
+    .bpp-action-pill.generic { background: rgba(100, 116, 139, 0.12); color: #475569; }
+
+    :root[data-theme='dark'] .bpp-action-pill.created { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    :root[data-theme='dark'] .bpp-action-pill.updated { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    :root[data-theme='dark'] .bpp-action-pill.status { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    :root[data-theme='dark'] .bpp-action-pill.deleted { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    :root[data-theme='dark'] .bpp-action-pill.access-grant { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    :root[data-theme='dark'] .bpp-action-pill.access-revoke { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    :root[data-theme='dark'] .bpp-action-pill.permissions { background: rgba(6, 182, 212, 0.2); color: #22d3ee; }
+    :root[data-theme='dark'] .bpp-action-pill.bulk { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+    :root[data-theme='dark'] .bpp-action-pill.generic { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+
+    /* View Details Button */
+    .bpp-btn-details {
+      height: 30px;
+      padding: 0 10px;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .bpp-btn-details:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      box-shadow: 0 2px 6px rgba(0, 107, 60, 0.2);
+    }
+    :root[data-theme='dark'] .bpp-btn-details {
+      background: rgba(16, 23, 33, 0.85);
+      border-color: rgba(123, 192, 67, 0.2);
+      color: var(--text-primary);
+    }
+    :root[data-theme='dark'] .bpp-btn-details:hover {
+      background: var(--accent);
+      color: #062817;
+      border-color: var(--accent);
+    }
+
+    /* ── Pagination Bar ──────────────────────────────────────────────── */
+    .bpp-pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 18px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+      flex-wrap: wrap;
+    }
+    .bpp-pagination-info {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .bpp-pagination-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bpp-pg-btn {
+      height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .bpp-pg-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--bg-hover);
+    }
+    .bpp-pg-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+    .bpp-pg-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ── Empty & Loading States ──────────────────────────────────────── */
+    .bpp-empty-state {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .bpp-empty-state i {
+      font-size: 38px;
+      opacity: 0.35;
+      margin-bottom: 6px;
+    }
+    .bpp-empty-state h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .bpp-empty-state p {
+      font-size: 13px;
+      margin: 0;
+      max-width: 420px;
+    }
+
+    /* ═══ VIEW DETAILS SIDE DRAWER ══════════════════════════════════════ */
+    .bpp-drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 14, 26, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 1100;
+      display: none;
+      align-items: stretch;
+      justify-content: flex-end;
+      animation: bppDrawerOverlayFade 0.2s ease-out;
+    }
+    .bpp-drawer-overlay.show {
+      display: flex;
+    }
+    @keyframes bppDrawerOverlayFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .bpp-drawer {
+      width: min(580px, 100vw);
+      height: 100vh;
+      background: var(--bg-card);
+      border-left: 1px solid var(--border);
+      box-shadow: -12px 0 40px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      animation: bppDrawerSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes bppDrawerSlideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .bpp-drawer-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      background: var(--bg-card);
+      flex-shrink: 0;
+    }
+    .bpp-drawer-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+    .bpp-drawer-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bpp-drawer-header h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.25;
+    }
+    .bpp-drawer-event-badge {
+      font-size: 11.5px;
+      font-family: monospace;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .bpp-drawer-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-body);
+      color: var(--text-secondary);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .bpp-drawer-close:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border-color: var(--accent);
+    }
+
+    .bpp-drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: var(--bg-body);
+    }
+
+    .bpp-drawer-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .bpp-drawer-section-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .bpp-drawer-section-title i {
+      color: var(--accent);
+      font-size: 14px;
+    }
+
+    .bpp-drawer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 16px;
+    }
+    @media (max-width: 480px) {
+      .bpp-drawer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .bpp-drawer-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .bpp-drawer-item.full-width {
+      grid-column: 1 / -1;
+    }
+    .bpp-drawer-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .bpp-drawer-value {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+    .bpp-drawer-value.monospace {
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    /* URL copy box in drawer */
+    .bpp-drawer-url-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12.5px;
+    }
+    .bpp-drawer-url-box a {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .bpp-drawer-url-box a:hover {
+      text-decoration: underline;
+    }
+    .bpp-btn-copy-url {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .bpp-btn-copy-url:hover {
+      color: var(--accent);
+    }
+
+    /* Diff Comparison Table */
+    .bpp-diff-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      margin-top: 4px;
+    }
+    .bpp-diff-table th {
+      padding: 8px 10px;
+      background: var(--bg-body);
+      color: var(--text-secondary);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 11.5px;
+      text-transform: uppercase;
+    }
+    .bpp-diff-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--text-primary);
+    }
+    .bpp-diff-table tr:last-child td {
+      border-bottom: none;
+    }
+    .bpp-diff-table tr.is-modified td {
+      background: rgba(245, 158, 11, 0.04);
+    }
+    :root[data-theme='dark'] .bpp-diff-table tr.is-modified td {
+      background: rgba(245, 158, 11, 0.08);
+    }
+    .bpp-diff-pill {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .bpp-diff-pill.modified {
+      background: rgba(245, 158, 11, 0.15);
+      color: #d97706;
+    }
+    .bpp-diff-pill.same {
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--text-secondary);
+    }
+    .bpp-diff-val.before,
+    .bpp-diff-val.prev {
+      color: #b91c1c;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      padding: 3px 8px;
+      border-radius: 5px;
+      word-break: break-word;
+      display: inline-block;
+      font-size: 12.5px;
+    }
+    .bpp-diff-val.after,
+    .bpp-diff-val.curr {
+      color: #047857;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-weight: 600;
+      word-break: break-word;
+      display: inline-block;
+      font-size: 12.5px;
+    }
+    :root[data-theme='dark'] .bpp-diff-val.before,
+    :root[data-theme='dark'] .bpp-diff-val.prev {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(248, 113, 113, 0.3);
+    }
+    :root[data-theme='dark'] .bpp-diff-val.after,
+    :root[data-theme='dark'] .bpp-diff-val.curr {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(52, 211, 153, 0.3);
+    }
+
+    .bpp-drawer-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      background: var(--bg-card);
+      flex-shrink: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .bpp-kpi-grid,
+      .bpp-log-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 640px) {
+      .bpp-kpi-grid,
+      .bpp-log-kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .bpp-action-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .bpp-filters {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .bpp-search-input {
+        max-width: 100%;
+        min-width: 100%;
+      }
+      .bpp-drawer {
+        width: 100vw;
+      }
+      .bpp-pagination-bar {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout admin-page">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
+        </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Admin Console</span>
+        </div>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/admin/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users" aria-hidden="true"></i></span> <span>Employees</span></a>
+        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Customers</span></a>
+        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>Loan Applications</span></a>
+        <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+        <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>Data Excel Document</span></a>
+        <a href="/admin/banking-partner-portal.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-landmark" aria-hidden="true"></i></span> <span>Banking Partner Portal</span></a>
+        <a href="/admin/private-communication.html" class="nav-item"><span class="nav-icon"><i class="fas fa-comments" aria-hidden="true"></i></span> <span>Private Communication</span></a>
+          <a href="/admin/login-activity.html" class="nav-item"><span class="nav-icon"><i class="fas fa-location-dot" aria-hidden="true"></i></span> <span>Login Activity</span></a>
+        <a href="/admin/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="user-details"><p id="sidebar-user-name">Admin</p><span id="sidebar-user-role">admin</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+        <span>Menu</span>
+      </button>
+      <div class="topbar-title">
+        <h2><i class="fas fa-landmark"></i> Banking Partner Portal</h2>
+        <p>Manage bank and NBFC portal links and control employee access.</p>
+      </div>
+      <div class="topbar-actions">
+        <span class="topbar-date-badge"><i class="fas fa-calendar-alt"></i> <span id="current-date-display">Today</span></span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="bpp-container">
+
+        <!-- Summary KPI Cards -->
+        <div class="bpp-kpi-grid">
+          <div class="bpp-kpi-card">
+            <div class="bpp-kpi-icon blue"><i class="fas fa-building-columns"></i></div>
+            <div class="bpp-kpi-info">
+              <h3 id="kpi-total-portals">0</h3>
+              <p>Total Portals</p>
+            </div>
+          </div>
+          <div class="bpp-kpi-card">
+            <div class="bpp-kpi-icon green"><i class="fas fa-circle-check"></i></div>
+            <div class="bpp-kpi-info">
+              <h3 id="kpi-active-portals">0</h3>
+              <p>Active Portals</p>
+            </div>
+          </div>
+          <div class="bpp-kpi-card">
+            <div class="bpp-kpi-icon amber"><i class="fas fa-circle-pause"></i></div>
+            <div class="bpp-kpi-info">
+              <h3 id="kpi-inactive-portals">0</h3>
+              <p>Inactive Portals</p>
+            </div>
+          </div>
+          <div class="bpp-kpi-card">
+            <div class="bpp-kpi-icon purple"><i class="fas fa-user-shield"></i></div>
+            <div class="bpp-kpi-info">
+              <h3 id="kpi-employees-access">0</h3>
+              <p>Employees With Access</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="bpp-tab-nav" role="tablist">
+          <button class="bpp-tab-btn active" data-tab="tab-bank-links" onclick="switchBppTab('tab-bank-links')">
+            <i class="fas fa-link"></i> Bank Links
+          </button>
+          <button class="bpp-tab-btn" data-tab="tab-employee-access" onclick="switchBppTab('tab-employee-access')">
+            <i class="fas fa-users-gear"></i> Employee Access
+          </button>
+          <button class="bpp-tab-btn" data-tab="tab-activity-log" onclick="switchBppTab('tab-activity-log')">
+            <i class="fas fa-clock-rotate-left"></i> Activity Log
+          </button>
+        </div>
+
+        <!-- TAB 1: BANK LINKS -->
+        <div id="tab-bank-links" class="bpp-tab-panel active">
+          <div class="bpp-action-bar">
+            <div class="bpp-filters">
+              <div class="bpp-search-input">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="portal-search" placeholder="Search by bank/NBFC name..." oninput="filterPortalsTable()" />
+              </div>
+              <select id="portal-filter-status" class="bpp-select" onchange="filterPortalsTable()">
+                <option value="all">All Statuses</option>
+                <option value="Active">Active Only</option>
+                <option value="Inactive">Inactive Only</option>
+              </select>
+              <select id="portal-filter-type" class="bpp-select" onchange="filterPortalsTable()">
+                <option value="all">All Types</option>
+                <option value="Bank">Bank</option>
+                <option value="NBFC">NBFC</option>
+              </select>
+              <button class="bpp-btn-secondary" id="btn-refresh-portals" onclick="refreshBankLinks()" title="Refresh Bank Links">
+                <i class="fas fa-rotate" id="refresh-portals-icon"></i> <span>Refresh</span>
+              </button>
+            </div>
+            <button class="bpp-btn-primary" onclick="openAddPortalModal()">
+              <i class="fas fa-plus"></i> Add Bank Portal
+            </button>
+          </div>
+
+          <div class="bpp-table-card">
+            <div class="table-responsive">
+              <table class="bpp-table">
+                <thead>
+                  <tr>
+                    <th style="width: 60px;">Logo</th>
+                    <th>Institution</th>
+                    <th>Type</th>
+                    <th>Login URL</th>
+                    <th>Status</th>
+                    <th>Order</th>
+                    <th>Updated At</th>
+                    <th style="text-align: right; width: 140px;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="portals-tbody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 30px; color: var(--text-secondary);">
+                      <i class="fas fa-spinner fa-spin"></i> Loading banking partner portals...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: EMPLOYEE ACCESS -->
+        <div id="tab-employee-access" class="bpp-tab-panel">
+          <!-- Dual-Layer Access Control Policy Banner -->
+          <div class="bpp-permission-banner">
+            <div class="bpp-permission-banner-icon">
+              <i class="fas fa-circle-info"></i>
+            </div>
+            <div class="bpp-permission-banner-content">
+              <h4>Dual-Layer Access Control Policy</h4>
+              <p>
+                Employee portal visibility operates across two coordinated levels:
+                <strong>Level A (Module Access)</strong> determines whether the Banking Partner Portal appears in the employee navigation bar.
+                <strong>Level B (Bank Permissions)</strong> controls the individual lender portals the employee is permitted to view and launch.
+              </p>
+            </div>
+          </div>
+
+          <div class="bpp-action-bar">
+            <div class="bpp-filters">
+              <div class="bpp-search-input">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="emp-search" placeholder="Search employee name or email..." oninput="filterEmployeesTable()" />
+              </div>
+              <select id="emp-filter-access" class="bpp-select" onchange="filterEmployeesTable()">
+                <option value="all">All Access States</option>
+                <option value="granted">Access Granted (Level A)</option>
+                <option value="revoked">Access Revoked (Level A)</option>
+              </select>
+              <select id="emp-filter-status" class="bpp-select" onchange="filterEmployeesTable()">
+                <option value="all">All Employees</option>
+                <option value="active">Active Only</option>
+                <option value="inactive">Inactive Only</option>
+              </select>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="bpp-btn-secondary" onclick="handleBulkAccess(true)">
+                <i class="fas fa-user-check"></i> Grant Selected
+              </button>
+              <button class="bpp-btn-secondary" onclick="handleBulkAccess(false)" style="color: #ef4444;">
+                <i class="fas fa-user-xmark"></i> Revoke Selected
+              </button>
+            </div>
+          </div>
+
+          <div class="bpp-table-card">
+            <div class="table-responsive">
+              <table class="bpp-table">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;">
+                      <input type="checkbox" id="emp-select-all" onchange="toggleSelectAllEmployees(this)" />
+                    </th>
+                    <th>Employee Name</th>
+                    <th>Email</th>
+                    <th>Account Status</th>
+                    <th>Portal Access (Level A)</th>
+                    <th>Accessible Banks (Level B)</th>
+                    <th>Last Updated</th>
+                    <th style="text-align: right; width: 140px;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="employees-tbody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 30px; color: var(--text-secondary);">
+                      <i class="fas fa-spinner fa-spin"></i> Loading employee access list...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: ACTIVITY LOG -->
+        <div id="tab-activity-log" class="bpp-tab-panel">
+          <!-- Activity Overview KPI Strip -->
+          <div class="bpp-log-kpi-grid">
+            <div class="bpp-log-kpi-card">
+              <div class="bpp-log-kpi-icon blue"><i class="fas fa-list-check"></i></div>
+              <div class="bpp-log-kpi-info">
+                <h3 id="log-kpi-total">0</h3>
+                <p>Total Events</p>
+              </div>
+            </div>
+            <div class="bpp-log-kpi-card">
+              <div class="bpp-log-kpi-icon green"><i class="fas fa-building-columns"></i></div>
+              <div class="bpp-log-kpi-info">
+                <h3 id="log-kpi-portals">0</h3>
+                <p>Portal Changes</p>
+              </div>
+            </div>
+            <div class="bpp-log-kpi-card">
+              <div class="bpp-log-kpi-icon purple"><i class="fas fa-user-shield"></i></div>
+              <div class="bpp-log-kpi-info">
+                <h3 id="log-kpi-access">0</h3>
+                <p>Access Updates</p>
+              </div>
+            </div>
+            <div class="bpp-log-kpi-card">
+              <div class="bpp-log-kpi-icon amber"><i class="fas fa-user-gear"></i></div>
+              <div class="bpp-log-kpi-info">
+                <h3 id="log-kpi-admins">0</h3>
+                <p>Active Admins</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enhanced Filter Toolbar -->
+          <div class="bpp-action-bar">
+            <div class="bpp-filters" style="flex-wrap: wrap;">
+              <div class="bpp-search-input">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="log-search" placeholder="Search institution, employee, admin, IP..." oninput="debounceLoadAuditLogs()" />
+              </div>
+              <select id="log-filter-action" class="bpp-select" onchange="loadAuditLogs(1)">
+                <option value="">All Action Types</option>
+                <option value="PORTAL_CREATED">Portal Created</option>
+                <option value="PORTAL_UPDATED">Portal Updated</option>
+                <option value="PORTAL_STATUS_CHANGED">Portal Status Changed</option>
+                <option value="PORTAL_DELETED">Portal Deleted</option>
+                <option value="PORTAL_ACCESS_GRANTED">Access Granted</option>
+                <option value="PORTAL_ACCESS_REVOKED">Access Revoked</option>
+                <option value="BANK_PERMISSIONS_UPDATED">Bank Permissions Updated</option>
+                <option value="BULK_ACCESS_UPDATED">Bulk Access Updated</option>
+              </select>
+              <div class="bpp-date-group">
+                <span class="bpp-date-label">From:</span>
+                <input type="date" id="log-filter-start" class="bpp-date-input" onchange="loadAuditLogs(1)" title="Filter start date" />
+              </div>
+              <div class="bpp-date-group">
+                <span class="bpp-date-label">To:</span>
+                <input type="date" id="log-filter-end" class="bpp-date-input" onchange="loadAuditLogs(1)" title="Filter end date" />
+              </div>
+              <button class="bpp-btn-secondary" id="btn-reset-log-filters" onclick="resetLogFilters()" title="Reset all filters">
+                <i class="fas fa-arrow-rotate-left"></i> <span>Reset</span>
+              </button>
+              <button class="bpp-btn-secondary" id="btn-refresh-logs" onclick="loadAuditLogs(currentLogPage)" title="Refresh logs">
+                <i class="fas fa-rotate" id="refresh-logs-icon"></i> <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="bpp-table-card">
+            <div class="table-responsive">
+              <table class="bpp-table bpp-log-table">
+                <thead>
+                  <tr>
+                    <th class="col-timestamp">Timestamp</th>
+                    <th class="col-admin">Admin</th>
+                    <th class="col-action">Action</th>
+                    <th class="col-item">Affected Item</th>
+                    <th class="col-summary">Change Summary</th>
+                    <th class="col-details">Details</th>
+                  </tr>
+                </thead>
+                <tbody id="logs-tbody">
+                  <tr>
+                    <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-secondary);">
+                      <i class="fas fa-spinner fa-spin"></i> Loading activity log...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Pagination Bar -->
+            <div class="bpp-pagination-bar" id="logs-pagination-bar">
+              <div class="bpp-pagination-info" id="logs-count-info">
+                Showing 0–0 of 0 events
+              </div>
+              <div class="bpp-pagination-controls" id="logs-pagination">
+                <!-- Dynamically rendered page buttons -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══ DRAWER: AUDIT LOG VIEW DETAILS ════════════════════════════════════ -->
+<div id="audit-drawer-overlay" class="bpp-drawer-overlay" onclick="handleDrawerBackdropClick(event)">
+  <div class="bpp-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" onclick="event.stopPropagation()">
+    <div class="bpp-drawer-header">
+      <div class="bpp-drawer-header-left">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <h3 id="drawer-title" style="font-size: 17px; font-weight: 800; color: var(--text-primary); margin: 0;">Audit Details</h3>
+          <span id="drawer-action-badge"></span>
+          <span class="bpp-drawer-event-badge" id="drawer-event-id" style="background: var(--bg-body); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); font-size: 11.5px; font-family: monospace;">Log #--</span>
+        </div>
+        <div id="drawer-header-subtitle" style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;"></div>
+      </div>
+      <button class="bpp-drawer-close" onclick="closeAuditDetailsDrawer()" title="Close drawer (Esc)">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="bpp-drawer-body" id="drawer-body-content">
+      <!-- Dynamically filled with sections -->
+    </div>
+
+    <div class="bpp-drawer-footer">
+      <button type="button" class="bpp-btn-secondary" onclick="closeAuditDetailsDrawer()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: ADD / EDIT BANK PORTAL ═════════════════════════════════════ -->
+<div id="portal-modal" class="bpp-modal-overlay">
+  <div class="bpp-modal">
+    <div class="bpp-modal-header">
+      <h3 id="portal-modal-title"><i class="fas fa-plus"></i> Add Bank Portal</h3>
+      <button class="bpp-modal-close" onclick="closePortalModal()">&times;</button>
+    </div>
+    <div class="bpp-modal-body">
+      <input type="hidden" id="pm-portal-id" value="" />
+
+      <div class="bpp-form-grid">
+        <!-- Row 1: Bank/NBFC Name | Location -->
+        <div class="bpp-form-group">
+          <label for="pm-name">Bank / NBFC Name <span style="color:#ef4444;">*</span></label>
+          <input type="text" id="pm-name" placeholder="e.g. ICICI Bank, HDFC Bank, InCred Finance" maxlength="150" />
+          <span class="bpp-input-error" id="pm-name-error">Please enter a valid institution name.</span>
+        </div>
+        <div class="bpp-form-group">
+          <label for="pm-location">Branch / City Location <span style="font-size:11.5px;font-weight:400;color:var(--text-secondary);">(Optional)</span></label>
+          <input type="text" id="pm-location" placeholder="e.g. Pune, Mumbai" maxlength="100" />
+        </div>
+
+        <!-- Row 2: Official Login URL | Institution Type -->
+        <div class="bpp-form-group">
+          <label for="pm-url">Official Login URL (HTTPS Required) <span style="color:#ef4444;">*</span></label>
+          <input type="url" id="pm-url" placeholder="https://corporate.bank.com/login" />
+          <span class="bpp-input-error" id="pm-url-error">Must be a valid HTTPS URL (e.g. https://...).</span>
+        </div>
+        <div class="bpp-form-group">
+          <label for="pm-type">Institution Type</label>
+          <select id="pm-type" class="bpp-select">
+            <option value="Bank">Bank</option>
+            <option value="NBFC">NBFC</option>
+          </select>
+        </div>
+
+        <!-- Row 3: Status | Display Order -->
+        <div class="bpp-form-group">
+          <label for="pm-status">Status</label>
+          <select id="pm-status" class="bpp-select">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+        <div class="bpp-form-group">
+          <label for="pm-order">Display Order</label>
+          <input type="number" id="pm-order" min="0" value="0" />
+        </div>
+
+        <!-- Row 4: Short Description / Operational Notes (full width) -->
+        <div class="bpp-form-group full-width">
+          <label for="pm-desc">Short Description / Operational Notes</label>
+          <textarea id="pm-desc" placeholder="Brief note, purpose, or helpline numbers..."></textarea>
+        </div>
+
+        <!-- Row 5: Institution Logo & Presets (full width) -->
+        <div class="bpp-form-group full-width">
+          <label>Institution Logo</label>
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 8px;">
+            <div class="bpp-logo-wrap" style="width: 50px; height: 50px;" id="pm-logo-preview">
+              <i class="fas fa-landmark" style="font-size: 22px; color: var(--text-secondary);"></i>
+            </div>
+            <input type="hidden" id="pm-logo-url" value="" />
+            <div>
+              <input type="file" id="pm-logo-file" accept=".png,.jpg,.jpeg,.webp,.svg" style="display: none;" onchange="handleLogoUpload(this)" />
+              <button type="button" class="bpp-btn-secondary" onclick="document.getElementById('pm-logo-file').click()">
+                <i class="fas fa-upload"></i> Upload Custom Logo
+              </button>
+            </div>
+          </div>
+
+          <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary); margin-top: 4px;">Or choose an approved preset logo:</div>
+          <div class="bpp-preset-logos">
+            <div class="bpp-preset-item" onclick="selectPresetLogo('/icons/lenders/hdfc-bank-logo.png', this)">
+              <img src="/icons/lenders/hdfc-bank-logo.png" alt="HDFC" /> HDFC Bank
+            </div>
+            <div class="bpp-preset-item" onclick="selectPresetLogo('/icons/lenders/icici-bank-logo.png', this)">
+              <img src="/icons/lenders/icici-bank-logo.png" alt="ICICI" /> ICICI Bank
+            </div>
+            <div class="bpp-preset-item" onclick="selectPresetLogo('/icons/lenders/idfc-first-bank-logo.png', this)">
+              <img src="/icons/lenders/idfc-first-bank-logo.png" alt="IDFC FIRST" /> IDFC FIRST
+            </div>
+            <div class="bpp-preset-item" onclick="selectPresetLogo('/icons/lenders/incred-finance-logo.png', this)">
+              <img src="/icons/lenders/incred-finance-logo.png" alt="InCred" /> InCred Finance
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="bpp-modal-footer">
+      <button type="button" class="bpp-btn-secondary" onclick="closePortalModal()">Cancel</button>
+      <button type="button" class="bpp-btn-primary" id="pm-save-btn" onclick="savePortal()">
+        <i class="fas fa-save"></i> Save Portal
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: MANAGE PER-BANK PERMISSIONS ════════════════════════════════ -->
+<div id="perm-modal" class="bpp-modal-overlay" onclick="handlePermModalBackdropClick(event)">
+  <div class="bpp-modal bpp-perm-dialog" role="dialog" aria-modal="true" aria-labelledby="perm-modal-title" onclick="event.stopPropagation()">
+    <div class="bpp-modal-header bpp-perm-modal-header">
+      <div class="bpp-perm-header-title-wrap">
+        <h3 id="perm-modal-title"><i class="fas fa-shield-halved"></i> Bank Access Permissions</h3>
+      </div>
+      <button class="bpp-modal-close" onclick="closePermModal()" aria-label="Close Bank Access Permissions" title="Close (Esc)">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="bpp-modal-body bpp-perm-modal-body">
+      <input type="hidden" id="perm-emp-id" value="" />
+
+      <!-- Compact Employee Info Strip -->
+      <div class="bpp-perm-emp-strip">
+        <div class="bpp-perm-emp-avatar" id="perm-emp-avatar">A</div>
+        <div class="bpp-perm-emp-meta">
+          <h4 id="perm-emp-name">Employee</h4>
+          <span id="perm-emp-email">email@example.com</span>
+        </div>
+      </div>
+
+      <!-- Selection Toolbar -->
+      <div class="bpp-perm-toolbar">
+        <div class="bpp-perm-toolbar-left">
+          <span class="bpp-perm-toolbar-title">Select Authorized Bank Portals</span>
+          <span class="bpp-perm-count-badge" id="perm-selected-count">0 of 0 selected</span>
+        </div>
+        <div class="bpp-perm-toolbar-actions">
+          <button type="button" class="bpp-perm-btn-action" onclick="setAllBankPerms(true)" title="Select all portals">All</button>
+          <button type="button" class="bpp-perm-btn-action" onclick="setAllBankPerms(false)" title="Clear all selections">Clear</button>
+        </div>
+      </div>
+
+      <!-- Compact Bank Selection Grid -->
+      <div class="bpp-perm-grid" id="perm-bank-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <div class="bpp-modal-footer bpp-perm-modal-footer">
+      <button type="button" class="bpp-btn-secondary" onclick="closePermModal()">Cancel</button>
+      <button type="button" class="bpp-btn-primary" id="perm-save-btn" onclick="saveBankPermissions()">
+        <i class="fas fa-check"></i> Save Permissions
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- JS SCRIPTS -->
+<script src="/js/api.js?v=20261012"></script>
+<script src="/js/employee-notifications.js?v=20261111"></script>
+<script>
+// ── Auth Guard ────────────────────────────────────────────────────────────
+const currentUser = requireRole('admin');
+
+// ── State ─────────────────────────────────────────────────────────────────
+let allPortals = [];
+let allEmployees = [];
+let debounceTimer = null;
+
+// ── Init on DOMContentLoaded ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderSidebarUser();
+  const d = new Date();
+  document.getElementById('current-date-display').textContent = d.toLocaleDateString('en-IN', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  });
+  loadAllData();
+});
+
+// ── Load All Data ─────────────────────────────────────────────────────────
+async function loadAllData() {
+  await Promise.all([
+    loadSummary(),
+    loadPortals(),
+    loadEmployees(),
+    loadAuditLogs(1)
+  ]);
+}
+
+// ── Refresh Bank Links ────────────────────────────────────────────────────
+async function refreshBankLinks() {
+  const btn = document.getElementById('btn-refresh-portals');
+  const icon = document.getElementById('refresh-portals-icon');
+  if (btn) btn.disabled = true;
+  if (icon) icon.classList.add('fa-spin');
+  try {
+    await Promise.all([loadPortals(), loadSummary()]);
+  } finally {
+    if (icon) icon.classList.remove('fa-spin');
+    if (btn) btn.disabled = false;
+  }
+}
+
+// ── Summary KPI ───────────────────────────────────────────────────────────
+async function loadSummary() {
+  try {
+    const res = await api.get('/banking-partners/admin/summary');
+    const d = res?.data || res;
+    if (res?.ok && d?.success && d?.summary) {
+      document.getElementById('kpi-total-portals').textContent = d.summary.totalPortals ?? 0;
+      document.getElementById('kpi-active-portals').textContent = d.summary.activePortals ?? 0;
+      document.getElementById('kpi-inactive-portals').textContent = d.summary.inactivePortals ?? 0;
+      document.getElementById('kpi-employees-access').textContent = d.summary.employeesWithAccess ?? 0;
+    }
+  } catch (err) {
+    console.error('Failed to load summary:', err);
+  }
+}
+
+// ── Tab Switching ─────────────────────────────────────────────────────────
+function switchBppTab(tabId) {
+  document.querySelectorAll('.bpp-tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+  });
+  document.querySelectorAll('.bpp-tab-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === tabId);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// TAB 1: BANK LINKS MANAGEMENT
+// ══════════════════════════════════════════════════════════════════════════
+
+async function loadPortals() {
+  try {
+    const res = await api.get('/banking-partners/admin/portals');
+    const d = res?.data || res;
+    if (res?.ok && d?.success) {
+      allPortals = d.portals || [];
+      renderPortalsTable(allPortals);
+    } else {
+      throw new Error(d?.message || 'Failed to load banking portals');
+    }
+  } catch (err) {
+    console.error('Failed to load portals:', err);
+    document.getElementById('portals-tbody').innerHTML = `
+      <tr><td colspan="8" style="text-align:center; padding:24px; color:#ef4444;">Failed to load banking portals. Please try refreshing.</td></tr>
+    `;
+  }
+}
+
+function renderPortalsTable(list) {
+  const tbody = document.getElementById('portals-tbody');
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+          <i class="fas fa-building-columns" style="font-size: 32px; opacity: 0.3; margin-bottom: 12px; display: block;"></i>
+          <strong>No banking partner portals found.</strong>
+          <p style="font-size: 13px; margin: 4px 0 0;">Click "Add Bank Portal" to create your first entry.</p>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = list.map(p => {
+    const logoHtml = p.logo_url
+      ? `<img src="${p.logo_url}" alt="${escHtml(p.name)}" onerror="this.onerror=null; this.src='/icons/dixit-official-logo.png';" />`
+      : `<i class="fas fa-landmark" style="font-size: 20px; color: var(--text-secondary);"></i>`;
+
+    const hostname = getHostname(p.login_url);
+    const updatedStr = p.updated_at ? formatDateTime(p.updated_at) : (p.created_at ? formatDateTime(p.created_at) : '—');
+
+    return `
+      <tr>
+        <td><div class="bpp-logo-wrap">${logoHtml}</div></td>
+        <td>
+          <div class="bpp-bank-info">
+            <div class="bpp-bank-name-row">
+              <span class="bpp-bank-name">${escHtml(p.name)}</span>
+              ${p.location ? `<span class="bpp-location-pill"><i class="fas fa-location-dot"></i> ${escHtml(p.location)}</span>` : ''}
+            </div>
+            <span class="bpp-bank-desc" title="${escHtml(p.description || '')}">${escHtml(p.description || 'No description added.')}</span>
+          </div>
+        </td>
+        <td>
+          <span class="bpp-badge ${p.institution_type === 'NBFC' ? 'nbfc' : 'bank'}">
+            ${escHtml(p.institution_type || 'Bank')}
+          </span>
+        </td>
+        <td>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-family: monospace; font-size: 12.5px;">${escHtml(hostname)}</span>
+            <a href="${escHtml(p.login_url)}" target="_blank" rel="noopener noreferrer" title="Test/Open external portal" style="color: var(--accent); font-size: 13px;">
+              <i class="fas fa-arrow-up-right-from-square"></i>
+            </a>
+          </div>
+        </td>
+        <td>
+          <span class="bpp-badge ${p.status === 'Active' ? 'active' : 'inactive'}">
+            ${escHtml(p.status)}
+          </span>
+        </td>
+        <td><strong>#${p.display_order || 0}</strong></td>
+        <td style="font-size: 12px; color: var(--text-secondary);">${updatedStr}</td>
+        <td style="text-align: right;">
+          <div style="display: inline-flex; gap: 6px;">
+            <button class="bpp-btn-secondary" style="height: 30px; padding: 0 8px; font-size: 12px;" onclick="openEditPortalModal(${p.id})" title="Edit portal">
+              <i class="fas fa-pen-to-square"></i>
+            </button>
+            <button class="bpp-btn-secondary" style="height: 30px; padding: 0 8px; font-size: 12px;" onclick="togglePortalStatus(${p.id}, '${p.status === 'Active' ? 'Inactive' : 'Active'}')" title="Toggle Active/Inactive">
+              <i class="fas ${p.status === 'Active' ? 'fa-pause' : 'fa-play'}" style="color: ${p.status === 'Active' ? '#f59e0b' : '#10b981'};"></i>
+            </button>
+            <button class="bpp-btn-secondary" style="height: 30px; padding: 0 8px; font-size: 12px; color: #ef4444;" onclick="deletePortal(${p.id}, '${escHtml(p.name)}')" title="Archive portal">
+              <i class="fas fa-trash-can"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterPortalsTable() {
+  const query = (document.getElementById('portal-search').value || '').toLowerCase().trim();
+  const statusFilter = document.getElementById('portal-filter-status').value;
+  const typeFilter = document.getElementById('portal-filter-type').value;
+
+  const filtered = allPortals.filter(p => {
+    const matchName = p.name.toLowerCase().includes(query) ||
+      (p.location && p.location.toLowerCase().includes(query)) ||
+      (p.description && p.description.toLowerCase().includes(query));
+    const matchStatus = statusFilter === 'all' || p.status === statusFilter;
+    const matchType = typeFilter === 'all' || p.institution_type === typeFilter;
+    return matchName && matchStatus && matchType;
+  });
+
+  renderPortalsTable(filtered);
+}
+
+// ── Add / Edit Portal Modal ───────────────────────────────────────────────
+function openAddPortalModal() {
+  document.getElementById('portal-modal-title').innerHTML = '<i class="fas fa-plus"></i> Add Bank Portal';
+  document.getElementById('pm-portal-id').value = '';
+  document.getElementById('pm-name').value = '';
+  document.getElementById('pm-location').value = '';
+  document.getElementById('pm-url').value = '';
+  document.getElementById('pm-type').value = 'Bank';
+  document.getElementById('pm-status').value = 'Active';
+  document.getElementById('pm-order').value = allPortals.length + 1;
+  document.getElementById('pm-desc').value = '';
+  document.getElementById('pm-logo-url').value = '';
+  updateLogoPreview('');
+  clearPresetSelections();
+  hideInputErrors();
+  document.getElementById('portal-modal').classList.add('show');
+}
+
+function openEditPortalModal(id) {
+  const p = allPortals.find(x => x.id === id);
+  if (!p) return;
+
+  document.getElementById('portal-modal-title').innerHTML = '<i class="fas fa-pen-to-square"></i> Edit Bank Portal';
+  document.getElementById('pm-portal-id').value = p.id;
+  document.getElementById('pm-name').value = p.name || '';
+  document.getElementById('pm-location').value = p.location || '';
+  document.getElementById('pm-url').value = p.login_url || '';
+  document.getElementById('pm-type').value = p.institution_type || 'Bank';
+  document.getElementById('pm-status').value = p.status || 'Active';
+  document.getElementById('pm-order').value = p.display_order || 0;
+  document.getElementById('pm-desc').value = p.description || '';
+  document.getElementById('pm-logo-url').value = p.logo_url || '';
+  updateLogoPreview(p.logo_url || '');
+  clearPresetSelections();
+  hideInputErrors();
+  document.getElementById('portal-modal').classList.add('show');
+}
+
+function closePortalModal() {
+  document.getElementById('portal-modal').classList.remove('show');
+}
+
+function hideInputErrors() {
+  document.getElementById('pm-name-error').style.display = 'none';
+  document.getElementById('pm-url-error').style.display = 'none';
+}
+
+function selectPresetLogo(url, el) {
+  document.getElementById('pm-logo-url').value = url;
+  updateLogoPreview(url);
+  clearPresetSelections();
+  if (el) el.classList.add('selected');
+}
+
+function clearPresetSelections() {
+  document.querySelectorAll('.bpp-preset-item').forEach(i => i.classList.remove('selected'));
+}
+
+function updateLogoPreview(url) {
+  const preview = document.getElementById('pm-logo-preview');
+  if (url) {
+    preview.innerHTML = `<img src="${url}" alt="Preview" />`;
+  } else {
+    preview.innerHTML = `<i class="fas fa-landmark" style="font-size: 22px; color: var(--text-secondary);"></i>`;
+  }
+}
+
+async function handleLogoUpload(input) {
+  if (!input.files || input.files.length === 0) return;
+  const file = input.files[0];
+  if (file.size > 2 * 1024 * 1024) {
+    alert('File size exceeds 2MB limit.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('logo', file);
+
+  const res = await apiPostForm('/banking-partners/admin/upload-logo', formData);
+  const d = res?.data || res;
+  if (res && res.ok && d && d.logo_url) {
+    document.getElementById('pm-logo-url').value = d.logo_url;
+    updateLogoPreview(d.logo_url);
+    clearPresetSelections();
+  } else {
+    alert(d?.message || 'Failed to upload logo.');
+  }
+}
+
+async function savePortal() {
+  hideInputErrors();
+  const id = document.getElementById('pm-portal-id').value;
+  const name = document.getElementById('pm-name').value.trim();
+  const location = document.getElementById('pm-location').value.trim();
+  const login_url = document.getElementById('pm-url').value.trim();
+  const institution_type = document.getElementById('pm-type').value;
+  const status = document.getElementById('pm-status').value;
+  const display_order = parseInt(document.getElementById('pm-order').value, 10) || 0;
+  const description = document.getElementById('pm-desc').value.trim();
+  const logo_url = document.getElementById('pm-logo-url').value.trim();
+
+  let hasError = false;
+  if (!name) {
+    document.getElementById('pm-name-error').style.display = 'block';
+    hasError = true;
+  }
+
+  // Validate HTTPS URL
+  const urlRegex = /^https:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(:\d+)?(\/.*)?$/;
+  if (!login_url || !urlRegex.test(login_url)) {
+    document.getElementById('pm-url-error').style.display = 'block';
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  const saveBtn = document.getElementById('pm-save-btn');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+  try {
+    const payload = {
+      name,
+      location: location || null,
+      login_url,
+      institution_type,
+      status,
+      display_order,
+      description,
+      logo_url
+    };
+
+    let res;
+    if (id) {
+      res = await api.put(`/banking-partners/admin/portals/${id}`, payload);
+    } else {
+      res = await api.post('/banking-partners/admin/portals', payload);
+    }
+
+    const d = res?.data || res;
+    if (res?.ok && d?.success) {
+      closePortalModal();
+      await loadAllData();
+    } else {
+      alert(d?.message || 'Failed to save portal.');
+    }
+  } catch (err) {
+    console.error('Error saving portal:', err);
+    alert('An unexpected error occurred while saving the portal.');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Portal';
+  }
+}
+
+async function togglePortalStatus(id, newStatus) {
+  try {
+    const res = await api.patch(`/banking-partners/admin/portals/${id}/status`, { status: newStatus });
+    const d = res?.data || res;
+    if (res?.ok && d?.success) {
+      await loadAllData();
+    } else {
+      alert(d?.message || 'Failed to update portal status.');
+    }
+  } catch (err) {
+    console.error('Error toggling status:', err);
+    alert('Failed to update portal status.');
+  }
+}
+
+async function deletePortal(id, name) {
+  if (!confirm(`Are you sure you want to safely remove/archive the portal "${name}"?\nEmployees will no longer be able to access it.`)) {
+    return;
+  }
+
+  try {
+    const res = await api.delete(`/banking-partners/admin/portals/${id}`);
+    const d = res?.data || res;
+    if (res?.ok && d?.success) {
+      await loadAllData();
+    } else {
+      alert(d?.message || 'Failed to delete portal.');
+    }
+  } catch (err) {
+    console.error('Error deleting portal:', err);
+    alert('Failed to remove portal.');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// TAB 2: EMPLOYEE ACCESS MANAGEMENT
+// ══════════════════════════════════════════════════════════════════════════
+
+async function loadEmployees() {
+  try {
+    const res = await api.get('/banking-partners/admin/employees');
+    const d = res?.data || res;
+    if (res?.ok && d?.success) {
+      allEmployees = d.employees || [];
+      renderEmployeesTable(allEmployees);
+    } else {
+      throw new Error(d?.message || 'Failed to load employees list');
+    }
+  } catch (err) {
+    console.error('Failed to load employees:', err);
+    document.getElementById('employees-tbody').innerHTML = `
+      <tr><td colspan="8" style="text-align:center; padding:24px; color:#ef4444;">Failed to load employees list.</td></tr>
+    `;
+  }
+}
+
+function renderEmployeesTable(list) {
+  const tbody = document.getElementById('employees-tbody');
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `
+      <tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-secondary);">No employees found.</td></tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = list.map(emp => {
+    const updatedStr = emp.access_updated_at ? formatDateTime(emp.access_updated_at) : '—';
+    const levelBContent = emp.has_portal_access
+      ? `<span class="bpp-perm-pill count"><i class="fas fa-building-columns"></i> ${emp.accessible_banks_count} of ${emp.total_active_portals} Portals</span>`
+      : `<span class="bpp-perm-pill count" style="opacity: 0.6;"><i class="fas fa-lock"></i> No Access (Revoked)</span>`;
+
+    return `
+      <tr>
+        <td>
+          <input type="checkbox" class="emp-row-cb" value="${emp.id}" />
+        </td>
+        <td>
+          <div style="font-weight: 700; color: var(--text-primary);">${escHtml(emp.name)}</div>
+          <span style="font-size: 11.5px; color: var(--text-secondary);">ID #${emp.id}</span>
+        </td>
+        <td style="font-size: 13px;">${escHtml(emp.email)}</td>
+        <td>
+          <span class="bpp-badge ${emp.is_active ? 'active' : 'inactive'}">
+            ${emp.is_active ? 'Active' : 'Deactivated'}
+          </span>
+        </td>
+        <td>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label class="bpp-switch">
+              <input type="checkbox" ${emp.has_portal_access ? 'checked' : ''} onchange="toggleEmployeePortalAccess(${emp.id}, this.checked)" />
+              <span class="bpp-slider"></span>
+            </label>
+            <span class="bpp-perm-pill ${emp.has_portal_access ? 'granted' : 'revoked'}">
+              <i class="fas ${emp.has_portal_access ? 'fa-check' : 'fa-xmark'}"></i> ${emp.has_portal_access ? 'Granted' : 'Revoked'}
+            </span>
+          </div>
+        </td>
+        <td>${levelBContent}</td>
+        <td style="font-size: 12px; color: var(--text-secondary);">${updatedStr}</td>
+        <td style="text-align: right;">
+          <button class="bpp-btn-secondary" style="height: 30px; padding: 0 10px; font-size: 12px;" onclick="openManagePermModal(${emp.id})">
+            <i class="fas fa-sliders"></i> Manage Banks
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterEmployeesTable() {
+  const query = (document.getElementById('emp-search').value || '').toLowerCase().trim();
+  const accessFilter = document.getElementById('emp-filter-access').value;
+  const statusFilter = document.getElementById('emp-filter-status').value;
+
+  const filtered = allEmployees.filter(emp => {
+    const matchName = emp.name.toLowerCase().includes(query) || emp.email.toLowerCase().includes(query);
+    const matchAccess = accessFilter === 'all' ||
+      (accessFilter === 'granted' && emp.has_portal_access) ||
+      (accessFilter === 'revoked' && !emp.has_portal_access);
+    const matchStatus = statusFilter === 'all' ||
+      (statusFilter === 'active' && emp.is_active) ||
+      (statusFilter === 'inactive' && !emp.is_active);
+    return matchName && matchAccess && matchStatus;
+  });
+
+  renderEmployeesTable(filtered);
+}
+
+function toggleSelectAllEmployees(headerCb) {
+  const cbs = document.querySelectorAll('.emp-row-cb');
+  cbs.forEach(cb => cb.checked = headerCb.checked);
+}
+
+async function toggleEmployeePortalAccess(empId, isGranted) {
+  try {
+    const res = await api.patch(`/banking-partners/admin/employees/${empId}/portal-access`, {
+      has_access: isGranted
+    });
+    const d = res?.data || res;
+    if (res?.ok && d?.success) {
+      await loadAllData();
+    } else {
+      alert(d?.message || 'Failed to update employee access.');
+      await loadEmployees();
+    }
+  } catch (err) {
+    console.error('Failed to update portal access:', err);
+    alert('Failed to update employee portal access.');
+    await loadEmployees();
+  }
+}
+
+async function handleBulkAccess(grantAccess) {
+  const checked = Array.from(document.querySelectorAll('.emp-row-cb:checked')).map(cb => parseInt(cb.value, 10));
+  if (checked.length === 0) {
+    alert('Please select at least one employee from the table.');
+    return;
+  }
+
+  const actionText = grantAccess ? 'grant Banking Partner Portal access to' : 'revoke Banking Partner Portal access from';
+  if (!confirm(`Are you sure you want to ${actionText} ${checked.length} selected employee(s)?`)) {
+    return;
+  }
+
+  try {
+    const res = await api.post('/banking-partners/admin/bulk-portal-access', {
+      employee_ids: checked,
+      has_access: grantAccess
+    });
+    const d = res?.data || res;
+    if (res?.ok && d?.success) {
+      await loadAllData();
+      const headerCb = document.getElementById('emp-select-all');
+      if (headerCb) headerCb.checked = false;
+    } else {
+      alert(d?.message || 'Failed to apply bulk access update.');
+    }
+  } catch (err) {
+    console.error('Error applying bulk access:', err);
+    alert('Failed to apply bulk access changes.');
+  }
+}
+
+// ── Per-Bank Permissions Modal ────────────────────────────────────────────
+async function openManagePermModal(empId) {
+  try {
+    const res = await api.get(`/banking-partners/admin/employees/${empId}/permissions`);
+    const d = res?.data || res;
+    if (!res?.ok || !d?.success) {
+      alert(d?.message || 'Failed to load employee permissions.');
+      return;
+    }
+
+    document.getElementById('perm-emp-id').value = empId;
+    document.getElementById('perm-emp-name').textContent = d.employee.name;
+    document.getElementById('perm-emp-email').textContent = d.employee.email;
+
+    // Set employee avatar initial
+    const avatarEl = document.getElementById('perm-emp-avatar');
+    if (avatarEl) {
+      const initial = (d.employee.name || 'E').trim().charAt(0).toUpperCase();
+      avatarEl.textContent = initial;
+    }
+
+    const listEl = document.getElementById('perm-bank-list');
+    if (!d.portals || d.portals.length === 0) {
+      listEl.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 24px 12px; color: var(--text-secondary);"><i class="fas fa-building-columns" style="font-size: 26px; opacity: 0.3; margin-bottom: 8px; display: block;"></i> No active bank portals configured in the system.</div>`;
+    } else {
+      listEl.innerHTML = d.portals.map(p => {
+        const logo = p.logo_url
+          ? `<img src="${p.logo_url}" alt="${escHtml(p.name)}" onerror="this.onerror=null; this.src='/icons/dixit-official-logo.png';" />`
+          : `<i class="fas fa-landmark"></i>`;
+
+        const isAllowed = Boolean(p.is_allowed);
+        return `
+          <label class="bpp-perm-tile ${isAllowed ? 'is-selected' : ''}" for="perm-cb-${p.id}">
+            <div class="bpp-perm-tile-logo-wrap">
+              ${logo}
+            </div>
+            <div class="bpp-perm-tile-info">
+              <span class="bpp-perm-tile-name" title="${escHtml(p.name)}">${escHtml(p.name)}</span>
+              <span class="bpp-badge ${p.institution_type === 'NBFC' ? 'nbfc' : 'bank'} bpp-perm-tile-badge">${escHtml(p.institution_type || 'Bank')}</span>
+            </div>
+            <div class="bpp-perm-tile-check">
+              <input type="checkbox" id="perm-cb-${p.id}" class="perm-bank-cb" data-portal-id="${p.id}" ${isAllowed ? 'checked' : ''} onchange="handlePermCheckboxChange(this)" aria-label="Authorize ${escHtml(p.name)}" />
+            </div>
+          </label>
+        `;
+      }).join('');
+    }
+
+    updatePermCount();
+
+    document.getElementById('perm-modal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  } catch (err) {
+    console.error('Error opening perm modal:', err);
+    alert('Failed to load employee bank permissions.');
+  }
+}
+
+function handlePermCheckboxChange(cb) {
+  const tile = cb.closest('.bpp-perm-tile');
+  if (tile) {
+    if (cb.checked) {
+      tile.classList.add('is-selected');
+    } else {
+      tile.classList.remove('is-selected');
+    }
+  }
+  updatePermCount();
+}
+
+function updatePermCount() {
+  const checkboxes = document.querySelectorAll('.perm-bank-cb');
+  const total = checkboxes.length;
+  let selected = 0;
+  checkboxes.forEach(cb => {
+    const tile = cb.closest('.bpp-perm-tile');
+    if (cb.checked) {
+      selected++;
+      if (tile) tile.classList.add('is-selected');
+    } else {
+      if (tile) tile.classList.remove('is-selected');
+    }
+  });
+
+  const countEl = document.getElementById('perm-selected-count');
+  if (countEl) {
+    countEl.textContent = `${selected} of ${total} selected`;
+  }
+}
+
+function setAllBankPerms(allowed) {
+  const checkboxes = document.querySelectorAll('.perm-bank-cb');
+  checkboxes.forEach(cb => {
+    cb.checked = allowed;
+    const tile = cb.closest('.bpp-perm-tile');
+    if (tile) {
+      if (allowed) tile.classList.add('is-selected');
+      else tile.classList.remove('is-selected');
+    }
+  });
+  updatePermCount();
+}
+
+function closePermModal() {
+  document.getElementById('perm-modal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function handlePermModalBackdropClick(e) {
+  if (e.target.id === 'perm-modal') {
+    closePermModal();
+  }
+}
+
+async function saveBankPermissions() {
+  const empId = document.getElementById('perm-emp-id').value;
+  const checkboxes = document.querySelectorAll('.perm-bank-cb');
+
+  const permissions = Array.from(checkboxes).map(cb => ({
+    portal_id: parseInt(cb.getAttribute('data-portal-id'), 10),
+    is_allowed: cb.checked
+  }));
+
+  const saveBtn = document.getElementById('perm-save-btn');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+  try {
+    const res = await api.put(`/banking-partners/admin/employees/${empId}/bank-permissions`, {
+      permissions
+    });
+    const d = res?.data || res;
+    if (res?.ok && d?.success) {
+      closePermModal();
+      await loadEmployees();
+    } else {
+      alert(d?.message || 'Failed to save bank permissions.');
+    }
+  } catch (err) {
+    console.error('Error saving bank permissions:', err);
+    alert('Failed to save bank permissions.');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = '<i class="fas fa-check"></i> Save Permissions';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// TAB 3: ACTIVITY AUDIT LOG & VIEW DETAILS DRAWER
+// ══════════════════════════════════════════════════════════════════════════
+
+let currentAuditLogs = [];
+let currentLoadedLogsMap = {};
+let currentActiveDrawerLog = null;
+let currentLogPage = 1;
+
+function debounceLoadAuditLogs() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    loadAuditLogs(1);
+  }, 300);
+}
+
+function resetLogFilters() {
+  const searchInput = document.getElementById('log-search');
+  const actionSelect = document.getElementById('log-filter-action');
+  const startInput = document.getElementById('log-filter-start');
+  const endInput = document.getElementById('log-filter-end');
+
+  if (searchInput) searchInput.value = '';
+  if (actionSelect) actionSelect.value = '';
+  if (startInput) startInput.value = '';
+  if (endInput) endInput.value = '';
+
+  loadAuditLogs(1);
+}
+
+async function loadAuditLogs(page = 1) {
+  currentLogPage = page;
+  const search = document.getElementById('log-search')?.value.trim() || '';
+  const action = document.getElementById('log-filter-action')?.value || '';
+  const startDate = document.getElementById('log-filter-start')?.value || '';
+  const endDate = document.getElementById('log-filter-end')?.value || '';
+
+  const refreshIcon = document.getElementById('refresh-logs-icon');
+  if (refreshIcon) refreshIcon.classList.add('fa-spin');
+
+  const params = new URLSearchParams({
+    page: page,
+    limit: 15
+  });
+  if (search) params.append('search', search);
+  if (action) params.append('action', action);
+  if (startDate) params.append('startDate', startDate);
+  if (endDate) params.append('endDate', endDate);
+
+  try {
+    const res = await api.get(`/banking-partners/admin/audit-logs?${params.toString()}`);
+    const d = res?.data || res;
+    if (res?.ok && d?.success) {
+      currentAuditLogs = d.logs || [];
+      currentLoadedLogsMap = {};
+      currentAuditLogs.forEach(l => {
+        currentLoadedLogsMap[l.id] = l;
+      });
+
+      if (d.stats) {
+        document.getElementById('log-kpi-total').textContent = d.stats.totalEvents ?? 0;
+        document.getElementById('log-kpi-portals').textContent = d.stats.portalEvents ?? 0;
+        document.getElementById('log-kpi-access').textContent = d.stats.accessEvents ?? 0;
+        document.getElementById('log-kpi-admins').textContent = d.stats.activeAdmins ?? 0;
+      }
+
+      renderAuditLogs(currentAuditLogs);
+      renderLogPagination(d.page || 1, d.totalPages || 1, d.total || 0, d.limit || 15);
+    } else {
+      throw new Error(d?.message || 'Failed to load audit logs');
+    }
+  } catch (err) {
+    console.error('Failed to load audit logs:', err);
+    document.getElementById('logs-tbody').innerHTML = `
+      <tr><td colspan="6" style="text-align:center; padding:30px; color:#ef4444;">Failed to load activity logs. Please try refreshing.</td></tr>
+    `;
+  } finally {
+    if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+  }
+}
+
+function parseAuditDetails(detailsStr) {
+  if (!detailsStr) return {};
+  if (typeof detailsStr === 'object') return detailsStr;
+  try {
+    return JSON.parse(detailsStr);
+  } catch (e) {
+    return { raw: detailsStr };
+  }
+}
+
+function getActionBadge(action) {
+  const map = {
+    'PORTAL_CREATED': '<span class="bpp-action-pill created"><i class="fas fa-plus"></i> Portal Created</span>',
+    'PORTAL_UPDATED': '<span class="bpp-action-pill updated"><i class="fas fa-pen"></i> Portal Updated</span>',
+    'PORTAL_STATUS_CHANGED': '<span class="bpp-action-pill status"><i class="fas fa-toggle-on"></i> Status Changed</span>',
+    'PORTAL_DELETED': '<span class="bpp-action-pill deleted"><i class="fas fa-trash-can"></i> Portal Deleted</span>',
+    'PORTAL_ACCESS_GRANTED': '<span class="bpp-action-pill access-grant"><i class="fas fa-user-check"></i> Access Granted</span>',
+    'PORTAL_ACCESS_REVOKED': '<span class="bpp-action-pill access-revoke"><i class="fas fa-user-xmark"></i> Access Revoked</span>',
+    'BANK_PERMISSIONS_UPDATED': '<span class="bpp-action-pill permissions"><i class="fas fa-sliders"></i> Permissions</span>',
+    'BULK_ACCESS_UPDATED': '<span class="bpp-action-pill bulk"><i class="fas fa-users-gear"></i> Bulk Access</span>'
+  };
+  return map[action] || `<span class="bpp-action-pill generic">${escHtml(action)}</span>`;
+}
+
+function formatAffectedItem(action, parsed) {
+  if (action === 'PORTAL_CREATED') {
+    return `<span class="bpp-audit-item-cell"><i class="fas fa-building-columns"></i> <strong>${escHtml(parsed.name || 'Bank Portal')}</strong></span>`;
+  }
+  if (action === 'PORTAL_UPDATED') {
+    const name = parsed.updated?.name || parsed.previous?.name || parsed.portalName || 'Bank Portal';
+    return `<span class="bpp-audit-item-cell"><i class="fas fa-building-columns"></i> <strong>${escHtml(name)}</strong></span>`;
+  }
+  if (action === 'PORTAL_STATUS_CHANGED' || action === 'PORTAL_DELETED') {
+    return `<span class="bpp-audit-item-cell"><i class="fas fa-building-columns"></i> <strong>${escHtml(parsed.portalName || 'Bank Portal')}</strong></span>`;
+  }
+  if (action === 'PORTAL_ACCESS_GRANTED' || action === 'PORTAL_ACCESS_REVOKED') {
+    return `<span class="bpp-audit-item-cell"><i class="fas fa-user"></i> <strong>${escHtml(parsed.employeeName || 'Employee')}</strong> <span class="bpp-item-meta">#${parsed.employeeId || ''}</span></span>`;
+  }
+  if (action === 'BANK_PERMISSIONS_UPDATED') {
+    return `<span class="bpp-audit-item-cell"><i class="fas fa-user-shield"></i> <strong>${escHtml(parsed.employeeName || 'Employee')}</strong> <span class="bpp-item-meta">#${parsed.employeeId || ''}</span></span>`;
+  }
+  if (action === 'BULK_ACCESS_UPDATED') {
+    return `<span class="bpp-audit-item-cell"><i class="fas fa-users"></i> <strong>${parsed.employee_count || 0} Employees</strong></span>`;
+  }
+  return `<span class="bpp-audit-item-cell"><i class="fas fa-layer-group"></i> <strong>${escHtml(parsed.name || parsed.portalName || parsed.employeeName || 'System')}</strong></span>`;
+}
+
+function formatChangeSummary(action, parsed) {
+  if (action === 'PORTAL_CREATED') {
+    return `Created portal (${parsed.institution_type || 'Bank'}) with status ${parsed.status || 'Active'}`;
+  }
+  if (action === 'PORTAL_UPDATED') {
+    const prev = parsed.previous || {};
+    const curr = parsed.updated || {};
+    const labels = {
+      name: 'Name',
+      location: 'Location',
+      login_url: 'Login URL',
+      institution_type: 'Type',
+      status: 'Status',
+      display_order: 'Order',
+      description: 'Notes',
+      logo_url: 'Logo'
+    };
+    const changes = [];
+    Object.keys(labels).forEach(k => {
+      const vPrev = prev[k] === null || prev[k] === undefined ? '' : String(prev[k]);
+      const vCurr = curr[k] === null || curr[k] === undefined ? '' : String(curr[k]);
+      if (vPrev !== vCurr) {
+        if (k === 'location') changes.push(`Location: "${vCurr || 'None'}"`);
+        else if (k === 'login_url') changes.push(`URL updated`);
+        else if (k === 'status') changes.push(`Status: ${vPrev} → ${vCurr}`);
+        else changes.push(`${labels[k]} changed`);
+      }
+    });
+    if (changes.length > 0) {
+      return `Updated: ${changes.join(', ')}`;
+    }
+    return `Portal configuration settings updated`;
+  }
+  if (action === 'PORTAL_STATUS_CHANGED') {
+    return `Status changed: ${parsed.previousStatus || '—'} → ${parsed.newStatus || '—'}`;
+  }
+  if (action === 'PORTAL_DELETED') {
+    return `Archived / removed bank portal from system`;
+  }
+  if (action === 'PORTAL_ACCESS_GRANTED') {
+    return `Granted Level A access to Banking Partner Portal`;
+  }
+  if (action === 'PORTAL_ACCESS_REVOKED') {
+    return `Revoked Level A access from Banking Partner Portal`;
+  }
+  if (action === 'BANK_PERMISSIONS_UPDATED') {
+    return `Allowed portals updated: ${parsed.permissionCount ?? 0} bank(s) authorized`;
+  }
+  if (action === 'BULK_ACCESS_UPDATED') {
+    return `Bulk ${parsed.has_access ? 'granted' : 'revoked'} access for ${parsed.employee_count ?? 0} employee(s)`;
+  }
+  if (parsed.portalName) return `Portal: ${parsed.portalName}`;
+  if (parsed.employeeName) return `Employee: ${parsed.employeeName}`;
+  return 'Audit event recorded';
+}
+
+function renderAuditLogs(logs) {
+  const tbody = document.getElementById('logs-tbody');
+  if (!logs || logs.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          <div class="bpp-empty-state">
+            <i class="fas fa-file-circle-question"></i>
+            <h4>No audit events found</h4>
+            <p>Try clearing filters or adjusting your date range to see historical activity.</p>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = logs.map(l => {
+    const timeStr = l.created_at ? formatDateTime(l.created_at) : '—';
+    const actionBadge = getActionBadge(l.action_type);
+    const parsed = parseAuditDetails(l.details);
+    const affectedItem = formatAffectedItem(l.action_type, parsed);
+    const summary = formatChangeSummary(l.action_type, parsed);
+
+    const adminName = (l.admin_name && l.admin_name !== '::1' && l.admin_name !== '127.0.0.1')
+      ? l.admin_name
+      : 'Admin';
+
+    return `
+      <tr>
+        <td class="col-timestamp" style="font-size: 12.5px; color: var(--text-secondary); white-space: nowrap;">
+          <div style="font-weight: 600; color: var(--text-primary);">${timeStr}</div>
+        </td>
+        <td class="col-admin">
+          <div style="font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escHtml(adminName)}">${escHtml(adminName)}</div>
+          ${l.admin_email ? `<div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escHtml(l.admin_email)}">${escHtml(l.admin_email)}</div>` : ''}
+        </td>
+        <td class="col-action">${actionBadge}</td>
+        <td class="col-item">${affectedItem}</td>
+        <td class="col-summary bpp-summary-cell" title="${escHtml(summary)}">
+          ${escHtml(summary)}
+        </td>
+        <td class="col-details" style="text-align: right;">
+          <button class="bpp-btn-details" onclick="openAuditDetailsDrawer(${l.id})" title="View full audit record">
+            <i class="fas fa-eye"></i> Details
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderLogPagination(current, totalPages, totalCount, limit) {
+  const infoEl = document.getElementById('logs-count-info');
+  const controlsEl = document.getElementById('logs-pagination');
+
+  if (infoEl) {
+    if (totalCount === 0) {
+      infoEl.textContent = 'Showing 0–0 of 0 events';
+    } else {
+      const start = (current - 1) * limit + 1;
+      const end = Math.min(current * limit, totalCount);
+      infoEl.textContent = `Showing ${start}–${end} of ${totalCount} events (Page ${current} of ${totalPages})`;
+    }
+  }
+
+  if (!controlsEl) return;
+  if (totalPages <= 1) {
+    controlsEl.innerHTML = '';
+    return;
+  }
+
+  let html = `
+    <button class="bpp-pg-btn" ${current <= 1 ? 'disabled' : ''} onclick="loadAuditLogs(1)" title="First Page">
+      <i class="fas fa-backward-step"></i>
+    </button>
+    <button class="bpp-pg-btn" ${current <= 1 ? 'disabled' : ''} onclick="loadAuditLogs(${current - 1})" title="Previous Page">
+      <i class="fas fa-chevron-left"></i> Prev
+    </button>
+  `;
+
+  let startP = Math.max(1, current - 2);
+  let endP = Math.min(totalPages, startP + 4);
+  if (endP - startP < 4) {
+    startP = Math.max(1, endP - 4);
+  }
+
+  for (let p = startP; p <= endP; p++) {
+    html += `
+      <button class="bpp-pg-btn ${p === current ? 'active' : ''}" onclick="loadAuditLogs(${p})">
+        ${p}
+      </button>
+    `;
+  }
+
+  html += `
+    <button class="bpp-pg-btn" ${current >= totalPages ? 'disabled' : ''} onclick="loadAuditLogs(${current + 1})" title="Next Page">
+      Next <i class="fas fa-chevron-right"></i>
+    </button>
+    <button class="bpp-pg-btn" ${current >= totalPages ? 'disabled' : ''} onclick="loadAuditLogs(${totalPages})" title="Last Page">
+      <i class="fas fa-forward-step"></i>
+    </button>
+  `;
+
+  controlsEl.innerHTML = html;
+}
+
+// ── View Details Side Drawer Logic ────────────────────────────────────────
+function openAuditDetailsDrawer(logId) {
+  const log = currentLoadedLogsMap[logId];
+  if (!log) {
+    console.warn('Log not found in current map:', logId);
+    return;
+  }
+
+  currentActiveDrawerLog = log;
+  const eventIdEl = document.getElementById('drawer-event-id');
+  if (eventIdEl) eventIdEl.textContent = `Log #${log.id}`;
+
+  const badgeEl = document.getElementById('drawer-action-badge');
+  if (badgeEl) badgeEl.innerHTML = getActionBadge(log.action_type);
+
+  const subEl = document.getElementById('drawer-header-subtitle');
+  const adminName = (log.admin_name && log.admin_name !== '::1' && log.admin_name !== '127.0.0.1') ? log.admin_name : 'Admin';
+  const timeStr = log.created_at ? formatDateTime(log.created_at) : '—';
+  if (subEl) subEl.textContent = `${timeStr} • Initiated by ${adminName}`;
+
+  const bodyEl = document.getElementById('drawer-body-content');
+  if (bodyEl) bodyEl.innerHTML = renderAuditDrawerDetails(log);
+
+  const overlay = document.getElementById('audit-drawer-overlay');
+  if (overlay) overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAuditDetailsDrawer() {
+  const overlay = document.getElementById('audit-drawer-overlay');
+  if (overlay) overlay.classList.remove('show');
+  document.body.style.overflow = '';
+  currentActiveDrawerLog = null;
+}
+
+function handleDrawerBackdropClick(e) {
+  if (e.target.id === 'audit-drawer-overlay') {
+    closeAuditDetailsDrawer();
+  }
+}
+
+function copyTextToClipboard(text, btnEl) {
+  if (!navigator.clipboard) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  } else {
+    navigator.clipboard.writeText(text);
+  }
+
+  if (btnEl) {
+    const originalHtml = btnEl.innerHTML;
+    btnEl.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> Copied!';
+    setTimeout(() => {
+      btnEl.innerHTML = originalHtml;
+    }, 1800);
+  }
+}
+
+function renderPortalUpdateDiff(prev, curr) {
+  const fields = [
+    { key: 'name', label: 'Institution Name' },
+    { key: 'location', label: 'Branch / Location' },
+    { key: 'login_url', label: 'Official Login URL', isUrl: true },
+    { key: 'institution_type', label: 'Institution Type' },
+    { key: 'status', label: 'Status' },
+    { key: 'display_order', label: 'Display Order' },
+    { key: 'description', label: 'Description / Notes' },
+    { key: 'logo_url', label: 'Logo URL', isUrl: true }
+  ];
+
+  // Include any extra changed fields dynamically from previous/updated
+  const standardKeys = new Set(fields.map(f => f.key));
+  const allKeys = new Set([...Object.keys(prev || {}), ...Object.keys(curr || {})]);
+  allKeys.forEach(k => {
+    if (!standardKeys.has(k) && k !== 'id' && k !== 'updated_at' && k !== 'created_at') {
+      fields.push({
+        key: k,
+        label: k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+      });
+    }
+  });
+
+  const rows = [];
+  fields.forEach(f => {
+    const pRaw = prev && prev[f.key] !== undefined ? prev[f.key] : null;
+    const cRaw = curr && curr[f.key] !== undefined ? curr[f.key] : null;
+
+    const pVal = (pRaw === null || pRaw === undefined) ? '' : String(pRaw).trim();
+    const cVal = (cRaw === null || cRaw === undefined) ? '' : String(cRaw).trim();
+
+    if (pVal !== cVal) {
+      let pDisplay = pVal ? escHtml(pVal) : '<span style="color:var(--text-secondary);">—</span>';
+      let cDisplay = cVal ? escHtml(cVal) : '<span style="color:var(--text-secondary);">—</span>';
+
+      if (f.isUrl && pVal) {
+        pDisplay = `<a href="${escHtml(pVal)}" target="_blank" rel="noopener noreferrer" style="color:var(--text-secondary);text-decoration:underline;word-break:break-all;">${escHtml(pVal)}</a>`;
+      }
+      if (f.isUrl && cVal) {
+        cDisplay = `<a href="${escHtml(cVal)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:600;word-break:break-all;">${escHtml(cVal)}</a>`;
+      }
+
+      rows.push(`
+        <tr>
+          <td style="font-weight: 600; color: var(--text-primary); white-space: nowrap;">${escHtml(f.label)}</td>
+          <td><span class="bpp-diff-val prev">${pDisplay}</span></td>
+          <td><span class="bpp-diff-val curr">${cDisplay}</span></td>
+        </tr>
+      `);
+    }
+  });
+
+  if (rows.length === 0) {
+    return `<p style="font-size: 13px; color: var(--text-secondary); margin: 6px 0;">No field-level discrepancies detected between records.</p>`;
+  }
+
+  return `
+    <div style="overflow-x: auto; width: 100%;">
+      <table class="bpp-diff-table">
+        <thead>
+          <tr>
+            <th style="width: 28%;">Field</th>
+            <th style="width: 36%;">Previous Value</th>
+            <th style="width: 36%;">Updated Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderAuditDrawerDetails(log) {
+  const parsed = parseAuditDetails(log.details);
+  const timeStr = log.created_at ? formatDateTime(log.created_at) : '—';
+  const actionBadge = getActionBadge(log.action_type);
+
+  // Clean admin name and email — never show loopback IP (::1) as admin name
+  const adminName = (log.admin_name && log.admin_name !== '::1' && log.admin_name !== '127.0.0.1')
+    ? log.admin_name
+    : 'Admin';
+  const adminEmail = log.admin_email || '';
+
+  // 1. Primary Section: Change Details / Resource Details
+  let resourceHtml = '';
+  if (log.action_type === 'PORTAL_CREATED') {
+    resourceHtml = `
+      <div class="bpp-drawer-section">
+        <h4 class="bpp-drawer-section-title"><i class="fas fa-building-columns"></i> Created Bank Portal Details</h4>
+        <div class="bpp-drawer-grid">
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Institution Name</span>
+            <span class="bpp-drawer-value">${escHtml(parsed.name || '—')}</span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Institution Type</span>
+            <span class="bpp-drawer-value">${escHtml(parsed.institution_type || 'Bank')}</span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Branch / Location</span>
+            <span class="bpp-drawer-value">${escHtml(parsed.location || '—')}</span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Initial Status</span>
+            <span class="bpp-drawer-value"><span class="bpp-badge ${parsed.status === 'Active' ? 'active' : 'inactive'}">${escHtml(parsed.status || 'Active')}</span></span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Display Order</span>
+            <span class="bpp-drawer-value">#${parsed.display_order ?? 0}</span>
+          </div>
+          <div class="bpp-drawer-item full-width">
+            <span class="bpp-drawer-label">Official HTTPS Login URL</span>
+            <div class="bpp-drawer-url-box">
+              <i class="fas fa-lock" style="color:var(--accent);"></i>
+              <a href="${escHtml(parsed.login_url || '#')}" target="_blank" rel="noopener noreferrer">${escHtml(parsed.login_url || '—')}</a>
+              <button class="bpp-btn-copy-url" onclick="copyTextToClipboard('${escHtml(parsed.login_url || '')}', this)" title="Copy URL">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (log.action_type === 'PORTAL_UPDATED') {
+    const prev = parsed.previous || {};
+    const curr = parsed.updated || {};
+    const portalName = curr.name || prev.name || parsed.portalName || 'Bank Portal';
+    resourceHtml = `
+      <div class="bpp-drawer-section">
+        <h4 class="bpp-drawer-section-title"><i class="fas fa-code-compare"></i> Before / After Comparison</h4>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);margin-bottom:8px;">
+          <span>Institution:</span>
+          <strong style="color:var(--text-primary);font-size:13.5px;">${escHtml(portalName)}</strong>
+        </div>
+        ${renderPortalUpdateDiff(prev, curr)}
+      </div>
+    `;
+  } else if (log.action_type === 'PORTAL_STATUS_CHANGED') {
+    resourceHtml = `
+      <div class="bpp-drawer-section">
+        <h4 class="bpp-drawer-section-title"><i class="fas fa-toggle-on"></i> Portal Status Change</h4>
+        <div class="bpp-drawer-grid">
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Institution</span>
+            <span class="bpp-drawer-value">${escHtml(parsed.portalName || '—')}</span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Portal ID</span>
+            <span class="bpp-drawer-value">#${parsed.portalId ?? '—'}</span>
+          </div>
+          <div class="bpp-drawer-item full-width">
+            <span class="bpp-drawer-label">Status Transition</span>
+            <div style="overflow-x: auto; width: 100%; margin-top: 6px;">
+              <table class="bpp-diff-table">
+                <thead>
+                  <tr>
+                    <th>Resource</th>
+                    <th>Previous Status</th>
+                    <th>New Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight:600;">${escHtml(parsed.portalName || 'Bank Portal')}</td>
+                    <td><span class="bpp-badge ${parsed.previousStatus === 'Active' ? 'active' : 'inactive'}">${escHtml(parsed.previousStatus || '—')}</span></td>
+                    <td><span class="bpp-badge ${parsed.newStatus === 'Active' ? 'active' : 'inactive'}">${escHtml(parsed.newStatus || '—')}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (log.action_type === 'PORTAL_DELETED') {
+    resourceHtml = `
+      <div class="bpp-drawer-section">
+        <h4 class="bpp-drawer-section-title"><i class="fas fa-trash-can"></i> Deletion / Archival Event</h4>
+        <div class="bpp-drawer-grid">
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Archived Portal</span>
+            <span class="bpp-drawer-value">${escHtml(parsed.portalName || '—')}</span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Portal ID</span>
+            <span class="bpp-drawer-value">#${parsed.portalId ?? '—'}</span>
+          </div>
+          <div class="bpp-drawer-item full-width">
+            <span class="bpp-drawer-label">Operation Notes</span>
+            <span class="bpp-drawer-value" style="font-weight:400;color:var(--text-secondary);font-size:13px;line-height:1.45;">
+              This banking partner portal was safely archived. Employees can no longer view or launch this portal link.
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (log.action_type === 'PORTAL_ACCESS_GRANTED' || log.action_type === 'PORTAL_ACCESS_REVOKED') {
+    const isGranted = log.action_type === 'PORTAL_ACCESS_GRANTED';
+    resourceHtml = `
+      <div class="bpp-drawer-section">
+        <h4 class="bpp-drawer-section-title"><i class="fas fa-user-shield"></i> Employee Access Modification</h4>
+        <div class="bpp-drawer-grid">
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Employee Name</span>
+            <span class="bpp-drawer-value">${escHtml(parsed.employeeName || '—')}</span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Employee ID</span>
+            <span class="bpp-drawer-value">#${parsed.employeeId ?? '—'}</span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Permission Layer</span>
+            <span class="bpp-drawer-value">Level A (Module Visibility)</span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Access State Set</span>
+            <span class="bpp-drawer-value">
+              <span class="bpp-perm-pill ${isGranted ? 'granted' : 'revoked'}">
+                <i class="fas ${isGranted ? 'fa-check' : 'fa-xmark'}"></i> ${isGranted ? 'Granted' : 'Revoked'}
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (log.action_type === 'BANK_PERMISSIONS_UPDATED') {
+    const allowedList = parsed.allowedPortals || [];
+    const allowedHtml = allowedList.length > 0
+      ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+          ${allowedList.map(p => `<span class="bpp-perm-pill count"><i class="fas fa-building-columns"></i> ${escHtml(p.name)}</span>`).join('')}
+         </div>`
+      : `<span style="font-size:12.5px;color:var(--text-secondary);margin-top:4px;display:block;">No portals currently authorized.</span>`;
+
+    resourceHtml = `
+      <div class="bpp-drawer-section">
+        <h4 class="bpp-drawer-section-title"><i class="fas fa-sliders"></i> Per-Bank Permissions Configured</h4>
+        <div class="bpp-drawer-grid">
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Employee Name</span>
+            <span class="bpp-drawer-value">${escHtml(parsed.employeeName || '—')}</span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Employee ID</span>
+            <span class="bpp-drawer-value">#${parsed.employeeId ?? '—'}</span>
+          </div>
+          <div class="bpp-drawer-item full-width">
+            <span class="bpp-drawer-label">Permission Layer</span>
+            <span class="bpp-drawer-value">Level B (Individual Lender Permissions) — ${parsed.permissionCount ?? allowedList.length} Authorized</span>
+          </div>
+          <div class="bpp-drawer-item full-width">
+            <span class="bpp-drawer-label">Authorized Lender Portals</span>
+            ${allowedHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (log.action_type === 'BULK_ACCESS_UPDATED') {
+    resourceHtml = `
+      <div class="bpp-drawer-section">
+        <h4 class="bpp-drawer-section-title"><i class="fas fa-users-gear"></i> Bulk Access Operation</h4>
+        <div class="bpp-drawer-grid">
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Employees Affected</span>
+            <span class="bpp-drawer-value">${parsed.employee_count ?? 0} Employee(s)</span>
+          </div>
+          <div class="bpp-drawer-item">
+            <span class="bpp-drawer-label">Access State Set</span>
+            <span class="bpp-drawer-value">
+              <span class="bpp-perm-pill ${parsed.has_access ? 'granted' : 'revoked'}">
+                <i class="fas ${parsed.has_access ? 'fa-check' : 'fa-xmark'}"></i> ${parsed.has_access ? 'Granted' : 'Revoked'}
+              </span>
+            </span>
+          </div>
+          <div class="bpp-drawer-item full-width">
+            <span class="bpp-drawer-label">Affected Employee IDs</span>
+            <span class="bpp-drawer-value monospace">${Array.isArray(parsed.employee_ids) ? parsed.employee_ids.join(', ') : '—'}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    // Generic fallback: render clean Label/Value pairs rather than raw JSON
+    const entries = Object.entries(parsed);
+    const gridItems = entries.map(([k, v]) => {
+      const label = k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const valStr = (v !== null && v !== undefined && typeof v === 'object')
+        ? JSON.stringify(v)
+        : String(v ?? '—');
+      return `
+        <div class="bpp-drawer-item">
+          <span class="bpp-drawer-label">${escHtml(label)}</span>
+          <span class="bpp-drawer-value">${escHtml(valStr)}</span>
+        </div>
+      `;
+    }).join('');
+
+    resourceHtml = `
+      <div class="bpp-drawer-section">
+        <h4 class="bpp-drawer-section-title"><i class="fas fa-layer-group"></i> Event Details</h4>
+        <div class="bpp-drawer-grid">
+          ${gridItems || '<p style="color:var(--text-secondary);font-size:13px;margin:0;">No additional details recorded.</p>'}
+        </div>
+      </div>
+    `;
+  }
+
+  // 2. Secondary Section Below: Origin & Audit Metadata
+  const targetId = parsed.portalId || parsed.employeeId || null;
+  const targetIdHtml = targetId
+    ? `<div class="bpp-drawer-item">
+         <span class="bpp-drawer-label">Target ID</span>
+         <span class="bpp-drawer-value monospace">#${targetId}</span>
+       </div>`
+    : '';
+
+  const metaHtml = `
+    <div class="bpp-drawer-section">
+      <h4 class="bpp-drawer-section-title"><i class="fas fa-server"></i> Origin & Audit Metadata</h4>
+      <div class="bpp-drawer-grid">
+        <div class="bpp-drawer-item">
+          <span class="bpp-drawer-label">Origin IP Address</span>
+          <span class="bpp-drawer-value monospace" style="color:var(--accent); font-weight:700;">${escHtml(log.ip_address || '—')}</span>
+        </div>
+        <div class="bpp-drawer-item">
+          <span class="bpp-drawer-label">Timestamp (Asia/Kolkata)</span>
+          <span class="bpp-drawer-value">${timeStr}</span>
+        </div>
+        <div class="bpp-drawer-item">
+          <span class="bpp-drawer-label">Admin User</span>
+          <span class="bpp-drawer-value">
+            ${escHtml(adminName)}
+            ${adminEmail ? `<span style="font-weight:400;color:var(--text-secondary);font-size:11.5px;display:block;">${escHtml(adminEmail)}</span>` : ''}
+          </span>
+        </div>
+        <div class="bpp-drawer-item">
+          <span class="bpp-drawer-label">Audit Event ID</span>
+          <span class="bpp-drawer-value monospace">Log #${log.id}</span>
+        </div>
+        ${targetIdHtml}
+      </div>
+    </div>
+  `;
+
+  return (resourceHtml || '') + metaHtml;
+}
+
+// Global Escape key listener
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeAuditDetailsDrawer();
+    closePortalModal();
+    closePermModal();
+  }
+});
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function getHostname(urlStr) {
+  try {
+    const u = new URL(urlStr);
+    return u.hostname;
+  } catch (e) {
+    return urlStr;
+  }
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+</script>
+</body>
+</html>

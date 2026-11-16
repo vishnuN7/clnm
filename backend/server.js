@@ -1,5 +1,6 @@
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const path = require('path');
 const db = require('./config/db');
@@ -18,6 +19,7 @@ const { loginLimiter, apiLimiter } = require('./middleware/rateLimit');
 const scheduler = require('./utils/scheduler');
 
 const app = express();
+const httpServer = http.createServer(app);
 
 // Trust the reverse proxy on VPS/Nginx so req.ip and secure cookies behave correctly
 app.set('trust proxy', 1);
@@ -33,7 +35,9 @@ function getAllowedOrigins() {
     'http://localhost:8080',
     'http://127.0.0.1:5000',
     'http://127.0.0.1:3000',
-    'http://127.0.0.1:8080'
+    'http://127.0.0.1:8080',
+    'https://dixitlendingsolution.in',
+    'https://www.dixitlendingsolution.in'
   ];
 
   const configuredOrigins = [process.env.ALLOWED_ORIGIN, process.env.FRONTEND_BASE_URL]
@@ -80,7 +84,7 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob:; frame-src 'self' blob:; object-src 'self' blob:; connect-src 'self';");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://tile.openstreetmap.org; frame-src 'self' blob:; object-src 'self' blob:; connect-src 'self' ws: wss:;");
 
   // Prevent caching of API responses and HTML templates to ensure multi-user isolation on shared computers
   if (req.path.startsWith('/api') || req.path.endsWith('.html') || req.path === '/' || req.path === '/index.html') {
@@ -97,6 +101,16 @@ app.use((req, res, next) => {
 // authenticated /api/documents/:id/view route (see below), which checks
 // that the requester is either an admin or the employee who owns that
 // customer before releasing any file bytes.
+
+// Alias emi_calculator.html (underscore) to emi-calculator.html (hyphen) for both admin & employee
+app.get(['/admin/emi_calculator.html', '/admin/emi-calculator.html'], (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'admin', 'emi-calculator.html'));
+});
+app.get(['/employee/emi_calculator.html', '/employee/emi-calculator.html'], (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'employee', 'emi-calculator.html'));
+});
 
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, '..', 'frontend'), {
@@ -125,8 +139,12 @@ app.use('/api/documents',     require('./routes/documents'));
 app.use('/api/notifications',  require('./routes/notifications'));
 app.use('/api/employee/notifications', require('./routes/notifications'));
 app.use('/api/whatsapp',       require('./routes/whatsapp'));
+app.use('/api/banking-partners', require('./routes/bankingPartner'));
+app.use('/api/private-communication', require('./routes/privateCommunication'));
+app.use('/api/login-activity',        require('./routes/loginActivity'));
 app.use('/uploads/profile_pics', express.static(path.join(__dirname, 'uploads', 'profile_pics')));
 app.use('/uploads/kyc_docs', express.static(path.join(__dirname, 'uploads', 'kyc_docs')));
+app.use('/uploads/bank_logos', express.static(path.join(__dirname, 'uploads', 'bank_logos')));
 
 // ── SPA Fallback (serve login page for unknown routes) ──────────
 app.get('*', (req, res) => {
@@ -975,13 +993,20 @@ async function runMigrations() {
     await ensureExcelModule();
     await ensureLoginHoursColumns();
     await ensureNotificationTables();
+    await require('./migrations/create_centralized_notification_tables')();
+    await require('./migrations/create_private_communication_tables')();
+    await require('./migrations/upgrade_private_communication_tables')();
+    await require('./migrations/create_login_tracking_tables')();
   } catch (err) {
     console.error('Migration error:', err.message);
   }
 }
 
+const { initSocket } = require('./services/socketService');
+initSocket(httpServer, allowedOrigins);
+
 runMigrations().finally(() => {
-  app.listen(PORT, () => {
+  httpServer.listen(PORT, () => {
     console.log(`\nCLN Server running at http://localhost:${PORT}`);
     console.log(`Admin login: dixitlendingsolution@gmail.com / Utkarsh.3112`);
     console.log(`Employee login: employee@cln.com / Employee@123\n`);

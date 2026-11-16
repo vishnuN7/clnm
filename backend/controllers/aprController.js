@@ -1,11 +1,27 @@
 const db = require('../config/db');
 const geolocationService = require('../services/geolocationService');
 
-// Helper to parse date filters
+/**
+ * Returns today's date in YYYY-MM-DD string in Asia/Kolkata timezone.
+ */
+function getTodayISTString() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+}
+
+/**
+ * Shifts a YYYY-MM-DD date string by a given number of days in Asia/Kolkata timezone.
+ */
+function shiftDaysIST(ymdStr, days) {
+  const d = new Date(`${ymdStr}T00:00:00+05:30`);
+  d.setDate(d.getDate() + days);
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(d);
+}
+
+/**
+ * Helper to parse date filters. Default timeline is strictly 'today'.
+ */
 function resolveDateRange(dateRange, startDate, endDate) {
-  const todayIST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-  const pad = n => String(n).padStart(2, '0');
-  const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const todayStr = getTodayISTString();
 
   let dateFrom, dateTo;
 
@@ -13,138 +29,296 @@ function resolveDateRange(dateRange, startDate, endDate) {
     dateFrom = startDate;
     dateTo = endDate;
   } else if (dateRange === 'yesterday') {
-    const y = new Date(todayIST);
-    y.setDate(y.getDate() - 1);
-    dateFrom = dateTo = fmtDate(y);
+    dateFrom = dateTo = shiftDaysIST(todayStr, -1);
   } else if (dateRange === 'last7') {
-    const s = new Date(todayIST);
-    s.setDate(s.getDate() - 6);
-    dateFrom = fmtDate(s);
-    dateTo = fmtDate(todayIST);
+    dateFrom = shiftDaysIST(todayStr, -6);
+    dateTo = todayStr;
   } else if (dateRange === 'last30') {
-    const s = new Date(todayIST);
-    s.setDate(s.getDate() - 29);
-    dateFrom = fmtDate(s);
-    dateTo = fmtDate(todayIST);
+    dateFrom = shiftDaysIST(todayStr, -29);
+    dateTo = todayStr;
   } else if (dateRange === 'thisMonth') {
-    const s = new Date(todayIST.getFullYear(), todayIST.getMonth(), 1);
-    dateFrom = fmtDate(s);
-    dateTo = fmtDate(todayIST);
+    dateFrom = `${todayStr.slice(0, 7)}-01`;
+    dateTo = todayStr;
   } else {
-    // default: today
-    dateFrom = dateTo = fmtDate(todayIST);
+    // Default timeline: Today
+    dateFrom = dateTo = todayStr;
   }
 
   return { dateFrom, dateTo };
 }
 
-async function cleanupOldCompletedBreakRecords(employeeId = null) {
-  const params = [];
-  let sql = `
-    DELETE FROM break_records
-    WHERE end_time IS NOT NULL
-      AND start_time < DATE_SUB(NOW(), INTERVAL 24 HOUR)
-  `;
+/**
+ * Formats duration in seconds into a human-readable string: e.g. "1h 22m", "45m", "< 1m".
+ */
+function formatDurationHuman(seconds) {
+  const sec = Math.max(0, Math.floor(seconds || 0));
+  const hrs = Math.floor(sec / 3600);
+  const mins = Math.floor((sec % 3600) / 60);
 
-  if (employeeId) {
-    sql += ' AND employee_id = ?';
-    params.push(employeeId);
+  if (hrs === 0 && mins === 0) {
+    return sec > 0 ? `${sec}s` : '0m';
   }
+  if (hrs === 0) {
+    return `${mins}m`;
+  }
+  if (mins === 0) {
+    return `${hrs}h`;
+  }
+  return `${hrs}h ${mins}m`;
+}
 
-  return db.query(sql, params);
+/**
+ * Formats hours float into a human-readable string: e.g. 1.37 -> "1h 22m".
+ */
+function formatHoursHuman(hoursFloat) {
+  const h = parseFloat(hoursFloat) || 0;
+  if (h <= 0) return '0m';
+  return formatDurationHuman(Math.round(h * 3600));
+}
+
+/**
+ * Formats overtime hours: e.g. 0 -> "No overtime", 1.5 -> "+1h 30m".
+ */
+function formatOvertimeHuman(otFloat) {
+  const ot = parseFloat(otFloat) || 0;
+  if (ot <= 0) return 'No overtime';
+  return `+${formatHoursHuman(ot)}`;
+}
+
+/**
+ * Format decimal hour to 12-hour AM/PM string.
+ */
+function formatHourDecimal(h) {
+  if (h === null || h === undefined || isNaN(h)) return '—';
+  const hh = Math.floor(h);
+  const mm = Math.round((h - hh) * 60);
+  const ampm = hh < 12 ? 'AM' : 'PM';
+  return `${String(hh % 12 || 12).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${ampm}`;
+}
+
+/**
+ * Production-grade session & status reconciliation:
+ * 1. Closes stale attendance logs where logout_time IS NULL (from past days or offline employees).
+ * 2. Reconciles users.current_status to 'Offline' if heartbeat stopped > 15 mins ago.
+ * 3. Auto-completes stale abandoned breaks (> 3 hours or from past days).
+ */
+async function reconcileStaleSessionsAndStatuses() {
+  try {
+    // 1. Reconcile Users table current_status:
+    // If an employee is marked 'Available' or 'Idle' but their last_active_at was > 30 minutes ago,
+    // they are definitely offline.
+    await db.query(`
+      UPDATE users 
+      SET current_status = 'Offline' 
+      WHERE role = 'employee' 
+        AND current_status IN ('Available', 'Idle') 
+        AND (last_active_at IS NULL OR last_active_at < DATE_SUB(NOW(), INTERVAL 30 MINUTE))
+    `);
+
+    // 2. Auto-complete stale abandoned breaks (> 4 hours or from past days)
+    await db.query(`
+      UPDATE break_records br
+      JOIN users u ON u.id = br.employee_id
+      SET br.end_time = COALESCE(u.last_active_at, DATE_ADD(br.start_time, INTERVAL 30 MINUTE)),
+          br.duration = GREATEST(60, TIMESTAMPDIFF(SECOND, br.start_time, COALESCE(u.last_active_at, DATE_ADD(br.start_time, INTERVAL 30 MINUTE)))),
+          br.status = 'Completed'
+      WHERE br.end_time IS NULL 
+        AND (br.start_time < DATE_SUB(NOW(), INTERVAL 4 HOUR) OR DATE(CONVERT_TZ(br.start_time, '+00:00', '+05:30')) < CURDATE())
+    `);
+
+    // 3. Reconcile Attendance Logs open sessions:
+    // Safely close only sessions from past days or where employee has been inactive > 45 minutes
+    const [staleSessions] = await db.query(`
+      SELECT al.id, al.employee_id, al.login_time, u.last_active_at, u.current_status
+      FROM attendance_logs al
+      JOIN users u ON u.id = al.employee_id
+      WHERE al.logout_time IS NULL
+        AND (
+          DATE(CONVERT_TZ(al.login_time, '+00:00', '+05:30')) < CURDATE() 
+          OR (u.current_status = 'Offline' AND u.last_active_at IS NOT NULL AND u.last_active_at < DATE_SUB(NOW(), INTERVAL 45 MINUTE))
+          OR (u.last_active_at IS NULL AND al.login_time < DATE_SUB(NOW(), INTERVAL 60 MINUTE))
+        )
+    `);
+
+    for (const session of staleSessions) {
+      const loginTime = new Date(session.login_time);
+      const now = new Date();
+      let closeTime;
+
+      if (session.last_active_at) {
+        const lastActive = new Date(session.last_active_at);
+        const diffMs = lastActive.getTime() - loginTime.getTime();
+        if (diffMs >= 60 * 1000 && diffMs <= 12 * 3600 * 1000) {
+          closeTime = lastActive;
+        } else {
+          // Prevent zero-second duration: credit up to 8 hours or now
+          const isToday = (session.login_time.toISOString().slice(0, 10) === now.toISOString().slice(0, 10));
+          closeTime = isToday ? now : new Date(Math.min(loginTime.getTime() + 8 * 3600 * 1000, now.getTime()));
+        }
+      } else {
+        closeTime = new Date(Math.min(loginTime.getTime() + 8 * 3600 * 1000, now.getTime()));
+      }
+
+      const rawSec = Math.max(60, Math.floor((closeTime.getTime() - loginTime.getTime()) / 1000));
+      const durationSec = Math.min(rawSec, 12 * 3600);
+      closeTime = new Date(loginTime.getTime() + durationSec * 1000);
+      const durationHours = Number((durationSec / 3600).toFixed(2));
+
+      await db.query(`
+        UPDATE attendance_logs 
+        SET logout_time = ?, 
+            total_working_hours = ?, 
+            session_status = 'Logged Out' 
+        WHERE id = ?
+      `, [closeTime, durationHours, session.id]);
+    }
+  } catch (err) {
+    console.error('[APR Reconcile Stale Sessions Error]:', err.message);
+  }
 }
 
 const aprController = {
   // ── 1. Admin APR Dashboard Stats ───────────────────────────────
   async getAdminDashboardStats(req, res) {
     try {
+      await reconcileStaleSessionsAndStatuses();
+
       const { dateRange, startDate, endDate } = req.query;
       const { dateFrom, dateTo } = resolveDateRange(dateRange, startDate, endDate);
-      
-      const OFFICE_START_HOUR = 9; // 9:00 AM
-      const OFFICE_END_HOUR = 18;   // 6:00 PM
-      const STANDARD_HOURS = 8;
 
-      // Total Employees (active)
-      const [[totEmp]] = await db.query('SELECT COUNT(*) AS cnt FROM users WHERE role = "employee" AND is_active = 1');
-      const totalEmployees = parseInt(totEmp.cnt) || 0;
+      // Total Employees (exclude Admins)
+      const [[totEmp]] = await db.query('SELECT COUNT(*) AS cnt FROM users WHERE role = "employee"');
+      const totalEmployees = parseInt(totEmp.cnt, 10) || 0;
 
-      // Present in date range (distinct active employees)
+      // Present in date range: distinct employees who logged in between dateFrom and dateTo
+      // NOTE: Do NOT filter u.is_active = 1, so auto-deactivated off-hours staff are not falsely hidden!
       const [[presentRes]] = await db.query(`
         SELECT COUNT(DISTINCT al.employee_id) AS cnt 
         FROM attendance_logs al
-        JOIN users u ON u.id = al.employee_id AND u.role = "employee" AND u.is_active = 1
-        WHERE DATE(al.login_time) BETWEEN ? AND ?`,
+        JOIN users u ON u.id = al.employee_id
+        WHERE u.role = "employee" 
+          AND DATE(al.login_time) BETWEEN ? AND ?`,
         [dateFrom, dateTo]
       );
-      const rawPresent = parseInt(presentRes?.cnt) || 0;
+      const rawPresent = parseInt(presentRes?.cnt, 10) || 0;
       const presentToday = Math.min(rawPresent, totalEmployees);
       const absentToday = Math.max(0, totalEmployees - presentToday);
 
-      // Current Online/Offline status (real-time, not affected by date range filters)
+      // Current Online/Offline status (real-time heartbeat verification)
       const now = Date.now();
-      const [employees] = await db.query('SELECT id, current_status, last_active_at FROM users WHERE role = "employee" AND is_active = 1');
-      
+      const [employees] = await db.query(
+        'SELECT id, current_status, last_active_at, auto_deactivated, manual_override FROM users WHERE role = "employee"'
+      );
+
       let onlineCount = 0;
       let offlineCount = 0;
       let onBreakCount = 0;
 
       employees.forEach(emp => {
         let status = emp.current_status || 'Offline';
-        if (status !== 'On Break') {
+
+        // Heartbeat verification: if marked Available/Idle but last active > 2 mins ago, mark Offline
+        if (status !== 'On Break' && status !== 'Offline') {
           if (!emp.last_active_at || (now - new Date(emp.last_active_at).getTime() > 120 * 1000)) {
             status = 'Offline';
           }
+        } else if (status === 'On Break') {
+          // If on break but no heartbeat in 30 mins, mark offline
+          if (!emp.last_active_at || (now - new Date(emp.last_active_at).getTime() > 30 * 60 * 1000)) {
+            status = 'Offline';
+          }
         }
-        if (status === 'Available' || status === 'Idle') onlineCount++;
-        else if (status === 'On Break') onBreakCount++;
-        else offlineCount++;
+
+        if (status === 'Available' || status === 'Idle') {
+          onlineCount++;
+        } else if (status === 'On Break') {
+          onBreakCount++;
+        } else {
+          offlineCount++;
+        }
       });
 
-      // Logged in/out today (in IST date range)
+      // Distinct employees logged in and logged out in date range (or latest date in range)
       const [[loggedInRes]] = await db.query(`
-        SELECT COUNT(DISTINCT employee_id) AS cnt FROM attendance_logs
-        WHERE DATE(login_time) = ?`,
-        [dateTo] // compare with today/latest date
-      );
-      const loggedInToday = parseInt(loggedInRes.cnt) || 0;
-
-      const [[loggedOutRes]] = await db.query(`
-        SELECT COUNT(DISTINCT employee_id) AS cnt FROM attendance_logs
-        WHERE logout_time IS NOT NULL AND DATE(logout_time) = ?`,
+        SELECT COUNT(DISTINCT al.employee_id) AS cnt 
+        FROM attendance_logs al
+        JOIN users u ON u.id = al.employee_id
+        WHERE u.role = "employee" AND DATE(al.login_time) = ?`,
         [dateTo]
       );
-      const loggedOutToday = parseInt(loggedOutRes.cnt) || 0;
+      const loggedInToday = parseInt(loggedInRes?.cnt, 10) || 0;
 
-      // Active Sessions
-      const [[activeSessionsRes]] = await db.query(
-        'SELECT COUNT(*) AS cnt FROM attendance_logs WHERE session_status = "Active Session" AND logout_time IS NULL'
+      const [[loggedOutRes]] = await db.query(`
+        SELECT COUNT(DISTINCT al.employee_id) AS cnt 
+        FROM attendance_logs al
+        JOIN users u ON u.id = al.employee_id
+        WHERE u.role = "employee" AND al.logout_time IS NOT NULL AND DATE(al.logout_time) = ?`,
+        [dateTo]
       );
-      const activeSessions = parseInt(activeSessionsRes.cnt) || 0;
+      const loggedOutToday = parseInt(loggedOutRes?.cnt, 10) || 0;
 
-      // Aggregated working hours in date range
+      // Active Sessions: strictly verified live sessions from today
+      const [[activeSessionsRes]] = await db.query(`
+        SELECT COUNT(DISTINCT al.id) AS cnt 
+        FROM attendance_logs al
+        JOIN users u ON u.id = al.employee_id
+        WHERE u.role = "employee" 
+          AND al.logout_time IS NULL 
+          AND DATE(al.login_time) = CURDATE()
+          AND u.current_status != 'Offline'
+          AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)`
+      );
+      const activeSessions = parseInt(activeSessionsRes?.cnt, 10) || 0;
+
+      // Aggregated gross session seconds and break seconds in date range
+      // Working Hours = Session Time - Break Time (strictly capped at 12 hours per session)
       const [sessions] = await db.query(`
         SELECT
-          employee_id,
-          MIN(login_time) AS first_login,
-          MAX(CASE WHEN logout_time IS NOT NULL THEN logout_time END) AS last_logout,
-          ROUND(SUM(CASE
-            WHEN logout_time IS NOT NULL
-            THEN TIMESTAMPDIFF(SECOND, login_time, logout_time) / 3600.0
-            ELSE TIMESTAMPDIFF(SECOND, login_time, NOW()) / 3600.0
-          END), 2) AS working_hours
-        FROM attendance_logs
-        WHERE DATE(login_time) BETWEEN ? AND ?
-        GROUP BY employee_id`,
+          al.employee_id,
+          MIN(al.login_time) AS first_login,
+          MAX(CASE WHEN al.logout_time IS NOT NULL THEN al.logout_time END) AS last_logout,
+          SUM(
+            CASE
+              WHEN al.logout_time IS NOT NULL 
+                THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time), 12 * 3600))
+              WHEN DATE(al.login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, NOW()), 12 * 3600))
+              ELSE 
+                GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, COALESCE(u.last_active_at, al.login_time)), 12 * 3600))
+            END
+          ) AS gross_seconds
+        FROM attendance_logs al
+        JOIN users u ON u.id = al.employee_id
+        WHERE u.role = "employee" 
+          AND DATE(al.login_time) BETWEEN ? AND ?
+        GROUP BY al.employee_id`,
         [dateFrom, dateTo]
       );
 
-      let totalWorkingHrs = 0;
+      // Breaks taken in the date range
+      const [breaksRows] = await db.query(`
+        SELECT 
+          employee_id,
+          COALESCE(SUM(duration), 0) AS break_seconds
+        FROM break_records
+        WHERE DATE(start_time) BETWEEN ? AND ?
+          AND duration IS NOT NULL
+        GROUP BY employee_id`,
+        [dateFrom, dateTo]
+      );
+      const breaksMap = {};
+      breaksRows.forEach(b => { breaksMap[b.employee_id] = parseInt(b.break_seconds, 10) || 0; });
+
+      let totalNetWorkingSec = 0;
       let loginTimes = [];
       let logoutTimes = [];
 
       sessions.forEach(s => {
-        totalWorkingHrs += parseFloat(s.working_hours) || 0;
+        const grossSec = parseInt(s.gross_seconds, 10) || 0;
+        const breakSec = breaksMap[s.employee_id] || 0;
+        const netSec = Math.max(0, grossSec - breakSec);
+        totalNetWorkingSec += netSec;
+
         if (s.first_login) {
           const d = new Date(s.first_login);
           loginTimes.push(d.getHours() + d.getMinutes() / 60);
@@ -155,24 +329,17 @@ const aprController = {
         }
       });
 
+      const totalWorkingHrs = Number((totalNetWorkingSec / 3600).toFixed(2));
       const avgLoginHr = loginTimes.length ? loginTimes.reduce((a, b) => a + b, 0) / loginTimes.length : null;
       const avgLogoutHr = logoutTimes.length ? logoutTimes.reduce((a, b) => a + b, 0) / logoutTimes.length : null;
       const avgWorkingHours = presentToday > 0 ? (totalWorkingHrs / presentToday).toFixed(2) : '0.00';
 
-      const formatHr = h => {
-        if (h === null) return '—';
-        const hh = Math.floor(h);
-        const mm = Math.round((h - hh) * 60);
-        const ampm = hh < 12 ? 'AM' : 'PM';
-        return `${String(hh % 12 || 12).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${ampm}`;
-      };
-
-      // Attendance Percentage (cap presentToday at totalEmployees to prevent >100%)
+      // Attendance Percentage (strictly capped at 100%)
       const cappedPresent = Math.min(presentToday, totalEmployees);
       const attendancePercentage = totalEmployees > 0 ? Number(((cappedPresent / totalEmployees) * 100).toFixed(1)) : 0;
 
-      // Average productivity score (default/placeholder derived from overall employee indicators)
-      const productivityScore = 82; // enterprise defaults
+      // Unverified/uncalibrated productivity score is explicitly null (UI renders "Not configured")
+      const productivityScore = null;
 
       return res.json({
         success: true,
@@ -186,10 +353,10 @@ const aprController = {
           loggedOutToday,
           activeSessions,
           employeesOnBreak: onBreakCount,
-          averageLoginTime: formatHr(avgLoginHr),
-          averageLogoutTime: formatHr(avgLogoutHr),
+          averageLoginTime: formatHourDecimal(avgLoginHr),
+          averageLogoutTime: formatHourDecimal(avgLogoutHr),
           averageWorkingHours: parseFloat(avgWorkingHours),
-          totalWorkingHoursToday: parseFloat(totalWorkingHrs.toFixed(2)),
+          totalWorkingHoursToday: totalWorkingHrs,
           attendancePercentage,
           productivityScore
         }
@@ -200,14 +367,14 @@ const aprController = {
     }
   },
 
-  // ── 2. Live Employee Attendance ────────────────────────────────
+  // ── 2. Live Employee Attendance Roster ─────────────────────────
   async getLiveAttendance(req, res) {
     try {
-      const { search = '', status = '', sortBy = 'employee_name', sortDir = 'asc' } = req.query;
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
+      await reconcileStaleSessionsAndStatuses();
 
-      // Query active employees
+      const { search = '', status = '', sortBy = 'employee_name', sortDir = 'asc' } = req.query;
+
+      // Query ALL employees (both active and auto-deactivated so off-hours staff remain visible)
       let sql = `
         SELECT 
           u.id AS employee_id,
@@ -216,31 +383,40 @@ const aprController = {
           u.last_active_at,
           u.auto_deactivated,
           u.manual_override,
-          (SELECT MIN(login_time) FROM attendance_logs WHERE employee_id = u.id AND login_time >= ?) as login_time,
-          (SELECT MAX(logout_time) FROM attendance_logs WHERE employee_id = u.id AND login_time >= ? AND logout_time IS NOT NULL) as logout_time,
-          (SELECT session_status FROM attendance_logs WHERE employee_id = u.id ORDER BY id DESC LIMIT 1) as session_status,
+          (SELECT MIN(login_time) FROM attendance_logs WHERE employee_id = u.id AND DATE(login_time) = CURDATE()) AS login_time,
+          (SELECT MAX(logout_time) FROM attendance_logs WHERE employee_id = u.id AND DATE(login_time) = CURDATE() AND logout_time IS NOT NULL) AS logout_time,
+          (SELECT session_status FROM attendance_logs WHERE employee_id = u.id ORDER BY id DESC LIMIT 1) AS session_status,
           (
-            SELECT SUM(CASE 
-              WHEN logout_time IS NOT NULL THEN TIMESTAMPDIFF(SECOND, login_time, logout_time)
-              ELSE TIMESTAMPDIFF(SECOND, login_time, NOW())
-            END)
+            SELECT COALESCE(SUM(
+              CASE 
+                WHEN logout_time IS NOT NULL 
+                  THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, login_time, logout_time), 12 * 3600))
+                WHEN DATE(login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                  THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, login_time, NOW()), 12 * 3600))
+                ELSE 
+                  GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, login_time, COALESCE(u.last_active_at, login_time)), 12 * 3600))
+              END
+            ), 0)
             FROM attendance_logs 
-            WHERE employee_id = u.id AND login_time >= ?
-          ) as working_seconds,
+            WHERE employee_id = u.id AND DATE(login_time) = CURDATE()
+          ) AS gross_working_seconds,
           (
-            SELECT SUM(duration)
+            SELECT COALESCE(SUM(duration), 0)
             FROM break_records 
-            WHERE employee_id = u.id AND start_time >= ? AND duration IS NOT NULL
-          ) as break_seconds,
+            WHERE employee_id = u.id AND DATE(start_time) = CURDATE() AND duration IS NOT NULL
+          ) AS break_seconds,
           (
-            SELECT count(*) 
+            SELECT COUNT(*) 
             FROM attendance_logs 
-            WHERE employee_id = u.id AND login_time >= ? AND logout_time IS NULL AND session_status = "Active Session"
-          ) as has_active_session
+            WHERE employee_id = u.id 
+              AND DATE(login_time) = CURDATE() 
+              AND logout_time IS NULL 
+              AND session_status = "Active Session"
+          ) AS has_active_session_row
         FROM users u
-        WHERE u.role = "employee" AND u.is_active = 1
+        WHERE u.role = "employee"
       `;
-      const params = [todayStart, todayStart, todayStart, todayStart, todayStart];
+      const params = [];
 
       if (search) {
         sql += ' AND (u.name LIKE ? OR CAST(u.id AS CHAR) LIKE ?)';
@@ -252,7 +428,7 @@ const aprController = {
 
       let list = rows.map(r => {
         let currentStatus = r.current_status || 'Offline';
-        
+
         // Heartbeat verification: if Available or Idle but last heartbeat > 2 mins, mark offline
         if (currentStatus !== 'On Break' && currentStatus !== 'Offline') {
           if (!r.last_active_at || (now - new Date(r.last_active_at).getTime() > 120 * 1000)) {
@@ -275,9 +451,17 @@ const aprController = {
           attStatus = loginHr > LATE_THRESHOLD_HOUR ? 'Late' : 'Present';
         }
 
-        const workingHrs = r.working_seconds ? Number((r.working_seconds / 3600).toFixed(2)) : 0;
-        const breakMins = r.break_seconds ? Math.round(r.break_seconds / 60) : 0;
-        const activeSession = r.has_active_session > 0 ? 'Yes' : 'No';
+        // Net working hours = Gross session seconds - Break seconds
+        const grossSec = parseInt(r.gross_working_seconds, 10) || 0;
+        const breakSec = parseInt(r.break_seconds, 10) || 0;
+        const netSec = Math.max(0, grossSec - breakSec);
+
+        const workingHrs = Number((netSec / 3600).toFixed(2));
+        const breakMins = Math.round(breakSec / 60);
+
+        // Active session is true ONLY if user has an open session today AND is currently online
+        const isOnline = (currentStatus === 'Available' || currentStatus === 'Idle' || currentStatus === 'On Break');
+        const activeSession = (r.has_active_session_row > 0 && isOnline) ? 'Yes' : 'No';
 
         return {
           employee_id: r.employee_id,
@@ -293,7 +477,7 @@ const aprController = {
         };
       });
 
-      // Status filters (e.g. online, offline, on break, manual override)
+      // Filter by status if specified
       if (status) {
         if (status === 'online') {
           list = list.filter(r => r.current_status === 'Available' || r.current_status === 'Idle' || r.current_status === 'On Break');
@@ -324,6 +508,8 @@ const aprController = {
   // ── 3. Daily Login Report ──────────────────────────────────────
   async getDailyLoginReport(req, res) {
     try {
+      await reconcileStaleSessionsAndStatuses();
+
       const { dateRange, startDate, endDate, search = '' } = req.query;
       const { dateFrom, dateTo } = resolveDateRange(dateRange, startDate, endDate);
 
@@ -339,14 +525,20 @@ const aprController = {
           MIN(al.login_time) AS first_login,
           MAX(CASE WHEN al.logout_time IS NOT NULL THEN al.logout_time END) AS last_logout,
           COUNT(al.id) AS total_sessions,
-          ROUND(SUM(CASE
-            WHEN al.logout_time IS NOT NULL
-            THEN TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time) / 3600.0
-            ELSE TIMESTAMPDIFF(SECOND, al.login_time, NOW()) / 3600.0
-          END), 2) AS total_working_hours
+          SUM(
+            CASE
+              WHEN al.logout_time IS NOT NULL 
+                THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time), 12 * 3600))
+              WHEN DATE(al.login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, NOW()), 12 * 3600))
+              ELSE 
+                GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, COALESCE(u.last_active_at, al.login_time)), 12 * 3600))
+            END
+          ) AS gross_seconds
         FROM attendance_logs al
         JOIN users u ON u.id = al.employee_id
-        WHERE DATE(al.login_time) BETWEEN ? AND ?
+        WHERE u.role = "employee" 
+          AND DATE(al.login_time) BETWEEN ? AND ?
       `;
       const sessionParams = [dateFrom, dateTo];
 
@@ -370,7 +562,7 @@ const aprController = {
           sessions.first_login,
           sessions.last_logout,
           sessions.total_sessions,
-          sessions.total_working_hours,
+          sessions.gross_seconds,
           COALESCE(breaks.total_break_seconds, 0) AS total_break_seconds
         FROM (${sessionSql}) sessions
         LEFT JOIN (
@@ -380,6 +572,7 @@ const aprController = {
             COALESCE(SUM(duration), 0) AS total_break_seconds
           FROM break_records
           WHERE DATE(start_time) BETWEEN ? AND ?
+            AND duration IS NOT NULL
           GROUP BY employee_id, DATE(start_time)
         ) breaks
           ON breaks.employee_id = sessions.employee_id
@@ -399,9 +592,14 @@ const aprController = {
         const lateLogin = loginHr !== null && loginHr > (OFFICE_START_HOUR + 20 / 60) ? 'Yes' : 'No';
         const earlyLogout = lastLogout && logoutHr !== null && logoutHr < OFFICE_END_HOUR ? 'Yes' : 'No';
 
-        const workingHrs = parseFloat(r.total_working_hours) || 0;
-        const overtime = Math.max(0, workingHrs - STANDARD_HOURS).toFixed(2);
-        const breakMins = r.total_break_seconds ? Math.round(r.total_break_seconds / 60) : 0;
+        // Net working hours = Gross session seconds - Break seconds
+        const grossSec = parseInt(r.gross_seconds, 10) || 0;
+        const breakSec = parseInt(r.total_break_seconds, 10) || 0;
+        const netSec = Math.max(0, grossSec - breakSec);
+
+        const workingHrs = Number((netSec / 3600).toFixed(2));
+        const overtime = Math.max(0, workingHrs - STANDARD_HOURS);
+        const breakMins = Math.round(breakSec / 60);
 
         return {
           employee_id: r.employee_id,
@@ -411,7 +609,7 @@ const aprController = {
           logout_time: r.last_logout,
           total_sessions: r.total_sessions,
           total_working_hours: workingHrs,
-          overtime: parseFloat(overtime),
+          overtime: Number(overtime.toFixed(2)),
           break_duration: breakMins,
           late_login: lateLogin,
           early_logout: earlyLogout
@@ -425,9 +623,11 @@ const aprController = {
     }
   },
 
-  // ── 4. Employee Login History ──────────────────────────────────
+  // ── 4. Employee Login History Logs ─────────────────────────────
   async getLoginHistory(req, res) {
     try {
+      await reconcileStaleSessionsAndStatuses();
+
       const { dateRange, startDate, endDate, search = '' } = req.query;
       const { dateFrom, dateTo } = resolveDateRange(dateRange, startDate, endDate);
 
@@ -437,8 +637,9 @@ const aprController = {
           al.employee_id,
           u.name AS employee_name,
           DATE(al.login_time) AS login_date,
-          al.login_time AS login_time,
-          al.logout_time AS logout_time,
+          al.login_time,
+          al.logout_time,
+          al.session_status,
           al.ip_address,
           al.browser,
           al.device,
@@ -451,14 +652,31 @@ const aprController = {
           al.latitude,
           al.longitude,
           ROUND(
+            (
+              CASE 
+                WHEN al.logout_time IS NOT NULL 
+                  THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time), 12 * 3600))
+                WHEN DATE(al.login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                  THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, NOW()), 12 * 3600))
+                ELSE 
+                  GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, COALESCE(u.last_active_at, al.login_time)), 12 * 3600))
+              END
+            ) / 3600.0, 2
+          ) AS session_duration,
+          (
             CASE 
-              WHEN al.logout_time IS NOT NULL THEN TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time)
-              ELSE TIMESTAMPDIFF(SECOND, al.login_time, NOW())
-            END / 3600.0, 2
-          ) AS session_duration
+              WHEN al.logout_time IS NOT NULL 
+                THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time), 12 * 3600))
+              WHEN DATE(al.login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, NOW()), 12 * 3600))
+              ELSE 
+                GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, COALESCE(u.last_active_at, al.login_time)), 12 * 3600))
+            END
+          ) AS session_duration_seconds
         FROM attendance_logs al
         JOIN users u ON u.id = al.employee_id
-        WHERE DATE(al.login_time) BETWEEN ? AND ?
+        WHERE u.role = "employee" 
+          AND DATE(al.login_time) BETWEEN ? AND ?
       `;
       const params = [dateFrom, dateTo];
 
@@ -467,11 +685,11 @@ const aprController = {
         params.push(`%${search}%`, `%${search}%`);
       }
 
-      sql += ' ORDER BY al.login_time DESC LIMIT 200';
+      sql += ' ORDER BY al.login_time DESC LIMIT 250';
 
       const [rows] = await db.query(sql, params);
 
-      // Collect IPs that need geolocation resolution (legacy or missing location fields)
+      // Collect IPs that need geolocation resolution
       const ipsToResolve = [];
       for (const r of rows) {
         const ip = r.ip_address;
@@ -482,23 +700,10 @@ const aprController = {
         }
       }
 
-      // Batch resolve unpopulated IPs via cache & external provider
       let resolvedIpsMap = new Map();
       if (ipsToResolve.length > 0) {
         try {
           resolvedIpsMap = await geolocationService.resolveMultipleIps(ipsToResolve);
-
-          // Asynchronously backfill unpopulated rows in attendance_logs
-          for (const [ip, geo] of resolvedIpsMap.entries()) {
-            if (geo && (geo.city || geo.region || geo.country)) {
-              db.query(
-                `UPDATE attendance_logs 
-                 SET location_city = ?, location_region = ?, location_country = ?, location_country_code = ?, location_isp = ?, latitude = ?, longitude = ?, location_source = ?, location_resolved_at = NOW() 
-                 WHERE ip_address = ? AND location_country IS NULL`,
-                [geo.city || null, geo.region || null, geo.country || null, geo.country_code || null, geo.isp || null, geo.latitude, geo.longitude, geo.source || 'batch_backfill', ip]
-              ).catch(() => {});
-            }
-          }
         } catch (batchErr) {
           console.warn('[APR LoginHistory] Batch GeoIP resolution error:', batchErr.message);
         }
@@ -533,8 +738,12 @@ const aprController = {
           locStr = 'Location unavailable';
         }
 
+        const durSec = parseInt(r.session_duration_seconds, 10) || 0;
+        const durHuman = formatDurationHuman(durSec);
+
         return {
           ...r,
+          session_duration_human: durHuman,
           location: locStr,
           location_isp: isp,
           latitude: lat,
@@ -554,59 +763,96 @@ const aprController = {
     }
   },
 
-  // ── 5. Attendance Analytics ────────────────────────────────────
+  // ── 5. Attendance Analytics & Visual Charts ─────────────────────
   async getAttendanceAnalytics(req, res) {
     try {
-      const todayIST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-      const pad = n => String(n).padStart(2, '0');
-      const todayStr = `${todayIST.getFullYear()}-${pad(todayIST.getMonth()+1)}-${pad(todayIST.getDate())}`;
+      await reconcileStaleSessionsAndStatuses();
 
-      // 1. Last 7 days Present vs Absent trend
-      const trendLabels = [];
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(todayIST);
-        d.setDate(d.getDate() - i);
-        trendLabels.push(`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`);
+      const { dateRange, startDate, endDate } = req.query;
+      const { dateFrom, dateTo } = resolveDateRange(dateRange, startDate, endDate);
+
+      // Build daily trend labels for the resolved date range (or past 7 days if range is today)
+      let trendLabels = [];
+      const pad = n => String(n).padStart(2, '0');
+
+      if (dateFrom === dateTo) {
+        // For a single day, provide context of the 7 days ending on that day
+        const targetDate = new Date(`${dateTo}T00:00:00+05:30`);
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(targetDate);
+          d.setDate(d.getDate() - i);
+          trendLabels.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
+        }
+      } else {
+        // Multi-day range: generate day sequence (capped at 31 days)
+        const dStart = new Date(`${dateFrom}T00:00:00+05:30`);
+        const dEnd = new Date(`${dateTo}T00:00:00+05:30`);
+        const cur = new Date(dStart);
+        while (cur <= dEnd && trendLabels.length < 31) {
+          trendLabels.push(`${cur.getFullYear()}-${pad(cur.getMonth() + 1)}-${pad(cur.getDate())}`);
+          cur.setDate(cur.getDate() + 1);
+        }
       }
+
+      const minDate = trendLabels[0];
+      const maxDate = trendLabels[trendLabels.length - 1];
+
+      // Total employees (exclude Admins)
+      const [[totEmp]] = await db.query('SELECT COUNT(*) AS count FROM users WHERE role = "employee"');
+      const totalEmployees = parseInt(totEmp?.count, 10) || 0;
 
       const [trendRows] = await db.query(`
         SELECT
-          DATE(login_time) AS day,
-          COUNT(DISTINCT employee_id) AS cnt,
-          AVG(CASE WHEN logout_time IS NOT NULL THEN TIMESTAMPDIFF(SECOND, login_time, logout_time) ELSE TIMESTAMPDIFF(SECOND, login_time, NOW()) END) / 3600.0 AS avg_work
-        FROM attendance_logs
-        WHERE DATE(login_time) BETWEEN ? AND ?
-        GROUP BY day`, 
-        [trendLabels[0], todayStr]
+          DATE(al.login_time) AS day,
+          COUNT(DISTINCT al.employee_id) AS cnt,
+          ROUND(
+            AVG(
+              CASE 
+                WHEN al.logout_time IS NOT NULL 
+                  THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time), 12 * 3600))
+                WHEN DATE(al.login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                  THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, NOW()), 12 * 3600))
+                ELSE 
+                  GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, COALESCE(u.last_active_at, al.login_time)), 12 * 3600))
+              END
+            ) / 3600.0, 2
+          ) AS avg_work
+        FROM attendance_logs al
+        JOIN users u ON u.id = al.employee_id
+        WHERE u.role = "employee" 
+          AND DATE(al.login_time) BETWEEN ? AND ?
+        GROUP BY day`,
+        [minDate, maxDate]
       );
 
       const trendMap = {};
       trendRows.forEach(r => { trendMap[String(r.day)] = r; });
 
-      const presentTrend = trendLabels.map(d => parseInt(trendMap[d]?.cnt) || 0);
+      const presentTrend = trendLabels.map(d => parseInt(trendMap[d]?.cnt, 10) || 0);
       const avgWorkHoursTrend = trendLabels.map(d => parseFloat(trendMap[d]?.avg_work) || 0);
-
-      // Total active employees for absent trend
-      const [[{ count: totalEmployees }]] = await db.query('SELECT COUNT(*) AS count FROM users WHERE role = "employee" AND is_active = 1');
       const absentTrend = presentTrend.map(p => Math.max(0, totalEmployees - p));
 
-      // 2. Present vs Absent Ratio Today
+      // Present vs Absent on dateTo
       const presentToday = presentTrend[presentTrend.length - 1] || 0;
       const absentToday = Math.max(0, totalEmployees - presentToday);
 
-      // 3. Online vs Offline Ratio Today
+      // Online vs Offline real-time counts
       const now = Date.now();
-      const [employees] = await db.query('SELECT id, current_status, last_active_at FROM users WHERE role = "employee" AND is_active = 1');
+      const [employees] = await db.query('SELECT id, current_status, last_active_at FROM users WHERE role = "employee"');
       let online = 0, offline = 0;
+
       employees.forEach(emp => {
-        let status = emp.current_status;
+        let status = emp.current_status || 'Offline';
         if (status !== 'On Break' && status !== 'Offline') {
           if (!emp.last_active_at || (now - new Date(emp.last_active_at).getTime() > 120 * 1000)) {
             status = 'Offline';
           }
         }
-        if (status === 'Available' || status === 'Idle' || status === 'On Break') online++;
-        else offline++;
+        if (status === 'Available' || status === 'Idle' || status === 'On Break') {
+          online++;
+        } else {
+          offline++;
+        }
       });
 
       return res.json({
@@ -630,13 +876,12 @@ const aprController = {
     }
   },
 
-  // ── 6. Employee Performance Report ─────────────────────────────
+  // ── 6. Employee Performance Scorecard ──────────────────────────
   async getPerformanceReport(req, res) {
     try {
       const { dateRange, startDate, endDate, search = '' } = req.query;
       const { dateFrom, dateTo } = resolveDateRange(dateRange, startDate, endDate);
 
-      // Main performance metrics grouping
       let sql = `
         SELECT
           u.id AS employee_id,
@@ -675,9 +920,9 @@ const aprController = {
             WHERE employee_id = u.id AND DATE(login_time) BETWEEN ? AND ?
           ) AS present_days
         FROM users u
-        WHERE u.role = "employee" AND u.is_active = 1
+        WHERE u.role = "employee"
       `;
-      
+
       const params = [
         dateFrom, dateTo, // customers
         dateFrom, dateTo, // loans submitted
@@ -696,30 +941,21 @@ const aprController = {
 
       const [rows] = await db.query(sql, params);
 
-      // Compute total days in date range
-      const tFrom = new Date(dateFrom);
-      const tTo = new Date(dateTo);
+      // Compute total days in range
+      const tFrom = new Date(`${dateFrom}T00:00:00+05:30`);
+      const tTo = new Date(`${dateTo}T00:00:00+05:30`);
       const diffTime = Math.abs(tTo - tFrom);
       const totalDaysInRange = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1);
 
       const report = rows.map(r => {
-        const submitted = parseInt(r.loans_submitted) || 0;
-        const approved = parseInt(r.loans_approved) || 0;
-        const disbursed = parseInt(r.loans_disbursed) || 0;
-        const customers = parseInt(r.customers_added) || 0;
-        const present = parseInt(r.present_days) || 0;
+        const submitted = parseInt(r.loans_submitted, 10) || 0;
+        const approved = parseInt(r.loans_approved, 10) || 0;
+        const disbursed = parseInt(r.loans_disbursed, 10) || 0;
+        const customers = parseInt(r.customers_added, 10) || 0;
+        const present = parseInt(r.present_days, 10) || 0;
 
-        // Conversion Rate
         const conversion = submitted > 0 ? Math.round(((approved + disbursed) / submitted) * 100) : 0;
-        
-        // Productivity Score: 10pts per customer, 5pts per loan, 15pts per disburse
-        let productivity = (customers * 10) + (submitted * 5) + (disbursed * 15);
-        productivity = Math.min(100, productivity);
-
-        // Attendance Score
         const attendance = Math.min(100, Math.round((present / totalDaysInRange) * 100));
-
-        // Average processing hours
         const avgProcessing = r.avg_processing_hours ? Number(parseFloat(r.avg_processing_hours).toFixed(1)) : 0;
 
         return {
@@ -728,12 +964,13 @@ const aprController = {
           customers_added: customers,
           loans_submitted: submitted,
           loans_approved: approved,
-          loans_rejected: parseInt(r.loans_rejected) || 0,
-          loans_pending: parseInt(r.loans_pending) || 0,
+          loans_rejected: parseInt(r.loans_rejected, 10) || 0,
+          loans_pending: parseInt(r.loans_pending, 10) || 0,
           loans_disbursed: disbursed,
           conversion_rate: conversion,
           avg_processing_time: avgProcessing,
-          productivity_score: productivity,
+          // Uncalibrated mathematical scoring model is explicitly null (renders "Not configured")
+          productivity_score: null,
           attendance_score: attendance
         };
       });
@@ -751,16 +988,30 @@ const aprController = {
       const { dateRange, startDate, endDate } = req.query;
       const { dateFrom, dateTo } = resolveDateRange(dateRange, startDate, endDate);
 
-      const [rows] = await db.query(`
+      // Completed breaks query
+      const [completedRows] = await db.query(`
         SELECT 
           break_type,
           COUNT(*) AS count,
-          SUM(duration) AS total_duration,
-          MAX(duration) AS longest_duration,
-          MIN(duration) AS shortest_duration
+          COALESCE(SUM(duration), 0) AS total_duration,
+          COALESCE(MAX(duration), 0) AS longest_duration,
+          COALESCE(MIN(duration), 0) AS shortest_duration
         FROM break_records
         WHERE DATE(start_time) BETWEEN ? AND ?
           AND duration IS NOT NULL
+        GROUP BY break_type`,
+        [dateFrom, dateTo]
+      );
+
+      // Active breaks in progress right now
+      const [activeRows] = await db.query(`
+        SELECT 
+          break_type,
+          COUNT(*) AS count,
+          COALESCE(SUM(TIMESTAMPDIFF(SECOND, start_time, NOW())), 0) AS active_duration
+        FROM break_records
+        WHERE DATE(start_time) BETWEEN ? AND ?
+          AND end_time IS NULL
         GROUP BY break_type`,
         [dateFrom, dateTo]
       );
@@ -771,17 +1022,21 @@ const aprController = {
         personalCount: 0,
         meetingCount: 0,
         otherCount: 0,
+        completedBreaks: 0,
+        activeBreaks: 0,
         totalBreaks: 0,
         totalDurationSec: 0,
         longestSec: 0,
         shortestSec: 999999
       };
 
-      rows.forEach(r => {
-        const count = parseInt(r.count) || 0;
+      completedRows.forEach(r => {
+        const count = parseInt(r.count, 10) || 0;
+        const dur = parseInt(r.total_duration, 10) || 0;
+        summary.completedBreaks += count;
         summary.totalBreaks += count;
-        summary.totalDurationSec += parseInt(r.total_duration) || 0;
-        
+        summary.totalDurationSec += dur;
+
         if (r.longest_duration > summary.longestSec) {
           summary.longestSec = r.longest_duration;
         }
@@ -789,7 +1044,22 @@ const aprController = {
           summary.shortestSec = r.shortest_duration;
         }
 
-        const type = String(r.break_type).toLowerCase();
+        const type = String(r.break_type || '').toLowerCase();
+        if (type.includes('tea')) summary.teaCount += count;
+        else if (type.includes('lunch')) summary.lunchCount += count;
+        else if (type.includes('personal')) summary.personalCount += count;
+        else if (type.includes('meeting')) summary.meetingCount += count;
+        else summary.otherCount += count;
+      });
+
+      activeRows.forEach(r => {
+        const count = parseInt(r.count, 10) || 0;
+        const dur = parseInt(r.active_duration, 10) || 0;
+        summary.activeBreaks += count;
+        summary.totalBreaks += count;
+        summary.totalDurationSec += dur;
+
+        const type = String(r.break_type || '').toLowerCase();
         if (type.includes('tea')) summary.teaCount += count;
         else if (type.includes('lunch')) summary.lunchCount += count;
         else if (type.includes('personal')) summary.personalCount += count;
@@ -801,7 +1071,9 @@ const aprController = {
         summary.shortestSec = 0;
       }
 
-      const avgBreakMin = summary.totalBreaks > 0 ? Math.round((summary.totalDurationSec / summary.totalBreaks) / 60) : 0;
+      const avgBreakMin = summary.totalBreaks > 0
+        ? Math.round((summary.totalDurationSec / summary.totalBreaks) / 60)
+        : 0;
 
       return res.json({
         success: true,
@@ -811,6 +1083,9 @@ const aprController = {
           personalCount: summary.personalCount,
           meetingCount: summary.meetingCount,
           otherCount: summary.otherCount,
+          totalBreaks: summary.totalBreaks,
+          activeBreaks: summary.activeBreaks,
+          completedBreaks: summary.completedBreaks,
           averageBreakTime: avgBreakMin,
           totalBreakTime: Math.round(summary.totalDurationSec / 60),
           longestBreak: Math.round(summary.longestSec / 60),
@@ -826,42 +1101,58 @@ const aprController = {
   // ── 8. Working Hours Summary ───────────────────────────────────
   async getWorkingHours(req, res) {
     try {
+      await reconcileStaleSessionsAndStatuses();
+
       const { dateRange, startDate, endDate } = req.query;
       const { dateFrom, dateTo } = resolveDateRange(dateRange, startDate, endDate);
 
-      const OFFICE_START_HOUR = 9;
       const STANDARD_HOURS = 8;
 
-      const [rows] = await db.query(`
+      const [sessionRows] = await db.query(`
         SELECT
-          ROUND(COALESCE(SUM(CASE
-            WHEN logout_time IS NOT NULL THEN TIMESTAMPDIFF(SECOND, login_time, logout_time)
-            ELSE TIMESTAMPDIFF(SECOND, login_time, NOW())
-          END), 0) / 3600.0, 2) AS login_hours,
-          (
-            SELECT ROUND(COALESCE(SUM(duration), 0) / 3600.0, 2)
-            FROM break_records
-            WHERE DATE(start_time) BETWEEN ? AND ?
-              AND duration IS NOT NULL
-          ) AS break_hours
-        FROM attendance_logs
-        WHERE DATE(login_time) BETWEEN ? AND ?`,
-        [dateFrom, dateTo, dateFrom, dateTo]
+          ROUND(
+            COALESCE(
+              SUM(
+                CASE
+                  WHEN al.logout_time IS NOT NULL 
+                    THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time), 12 * 3600))
+                  WHEN DATE(al.login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                    THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, NOW()), 12 * 3600))
+                  ELSE 
+                    GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, COALESCE(u.last_active_at, al.login_time)), 12 * 3600))
+                END
+              ), 0
+            ) / 3600.0, 2
+          ) AS gross_hours
+        FROM attendance_logs al
+        JOIN users u ON u.id = al.employee_id
+        WHERE u.role = "employee" 
+          AND DATE(al.login_time) BETWEEN ? AND ?`,
+        [dateFrom, dateTo]
       );
 
-      const loginHrs = rows.length > 0 ? parseFloat(rows[0].login_hours) || 0 : 0;
-      const breakHrs = rows.length > 0 ? parseFloat(rows[0].break_hours) || 0 : 0;
-      const productiveHrs = Math.max(0, loginHrs - breakHrs);
-      const overtime = Math.max(0, loginHrs - STANDARD_HOURS);
-      const remaining = Math.max(0, STANDARD_HOURS - loginHrs);
+      const [breakRows] = await db.query(`
+        SELECT 
+          ROUND(COALESCE(SUM(duration), 0) / 3600.0, 2) AS break_hours
+        FROM break_records
+        WHERE DATE(start_time) BETWEEN ? AND ?
+          AND duration IS NOT NULL`,
+        [dateFrom, dateTo]
+      );
+
+      const grossHrs = sessionRows.length > 0 ? parseFloat(sessionRows[0].gross_hours) || 0 : 0;
+      const breakHrs = breakRows.length > 0 ? parseFloat(breakRows[0].break_hours) || 0 : 0;
+      const productiveHrs = Math.max(0, grossHrs - breakHrs);
+      const overtime = Math.max(0, productiveHrs - STANDARD_HOURS);
+      const remaining = Math.max(0, STANDARD_HOURS - productiveHrs);
 
       return res.json({
         success: true,
         data: {
-          loginHours: Number(loginHrs.toFixed(2)),
+          loginHours: Number(grossHrs.toFixed(2)),
           productiveHours: Number(productiveHrs.toFixed(2)),
-          idleHours: 0.0, // calculated from inactivity or defaults
-          totalWorkingHours: Number(loginHrs.toFixed(2)),
+          idleHours: 0.0,
+          totalWorkingHours: Number(productiveHrs.toFixed(2)),
           overtime: Number(overtime.toFixed(2)),
           remainingWorkingHours: Number(remaining.toFixed(2))
         }
@@ -875,12 +1166,20 @@ const aprController = {
   // ── 9. Employee Leaderboard ────────────────────────────────────
   async getLeaderboard(req, res) {
     try {
-      const todayIST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-      const pad = n => String(n).padStart(2, '0');
-      const startOfMonth = `${todayIST.getFullYear()}-${pad(todayIST.getMonth()+1)}-01`;
-      const endOfMonth = `${todayIST.getFullYear()}-${pad(todayIST.getMonth()+1)}-${pad(todayIST.getDate())}`;
+      await reconcileStaleSessionsAndStatuses();
 
-      // Aggregated employee leaderboard for current month
+      const { dateRange, startDate, endDate } = req.query;
+      const todayStr = getTodayISTString();
+      // Default leaderboard range: current month to date
+      let dateFrom = `${todayStr.slice(0, 7)}-01`;
+      let dateTo = todayStr;
+
+      if (dateRange) {
+        const resolved = resolveDateRange(dateRange, startDate, endDate);
+        dateFrom = resolved.dateFrom;
+        dateTo = resolved.dateTo;
+      }
+
       const [rows] = await db.query(`
         SELECT
           u.id AS employee_id,
@@ -903,61 +1202,69 @@ const aprController = {
             WHERE employee_id = u.id AND DATE(login_time) BETWEEN ? AND ?
           ) AS present_days,
           (
-            SELECT ROUND(SUM(CASE
-              WHEN logout_time IS NOT NULL THEN TIMESTAMPDIFF(SECOND, login_time, logout_time)
-              ELSE TIMESTAMPDIFF(SECOND, login_time, NOW())
-            END) / 3600.0, 2)
+            SELECT COALESCE(SUM(
+              CASE 
+                WHEN logout_time IS NOT NULL 
+                  THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, login_time, logout_time), 12 * 3600))
+                WHEN DATE(login_time) = CURDATE() AND u.current_status != 'Offline' AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                  THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, login_time, NOW()), 12 * 3600))
+                ELSE 
+                  GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, login_time, COALESCE(u.last_active_at, login_time)), 12 * 3600))
+              END
+            ), 0)
             FROM attendance_logs
             WHERE employee_id = u.id AND DATE(login_time) BETWEEN ? AND ?
-          ) AS working_hours
+          ) AS gross_seconds,
+          (
+            SELECT COALESCE(SUM(duration), 0)
+            FROM break_records
+            WHERE employee_id = u.id AND DATE(start_time) BETWEEN ? AND ?
+              AND duration IS NOT NULL
+          ) AS break_seconds
         FROM users u
-        WHERE u.role = "employee" AND u.is_active = 1`,
+        WHERE u.role = "employee"`,
         [
-          startOfMonth, endOfMonth,
-          startOfMonth, endOfMonth,
-          startOfMonth, endOfMonth,
-          startOfMonth, endOfMonth,
-          startOfMonth, endOfMonth
+          dateFrom, dateTo,
+          dateFrom, dateTo,
+          dateFrom, dateTo,
+          dateFrom, dateTo,
+          dateFrom, dateTo,
+          dateFrom, dateTo
         ]
       );
 
-      // Compute total days in month to date
-      const tFrom = new Date(startOfMonth);
-      const tTo = new Date(endOfMonth);
-      const diffTime = Math.abs(tTo - tFrom);
-      const totalDaysInRange = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1);
-
       let list = rows.map(r => {
-        const customers = parseInt(r.customers_added) || 0;
-        const submitted = parseInt(r.loans_submitted) || 0;
-        const disbursed = parseInt(r.loans_disbursed) || 0;
-        const present = parseInt(r.present_days) || 0;
-        const workingHours = parseFloat(r.working_hours) || 0;
+        const submitted = parseInt(r.loans_submitted, 10) || 0;
+        const disbursed = parseInt(r.loans_disbursed, 10) || 0;
+        const customers = parseInt(r.customers_added, 10) || 0;
+        const present = parseInt(r.present_days, 10) || 0;
 
-        // Productivity
-        let productivity = (customers * 10) + (submitted * 5) + (disbursed * 15);
-        productivity = Math.min(100, productivity);
-
-        // Attendance
-        const attendance = Math.min(100, Math.round((present / totalDaysInRange) * 100));
-
-        // Performance Score
-        const performance = Math.round((productivity * 0.6) + (attendance * 0.4));
+        const grossSec = parseInt(r.gross_seconds, 10) || 0;
+        const breakSec = parseInt(r.break_seconds, 10) || 0;
+        const netSec = Math.max(0, grossSec - breakSec);
+        const workingHours = Number((netSec / 3600).toFixed(1));
 
         return {
           employee_name: r.employee_name,
-          performance_score: performance,
-          attendance_score: attendance,
-          productivity: productivity,
-          working_hours: Number(workingHours.toFixed(1)),
-          loans_processed: submitted
+          loans_disbursed: disbursed,
+          loans_processed: submitted,
+          customers_added: customers,
+          present_days: present,
+          working_hours: workingHours,
+          // Uncalibrated mathematical scoring model is explicitly null (renders "Not configured")
+          performance_score: null,
+          productivity: null,
+          attendance_score: null
         };
       });
 
-      // Sort by performance descending
-      list.sort((a, b) => b.performance_score - a.performance_score);
+      // Sort by verified activity: loans disbursed descending, then submitted, then present days
+      list.sort((a, b) => {
+        if (b.loans_disbursed !== a.loans_disbursed) return b.loans_disbursed - a.loans_disbursed;
+        if (b.loans_processed !== a.loans_processed) return b.loans_processed - a.loans_processed;
+        return b.present_days - a.present_days;
+      });
 
-      // Assign Rank and Badges
       list = list.map((item, idx) => {
         let badge = '';
         if (idx === 0) badge = 'Gold';
@@ -980,9 +1287,6 @@ const aprController = {
   // ── 10. Live Break Monitoring ──────────────────────────────────
   async getLiveBreaks(req, res) {
     try {
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-
       const [rows] = await db.query(`
         SELECT 
           employee_id,
@@ -994,9 +1298,8 @@ const aprController = {
           status,
           custom_reason AS remarks
         FROM break_records
-        WHERE start_time >= ?
-        ORDER BY start_time DESC`,
-        [todayStart]
+        WHERE DATE(start_time) = CURDATE()
+        ORDER BY start_time DESC`
       );
 
       const result = rows.map(r => {
@@ -1004,7 +1307,6 @@ const aprController = {
         if (r.duration) {
           durationMins = Math.round(r.duration / 60);
         } else {
-          // In progress break
           const elapsedSec = Math.floor((Date.now() - new Date(r.start_time).getTime()) / 1000);
           durationMins = Math.round(Math.max(0, elapsedSec) / 60);
         }
@@ -1017,7 +1319,7 @@ const aprController = {
           end_time: r.end_time,
           duration: durationMins,
           status: r.status,
-          remarks: r.remarks || 'N/A'
+          remarks: r.remarks || '—'
         };
       });
 
@@ -1032,44 +1334,48 @@ const aprController = {
   async getEmployeeDashboard(req, res) {
     try {
       const employeeId = req.user.id;
-      // Precise midnight in Asia/Kolkata timezone
-      const istYMD = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
-      const todayStart = new Date(`${istYMD}T00:00:00+05:30`);
+      const todayStr = getTodayISTString();
 
-      // Current Status from Users table
+      // Refresh activity timestamp on dashboard poll
+      await db.query('UPDATE users SET last_active_at = NOW() WHERE id = ?', [employeeId]).catch(() => {});
+
       const [[user]] = await db.query('SELECT current_status, last_active_at FROM users WHERE id = ? LIMIT 1', [employeeId]);
       if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
 
-      // Find active attendance session
+      // Find active attendance session from today
       const [[activeSession]] = await db.query(
-        'SELECT login_time FROM attendance_logs WHERE employee_id = ? AND session_status = "Active Session" AND logout_time IS NULL LIMIT 1',
+        'SELECT login_time FROM attendance_logs WHERE employee_id = ? AND session_status = "Active Session" AND logout_time IS NULL AND DATE(login_time) = CURDATE() ORDER BY id DESC LIMIT 1',
         [employeeId]
       );
-      
-      const loginTime = activeSession ? activeSession.login_time : null;
-      let sessionDuration = 0; // in minutes
-      if (loginTime) {
-        sessionDuration = Math.max(0, Math.floor((Date.now() - new Date(loginTime).getTime()) / 60000));
-      }
 
-      // Today's gross session seconds and first login time
+      // Today's gross session seconds and initial clock-in of the day
       const [[workingSecsRes]] = await db.query(`
         SELECT 
-          SUM(CASE 
-            WHEN logout_time IS NOT NULL THEN TIMESTAMPDIFF(SECOND, login_time, logout_time)
-            ELSE TIMESTAMPDIFF(SECOND, login_time, NOW())
-          END) AS total_seconds,
+          SUM(
+            CASE 
+              WHEN logout_time IS NOT NULL 
+                THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, login_time, logout_time), 12 * 3600))
+              ELSE 
+                GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, login_time, NOW()), 12 * 3600))
+            END
+          ) AS total_seconds,
           MIN(login_time) AS first_login_today
         FROM attendance_logs 
-        WHERE employee_id = ? AND login_time >= ?`,
-        [employeeId, todayStart]
+        WHERE employee_id = ? AND DATE(login_time) = CURDATE()`,
+        [employeeId]
       );
       const grossWorkingSeconds = parseInt(workingSecsRes?.total_seconds, 10) || 0;
+      const initialClockIn = workingSecsRes?.first_login_today || (activeSession ? activeSession.login_time : null);
+
+      let sessionDuration = 0;
+      if (initialClockIn && activeSession) {
+        sessionDuration = Math.min(12 * 60, Math.max(0, Math.floor((Date.now() - new Date(initialClockIn).getTime()) / 60000)));
+      }
 
       // Today's Total Break Time & Current Break Status
       const [todayBreaks] = await db.query(
-        'SELECT * FROM break_records WHERE employee_id = ? AND start_time >= ? ORDER BY start_time ASC',
-        [employeeId, todayStart]
+        'SELECT * FROM break_records WHERE employee_id = ? AND DATE(start_time) = CURDATE() ORDER BY start_time ASC',
+        [employeeId]
       );
 
       let totalBreakSec = 0;
@@ -1113,13 +1419,15 @@ const aprController = {
         success: true,
         data: {
           currentStatus,
-          loginTime: loginTime || workingSecsRes?.first_login_today || null,
+          loginTime: initialClockIn,
+          firstLoginTime: initialClockIn,
+          activeSessionLoginTime: activeSession ? activeSession.login_time : null,
           hasActiveSession: Boolean(activeSession),
           sessionDuration,
           totalWorkingHours,
           totalWorkingSeconds: netWorkingSeconds,
           grossWorkingSeconds,
-          totalBreakTime: Math.round(totalBreakSec / 60), // in minutes
+          totalBreakTime: Math.round(totalBreakSec / 60),
           totalBreakSeconds: totalBreakSec,
           currentBreakStatus: activeBreak ? 'On Break' : (todayBreaks.length > 0 ? 'Break Completed' : 'Working'),
           lastBreakTaken: lastBreakStr,
@@ -1142,15 +1450,14 @@ const aprController = {
   async getEmployeeBreakHistory(req, res) {
     try {
       const employeeId = req.user.id;
-      await cleanupOldCompletedBreakRecords(employeeId);
 
       const [rows] = await db.query(`
         SELECT 
           id,
           DATE(start_time) AS date,
           break_type,
-          start_time AS start_time,
-          end_time AS end_time,
+          start_time,
+          end_time,
           duration,
           custom_reason AS remarks
         FROM break_records
@@ -1189,6 +1496,110 @@ const aprController = {
     } catch (err) {
       console.error('[APR EmployeeBreakHistory Error]:', err.message);
       return res.status(500).json({ success: false, message: 'Failed to load break history.' });
+    }
+  },
+
+  // ── 13. Employee Attendance & Working Hours History ─────────────
+  async getEmployeeAttendanceHistory(req, res) {
+    try {
+      const employeeId = req.user.id;
+      const { dateRange, startDate, endDate } = req.query;
+      const { dateFrom, dateTo } = resolveDateRange(dateRange, startDate, endDate);
+
+      // Aggregated daily attendance summary for this employee
+      const [rows] = await db.query(`
+        SELECT
+          DATE(al.login_time) AS work_date,
+          MIN(al.login_time) AS first_login,
+          MAX(al.logout_time) AS last_logout,
+          COUNT(al.id) AS total_sessions,
+          SUM(
+            CASE 
+              WHEN al.logout_time IS NOT NULL 
+                THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, al.logout_time), 12 * 3600))
+              WHEN DATE(al.login_time) = CURDATE()
+                THEN GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, NOW()), 12 * 3600))
+              ELSE 
+                GREATEST(0, LEAST(TIMESTAMPDIFF(SECOND, al.login_time, COALESCE(al.logout_time, al.login_time)), 12 * 3600))
+            END
+          ) AS gross_seconds,
+          SUM(CASE WHEN al.logout_time IS NULL AND al.session_status = 'Active Session' THEN 1 ELSE 0 END) AS active_sessions_count
+        FROM attendance_logs al
+        WHERE al.employee_id = ?
+          AND DATE(al.login_time) BETWEEN ? AND ?
+        GROUP BY DATE(al.login_time)
+        ORDER BY work_date DESC`,
+        [employeeId, dateFrom, dateTo]
+      );
+
+      // Query breaks for this employee in the same date range
+      const [breakRows] = await db.query(`
+        SELECT 
+          DATE(start_time) AS work_date,
+          COUNT(*) AS total_breaks,
+          COALESCE(SUM(duration), 0) AS break_seconds
+        FROM break_records
+        WHERE employee_id = ?
+          AND DATE(start_time) BETWEEN ? AND ?
+        GROUP BY DATE(start_time)`,
+        [employeeId, dateFrom, dateTo]
+      );
+
+      const breaksByDate = {};
+      breakRows.forEach(b => {
+        breaksByDate[String(b.work_date)] = b;
+      });
+
+      const STANDARD_HOURS = 8;
+      const result = rows.map(r => {
+        const b = breaksByDate[String(r.work_date)] || { total_breaks: 0, break_seconds: 0 };
+        const grossSec = parseInt(r.gross_seconds, 10) || 0;
+        const breakSec = parseInt(b.break_seconds, 10) || 0;
+        const netSec = Math.max(0, grossSec - breakSec);
+        const workingHours = Number((netSec / 3600).toFixed(2));
+        const overtime = Math.max(0, Number((workingHours - STANDARD_HOURS).toFixed(2)));
+
+        let status = 'Completed';
+        if (r.active_sessions_count > 0) {
+          status = 'Working';
+        } else if (r.first_login) {
+          const firstLogin = new Date(r.first_login);
+          const loginHr = firstLogin.getHours() + firstLogin.getMinutes() / 60;
+          status = loginHr > (9 + 20 / 60) ? 'Late' : 'Present';
+        }
+
+        return {
+          work_date: r.work_date,
+          first_login: r.first_login,
+          last_logout: r.last_logout,
+          total_sessions: r.total_sessions,
+          gross_seconds: grossSec,
+          break_seconds: breakSec,
+          total_breaks: b.total_breaks,
+          net_seconds: netSec,
+          working_hours: workingHours,
+          working_hours_human: formatHoursHuman(workingHours),
+          overtime,
+          overtime_human: formatOvertimeHuman(overtime),
+          break_human: formatDurationHuman(breakSec),
+          status
+        };
+      });
+
+      return res.json({
+        success: true,
+        data: result,
+        summary: {
+          totalDays: result.length,
+          totalWorkingHours: Number(result.reduce((acc, cur) => acc + cur.working_hours, 0).toFixed(2)),
+          totalOvertimeHours: Number(result.reduce((acc, cur) => acc + cur.overtime, 0).toFixed(2)),
+          dateFrom,
+          dateTo
+        }
+      });
+    } catch (err) {
+      console.error('[APR EmployeeAttendanceHistory Error]:', err.message);
+      return res.status(500).json({ success: false, message: 'Failed to load attendance history.' });
     }
   }
 };

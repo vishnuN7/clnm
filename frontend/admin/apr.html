@@ -907,6 +907,9 @@
         <a href="/admin/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>Loan Applications</span></a>
         <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
         <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>Data Excel Document</span></a>
+        <a href="/admin/banking-partner-portal.html" class="nav-item"><span class="nav-icon"><i class="fas fa-landmark" aria-hidden="true"></i></span> <span>Banking Partner Portal</span></a>
+        <a href="/admin/private-communication.html" class="nav-item"><span class="nav-icon"><i class="fas fa-comments" aria-hidden="true"></i></span> <span>Private Communication</span></a>
+          <a href="/admin/login-activity.html" class="nav-item"><span class="nav-icon"><i class="fas fa-location-dot" aria-hidden="true"></i></span> <span>Login Activity</span></a>
         <a href="/admin/apr.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
       </div>
     </nav>
@@ -954,14 +957,14 @@
           <div class="apr-filter-group">
             <label class="apr-filter-label"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Timeline</label>
             <div class="apr-timeline-segmented" role="group" aria-label="Timeline Filter">
-              <button type="button" class="apr-segmented-btn" data-range="today" onclick="selectTimelineRange('today')">Today</button>
+              <button type="button" class="apr-segmented-btn active" data-range="today" onclick="selectTimelineRange('today')">Today</button>
               <button type="button" class="apr-segmented-btn" data-range="yesterday" onclick="selectTimelineRange('yesterday')">Yesterday</button>
               <button type="button" class="apr-segmented-btn" data-range="last7" onclick="selectTimelineRange('last7')">Last 7 Days</button>
-              <button type="button" class="apr-segmented-btn active" data-range="last30" onclick="selectTimelineRange('last30')">Last 30 Days</button>
+              <button type="button" class="apr-segmented-btn" data-range="last30" onclick="selectTimelineRange('last30')">Last 30 Days</button>
               <button type="button" class="apr-segmented-btn" data-range="thisMonth" onclick="selectTimelineRange('thisMonth')">This Month</button>
               <button type="button" class="apr-segmented-btn" data-range="custom" onclick="selectTimelineRange('custom')">Custom Date Range</button>
             </div>
-            <input type="hidden" id="filter-range" value="last30" />
+            <input type="hidden" id="filter-range" value="today" />
           </div>
           
           <div class="apr-filter-group" id="custom-date-container" style="display:none; flex-direction:row; gap:10px;">
@@ -1341,6 +1344,7 @@
 
 <script src="/js/runtime-config.js?v=20260523a"></script>
 <script src="/js/api.js?v=20261008"></script>
+<script src="/js/employee-notifications.js?v=20261111"></script>
 <script>
   // ── Pagination & State Management ──
   const PAGE_SIZE = 20;
@@ -1449,7 +1453,7 @@
   }
 
   function resetFilters() {
-    selectTimelineRange('last30');
+    selectTimelineRange('today');
     const startInput = document.getElementById('filter-start');
     const endInput = document.getElementById('filter-end');
     if (startInput) startInput.value = '';
@@ -1460,7 +1464,7 @@
   }
 
   function getQueryString() {
-    const range = document.getElementById('filter-range')?.value || 'last30';
+    const range = document.getElementById('filter-range')?.value || 'today';
     const search = document.getElementById('filter-search')?.value.trim() || '';
     
     let query = `?dateRange=${encodeURIComponent(range)}`;
@@ -1519,11 +1523,11 @@
       } else if (currentTab === 'tab-history') {
         await loadLoginHistory(query);
       } else if (currentTab === 'tab-analytics') {
-        await loadAnalytics();
+        await loadAnalytics(query);
       } else if (currentTab === 'tab-performance') {
         await loadPerformanceScorecard(query);
       } else if (currentTab === 'tab-leaderboard') {
-        await loadLeaderboard();
+        await loadLeaderboard(query);
       } else if (currentTab === 'tab-breaks') {
         await loadLiveBreaks();
       }
@@ -1558,6 +1562,25 @@
         }
       });
     }
+  }
+
+  // ── Production-Grade Duration & Overtime Human Formatters ──
+  function formatHoursHuman(hoursFloat) {
+    const h = parseFloat(hoursFloat) || 0;
+    if (h <= 0) return '0m';
+    const totalSec = Math.round(h * 3600);
+    const hrs = Math.floor(totalSec / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    if (hrs === 0 && mins === 0) return totalSec > 0 ? `${totalSec}s` : '0m';
+    if (hrs === 0) return `${mins}m`;
+    if (mins === 0) return `${hrs}h`;
+    return `${hrs}h ${mins}m`;
+  }
+
+  function formatOvertimeHuman(otFloat) {
+    const ot = parseFloat(otFloat) || 0;
+    if (ot <= 0) return '<span style="color:var(--text-muted);font-size:12px;">No overtime</span>';
+    return `<span style="color:#2563eb;font-weight:700;">+${formatHoursHuman(ot)}</span>`;
   }
 
   // ── Reusable 20-Record Pagination Builder ──
@@ -1640,9 +1663,9 @@
     const attRate = Math.min(100, Math.max(0, Number(d.attendancePercentage) || 0));
 
     const attendanceKPIs = [
-      { title: 'Total Employees', val: d.totalEmployees, sub: 'Active staff members', color: 'blue', icon: 'fas fa-users' },
+      { title: 'Total Employees', val: d.totalEmployees, sub: 'Staff members (excl. Admins)', color: 'blue', icon: 'fas fa-users' },
       { title: 'Present in Period', val: d.presentToday, sub: 'At least 1 verified session', color: 'green', icon: 'fas fa-user-check' },
-      { title: 'Absent / Inactive', val: d.absentToday, sub: 'No logins recorded', color: 'rose', icon: 'fas fa-user-xmark' },
+      { title: 'Absent / Inactive', val: d.absentToday, sub: 'No logins in selected period', color: 'rose', icon: 'fas fa-user-xmark' },
       { title: 'Attendance Rate', val: `${attRate}%`, sub: 'Present vs Total staff', color: 'green', icon: 'fas fa-chart-line' }
     ];
 
@@ -1660,7 +1683,7 @@
       { title: 'Avg Last Logout', val: d.averageLogoutTime || '—', sub: 'Average end time', color: 'rose', icon: 'fas fa-business-time' },
       { title: 'Avg Working Hours', val: `${d.averageWorkingHours}h`, sub: 'Per present employee', color: 'green', icon: 'fas fa-hourglass-half' },
       { title: 'Total Hours Worked', val: `${d.totalWorkingHoursToday}h`, sub: 'Cumulative in period', color: 'purple', icon: 'fas fa-calculator' },
-      { title: 'Productivity Score', val: `${d.productivityScore}/100`, sub: 'Enterprise benchmark', color: 'purple', icon: 'fas fa-bullseye' }
+      { title: 'Productivity Score', val: d.productivityScore ? `${d.productivityScore}/100` : '<span style="font-size:14px;font-weight:600;color:var(--text-muted);">Not configured</span>', sub: d.productivityScore ? 'Enterprise benchmark' : 'Scoring model not configured', color: 'purple', icon: 'fas fa-bullseye' }
     ];
 
     const makeCardHtml = k => `
@@ -1700,7 +1723,7 @@
       </div>
       <div class="score-card">
         <span class="score-title" style="color:#2563eb;"><i class="fas fa-fire" aria-hidden="true"></i> Overtime</span>
-        <div class="score-val" style="color:#2563eb;">${d.overtime} <span style="font-size:12px;font-weight:600;">hrs</span></div>
+        <div class="score-val">${d.overtime > 0 ? `<span style="color:#2563eb;font-weight:700;">+${formatHoursHuman(d.overtime)}</span>` : '<span style="color:var(--text-muted);font-size:14px;font-weight:600;">No overtime</span>'}</div>
       </div>
     `;
   }
@@ -1865,8 +1888,8 @@
         <td>${fmtT(r.login_time)}</td>
         <td>${fmtT(r.logout_time)}</td>
         <td><span class="status-badge online" style="padding:2px 6px;">${r.total_sessions}</span></td>
-        <td><strong>${r.total_working_hours}</strong> hrs</td>
-        <td>${r.overtime > 0 ? `<span style="color:#2563eb;font-weight:700;">+${r.overtime}h</span>` : '0.00'}</td>
+        <td><strong>${formatHoursHuman(r.total_working_hours)}</strong> <span style="font-size:11px;color:var(--text-muted);">(${r.total_working_hours}h)</span></td>
+        <td>${formatOvertimeHuman(r.overtime)}</td>
         <td>${r.break_duration} mins</td>
         <td><span class="status-badge ${r.late_login === 'Yes' ? 'logged-out' : 'online'}">${r.late_login === 'Yes' ? 'Late' : 'On Time'}</span></td>
         <td><span class="status-badge ${r.early_logout === 'Yes' ? 'on-break' : 'online'}">${r.early_logout === 'Yes' ? 'Early' : 'Regular'}</span></td>
@@ -1983,7 +2006,7 @@
         <td>${fmtD(r.login_date)}</td>
         <td>${fmtT(r.login_time)}</td>
         <td>${fmtT(r.logout_time)}</td>
-        <td><strong>${r.session_duration}</strong> hrs</td>
+        <td><strong>${r.session_duration_human || formatHoursHuman(r.session_duration)}</strong> <span style="font-size:11px;color:var(--text-muted);">(${r.session_duration}h)</span></td>
         <td><code style="font-size:11px;background:var(--bg-secondary);padding:2px 6px;border-radius:4px;">${r.ip_address || '—'}</code></td>
         <td>${escapeHtml(r.browser || '—')}</td>
         <td>${escapeHtml(r.os || '—')} (${escapeHtml(r.device || 'Desktop')})</td>
@@ -1995,8 +2018,9 @@
   }
 
   // ── 5. Visual Analytics Charts Loader ──
-  async function loadAnalytics() {
-    const res = await api.get('/apr/admin/analytics');
+  async function loadAnalytics(query = '') {
+    const q = query || getQueryString();
+    const res = await api.get('/apr/admin/analytics' + q);
     if (!res?.ok) return;
     const d = res.data.data;
 
@@ -2166,12 +2190,13 @@
         <td><strong>${r.conversion_rate}%</strong></td>
         <td>${r.avg_processing_time} hrs</td>
         <td>
+          ${r.productivity_score !== null && r.productivity_score !== undefined ? `
           <div class="apr-score-cell">
             <div class="score-progress-bar">
               <div class="score-progress-val" style="width:${r.productivity_score}%; background:#2563eb;"></div>
             </div>
             <span>${r.productivity_score}</span>
-          </div>
+          </div>` : `<span class="badge-pw-status badge-pw-none" style="font-size:11px;padding:3px 8px;border-radius:12px;background:var(--bg-secondary);color:var(--text-muted);">Not configured</span>`}
         </td>
         <td>
           <div class="apr-score-cell">
@@ -2188,8 +2213,9 @@
   }
 
   // ── 7. Monthly Leaderboard Loader & 20-Record Pagination (Global Rank Never Restarts) ──
-  async function loadLeaderboard() {
-    const res = await api.get('/apr/admin/leaderboard');
+  async function loadLeaderboard(query = '') {
+    const q = query || getQueryString();
+    const res = await api.get('/apr/admin/leaderboard' + q);
     const tbody = document.getElementById('leaderboard-tbody');
 
     if (!res?.ok) {
@@ -2253,17 +2279,18 @@
           <td><span class="badge-rank ${badgeClass}">#${globalRank}</span></td>
           <td><strong>${escapeHtml(r.employee_name)}</strong></td>
           <td>
+            ${r.performance_score !== null && r.performance_score !== undefined ? `
             <div style="display:flex;align-items:center;gap:8px;">
               <div class="score-progress-bar" style="width:75px;margin:0;">
                 <div class="score-progress-val" style="width:${r.performance_score}%; background:linear-gradient(90deg, #7c3aed, #2563eb);"></div>
               </div>
               <span><strong>${r.performance_score}</strong>/100</span>
-            </div>
+            </div>` : '<span style="color:var(--text-muted);font-size:12px;">Not configured</span>'}
           </td>
-          <td>${r.attendance_score}%</td>
-          <td>${r.productivity}%</td>
-          <td><strong>${r.working_hours}</strong> hrs</td>
-          <td>${r.loans_processed} loans</td>
+          <td>${r.attendance_score !== null && r.attendance_score !== undefined ? `${r.attendance_score}%` : `<strong>${r.present_days || 0}</strong> days present`}</td>
+          <td>${r.productivity !== null && r.productivity !== undefined ? `${r.productivity}%` : '<span style="color:var(--text-muted);font-size:12px;">Not configured</span>'}</td>
+          <td><strong>${formatHoursHuman(r.working_hours)}</strong> <span style="font-size:11px;color:var(--text-muted);">(${r.working_hours}h)</span></td>
+          <td><strong>${r.loans_processed || 0}</strong> loans ${r.loans_disbursed ? `<span style="font-size:11px;color:#16a34a;">(${r.loans_disbursed} disbursed)</span>` : ''}</td>
           <td><span class="status-badge ${globalRank <= 3 ? 'online' : 'offline'}" style="display:inline-flex;align-items:center;">${badgeHtml}</span></td>
         </tr>
       `;
@@ -2410,8 +2437,8 @@
             r.loans_disbursed,
             `${r.conversion_rate}%`,
             `${r.avg_processing_time} hrs`,
-            r.productivity_score,
-            r.attendance_score
+            r.productivity_score !== null && r.productivity_score !== undefined ? r.productivity_score : 'Not configured',
+            r.attendance_score !== null && r.attendance_score !== undefined ? `${r.attendance_score}%` : '—'
           ])
         };
       case 'leaderboard':
@@ -2428,11 +2455,11 @@
             return [
               rank,
               r.employee_name,
-              r.performance_score,
-              `${r.attendance_score}%`,
-              `${r.productivity}%`,
-              `${r.working_hours} hrs`,
-              r.loans_processed,
+              r.performance_score !== null ? r.performance_score : 'Not configured',
+              r.attendance_score !== null ? `${r.attendance_score}%` : `${r.present_days || 0} days present`,
+              r.productivity !== null ? `${r.productivity}%` : 'Not configured',
+              `${r.working_hours} hrs (${formatHoursHuman(r.working_hours)})`,
+              r.loans_processed || 0,
               r.badge || tier
             ];
           })

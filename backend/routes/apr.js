@@ -18,5 +18,6 @@ router.get('/admin/live-breaks', requireAdmin, aprController.getLiveBreaks);
 // ── Employee APR Endpoints ───────────────────────────────────────
 router.get('/employee/dashboard', requireEmployee, aprController.getEmployeeDashboard);
 router.get('/employee/break/history', requireEmployee, aprController.getEmployeeBreakHistory);
+router.get('/employee/attendance/history', requireEmployee, aprController.getEmployeeAttendanceHistory);
 
 module.exports = router;

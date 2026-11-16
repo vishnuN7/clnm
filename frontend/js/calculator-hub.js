@@ -16,20 +16,19 @@
   var LENDER_PROFILES = {
     default: {
       id: 'default',
-      key: '',
+      key: 'default',
       name: 'DIXIT LENDING SOLUTION',
       shortName: 'Dixit Lending Solution',
-      selectorLabel: 'NBFC Default',
-      primaryColor: [15, 39, 71],       // #0F2747 Dixit Navy
-      secondaryColor: [15, 139, 113],   // #0F8B71 Forest Teal
-      accentColor: [47, 111, 237],      // #2F6FED Royal Blue
-      lightBg: [248, 250, 253],
-      borderStroke: [217, 227, 239],
-      hexPrimary: '#0f2747',
-      hexSecondary: '#0f8b71',
-      hexAccent: '#2f6fed',
-      hexLightBg: '#f8fafc',
-      hexBorder: '#d9e3ef',
+      primaryColor: [26, 54, 93],        // #1A365D Corporate Navy
+      secondaryColor: [49, 151, 149],    // #319795 Emerald/Teal Accent Stripe
+      accentColor: [47, 111, 237],       // #2F6FED Royal Blue Accent
+      lightBg: [248, 250, 253],          // #F8FAFD Soft Tint Background
+      borderStroke: [217, 227, 239],     // #D9E3EF Soft Border
+      hexPrimary: '#1A365D',
+      hexSecondary: '#319795',
+      hexAccent: '#2F6FED',
+      hexLightBg: '#F8FAFD',
+      hexBorder: '#D9E3EF',
       fileSlug: 'Dixit_Lending'
     },
     icici_bank: {
@@ -37,15 +36,15 @@
       key: 'icici_bank',
       name: 'ICICI BANK',
       shortName: 'ICICI Bank',
-      primaryColor: [176, 42, 48],      // #B02A30 ICICI Maroon
-      secondaryColor: [243, 112, 33],   // #F37021 ICICI Orange
-      accentColor: [5, 60, 109],        // #053C6D Deep Corporate Blue Accent
-      lightBg: [255, 248, 245],
+      primaryColor: [227, 107, 30],      // #E36B1E Official ICICI Orange
+      secondaryColor: [176, 42, 48],     // #B02A30 Official ICICI Maroon Accent
+      accentColor: [5, 60, 109],         // #053C6D Deep Corporate Blue Accent
+      lightBg: [255, 249, 245],
       borderStroke: [252, 220, 212],
-      hexPrimary: '#B02A30',
-      hexSecondary: '#F37021',
+      hexPrimary: '#E36B1E',
+      hexSecondary: '#B02A30',
       hexAccent: '#053C6D',
-      hexLightBg: '#FFF8F5',
+      hexLightBg: '#FFF9F5',
       hexBorder: '#FCDCD4',
       fileSlug: 'ICICI_Bank'
     },
@@ -71,14 +70,14 @@
       key: 'incred_finance',
       name: 'InCred Finance',
       shortName: 'InCred Finance',
-      primaryColor: [230, 81, 0],       // #E65100 Vivid InCred Deep Orange
-      secondaryColor: [35, 44, 61],     // #232C3D Dark Slate
-      accentColor: [255, 102, 0],       // #FF6600 Bright Orange
-      lightBg: [255, 249, 245],
-      borderStroke: [255, 224, 204],
-      hexPrimary: '#E65100',
-      hexSecondary: '#232C3D',
-      hexAccent: '#FF6600',
+      primaryColor: [255, 102, 0],       // #FF6600 InCred Vibrant Fintech Orange Header
+      secondaryColor: [14, 72, 155],     // #0E489B InCred Deep Corporate Blue Accent Stripe
+      accentColor: [14, 72, 155],        // #0E489B InCred Corporate Blue Accent
+      lightBg: [255, 249, 245],          // #FFF9F5 Soft Warm Ivory Card Background
+      borderStroke: [255, 224, 204],     // #FFE0CC Soft Warm Peach Border
+      hexPrimary: '#FF6600',
+      hexSecondary: '#0E489B',
+      hexAccent: '#0E489B',
       hexLightBg: '#FFF9F5',
       hexBorder: '#FFE0CC',
       fileSlug: 'InCred_Finance'
@@ -89,16 +88,118 @@
       name: 'IDFC FIRST BANK',
       shortName: 'IDFC FIRST Bank',
       primaryColor: [156, 29, 38],      // #9C1D26 IDFC Crimson Maroon
-      secondaryColor: [255, 199, 44],   // #FFC72C IDFC Gold
-      accentColor: [102, 16, 22],       // #661016 Deep Wine
+      secondaryColor: [120, 20, 27],     // #78141B Tonal Deep Wine Accent (No Yellow)
+      accentColor: [102, 16, 22],        // #661016 Deep Wine
       lightBg: [253, 248, 248],
       borderStroke: [244, 211, 213],
       hexPrimary: '#9C1D26',
-      hexSecondary: '#FFC72C',
+      hexSecondary: '#78141B',
       hexAccent: '#661016',
       hexLightBg: '#FDF8F8',
       hexBorder: '#F4D3D5',
       fileSlug: 'IDFC_FIRST_Bank'
+    },
+        state_bank_of_india: {
+      id: 'state_bank_of_india',
+      key: 'state_bank_of_india',
+      name: 'STATE BANK OF INDIA',
+      shortName: 'State Bank of India',
+      primaryColor: [0, 51, 102],
+      secondaryColor: [47, 169, 225],
+      accentColor: [47, 169, 225],
+      lightBg: [244, 248, 253],
+      borderStroke: [210, 225, 240],
+      hexPrimary: '#003366',
+      hexSecondary: '#2FA9E1',
+      hexAccent: '#2FA9E1',
+      hexLightBg: '#F4F8FD',
+      hexBorder: '#D2E1F0',
+      fileSlug: 'State_Bank_of_India'
+    },
+    axis_bank: {
+      id: 'axis_bank',
+      key: 'axis_bank',
+      name: 'AXIS BANK LIMITED',
+      shortName: 'Axis Bank',
+      primaryColor: [151, 18, 74],
+      secondaryColor: [174, 21, 85],
+      accentColor: [174, 21, 85],
+      lightBg: [253, 248, 250],
+      borderStroke: [242, 215, 225],
+      hexPrimary: '#97124A',
+      hexSecondary: '#AE1555',
+      hexAccent: '#AE1555',
+      hexLightBg: '#FDF8FA',
+      hexBorder: '#F2D7E1',
+      fileSlug: 'Axis_Bank'
+    },
+    bajaj_finance: {
+      id: 'bajaj_finance',
+      key: 'bajaj_finance',
+      name: 'BAJAJ FINANCE LIMITED',
+      shortName: 'Bajaj Finance',
+      primaryColor: [0, 85, 165],
+      secondaryColor: [0, 114, 206],
+      accentColor: [0, 114, 206],
+      lightBg: [245, 249, 253],
+      borderStroke: [215, 230, 245],
+      hexPrimary: '#0055A5',
+      hexSecondary: '#0072CE',
+      hexAccent: '#0072CE',
+      hexLightBg: '#F5F9FD',
+      hexBorder: '#D7E6F5',
+      fileSlug: 'Bajaj_Finance'
+    },
+    muthoot_finance: {
+      id: 'muthoot_finance',
+      key: 'muthoot_finance',
+      name: 'MUTHOOT FINANCE LIMITED',
+      shortName: 'Muthoot Finance',
+      primaryColor: [217, 37, 42],
+      secondaryColor: [255, 194, 14],
+      accentColor: [255, 194, 14],
+      lightBg: [254, 246, 246],
+      borderStroke: [247, 211, 212],
+      hexPrimary: '#D9252A',
+      hexSecondary: '#FFC20E',
+      hexAccent: '#FFC20E',
+      hexLightBg: '#FEF6F6',
+      hexBorder: '#F7D3D4',
+      fileSlug: 'Muthoot_Finance'
+    },
+    tata_capital: {
+      id: 'tata_capital',
+      key: 'tata_capital',
+      name: 'TATA CAPITAL LIMITED',
+      shortName: 'Tata Capital',
+      primaryColor: [0, 82, 136],
+      secondaryColor: [0, 160, 227],
+      accentColor: [0, 160, 227],
+      lightBg: [245, 249, 253],
+      borderStroke: [215, 230, 245],
+      hexPrimary: '#005288',
+      hexSecondary: '#00A0E3',
+      hexAccent: '#00A0E3',
+      hexLightBg: '#F5F9FD',
+      hexBorder: '#D7E6F5',
+      fileSlug: 'Tata_Capital'
+    },
+    indusind_bank: {
+      id: 'indusind_bank',
+      key: 'indusind_bank',
+      name: 'INDUSIND BANK LIMITED',
+      shortName: 'IndusInd Bank',
+      primaryColor: [132, 34, 35],      // #842223 Official IndusInd Auburn
+      secondaryColor: [197, 155, 39],   // #C59B27 IndusInd Gold Accent Stripe
+      accentColor: [197, 155, 39],      // #C59B27 Gold Accent
+      lightBg: [253, 248, 248],         // #FDF8F8 Soft Warm Tint Background
+      borderStroke: [242, 213, 213],    // #F2D5D5 Soft Tint Border
+      hexPrimary: '#842223',
+      hexSecondary: '#C59B27',
+      hexAccent: '#C59B27',
+      hexLightBg: '#FDF8F8',
+      hexBorder: '#F2D5D5',
+      fileSlug: 'IndusInd_Bank'
     }
   };
 
@@ -127,18 +228,26 @@
     'Other': { name: 'OTHER BANK / NBFC', shortName: 'Other Bank / NBFC', slug: 'Other_Lender' }
   };
 
-  // Merge external high-res asset bundle if present
+  // Merge external high-res asset bundle if present (Single Source of Truth)
   function enrichProfileWithAssets(p) {
     if (!p) return p;
     var assets = (typeof window !== 'undefined' && window.LENDER_ASSETS) ? window.LENDER_ASSETS : {};
     var a = assets[p.id] || assets[p.key] || assets[p.fileSlug] || assets.default || {};
-    p.logoUrl = p.logoUrl || a.logoUrl || '/icons/lenders/dixit-logo.png';
-    p.faviconUrl = p.faviconUrl || a.faviconUrl || '/icons/lenders/dixit-favicon.png';
-    p.logoBase64 = p.logoBase64 || a.logoBase64 || '';
-    p.faviconBase64 = p.faviconBase64 || a.faviconBase64 || '';
-    p.logoWidth = p.logoWidth || a.logoWidth || 100;
-    p.logoHeight = p.logoHeight || a.logoHeight || 100;
-    p.logoAspect = p.logoAspect || a.logoAspect || 1;
+    p.logoUrl = a.logoUrl || p.logoUrl || (p.id === 'default' ? '/icons/lenders/dixit-logo.png' : '');
+    p.faviconUrl = a.faviconUrl || p.faviconUrl || (p.id === 'default' ? '/icons/lenders/dixit-favicon.png' : '');
+    p.logoBase64 = a.logoBase64 || p.logoBase64 || '';
+    p.faviconBase64 = a.faviconBase64 || p.faviconBase64 || '';
+    p.logoWidth = a.logoWidth || p.logoWidth || 100;
+    p.logoHeight = a.logoHeight || p.logoHeight || 100;
+    p.logoAspect = a.logoAspect || p.logoAspect || 1;
+    if (a.primaryColor) p.primaryColor = a.primaryColor;
+    if (a.secondaryColor) p.secondaryColor = a.secondaryColor;
+    if (a.borderStroke) p.borderStroke = a.borderStroke;
+    if (a.lightBg) p.lightBg = a.lightBg;
+    if (a.hexPrimary) p.hexPrimary = a.hexPrimary;
+    if (a.hexSecondary) p.hexSecondary = a.hexSecondary;
+    if (a.hexBorder) p.hexBorder = a.hexBorder;
+    if (a.hexLightBg) p.hexLightBg = a.hexLightBg;
     return p;
   }
 
@@ -409,6 +518,22 @@
       tableBadgeIcon.style.color = lender.hexPrimary;
     }
     if (tableBadgeEl) {
+      var miniLogo = tableBadgeEl.querySelector('.lender-table-mini-logo');
+      var iconSrc = flatSelectedLender ? (lender.faviconBase64 || lender.faviconUrl) : '';
+      if (iconSrc) {
+        if (!miniLogo) {
+          miniLogo = document.createElement('img');
+          miniLogo.className = 'lender-table-mini-logo';
+          miniLogo.style.cssText = 'width:16px;height:16px;border-radius:3px;margin-right:5px;object-fit:contain;vertical-align:middle;';
+          tableBadgeEl.insertBefore(miniLogo, tableBadgeText);
+        }
+        miniLogo.src = iconSrc;
+        miniLogo.style.display = 'inline-block';
+        if (tableBadgeIcon) tableBadgeIcon.style.display = 'none';
+      } else {
+        if (miniLogo) miniLogo.style.display = 'none';
+        if (tableBadgeIcon) tableBadgeIcon.style.display = 'inline-block';
+      }
       if (flatSelectedLender) {
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         tableBadgeEl.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.14)' : lender.hexBorder;
@@ -462,7 +587,7 @@
     var rows = buildFlatScheduleRows(d);
     var principal = Math.round(d.principal);
     var refCode = 'DLS-' + lender.fileSlug.toUpperCase() + '-' + principal;
-    var docTitle = lender.name + ' — Flat Rate Loan Repayment Schedule';
+    var formattedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
     var doc = new jsPDFLib.jsPDF('p', 'pt', 'a4');
     var fontName = 'helvetica';
@@ -477,165 +602,137 @@
       } catch (e) {}
     }
 
-    doc.setFillColor.apply(doc, lender.primaryColor);
-    doc.rect(0, 0, 595, 6, 'F');
-    doc.setFillColor.apply(doc, lender.secondaryColor);
-    doc.rect(0, 6, 595, 2, 'F');
+    var curSymbol = fontName === 'SegoeUI' ? '₹' : '₹';
+    var primaryBrand = lender.primaryColor || [15, 39, 71];
+    var textDark = [16, 32, 51];
+    var textMuted = [82, 97, 115];
+    var borderStroke = lender.borderStroke || [217, 227, 239];
+    var cardBg = lender.lightBg || [248, 250, 252];
 
-    var flatLogo = lender.faviconBase64 || lender.logoBase64;
-    var flatTitleX = 40;
-    if (flatLogo) {
-      try {
-        doc.addImage(flatLogo, 'PNG', 40, 20, 34, 34);
-        flatTitleX = 84;
-      } catch (e) {
-        console.warn('Flat PDF logo embedding error:', e);
-      }
+    doc.setProperties({
+      title: lender.name + ' - Flat Rate Loan Repayment Schedule',
+      subject: 'Repayment Schedule - Reference ' + refCode,
+      author: 'Dixit Lending Solution',
+      creator: 'Dixit Lending Solution CRM'
+    });
+
+    if (typeof window.renderLenderPdfHeader === 'function') {
+      window.renderLenderPdfHeader(
+        doc,
+        lender,
+        'FLAT RATE LOAN REPAYMENT SCHEDULE',
+        null,
+        refCode,
+        formattedDate,
+        'Flat Interest Rate',
+        fontName
+      );
     }
 
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor.apply(doc, lender.primaryColor);
-    doc.text(lender.name, flatTitleX, 36);
-
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(16, 32, 51);
-    doc.text('Flat Rate Loan Repayment Schedule', flatTitleX, 52);
-
-    doc.setFont(fontName, 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(82, 97, 115);
-    doc.text('Illustrative repayment schedule based on flat interest rate methodology', flatTitleX, 66);
+    // Flat Rate Summary Box
+    doc.setFillColor.apply(doc, cardBg);
+    doc.setDrawColor.apply(doc, borderStroke);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(40, 60, 515.28, 68, 4, 4, 'FD');
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(8.5);
-    doc.setTextColor(16, 32, 51);
-    doc.text('Reference: ' + refCode, 555, 42, { align: 'right' });
-    doc.setFont(fontName, 'normal');
-    doc.setTextColor(82, 97, 115);
-    doc.text('Generated: ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }), 555, 56, { align: 'right' });
+    doc.setTextColor.apply(doc, primaryBrand);
+    doc.text('LOAN FACILITY & FLAT REPAYMENT SUMMARY', 52, 72);
 
-    doc.setDrawColor.apply(doc, lender.borderStroke);
-    doc.setLineWidth(0.75);
-    doc.line(40, 84, 555, 84);
+    doc.setDrawColor.apply(doc, borderStroke);
+    doc.setLineWidth(0.4);
+    doc.line(52, 77, 543, 77);
 
-    doc.setFillColor.apply(doc, lender.lightBg);
-    doc.setDrawColor.apply(doc, lender.borderStroke);
-    doc.roundedRect(40, 94, 515, 78, 5, 5, 'FD');
+    // Left Column
+    doc.setFont(fontName, 'normal'); doc.setFontSize(8.5); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Principal Amount:', 52, 89);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(curSymbol + principal.toLocaleString('en-IN'), 160, 89);
 
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(9.5);
-    doc.setTextColor.apply(doc, lender.primaryColor);
-    doc.text('LOAN DETAILS & FLAT REPAYMENT SUMMARY', 52, 110);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Flat Interest Rate:', 52, 102);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(d.rateVal + '% p.a.', 160, 102);
 
-    doc.setFont(fontName, 'normal'); doc.setFontSize(8.5); doc.setTextColor(82, 97, 115);
-    doc.text('Principal Amount:', 52, 126);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(16, 32, 51);
-    doc.text('₹' + principal.toLocaleString('en-IN'), 150, 126);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Loan Tenure:', 52, 115);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(d.totalMonths + ' Months (' + d.tenureYears.toFixed(1) + ' Years)', 160, 115);
 
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Flat Interest Rate:', 52, 140);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(16, 32, 51);
-    doc.text(d.rateVal + '% p.a.', 150, 140);
+    // Right Column
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Monthly Payment:', 315, 89);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, primaryBrand);
+    doc.text(curSymbol + Math.round(d.monthlyPayment).toLocaleString('en-IN'), 435, 89);
 
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Loan Tenure:', 52, 154);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(16, 32, 51);
-    doc.text(d.totalMonths + ' Months (' + d.tenureYears.toFixed(1) + ' Years)', 150, 154);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Total Flat Interest:', 315, 102);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(curSymbol + Math.round(d.totalInterest).toLocaleString('en-IN'), 435, 102);
 
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Monthly Payment:', 320, 126);
-    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, lender.primaryColor);
-    doc.text('₹' + Math.round(d.monthlyPayment).toLocaleString('en-IN'), 430, 126);
-
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Total Flat Interest:', 320, 140);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(192, 38, 211);
-    doc.text('₹' + Math.round(d.totalInterest).toLocaleString('en-IN'), 430, 140);
-
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Total Repayment:', 320, 154);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(16, 32, 51);
-    doc.text('₹' + Math.round(d.totalAmount).toLocaleString('en-IN'), 430, 154);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Total Repayment Amount:', 315, 115);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(curSymbol + Math.round(d.totalAmount).toLocaleString('en-IN'), 435, 115);
 
     var tableBody = rows.map(function (r) {
       return [
-        'Month ' + r.period,
-        '₹' + Math.round(r.open).toLocaleString('en-IN'),
-        '₹' + Math.round(r.flatInt).toLocaleString('en-IN'),
-        '₹' + Math.round(r.prinComp).toLocaleString('en-IN'),
-        '₹' + Math.round(r.payment).toLocaleString('en-IN'),
-        '₹' + Math.round(r.rem).toLocaleString('en-IN')
+        r.period,
+        curSymbol + Math.round(r.open).toLocaleString('en-IN'),
+        curSymbol + Math.round(r.flatInt).toLocaleString('en-IN'),
+        curSymbol + Math.round(r.prinComp).toLocaleString('en-IN'),
+        curSymbol + Math.round(r.payment).toLocaleString('en-IN'),
+        curSymbol + Math.round(r.rem).toLocaleString('en-IN')
       ];
     });
 
     doc.autoTable({
-      head: [['Period', 'Opening Principal', 'Flat Interest', 'Principal Comp.', 'Monthly Payment', 'Remaining Principal']],
+      head: [['#', 'Opening Principal', 'Flat Interest', 'Principal Paid', 'Monthly EMI', 'Remaining Principal']],
       body: tableBody,
-      startY: 184,
+      startY: 136,
       showHead: 'everyPage',
       theme: 'plain',
       headStyles: {
-        fillColor: lender.primaryColor,
+        fillColor: primaryBrand,
         textColor: [255, 255, 255],
         fontStyle: 'bold',
+        fontSize: 8,
+        halign: 'left',
         font: fontName,
-        fontSize: 8.5
+        cellPadding: { top: 4.5, bottom: 4.5, left: 5, right: 5 }
       },
       styles: {
-        fontSize: 8,
-        cellPadding: { top: 4.5, bottom: 4.5, left: 6, right: 6 },
         font: fontName,
-        lineColor: lender.borderStroke,
-        lineWidth: 0.5
+        fontSize: 7.5,
+        cellPadding: { top: 3.5, bottom: 3.5, left: 5, right: 5 },
+        textColor: textDark,
+        lineColor: borderStroke,
+        lineWidth: 0.4
       },
       alternateRowStyles: {
-        fillColor: [248, 250, 253]
+        fillColor: cardBg
       },
       columnStyles: {
-        0: { cellWidth: 65, halign: 'center' },
+        0: { cellWidth: 42, halign: 'center' },
         1: { cellWidth: 90, halign: 'right' },
         2: { cellWidth: 90, halign: 'right' },
-        3: { cellWidth: 90, halign: 'right' },
-        4: { cellWidth: 90, halign: 'right' },
-        5: { cellWidth: 90, halign: 'right', fontStyle: 'bold' }
+        3: { cellWidth: 95, halign: 'right' },
+        4: { cellWidth: 95, halign: 'right' },
+        5: { cellWidth: 103.28, halign: 'right', fontStyle: 'bold' }
       },
-      margin: { left: 40, right: 40, bottom: 42 }
+      margin: { left: 40, right: 40, top: 28, bottom: 42 }
     });
 
-    var totalPages = doc.getNumberOfPages();
-    for (var i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      if (i > 1) {
-        var flatRunningX = 40;
-        if (flatLogo) {
-          try {
-            doc.addImage(flatLogo, 'PNG', 40, 13, 14, 14);
-            flatRunningX = 58;
-          } catch (e) {}
-        }
-        doc.setFont(fontName, 'bold');
-        doc.setFontSize(8.5);
-        doc.setTextColor.apply(doc, lender.primaryColor);
-        doc.text(docTitle, flatRunningX, 24);
-        doc.setFont(fontName, 'normal');
-        doc.setTextColor(82, 97, 115);
-        doc.text('Ref: ' + refCode, 555, 24, { align: 'right' });
-        doc.setDrawColor.apply(doc, lender.borderStroke);
-        doc.line(40, 28, 555, 28);
-      }
-      doc.setDrawColor.apply(doc, lender.borderStroke);
-      doc.line(40, 810, 555, 810);
-      doc.setFont(fontName, 'normal');
-      doc.setFontSize(6.8);
-      doc.setTextColor(100, 116, 139);
-      var disclaimerLines = doc.splitTextToSize(MANDATORY_DISCLAIMERS.flat, 430);
-      doc.text(disclaimerLines, 40, 819);
-      doc.setFont(fontName, 'bold');
-      doc.setFontSize(7.5);
-      doc.setTextColor(140, 150, 165);
-      doc.text('Page ' + i + ' of ' + totalPages, 555, 822, { align: 'right' });
+    if (typeof window.renderLenderPdfPageDecorations === 'function') {
+      window.renderLenderPdfPageDecorations(
+        doc,
+        lender,
+        (lender.shortName || lender.name) + ' — Flat Rate Loan Repayment Schedule',
+        refCode,
+        MANDATORY_DISCLAIMERS.flat,
+        fontName
+      );
     }
 
     doc.save('Loan_Repayment_Schedule_Flat_' + lender.fileSlug + '_' + principal + '.pdf');
@@ -856,7 +953,9 @@
     var lender1 = getLenderProfile(opt1.b);
     var lender2 = getLenderProfile(opt2.b);
     var betterLender = cd.betterOption === 1 ? lender1 : lender2;
-    var refCode = 'DLS-COMPARE-' + Math.round(opt1.p);
+    var principal = Math.round(opt1.p);
+    var refCode = 'DLS-COMPARE-' + principal;
+    var formattedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
     var doc = new jsPDFLib.jsPDF('p', 'pt', 'a4');
     var fontName = 'helvetica';
@@ -871,140 +970,136 @@
       } catch (e) {}
     }
 
-    var brandNavy = [15, 39, 71];
-    var forestTeal = [15, 139, 113];
+    var curSymbol = fontName === 'SegoeUI' ? '₹' : '₹';
+    var primaryBrand = betterLender.primaryColor || [15, 39, 71];
+    var textDark = [16, 32, 51];
+    var textMuted = [82, 97, 115];
+    var borderStroke = betterLender.borderStroke || [217, 227, 239];
+    var cardBg = betterLender.lightBg || [248, 250, 252];
 
-    doc.setFillColor.apply(doc, brandNavy);
-    doc.rect(0, 0, 595, 6, 'F');
-    doc.setFillColor.apply(doc, forestTeal);
-    doc.rect(0, 6, 595, 2, 'F');
+    doc.setProperties({
+      title: 'Loan Comparison Assessment - ' + lender1.shortName + ' vs ' + lender2.shortName,
+      subject: 'Comparison Assessment - Reference ' + refCode,
+      author: 'Dixit Lending Solution',
+      creator: 'Dixit Lending Solution CRM'
+    });
 
-    var compareLogo = (betterLender && (betterLender.faviconBase64 || betterLender.logoBase64)) || (window.LENDER_ASSETS && window.LENDER_ASSETS.dixit && window.LENDER_ASSETS.dixit.logoBase64);
-    var compTitleX = 40;
-    if (compareLogo) {
-      try {
-        doc.addImage(compareLogo, 'PNG', 40, 20, 34, 34);
-        compTitleX = 84;
-      } catch (e) {
-        console.warn('Compare PDF logo error:', e);
-      }
+    if (typeof window.renderLenderPdfHeader === 'function') {
+      window.renderLenderPdfHeader(
+        doc,
+        betterLender,
+        'LOAN COMPARISON ASSESSMENT',
+        null,
+        refCode,
+        formattedDate,
+        'Comparative Facility Assessment',
+        fontName
+      );
     }
 
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor.apply(doc, brandNavy);
-    doc.text('LOAN COMPARISON', compTitleX, 36);
-
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(12);
-    doc.setTextColor(16, 32, 51);
-    doc.text('Comparative Analysis: ' + lender1.shortName + ' vs ' + lender2.shortName, compTitleX, 52);
-
-    doc.setFont(fontName, 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(82, 97, 115);
-    doc.text('Side-by-side metric comparison between both loan options', compTitleX, 66);
+    // Recommendation & Summary Card
+    doc.setFillColor.apply(doc, cardBg);
+    doc.setDrawColor.apply(doc, borderStroke);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(40, 60, 515.28, 68, 4, 4, 'FD');
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(8.5);
-    doc.setTextColor(16, 32, 51);
-    doc.text('Reference: ' + refCode, 555, 42, { align: 'right' });
-    doc.setFont(fontName, 'normal');
-    doc.setTextColor(82, 97, 115);
-    doc.text('Generated: ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }), 555, 56, { align: 'right' });
+    doc.setTextColor.apply(doc, primaryBrand);
+    doc.text('COMPARISON OUTCOME & RECOMMENDATION', 52, 72);
 
-    doc.setDrawColor(217, 227, 239);
-    doc.line(40, 84, 555, 84);
+    doc.setDrawColor.apply(doc, borderStroke);
+    doc.setLineWidth(0.4);
+    doc.line(52, 77, 543, 77);
 
-    doc.setFillColor(240, 253, 249);
-    doc.setDrawColor(15, 139, 113);
-    doc.roundedRect(40, 94, 515, 52, 5, 5, 'FD');
+    // Left Column
+    doc.setFont(fontName, 'normal'); doc.setFontSize(8.5); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Financially Advantaged Option:', 52, 89);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, primaryBrand);
+    doc.text('Option ' + cd.betterOption + ' (' + betterLender.shortName + ')', 185, 89);
 
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(15, 139, 113);
-    doc.text('Recommendation: Loan Option ' + cd.betterOption + ' (' + betterLender.shortName + ') is financially advantageous', 52, 112);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Monthly Payment Variance:', 52, 102);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(curSymbol + Math.round(cd.emiDiff).toLocaleString('en-IN') + ' / month', 185, 102);
 
-    doc.setFont(fontName, 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(51, 65, 85);
-    doc.text('Choosing Option ' + cd.betterOption + ' saves an estimated ₹' + Math.round(cd.savings).toLocaleString('en-IN') + ' in total borrowing cost over the tenure.', 52, 130);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Evaluation Baseline:', 52, 115);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(lender1.shortName + ' vs ' + lender2.shortName, 185, 115);
+
+    // Right Column
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Borrowing Principal:', 330, 89);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(curSymbol + principal.toLocaleString('en-IN'), 440, 89);
+
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Total Interest Variance:', 330, 102);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(curSymbol + Math.round(cd.interestDiff).toLocaleString('en-IN'), 440, 102);
+
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Net Estimated Savings:', 330, 115);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, primaryBrand);
+    doc.text(curSymbol + Math.round(cd.savings).toLocaleString('en-IN'), 440, 115);
 
     var tableBody = [
-      ['Loan Amount (Principal)', '₹' + Math.round(opt1.p).toLocaleString('en-IN'), '₹' + Math.round(opt2.p).toLocaleString('en-IN'), '₹' + Math.round(Math.abs(opt1.p - opt2.p)).toLocaleString('en-IN')],
+      ['Loan Amount (Principal)', curSymbol + Math.round(opt1.p).toLocaleString('en-IN'), curSymbol + Math.round(opt2.p).toLocaleString('en-IN'), curSymbol + Math.round(Math.abs(opt1.p - opt2.p)).toLocaleString('en-IN')],
       ['Interest Rate (% p.a.)', opt1.r + '% p.a.', opt2.r + '% p.a.', Math.abs(opt1.r - opt2.r).toFixed(2) + '%'],
       ['Loan Tenure (Months)', opt1.t + ' Months', opt2.t + ' Months', Math.abs(opt1.t - opt2.t) + ' Months'],
-      ['Monthly EMI', '₹' + Math.round(opt1.emi).toLocaleString('en-IN'), '₹' + Math.round(opt2.emi).toLocaleString('en-IN'), '₹' + Math.round(cd.emiDiff).toLocaleString('en-IN')],
-      ['Total Interest Payable', '₹' + Math.round(opt1.interest).toLocaleString('en-IN'), '₹' + Math.round(opt2.interest).toLocaleString('en-IN'), '₹' + Math.round(cd.interestDiff).toLocaleString('en-IN')],
-      ['Total Repayment Amount', '₹' + Math.round(opt1.total).toLocaleString('en-IN'), '₹' + Math.round(opt2.total).toLocaleString('en-IN'), '₹' + Math.round(cd.savings).toLocaleString('en-IN')]
+      ['Monthly EMI', curSymbol + Math.round(opt1.emi).toLocaleString('en-IN'), curSymbol + Math.round(opt2.emi).toLocaleString('en-IN'), curSymbol + Math.round(cd.emiDiff).toLocaleString('en-IN')],
+      ['Total Interest Payable', curSymbol + Math.round(opt1.interest).toLocaleString('en-IN'), curSymbol + Math.round(opt2.interest).toLocaleString('en-IN'), curSymbol + Math.round(cd.interestDiff).toLocaleString('en-IN')],
+      ['Total Repayment Amount', curSymbol + Math.round(opt1.total).toLocaleString('en-IN'), curSymbol + Math.round(opt2.total).toLocaleString('en-IN'), curSymbol + Math.round(cd.savings).toLocaleString('en-IN')]
     ];
 
     doc.autoTable({
-      head: [['Loan Parameters', 'Option 1 (' + lender1.shortName + ')', 'Option 2 (' + lender2.shortName + ')', 'Difference']],
+      head: [['Loan Parameter', 'Option 1 (' + lender1.shortName + ')', 'Option 2 (' + lender2.shortName + ')', 'Variance / Savings']],
       body: tableBody,
-      startY: 160,
+      startY: 136,
+      showHead: 'everyPage',
       theme: 'plain',
       headStyles: {
-        fillColor: brandNavy,
+        fillColor: primaryBrand,
         textColor: [255, 255, 255],
         fontStyle: 'bold',
+        fontSize: 8,
+        halign: 'left',
         font: fontName,
-        fontSize: 9
+        cellPadding: { top: 4.5, bottom: 4.5, left: 5, right: 5 }
       },
       styles: {
-        fontSize: 8.5,
-        cellPadding: 8,
+        fontSize: 7.5,
+        cellPadding: { top: 4, bottom: 4, left: 6, right: 6 },
         font: fontName,
-        lineColor: [217, 227, 239],
-        lineWidth: 0.5
+        textColor: textDark,
+        lineColor: borderStroke,
+        lineWidth: 0.4
       },
       alternateRowStyles: {
-        fillColor: [248, 250, 253]
+        fillColor: cardBg
       },
       columnStyles: {
-        0: { cellWidth: 155 },
+        0: { cellWidth: 155, halign: 'left' },
         1: { cellWidth: 120, halign: 'right' },
         2: { cellWidth: 120, halign: 'right' },
-        3: { cellWidth: 120, halign: 'right', fontStyle: 'bold' }
+        3: { cellWidth: 120.28, halign: 'right', fontStyle: 'bold' }
       },
-      margin: { left: 40, right: 40, bottom: 42 }
+      margin: { left: 40, right: 40, top: 28, bottom: 42 }
     });
 
-    var totalPages = doc.getNumberOfPages();
-    for (var i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      if (i > 1) {
-        var compRunningX = 40;
-        if (compareLogo) {
-          try {
-            doc.addImage(compareLogo, 'PNG', 40, 13, 14, 14);
-            compRunningX = 58;
-          } catch (e) {}
-        }
-        doc.setFont(fontName, 'bold');
-        doc.setFontSize(8.5);
-        doc.setTextColor.apply(doc, brandNavy);
-        doc.text('Loan Comparison - ' + lender1.shortName + ' vs ' + lender2.shortName, compRunningX, 24);
-        doc.setFont(fontName, 'normal');
-        doc.setTextColor(82, 97, 115);
-        doc.text('Ref: ' + refCode, 555, 24, { align: 'right' });
-        doc.setDrawColor(217, 227, 239);
-        doc.line(40, 28, 555, 28);
-      }
-      doc.setDrawColor(217, 227, 239);
-      doc.line(40, 810, 555, 810);
-      doc.setFont(fontName, 'normal');
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139);
-      var disclaimerLines = doc.splitTextToSize(MANDATORY_DISCLAIMERS.compare, 430);
-      doc.text(disclaimerLines, 40, 819);
-      doc.setFont(fontName, 'bold');
-      doc.setFontSize(7.5);
-      doc.setTextColor(140, 150, 165);
-      doc.text('Page ' + i + ' of ' + totalPages, 555, 822, { align: 'right' });
+    if (typeof window.renderLenderPdfPageDecorations === 'function') {
+      window.renderLenderPdfPageDecorations(
+        doc,
+        betterLender,
+        'Loan Comparison Analysis — ' + lender1.shortName + ' vs ' + lender2.shortName,
+        refCode,
+        MANDATORY_DISCLAIMERS.compare,
+        fontName
+      );
     }
 
-    doc.save('Loan_Comparison_' + lender1.fileSlug + '_' + lender2.fileSlug + '_' + Math.round(opt1.p) + '.pdf');
+    doc.save('Loan_Comparison_' + lender1.fileSlug + '_' + lender2.fileSlug + '_' + principal + '.pdf');
   }
 
   function exportCompareExcel() {
@@ -1180,6 +1275,22 @@
       tableBadgeIcon.style.color = lender.hexPrimary;
     }
     if (tableBadgeEl) {
+      var miniLogo = tableBadgeEl.querySelector('.lender-table-mini-logo');
+      var iconSrc = eligSelectedLender ? (lender.faviconBase64 || lender.faviconUrl) : '';
+      if (iconSrc) {
+        if (!miniLogo) {
+          miniLogo = document.createElement('img');
+          miniLogo.className = 'lender-table-mini-logo';
+          miniLogo.style.cssText = 'width:16px;height:16px;border-radius:3px;margin-right:5px;object-fit:contain;vertical-align:middle;';
+          tableBadgeEl.insertBefore(miniLogo, tableBadgeText);
+        }
+        miniLogo.src = iconSrc;
+        miniLogo.style.display = 'inline-block';
+        if (tableBadgeIcon) tableBadgeIcon.style.display = 'none';
+      } else {
+        if (miniLogo) miniLogo.style.display = 'none';
+        if (tableBadgeIcon) tableBadgeIcon.style.display = 'inline-block';
+      }
       if (eligSelectedLender) {
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         tableBadgeEl.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.14)' : lender.hexBorder;
@@ -1466,7 +1577,9 @@
       return;
     }
     var lender = getLenderProfile(window.eligSelectedLender);
-    var refCode = 'DLS-' + lender.fileSlug.toUpperCase() + '-' + Math.round(ed.roundedPrincipal);
+    var principal = Math.round(ed.roundedPrincipal);
+    var refCode = 'DLS-' + lender.fileSlug.toUpperCase() + '-' + principal;
+    var formattedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
     var doc = new jsPDFLib.jsPDF('p', 'pt', 'a4');
     var fontName = 'helvetica';
@@ -1481,143 +1594,134 @@
       } catch (e) {}
     }
 
-    doc.setFillColor.apply(doc, lender.primaryColor);
-    doc.rect(0, 0, 595, 6, 'F');
-    doc.setFillColor.apply(doc, lender.secondaryColor);
-    doc.rect(0, 6, 595, 2, 'F');
+    var curSymbol = fontName === 'SegoeUI' ? '₹' : '₹';
+    var primaryBrand = lender.primaryColor || [15, 39, 71];
+    var textDark = [16, 32, 51];
+    var textMuted = [82, 97, 115];
+    var borderStroke = lender.borderStroke || [217, 227, 239];
+    var cardBg = lender.lightBg || [248, 250, 252];
 
-    var eligLogo = lender.faviconBase64 || lender.logoBase64;
-    var eligTitleX = 40;
-    if (eligLogo) {
-      try {
-        doc.addImage(eligLogo, 'PNG', 40, 20, 34, 34);
-        eligTitleX = 84;
-      } catch (e) {
-        console.warn('Elig PDF logo error:', e);
-      }
+    doc.setProperties({
+      title: lender.name + ' - Loan Eligibility Assessment',
+      subject: 'Eligibility Assessment - Reference ' + refCode,
+      author: 'Dixit Lending Solution',
+      creator: 'Dixit Lending Solution CRM'
+    });
+
+    if (typeof window.renderLenderPdfHeader === 'function') {
+      window.renderLenderPdfHeader(
+        doc,
+        lender,
+        'LOAN ELIGIBILITY ASSESSMENT',
+        null,
+        refCode,
+        formattedDate,
+        'Income & Debt Burden Evaluation',
+        fontName
+      );
     }
 
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor.apply(doc, lender.primaryColor);
-    doc.text(lender.name, eligTitleX, 36);
-
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(16, 32, 51);
-    doc.text('Loan Eligibility Assessment', eligTitleX, 52);
-
-    doc.setFont(fontName, 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(82, 97, 115);
-    doc.text('Borrower income evaluation, debt-to-income benchmark, and borrowing capacity', eligTitleX, 66);
+    // Eligibility Summary Box
+    doc.setFillColor.apply(doc, cardBg);
+    doc.setDrawColor.apply(doc, borderStroke);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(40, 60, 515.28, 68, 4, 4, 'FD');
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(8.5);
-    doc.setTextColor(16, 32, 51);
-    doc.text('Reference: ' + refCode, 555, 42, { align: 'right' });
-    doc.setFont(fontName, 'normal');
-    doc.setTextColor(82, 97, 115);
-    doc.text('Generated: ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }), 555, 56, { align: 'right' });
+    doc.setTextColor.apply(doc, primaryBrand);
+    doc.text('BORROWER CAPACITY & UNDERWRITING SUMMARY', 52, 72);
 
-    doc.setDrawColor.apply(doc, lender.borderStroke);
-    doc.line(40, 84, 555, 84);
+    doc.setDrawColor.apply(doc, borderStroke);
+    doc.setLineWidth(0.4);
+    doc.line(52, 77, 543, 77);
 
-    doc.setFillColor.apply(doc, lender.lightBg);
-    doc.setDrawColor.apply(doc, lender.borderStroke);
-    doc.roundedRect(40, 94, 515, 78, 5, 5, 'FD');
+    // Left Column
+    doc.setFont(fontName, 'normal'); doc.setFontSize(8.5); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Net Monthly Income:', 52, 89);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(curSymbol + Math.round(ed.income).toLocaleString('en-IN'), 160, 89);
 
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(9.5);
-    doc.setTextColor.apply(doc, lender.primaryColor);
-    doc.text('BORROWER CAPACITY & UNDERWRITING SUMMARY', 52, 110);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Existing Obligations:', 52, 102);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(curSymbol + Math.round(ed.existingEmi).toLocaleString('en-IN'), 160, 102);
 
-    doc.setFont(fontName, 'normal'); doc.setFontSize(8.5); doc.setTextColor(82, 97, 115);
-    doc.text('Net Monthly Income:', 52, 126);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(16, 32, 51);
-    doc.text('₹' + Math.round(ed.income).toLocaleString('en-IN'), 160, 126);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('FOIR Benchmark:', 52, 115);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(ed.foir + '% FOIR', 160, 115);
 
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Existing Obligations:', 52, 140);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(16, 32, 51);
-    doc.text('₹' + Math.round(ed.existingEmi).toLocaleString('en-IN'), 160, 140);
+    // Right Column
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Eligible Loan Capacity:', 320, 89);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, primaryBrand);
+    doc.text(curSymbol + principal.toLocaleString('en-IN'), 440, 89);
 
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('FOIR Benchmark:', 52, 154);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(16, 32, 51);
-    doc.text(ed.foir + '% FOIR', 160, 154);
-
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Eligible Loan Amount:', 320, 126);
-    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, lender.primaryColor);
-    doc.text('₹' + Math.round(ed.roundedPrincipal).toLocaleString('en-IN'), 440, 126);
-
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Affordable Monthly EMI:', 320, 140);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Affordable Monthly EMI:', 320, 102);
     doc.setFont(fontName, 'bold'); doc.setTextColor(15, 139, 113);
-    doc.text('₹' + Math.round(ed.availableNewEmi).toLocaleString('en-IN') + ' / mo', 440, 140);
+    doc.text(curSymbol + Math.round(ed.availableNewEmi).toLocaleString('en-IN') + ' / mo', 440, 102);
 
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Total Debt Obligation:', 320, 154);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(16, 32, 51);
-    doc.text(ed.debtRatio.toFixed(1) + '%', 440, 154);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Total Debt Obligation:', 320, 115);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(ed.debtRatio.toFixed(1) + '%', 440, 115);
 
     var tableBody = [
-      ['Net Monthly Take-Home Income', '₹' + Math.round(ed.income).toLocaleString('en-IN')],
-      ['Permissible Obligation Limit (' + ed.foir + '% FOIR)', '₹' + Math.round(ed.maxPermissible).toLocaleString('en-IN')],
-      ['Less: Existing Monthly Commitments', '- ₹' + Math.round(ed.existingEmi).toLocaleString('en-IN')],
-      ['Net Available Capacity for New EMI', '₹' + Math.round(ed.availableNewEmi).toLocaleString('en-IN')],
-      ['Estimated Eligible Principal (Sanction Limit)', '₹' + Math.round(ed.roundedPrincipal).toLocaleString('en-IN')],
-      ['Estimated Total Interest over ' + ed.tenureMonths + ' Months', '₹' + Math.round(ed.totalInterest).toLocaleString('en-IN')],
-      ['Total Amount Payable', '₹' + Math.round(ed.totalRepayment).toLocaleString('en-IN')]
+      ['Net Monthly Take-Home Income', curSymbol + Math.round(ed.income).toLocaleString('en-IN')],
+      ['Permissible Obligation Limit (' + ed.foir + '% FOIR)', curSymbol + Math.round(ed.maxPermissible).toLocaleString('en-IN')],
+      ['Less: Existing Monthly Commitments', '- ' + curSymbol + Math.round(ed.existingEmi).toLocaleString('en-IN')],
+      ['Net Available Capacity for New Monthly EMI', curSymbol + Math.round(ed.availableNewEmi).toLocaleString('en-IN')],
+      ['Estimated Eligible Principal (Sanction Capacity)', curSymbol + principal.toLocaleString('en-IN')],
+      ['Estimated Total Interest over ' + ed.tenureMonths + ' Months', curSymbol + Math.round(ed.totalInterest).toLocaleString('en-IN')],
+      ['Total Repayment Commitment over Tenure', curSymbol + Math.round(ed.totalRepayment).toLocaleString('en-IN')]
     ];
 
     doc.autoTable({
-      head: [['Underwriting Parameter', 'Calculated Assessment (₹)']],
+      head: [['Underwriting Evaluation Parameter', 'Assessed Value']],
       body: tableBody,
-      startY: 184,
+      startY: 136,
+      showHead: 'everyPage',
       theme: 'plain',
       headStyles: {
-        fillColor: lender.primaryColor,
+        fillColor: primaryBrand,
         textColor: [255, 255, 255],
         fontStyle: 'bold',
         font: fontName,
-        fontSize: 9
+        fontSize: 8.5,
+        cellPadding: { top: 4.5, bottom: 4.5, left: 6, right: 6 }
       },
       styles: {
-        fontSize: 8.5,
-        cellPadding: 7,
+        fontSize: 7.5,
+        cellPadding: { top: 4, bottom: 4, left: 6, right: 6 },
         font: fontName,
-        lineColor: lender.borderStroke,
-        lineWidth: 0.5
+        textColor: textDark,
+        lineColor: borderStroke,
+        lineWidth: 0.4
       },
       alternateRowStyles: {
-        fillColor: [248, 250, 253]
+        fillColor: cardBg
       },
       columnStyles: {
-        0: { cellWidth: 350 },
-        1: { cellWidth: 165, halign: 'right', fontStyle: 'bold' }
+        0: { cellWidth: 350, halign: 'left' },
+        1: { cellWidth: 165.28, halign: 'right', fontStyle: 'bold' }
       },
-      margin: { left: 40, right: 40, bottom: 42 }
+      margin: { left: 40, right: 40, top: 28, bottom: 42 }
     });
 
-    var totalPages = doc.getNumberOfPages();
-    for (var i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      doc.setDrawColor.apply(doc, lender.borderStroke);
-      doc.line(40, 810, 555, 810);
-      doc.setFont(fontName, 'normal');
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139);
-      var disclaimerLines = doc.splitTextToSize(MANDATORY_DISCLAIMERS.eligibility, 430);
-      doc.text(disclaimerLines, 40, 819);
-      doc.setFont(fontName, 'bold');
-      doc.setFontSize(7.5);
-      doc.setTextColor(140, 150, 165);
-      doc.text('Page ' + i + ' of ' + totalPages, 555, 822, { align: 'right' });
+    if (typeof window.renderLenderPdfPageDecorations === 'function') {
+      window.renderLenderPdfPageDecorations(
+        doc,
+        lender,
+        (lender.shortName || lender.name) + ' — Loan Eligibility Assessment',
+        refCode,
+        MANDATORY_DISCLAIMERS.eligibility,
+        fontName
+      );
     }
 
-    doc.save('Loan_Eligibility_Assessment_' + lender.fileSlug + '_' + Math.round(ed.roundedPrincipal) + '.pdf');
+    doc.save('Loan_Eligibility_Assessment_' + lender.fileSlug + '_' + principal + '.pdf');
   }
 
   function exportEligExcel() {
@@ -1798,6 +1902,22 @@
       tableBadgeIcon.style.color = newLender.hexPrimary;
     }
     if (tableBadgeEl) {
+      var miniLogo = tableBadgeEl.querySelector('.lender-table-mini-logo');
+      var iconSrc = transferNewLender ? (newLender.faviconBase64 || newLender.faviconUrl) : '';
+      if (iconSrc) {
+        if (!miniLogo) {
+          miniLogo = document.createElement('img');
+          miniLogo.className = 'lender-table-mini-logo';
+          miniLogo.style.cssText = 'width:16px;height:16px;border-radius:3px;margin-right:5px;object-fit:contain;vertical-align:middle;';
+          tableBadgeEl.insertBefore(miniLogo, tableBadgeText);
+        }
+        miniLogo.src = iconSrc;
+        miniLogo.style.display = 'inline-block';
+        if (tableBadgeIcon) tableBadgeIcon.style.display = 'none';
+      } else {
+        if (miniLogo) miniLogo.style.display = 'none';
+        if (tableBadgeIcon) tableBadgeIcon.style.display = 'inline-block';
+      }
       if (transferNewLender) {
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         tableBadgeEl.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.14)' : newLender.hexBorder;
@@ -2080,7 +2200,9 @@
     }
     var existingLender = getLenderProfile(window.transferExistingLender);
     var newLender = getLenderProfile(window.transferNewLender);
-    var refCode = 'DLS-' + newLender.fileSlug.toUpperCase() + '-' + Math.round(td.principal);
+    var principal = Math.round(td.principal);
+    var refCode = 'DLS-' + newLender.fileSlug.toUpperCase() + '-' + principal;
+    var formattedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
     var doc = new jsPDFLib.jsPDF('p', 'pt', 'a4');
     var fontName = 'helvetica';
@@ -2095,90 +2217,80 @@
       } catch (e) {}
     }
 
-    doc.setFillColor.apply(doc, newLender.primaryColor);
-    doc.rect(0, 0, 595, 6, 'F');
-    doc.setFillColor.apply(doc, newLender.secondaryColor);
-    doc.rect(0, 6, 595, 2, 'F');
+    var curSymbol = fontName === 'SegoeUI' ? '₹' : '₹';
+    var primaryBrand = newLender.primaryColor || [15, 39, 71];
+    var textDark = [16, 32, 51];
+    var textMuted = [82, 97, 115];
+    var borderStroke = newLender.borderStroke || [217, 227, 239];
+    var cardBg = newLender.lightBg || [248, 250, 252];
 
-    var transferLogo = newLender.faviconBase64 || newLender.logoBase64;
-    var transferTitleX = 40;
-    if (transferLogo) {
-      try {
-        doc.addImage(transferLogo, 'PNG', 40, 20, 34, 34);
-        transferTitleX = 84;
-      } catch (e) {
-        console.warn('Transfer PDF logo error:', e);
-      }
+    doc.setProperties({
+      title: newLender.name + ' - Balance Transfer Benefit Analysis',
+      subject: 'Refinancing Analysis - Reference ' + refCode,
+      author: 'Dixit Lending Solution',
+      creator: 'Dixit Lending Solution CRM'
+    });
+
+    if (typeof window.renderLenderPdfHeader === 'function') {
+      window.renderLenderPdfHeader(
+        doc,
+        newLender,
+        'BALANCE TRANSFER BENEFIT ANALYSIS',
+        null,
+        refCode,
+        formattedDate,
+        'Refinancing & Interest Arbitrage',
+        fontName
+      );
     }
 
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor.apply(doc, newLender.primaryColor);
-    doc.text(newLender.name, transferTitleX, 36);
-
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(16, 32, 51);
-    doc.text('Balance Transfer Benefit Analysis', transferTitleX, 52);
-
-    doc.setFont(fontName, 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(82, 97, 115);
-    doc.text('Refinancing savings evaluation: ' + existingLender.shortName + ' -> ' + newLender.shortName, transferTitleX, 66);
+    // Refinancing Summary Box
+    doc.setFillColor.apply(doc, cardBg);
+    doc.setDrawColor.apply(doc, borderStroke);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(40, 60, 515.28, 68, 4, 4, 'FD');
 
     doc.setFont(fontName, 'bold');
     doc.setFontSize(8.5);
-    doc.setTextColor(16, 32, 51);
-    doc.text('Reference: ' + refCode, 555, 42, { align: 'right' });
-    doc.setFont(fontName, 'normal');
-    doc.setTextColor(82, 97, 115);
-    doc.text('Generated: ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }), 555, 56, { align: 'right' });
+    doc.setTextColor.apply(doc, primaryBrand);
+    doc.text('BALANCE TRANSFER REFINANCING SUMMARY', 52, 72);
 
-    doc.setDrawColor.apply(doc, newLender.borderStroke);
-    doc.line(40, 84, 555, 84);
+    doc.setDrawColor.apply(doc, borderStroke);
+    doc.setLineWidth(0.4);
+    doc.line(52, 77, 543, 77);
 
-    doc.setFillColor(248, 250, 253);
-    doc.setDrawColor(217, 227, 239);
-    doc.roundedRect(40, 92, 515, 28, 4, 4, 'FD');
-    doc.setFont(fontName, 'bold'); doc.setFontSize(8.5); doc.setTextColor(82, 97, 115);
-    doc.text('Existing Loan Current Lender:', 50, 110);
-    doc.setTextColor(16, 32, 51);
-    doc.text(existingLender.shortName, 185, 110);
+    // Left Column
+    doc.setFont(fontName, 'normal'); doc.setFontSize(8.5); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Outstanding Loan Principal:', 52, 89);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(curSymbol + principal.toLocaleString('en-IN'), 180, 89);
 
-    doc.setTextColor(82, 97, 115);
-    doc.text('Proposed Loan Target Lender:', 310, 110);
-    doc.setTextColor.apply(doc, newLender.primaryColor);
-    doc.text(newLender.shortName, 445, 110);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Existing Lender Rate:', 52, 102);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(existingLender.shortName + ' (' + td.rate1.toFixed(2) + '% p.a.)', 180, 102);
 
-    doc.setFillColor.apply(doc, newLender.lightBg);
-    doc.setDrawColor.apply(doc, newLender.borderStroke);
-    doc.roundedRect(40, 126, 515, 68, 5, 5, 'FD');
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('New Proposed Lender Rate:', 52, 115);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, primaryBrand);
+    doc.text(newLender.shortName + ' (' + td.rate2.toFixed(2) + '% p.a.)', 180, 115);
 
-    doc.setFont(fontName, 'bold');
-    doc.setFontSize(9.5);
-    doc.setTextColor.apply(doc, newLender.primaryColor);
-    doc.text('REFINANCING BENEFIT & BREAK-EVEN SUMMARY', 52, 142);
-
-    doc.setFont(fontName, 'normal'); doc.setFontSize(8.5); doc.setTextColor(82, 97, 115);
-    doc.text('Net Lifetime Savings:', 52, 158);
-    doc.setFont(fontName, 'bold');
-    doc.setTextColor(td.netSavings > 0 ? 15 : 224, td.netSavings > 0 ? 139 : 82, td.netSavings > 0 ? 113 : 82);
-    doc.text('₹' + Math.round(td.netSavings).toLocaleString('en-IN'), 160, 158);
-
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Monthly EMI Reduction:', 52, 174);
+    // Right Column
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Monthly Payment Savings:', 330, 89);
     doc.setFont(fontName, 'bold'); doc.setTextColor(15, 139, 113);
-    doc.text('₹' + Math.round(td.monthlySavings).toLocaleString('en-IN') + ' / mo', 160, 174);
+    doc.text(curSymbol + Math.round(td.monthlySavings).toLocaleString('en-IN') + ' / mo', 440, 89);
 
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Total Transfer Costs:', 320, 158);
-    doc.setFont(fontName, 'bold'); doc.setTextColor(16, 32, 51);
-    doc.text('₹' + Math.round(td.totalTransferCosts).toLocaleString('en-IN'), 440, 158);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Total Transfer Costs:', 330, 102);
+    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, textDark);
+    doc.text(curSymbol + Math.round(td.totalTransferCosts).toLocaleString('en-IN'), 440, 102);
 
-    doc.setFont(fontName, 'normal'); doc.setTextColor(82, 97, 115);
-    doc.text('Break-Even Period:', 320, 174);
-    doc.setFont(fontName, 'bold'); doc.setTextColor.apply(doc, newLender.primaryColor);
-    doc.text(td.breakevenMonths === 0 ? 'Immediate' : (td.breakevenMonths ? td.breakevenMonths + ' Months' : 'N/A'), 440, 174);
+    doc.setFont(fontName, 'normal'); doc.setTextColor.apply(doc, textMuted);
+    doc.text('Net Lifetime Savings:', 330, 115);
+    doc.setFont(fontName, 'bold');
+    doc.setTextColor(td.netSavings > 0 ? 15 : 220, td.netSavings > 0 ? 139 : 38, td.netSavings > 0 ? 113 : 38);
+    doc.text(curSymbol + Math.round(td.netSavings).toLocaleString('en-IN'), 440, 115);
 
     var rateDiff = (td.rate2 - td.rate1).toFixed(2);
     var tenureDiff = td.tenure2 - td.tenure1;
@@ -2187,81 +2299,61 @@
     var costDiff = td.totalCost2 - td.totalCost1;
 
     var tableBody = [
-      ['Principal Loan Amount', '₹' + Math.round(td.principal).toLocaleString('en-IN'), '₹' + Math.round(td.principal).toLocaleString('en-IN'), '—'],
+      ['Principal Loan Amount', curSymbol + principal.toLocaleString('en-IN'), curSymbol + principal.toLocaleString('en-IN'), '—'],
       ['Interest Rate (% p.a.)', td.rate1.toFixed(2) + '%', td.rate2.toFixed(2) + '%', (rateDiff > 0 ? '+' : '') + rateDiff + '%'],
       ['Remaining Tenure', td.tenure1 + ' Months', td.tenure2 + ' Months', (tenureDiff > 0 ? '+' : '') + tenureDiff + ' Months'],
-      ['Monthly EMI', '₹' + Math.round(td.emi1).toLocaleString('en-IN'), '₹' + Math.round(td.emi2).toLocaleString('en-IN'), (emiDiff > 0 ? '+' : '') + '₹' + Math.round(emiDiff).toLocaleString('en-IN')],
-      ['Total Interest Payable', '₹' + Math.round(td.totalInterest1).toLocaleString('en-IN'), '₹' + Math.round(td.totalInterest2).toLocaleString('en-IN'), (intDiff > 0 ? '+' : '') + '₹' + Math.round(intDiff).toLocaleString('en-IN')],
-      ['Processing Fees & Charges', '—', '₹' + Math.round(td.totalTransferCosts).toLocaleString('en-IN'), '+₹' + Math.round(td.totalTransferCosts).toLocaleString('en-IN')],
-      ['Total Cost of Loan', '₹' + Math.round(td.totalCost1).toLocaleString('en-IN'), '₹' + Math.round(td.totalCost2).toLocaleString('en-IN'), (costDiff > 0 ? '+' : '') + '₹' + Math.round(costDiff).toLocaleString('en-IN')]
+      ['Monthly EMI', curSymbol + Math.round(td.emi1).toLocaleString('en-IN'), curSymbol + Math.round(td.emi2).toLocaleString('en-IN'), (emiDiff > 0 ? '+' : '') + curSymbol + Math.round(emiDiff).toLocaleString('en-IN')],
+      ['Total Interest Payable', curSymbol + Math.round(td.totalInterest1).toLocaleString('en-IN'), curSymbol + Math.round(td.totalInterest2).toLocaleString('en-IN'), (intDiff > 0 ? '+' : '') + curSymbol + Math.round(intDiff).toLocaleString('en-IN')],
+      ['Processing Fees & Charges', '—', curSymbol + Math.round(td.totalTransferCosts).toLocaleString('en-IN'), '+' + curSymbol + Math.round(td.totalTransferCosts).toLocaleString('en-IN')],
+      ['Total Cost of Loan', curSymbol + Math.round(td.totalCost1).toLocaleString('en-IN'), curSymbol + Math.round(td.totalCost2).toLocaleString('en-IN'), (costDiff > 0 ? '+' : '') + curSymbol + Math.round(costDiff).toLocaleString('en-IN')]
     ];
 
     doc.autoTable({
-      head: [['Parameter', 'Existing Loan (' + existingLender.shortName + ')', 'Proposed New Loan (' + newLender.shortName + ')', 'Net Difference']],
+      head: [['Loan Parameter', 'Existing Loan (' + existingLender.shortName + ')', 'Proposed New Loan (' + newLender.shortName + ')', 'Net Difference']],
       body: tableBody,
-      startY: 204,
+      startY: 136,
+      showHead: 'everyPage',
       theme: 'plain',
       headStyles: {
-        fillColor: newLender.primaryColor,
+        fillColor: primaryBrand,
         textColor: [255, 255, 255],
         fontStyle: 'bold',
         font: fontName,
-        fontSize: 8.5
+        fontSize: 8,
+        cellPadding: { top: 4.5, bottom: 4.5, left: 5, right: 5 }
       },
       styles: {
-        fontSize: 8,
-        cellPadding: 6,
+        fontSize: 7.5,
+        cellPadding: { top: 4, bottom: 4, left: 6, right: 6 },
         font: fontName,
-        lineColor: newLender.borderStroke,
-        lineWidth: 0.5
+        textColor: textDark,
+        lineColor: borderStroke,
+        lineWidth: 0.4
       },
       alternateRowStyles: {
-        fillColor: [248, 250, 253]
+        fillColor: cardBg
       },
       columnStyles: {
-        0: { cellWidth: 155 },
+        0: { cellWidth: 145, halign: 'left' },
         1: { cellWidth: 120, halign: 'right' },
         2: { cellWidth: 120, halign: 'right' },
-        3: { cellWidth: 120, halign: 'right', fontStyle: 'bold' }
+        3: { cellWidth: 130.28, halign: 'right', fontStyle: 'bold' }
       },
-      margin: { left: 40, right: 40, bottom: 42 }
+      margin: { left: 40, right: 40, top: 28, bottom: 42 }
     });
 
-    var totalPages = doc.getNumberOfPages();
-    for (var i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      if (i > 1) {
-        var transferRunningX = 40;
-        if (transferLogo) {
-          try {
-            doc.addImage(transferLogo, 'PNG', 40, 13, 14, 14);
-            transferRunningX = 58;
-          } catch (e) {}
-        }
-        doc.setFont(fontName, 'bold');
-        doc.setFontSize(8.5);
-        doc.setTextColor.apply(doc, newLender.primaryColor);
-        doc.text(newLender.name + ' — Balance Transfer Benefit Analysis', transferRunningX, 24);
-        doc.setFont(fontName, 'normal');
-        doc.setTextColor(82, 97, 115);
-        doc.text('Ref: ' + refCode, 555, 24, { align: 'right' });
-        doc.setDrawColor.apply(doc, newLender.borderStroke);
-        doc.line(40, 28, 555, 28);
-      }
-      doc.setDrawColor.apply(doc, newLender.borderStroke);
-      doc.line(40, 810, 555, 810);
-      doc.setFont(fontName, 'normal');
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139);
-      var disclaimerLines = doc.splitTextToSize(MANDATORY_DISCLAIMERS.transfer, 430);
-      doc.text(disclaimerLines, 40, 819);
-      doc.setFont(fontName, 'bold');
-      doc.setFontSize(7.5);
-      doc.setTextColor(140, 150, 165);
-      doc.text('Page ' + i + ' of ' + totalPages, 555, 822, { align: 'right' });
+    if (typeof window.renderLenderPdfPageDecorations === 'function') {
+      window.renderLenderPdfPageDecorations(
+        doc,
+        newLender,
+        'Balance Transfer Analysis — ' + existingLender.shortName + ' -> ' + newLender.shortName,
+        refCode,
+        MANDATORY_DISCLAIMERS.transfer,
+        fontName
+      );
     }
 
-    doc.save('Balance_Transfer_Analysis_' + newLender.fileSlug + '_' + Math.round(td.principal) + '.pdf');
+    doc.save('Balance_Transfer_Analysis_' + newLender.fileSlug + '_' + principal + '.pdf');
   }
 
   function exportTransferExcel() {

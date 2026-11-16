@@ -124,10 +124,14 @@ function recordSuccessfulLogin(rawIp, rawEmail) {
  * Slightly looser than login, but still protects the mailbox.
  */
 const forgotPasswordLimiter = (req, res, next) => {
-  const identifier = `forgot-password:${req.ip}:${req.body?.email || 'unknown'}`;
+  const email = (req.body?.email || '').trim().toLowerCase();
+  const identifier = `forgot-password:${req.ip}:${email || 'unknown'}`;
+  const windowMs = parseInt(process.env.FORGOT_PASSWORD_WINDOW_MS || process.env.RATE_LIMIT_WINDOW_MS || '900000', 10); // 15 mins default
+  const maxRequests = parseInt(process.env.FORGOT_PASSWORD_MAX_REQUESTS || '5', 10);
+
   const limit = rateLimit(identifier, {
-    windowMs: 60 * 60 * 1000, // 1 hour
-    maxRequests: 3 // 3 requests per hour
+    windowMs,
+    maxRequests
   });
 
   res.setHeader('RateLimit-Limit', limit.maxRequests || 3);

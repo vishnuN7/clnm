@@ -6,11 +6,12 @@ const fs = require('fs');
 
 // ─── Decide storage: R2 in production, local disk in development ───────────
 
-const useR2 = process.env.NODE_ENV === 'production' &&
-              process.env.R2_ACCOUNT_ID &&
-              process.env.R2_ACCESS_KEY_ID &&
-              process.env.R2_SECRET_KEY &&
-              process.env.R2_BUCKET_NAME;
+const useR2 = Boolean(
+  process.env.R2_ACCOUNT_ID &&
+  process.env.R2_ACCESS_KEY_ID &&
+  process.env.R2_SECRET_KEY &&
+  process.env.R2_BUCKET_NAME
+);
 
 // ─── Cloudflare R2 Client ──────────────────────────────────────────────────
 
@@ -176,7 +177,11 @@ upload.getFileUrl = (req, file) => {
   if (useR2) {
     // Build the public URL manually — file.location points to the
     // private S3 API endpoint, not the public R2.dev URL
-    return `${process.env.R2_PUBLIC_URL}/${file.key}`;
+    const pubUrl = (process.env.R2_PUBLIC_URL || '').replace(/\/+$/, '');
+    if (pubUrl) {
+      return `${pubUrl}/${file.key}`;
+    }
+    return `/${file.key}`;
   }
   const customerId = req.params.customerId || 'general';
   return `/uploads/customer_${customerId}/${file.filename}`;
@@ -247,14 +252,29 @@ upload.kyc = multer({
 upload.deleteFile = async (fileUrl) => {
   if (!fileUrl) return;
   try {
-    if (useR2 && fileUrl.startsWith(process.env.R2_PUBLIC_URL)) {
-      const key = fileUrl.replace(`${process.env.R2_PUBLIC_URL}/`, '');
+    if (useR2 && r2Client && process.env.R2_BUCKET_NAME) {
+      let key = fileUrl;
+      if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+        try {
+          const u = new URL(fileUrl);
+          key = u.pathname.replace(/^\/+/, '');
+          const bName = process.env.R2_BUCKET_NAME;
+          if (bName && key.startsWith(bName + '/')) key = key.substring(bName.length + 1);
+        } catch (_) {
+          key = fileUrl.replace(/^https?:\/\/[^\/]+\//, '');
+        }
+      } else if (fileUrl.startsWith('/uploads/')) {
+        key = fileUrl.replace(/^\/uploads\//, '');
+      } else {
+        key = fileUrl.replace(/^\/+/, '');
+      }
+
       await r2Client.send(new DeleteObjectCommand({
         Bucket: process.env.R2_BUCKET_NAME,
         Key: key,
       }));
       console.log(`[R2] Deleted file: ${key}`);
-    } else if (!useR2 && fileUrl.startsWith('/uploads/')) {
+    } else if (fileUrl.startsWith('/uploads/')) {
       const localPath = path.join(__dirname, '..', fileUrl);
       if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
     }

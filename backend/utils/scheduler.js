@@ -2,6 +2,7 @@ const db = require('../config/db');
 const mailer = require('./mailer');
 const excelExpiry = require('./excelExpiry');
 const notifCtrl = require('../controllers/notificationController');
+const commCleanup = require('./communicationCleanup');
 
 function formatAuditTimestamp(date) {
   const options = {
@@ -31,10 +32,15 @@ async function closeActiveSessions(employeeId) {
     'SELECT id, login_time FROM attendance_logs WHERE employee_id = ? AND session_status = "Active Session" AND logout_time IS NULL',
     [employeeId]
   );
+  const [userRow] = await db.query('SELECT last_active_at FROM users WHERE id = ?', [employeeId]);
+  const userLastActive = userRow && userRow[0] && userRow[0].last_active_at ? new Date(userRow[0].last_active_at) : null;
+
   for (const s of activeSessions) {
-    const closeTime = new Date();
     const loginTime = new Date(s.login_time);
-    const durationSec = Math.max(0, Math.floor((closeTime.getTime() - loginTime.getTime()) / 1000));
+    let closeTime = userLastActive && userLastActive >= loginTime ? userLastActive : new Date();
+    let rawSec = Math.max(0, Math.floor((closeTime.getTime() - loginTime.getTime()) / 1000));
+    const durationSec = Math.min(rawSec, 12 * 3600);
+    closeTime = new Date(loginTime.getTime() + durationSec * 1000);
     const durationHours = Number((durationSec / 3600).toFixed(2));
     await db.query(
       'UPDATE attendance_logs SET logout_time = ?, total_working_hours = ?, session_status = "Logged Out" WHERE id = ?',
@@ -47,6 +53,7 @@ async function checkAndProcessSchedules() {
   try {
     await excelExpiry.processExpiredAssignments();
     await notifCtrl.checkExpiringAssignments().catch(() => {});
+    await commCleanup.processExpiredMessages().catch((err) => console.error('[Scheduler] commCleanup error:', err.message));
 
     // 1. Fetch current settings
     const [settings] = await db.query('SELECT * FROM system_settings');

@@ -8,6 +8,7 @@ const { loginLimiter, forgotPasswordLimiter } = require('../middleware/rateLimit
 router.post('/login', loginLimiter, authController.login);
 
 router.post('/forgot-password', forgotPasswordLimiter, authController.forgotPassword);
+router.get('/verify-reset-token', authController.verifyResetToken);
 router.post('/reset-password', authController.resetPassword);
 
 // Get current user info

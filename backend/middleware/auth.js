@@ -41,6 +41,12 @@ const verifyToken = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Session has expired or was terminated. Please sign in again.' });
     }
 
+    // Keep user's last_active_at fresh in the database (throttled to at most once per 60 seconds)
+    db.query(
+      'UPDATE users SET last_active_at = NOW() WHERE id = ? AND (last_active_at IS NULL OR last_active_at < DATE_SUB(NOW(), INTERVAL 60 SECOND))',
+      [user.id]
+    ).catch(() => {});
+
     if (decoded.role === 'admin') {
       if (!user.is_active) {
         return res.status(403).json({ success: false, message: 'Admin account has been deactivated.' });

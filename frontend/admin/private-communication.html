@@ -1,0 +1,3853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dixit Lending Solution — Private Communication</title>
+  <meta name="description" content="Secure, real-time internal communication platform for Dixit Lending Solution." />
+  <meta name="theme-color" content="#0f2747" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" href="/icons/dixit-official-logo.png" />
+  <link rel="apple-touch-icon" href="/icons/dixit-official-logo.png" />
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('cln_theme');
+        var theme = storedTheme === 'light' || storedTheme === 'dark'
+          ? storedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/styles.css?v=20261008" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    if (typeof io === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.8.1/dist/socket.io.min.js"><\/script>');
+    }
+  </script>
+  <script src="/js/api.js?v=20261115b"></script>
+  <script src="/js/employee-notifications.js?v=20261115b"></script>
+
+  <style>
+    /* ═══ Scoped styles for Private Communication ══════════════════════ */
+    .content-area,
+    .page-content {
+      padding: 20px 24px 36px;
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    @media (max-width: 768px) {
+      .content-area,
+      .page-content {
+        padding: 14px 12px 28px;
+      }
+    }
+    .comm-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .main-content {
+      min-width: 0;
+      max-width: calc(100vw - var(--sidebar-width, 260px));
+      overflow-x: hidden;
+    }
+
+    /* Topbar branding */
+    .admin-page .topbar {
+      display: flex !important;
+      align-items: center !important;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      min-height: 64px;
+      height: auto;
+      padding: 10px 24px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    :root[data-theme='dark'] .admin-page .topbar {
+      background: rgba(12, 18, 25, 0.95);
+      border-bottom-color: rgba(123, 192, 67, 0.14);
+    }
+    .admin-page .topbar-title {
+      position: absolute !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      text-align: center !important;
+      max-width: min(720px, calc(100% - 240px)) !important;
+      pointer-events: auto !important;
+      margin: 0 !important;
+    }
+    .admin-page .topbar-title h2 {
+      margin: 0 !important;
+      font-size: 18px !important;
+      font-weight: 800 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1.25 !important;
+      color: var(--text-primary) !important;
+      letter-spacing: -0.2px;
+    }
+    .admin-page .topbar-title h2 i {
+      color: var(--accent);
+      margin-right: 8px;
+      font-size: 17px;
+    }
+    .admin-page .topbar-title p {
+      margin: 2px 0 0 !important;
+      font-size: 12px !important;
+      color: var(--text-secondary) !important;
+      line-height: 1.35 !important;
+      text-align: center !important;
+      white-space: normal !important;
+    }
+    .admin-page .topbar-actions {
+      margin-left: auto !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      flex-shrink: 0 !important;
+      position: relative;
+      z-index: 2;
+    }
+    .topbar-date-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-body);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .topbar-date-badge i {
+      color: var(--accent);
+      font-size: 11px;
+    }
+    .mobile-menu-btn {
+      display: none !important;
+    }
+    @media (max-width: 900px) {
+      .mobile-menu-btn {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+        cursor: pointer;
+      }
+    }
+
+    /* Policy Notice Banner */
+    .comm-policy-banner {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 12px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .comm-policy-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .comm-policy-icon {
+      font-size: 18px;
+      color: var(--accent, #10b981);
+    }
+    .comm-policy-text h4 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .comm-policy-text p {
+      margin: 2px 0 0;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+    .comm-policy-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .comm-policy-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .comm-policy-pill.green {
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #10b981;
+    }
+    .comm-policy-pill.amber {
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #f59e0b;
+    }
+
+    /* Tab navigation */
+    .comm-tab-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+    }
+    .comm-tab-btn {
+      padding: 9px 16px;
+      border: none;
+      background: transparent;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border-radius: 6px 6px 0 0;
+    }
+    .comm-tab-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-hover, rgba(0,0,0,0.02));
+    }
+    .comm-tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: var(--bg-card);
+    }
+    .comm-tab-btn .badge-count {
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .comm-tab-panel {
+      display: none;
+    }
+    .comm-tab-panel.active {
+      display: block;
+    }
+
+    /* ── Split Chat View ─────────────────────────────────────────────── */
+    .comm-chat-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 0;
+      height: calc(100vh - 235px);
+      min-height: 540px;
+      max-height: calc(100vh - 210px);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: relative;
+    }
+    @media (max-width: 900px) {
+      .comm-chat-layout {
+        grid-template-columns: 1fr;
+        height: calc(100vh - 170px);
+        min-height: 480px;
+      }
+      .comm-sidebar-pane.mobile-hidden {
+        display: none !important;
+      }
+      .comm-chat-pane.mobile-hidden {
+        display: none !important;
+      }
+    }
+
+    /* Left pane: Conversation List */
+    .comm-sidebar-pane {
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      min-width: 0;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    .comm-sidebar-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .comm-search-wrap {
+      position: relative;
+    }
+    .comm-search-wrap input {
+      width: 100%;
+      height: 36px;
+      padding: 0 12px 0 34px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .comm-search-wrap input:focus {
+      border-color: var(--accent);
+    }
+    .comm-search-wrap i {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    /* Channel Filter Pills in Sidebar */
+    .comm-filter-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .comm-filter-pill {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--bg-body);
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .comm-filter-pill:hover {
+      color: var(--text-primary);
+      border-color: var(--accent);
+    }
+    .comm-filter-pill.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .comm-conv-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .comm-conv-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s ease;
+      position: relative;
+    }
+    .comm-conv-item:hover {
+      background: var(--bg-hover, rgba(0,0,0,0.025));
+    }
+    .comm-conv-item.active {
+      background: var(--bg-card);
+      border-left: 3px solid var(--accent);
+    }
+
+    /* Pinned Group Card special styling */
+    .comm-conv-item.group-card {
+      background: rgba(16, 185, 129, 0.04);
+      border-bottom: 2px solid rgba(16, 185, 129, 0.2);
+    }
+    .comm-conv-item.group-card.active {
+      background: rgba(16, 185, 129, 0.1);
+      border-left-color: #10b981;
+    }
+
+    .comm-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #006b3c, #10b981);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .comm-avatar.group-avatar {
+      background: linear-gradient(135deg, #0f2747, #006b3c);
+      font-size: 16px;
+    }
+    .comm-online-dot {
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 2px solid var(--bg-card);
+      display: none;
+    }
+    .comm-online-dot.visible {
+      display: block;
+    }
+    .comm-conv-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .comm-conv-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+    .comm-conv-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .comm-conv-time {
+      font-size: 11px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .comm-conv-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .comm-conv-preview {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+      flex: 1;
+    }
+    .comm-unread-pill {
+      background: var(--accent);
+      color: #fff;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+
+    /* Right pane: Active Chat Room */
+    .comm-chat-pane {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      min-width: 0;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    #active-chat-container {
+      display: none;
+      height: 100%;
+      min-height: 0;
+      min-width: 0;
+      flex-direction: column;
+      overflow: hidden;
+      flex: 1 1 0;
+    }
+    .comm-chat-header {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: var(--bg-card);
+      flex-shrink: 0;
+    }
+    .comm-chat-header-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+      cursor: pointer;
+    }
+    .comm-chat-user-details {
+      min-width: 0;
+      flex: 1;
+    }
+    .comm-chat-user-details h3 {
+      margin: 0;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .comm-chat-user-details p {
+      margin: 2px 0 0;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .comm-chat-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Pinned message banner in Chat */
+    .comm-pinned-bar {
+      background: rgba(245, 158, 11, 0.08);
+      border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+    .comm-pinned-bar i {
+      color: #f59e0b;
+      font-size: 13px;
+    }
+    .comm-pinned-content {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .comm-pinned-jump {
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    /* Messages Stream */
+    .comm-messages-scroll {
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--bg-body);
+    }
+    .comm-date-separator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    .comm-date-separator span {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Message Bubbles */
+    .comm-msg-row {
+      display: flex;
+      flex-direction: column;
+      max-width: 72%;
+      position: relative;
+    }
+    .comm-msg-row.outgoing {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    .comm-msg-row.incoming {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .comm-sender-tag {
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 3px;
+      padding: 0 4px;
+      color: #006b3c;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .comm-sender-tag.admin-tag {
+      color: #2563eb;
+    }
+
+    .comm-bubble {
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      position: relative;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      word-break: break-word;
+      transition: box-shadow 0.15s ease;
+    }
+    .comm-bubble:hover .comm-bubble-actions {
+      display: flex;
+    }
+    .comm-msg-row.outgoing .comm-bubble {
+      background: linear-gradient(135deg, #006b3c 0%, #00552f 100%);
+      color: #ffffff;
+      border-bottom-right-radius: 3px;
+    }
+    .comm-msg-row.incoming .comm-bubble {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 3px;
+    }
+
+    /* Highlighted @mentions in bubbles */
+    .comm-mention-pill {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .comm-msg-row.outgoing .comm-mention-pill {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    /* Reply preview within bubble */
+    .comm-bubble-reply {
+      background: rgba(0, 0, 0, 0.08);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      padding: 4px 8px;
+      margin-bottom: 6px;
+      font-size: 11.5px;
+      cursor: pointer;
+    }
+    .comm-msg-row.outgoing .comm-bubble-reply {
+      background: rgba(255, 255, 255, 0.15);
+      border-left-color: #ffffff;
+    }
+    .comm-bubble-reply-author {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    /* Bubble metadata (Time, ticks, 24h expiry) */
+    .comm-bubble-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10.5px;
+      margin-top: 5px;
+      opacity: 0.85;
+      justify-content: flex-end;
+    }
+    .comm-msg-row.outgoing .comm-bubble-meta {
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .comm-msg-row.incoming .comm-bubble-meta {
+      color: var(--text-secondary);
+    }
+    .comm-expiry-pill {
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.08);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .comm-msg-row.outgoing .comm-expiry-pill {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Bubble Hover Action Menu */
+    .comm-bubble-actions {
+      display: none;
+      position: absolute;
+      top: -14px;
+      right: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2px 6px;
+      gap: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10;
+    }
+    .comm-bubble-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 12px;
+      padding: 4px 6px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .comm-bubble-btn:hover {
+      color: var(--accent);
+      background: var(--bg-hover);
+    }
+
+    /* Emoji Reactions bar */
+    .comm-reactions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .comm-reaction-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2px 7px;
+      font-size: 11.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .comm-reaction-pill:hover {
+      border-color: var(--accent);
+      transform: scale(1.05);
+    }
+    .comm-reaction-pill.reacted {
+      border-color: var(--accent);
+      background: rgba(16, 185, 129, 0.12);
+    }
+
+    /* Attachments Card */
+    .comm-attachment-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-top: 6px;
+    }
+    .comm-msg-row.outgoing .comm-attachment-card {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .comm-attachment-icon {
+      font-size: 20px;
+      color: var(--accent);
+    }
+    .comm-msg-row.outgoing .comm-attachment-icon {
+      color: #ffffff;
+    }
+    .comm-attachment-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .comm-attachment-name {
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .comm-attachment-size {
+      font-size: 10.5px;
+      opacity: 0.8;
+    }
+    .comm-attachment-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .comm-att-btn {
+      background: rgba(0, 0, 0, 0.08);
+      border: none;
+      color: inherit;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .comm-att-btn:hover {
+      background: rgba(0, 0, 0, 0.16);
+    }
+
+    /* OTP Message Card */
+    .comm-otp-card {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-top: 4px;
+    }
+    .comm-otp-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #d97706;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .comm-otp-code-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .comm-otp-code {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: #d97706;
+      font-family: monospace;
+    }
+    .comm-otp-copy-btn {
+      background: #f59e0b;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Composer */
+    .comm-chat-composer {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .comm-reply-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(16, 185, 129, 0.08);
+      border-left: 3px solid var(--accent);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .comm-reply-banner.active {
+      display: flex;
+    }
+    .comm-composer-files {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .comm-composer-file-chip {
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .comm-composer-file-chip i.remove-file {
+      color: #ef4444;
+      cursor: pointer;
+    }
+
+    .comm-composer-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .comm-tool-btn {
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-body);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .comm-tool-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--accent);
+      background: var(--bg-hover);
+    }
+    .comm-composer-textarea {
+      flex: 1;
+      min-height: 38px;
+      max-height: 120px;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      outline: none;
+      resize: none;
+      box-sizing: border-box;
+      line-height: 1.4;
+    }
+    .comm-composer-textarea:focus {
+      border-color: var(--accent);
+    }
+    .comm-send-btn {
+      height: 38px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #006b3c 0%, #00552f 100%);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 107, 60, 0.25);
+    }
+    .comm-send-btn:hover {
+      background: linear-gradient(135deg, #007a44 0%, #005d34 100%);
+      transform: translateY(-1px);
+    }
+
+    /* Typing indicator */
+    .comm-typing-indicator {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-style: italic;
+      padding: 2px 6px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+    .comm-typing-indicator.active {
+      display: flex;
+    }
+
+    /* Right Sliding Drawer: Group / User Info */
+    .comm-info-drawer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 320px;
+      height: 100%;
+      background: var(--bg-card);
+      border-left: 1px solid var(--border);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+      z-index: 40;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .comm-info-drawer.open {
+      transform: translateX(0);
+    }
+    .comm-drawer-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .comm-drawer-header h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .comm-drawer-close {
+      background: transparent;
+      border: none;
+      font-size: 16px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .comm-drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .comm-member-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .comm-member-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .comm-member-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .comm-member-role {
+      font-size: 10.5px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    .comm-member-status {
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .comm-member-status.online {
+      color: #10b981;
+    }
+    .comm-member-status.offline {
+      color: var(--text-secondary);
+    }
+
+    /* ── Announcements Tab Styles ────────────────────────────────────── */
+    .comm-announcements-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .comm-anno-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 18px;
+    }
+    .comm-anno-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      border-left: 4px solid var(--accent);
+    }
+    .comm-anno-card.urgent {
+      border-left-color: #ef4444;
+      background: rgba(239, 68, 68, 0.03);
+    }
+    .comm-anno-card.important {
+      border-left-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.03);
+    }
+    .comm-anno-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .comm-anno-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .comm-anno-priority-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .comm-anno-priority-badge.normal {
+      background: rgba(59, 130, 246, 0.12);
+      color: #3b82f6;
+    }
+    .comm-anno-priority-badge.important {
+      background: rgba(245, 158, 11, 0.12);
+      color: #f59e0b;
+    }
+    .comm-anno-priority-badge.urgent {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+    }
+    .comm-anno-body {
+      font-size: 13.5px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .comm-anno-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+    }
+
+    /* ── Employee Access & Audit Styles (Preserved) ───────────────────── */
+    .comm-access-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 18px;
+    }
+    .comm-access-filters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+    .comm-table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .comm-data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .comm-data-table th {
+      background: var(--bg-body);
+      padding: 11px 16px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+    .comm-data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+    .comm-data-table tr:hover td {
+      background: var(--bg-hover, rgba(0,0,0,0.02));
+    }
+
+    /* Modal dialogs */
+    .comm-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(3px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .comm-modal-backdrop.open {
+      display: flex;
+    }
+    .comm-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    .comm-modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .comm-modal-header h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .comm-modal-body {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .comm-modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* Dark Mode Harmonization */
+    :root[data-theme='dark'] .comm-chat-layout {
+      background: rgba(12, 18, 25, 0.95);
+      border-color: rgba(123, 192, 67, 0.14);
+    }
+    :root[data-theme='dark'] .comm-sidebar-pane {
+      background: rgba(14, 20, 28, 0.95);
+      border-right-color: rgba(123, 192, 67, 0.14);
+    }
+    :root[data-theme='dark'] .comm-info-drawer {
+      background: rgba(14, 20, 28, 0.98);
+      border-left-color: rgba(123, 192, 67, 0.18);
+    }
+  
+    /* ═══ Header Responsive Controls ═══════════════════════════════════ */
+    .admin-page .topbar-actions {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      flex-shrink: 0 !important;
+      flex-wrap: nowrap !important;
+    }
+    @media (max-width: 900px) {
+      .admin-page .topbar {
+        position: relative !important;
+        padding: 10px 14px !important;
+        gap: 10px !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+      }
+      .admin-page .topbar-title {
+        position: static !important;
+        transform: none !important;
+        text-align: left !important;
+        max-width: none !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+      }
+      .admin-page .topbar-title h2 {
+        font-size: 15px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+      .admin-page .topbar-title p {
+        display: none !important;
+      }
+      .admin-page .topbar-actions {
+        gap: 8px !important;
+      }
+      .topbar-date-badge span {
+        display: none !important;
+      }
+      .topbar-date-badge {
+        padding: 6px 8px !important;
+      }
+    }
+    @media (max-width: 520px) {
+      .topbar-date-badge {
+        display: none !important;
+      }
+    }
+
+    /* ═══ SaaS Enterprise Announcement Composer ═════════════════════════ */
+    .comm-modal-composer {
+      max-width: 980px !important;
+      width: 94% !important;
+      border-radius: 16px !important;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35) !important;
+      border: 1px solid var(--border) !important;
+      background: var(--bg-card) !important;
+      overflow: hidden !important;
+      max-height: 92vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    .anno-composer-header {
+      padding: 18px 24px;
+      background: linear-gradient(135deg, rgba(0, 77, 42, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    :root[data-theme='dark'] .anno-composer-header {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(12, 18, 25, 0.95) 100%);
+      border-bottom-color: rgba(123, 192, 67, 0.16);
+    }
+
+    .anno-composer-head-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .anno-composer-head-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.14);
+      color: var(--accent, #10b981);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      flex-shrink: 0;
+    }
+
+    .anno-composer-head-text h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    .anno-composer-head-text p {
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .anno-composer-grid {
+      display: grid;
+      grid-template-columns: 1.18fr 0.82fr;
+      gap: 24px;
+      padding: 22px 24px;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+    }
+
+    @media (max-width: 860px) {
+      .anno-composer-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 16px;
+      }
+    }
+
+    /* Priority Segmented Cards */
+    .anno-priority-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .anno-priority-card {
+      border: 1.5px solid var(--border);
+      background: var(--bg-body);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      text-align: left;
+      user-select: none;
+    }
+
+    .anno-priority-card:hover {
+      border-color: rgba(16, 185, 129, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .anno-priority-card.selected.priority-normal {
+      border-color: #3b82f6 !important;
+      background: rgba(59, 130, 246, 0.08) !important;
+    }
+
+    .anno-priority-card.selected.priority-important {
+      border-color: #f59e0b !important;
+      background: rgba(245, 158, 11, 0.08) !important;
+    }
+
+    .anno-priority-card.selected.priority-urgent {
+      border-color: #ef4444 !important;
+      background: rgba(239, 68, 68, 0.08) !important;
+    }
+
+    .anno-priority-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .anno-priority-head span {
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .anno-priority-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+
+    .anno-priority-radio-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: #fff;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .anno-priority-card.selected.priority-normal .anno-priority-radio-check {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    .anno-priority-card.selected.priority-important .anno-priority-radio-check {
+      background: #f59e0b;
+      border-color: #f59e0b;
+    }
+
+    .anno-priority-card.selected.priority-urgent .anno-priority-radio-check {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    /* Audience Segmented Selector */
+    .anno-audience-segmented {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      margin-top: 6px;
+    }
+
+    .anno-audience-tab {
+      flex: 1;
+      padding: 8px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .anno-audience-tab.active {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      font-weight: 700;
+    }
+
+    /* Selected Employees Box */
+    .anno-employees-box {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      background: var(--bg-body);
+      margin-top: 10px;
+      display: none;
+    }
+
+    .anno-employees-search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 12.5px;
+      margin-bottom: 8px;
+    }
+
+    .anno-employees-search-wrap input {
+      border: none;
+      background: transparent;
+      width: 100%;
+      font-size: 12px;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .anno-employees-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      padding: 0 2px;
+    }
+
+    .anno-employees-list {
+      max-height: 155px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-right: 4px;
+    }
+
+    .anno-emp-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: var(--bg-card);
+      border: 1px solid transparent;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .anno-emp-item:hover {
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .anno-emp-item.checked {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+
+    .anno-counter {
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+      font-size: 11px;
+    }
+
+    .anno-form-error {
+      color: #ef4444;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: none;
+      margin-top: 4px;
+    }
+
+    /* Live Dynamic Preview Panel */
+    .anno-preview-panel {
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .anno-preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .anno-preview-tag {
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+      background: rgba(16, 185, 129, 0.12);
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .anno-sim-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      border-left: 4px solid var(--accent);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+    }
+
+    .anno-sim-card.urgent {
+      border-left-color: #ef4444 !important;
+      background: rgba(239, 68, 68, 0.03) !important;
+    }
+
+    .anno-sim-card.important {
+      border-left-color: #f59e0b !important;
+      background: rgba(245, 158, 11, 0.03) !important;
+    }
+
+    .anno-sim-card.normal {
+      border-left-color: #3b82f6 !important;
+      background: rgba(59, 130, 246, 0.03) !important;
+    }
+
+    .anno-sim-title-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .anno-sim-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .anno-sim-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .anno-sim-body {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    .anno-sim-footer {
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .comm-anno-aud-badge {
+      font-size: 10.5px;
+      font-weight: 600;
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 2px 7px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="app-layout admin-page">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="/admin/dashboard.html" class="sidebar-logo dixit-brand-header" title="Dixit Lending Solution">
+        <div class="dixit-mark-wrap">
+          <img src="/icons/dixit-mark.png" alt="Dixit Lending Solution Logo" class="dixit-mark-img" />
+        </div>
+        <div class="dixit-brand-text">
+          <h2 class="dixit-title">DIXIT</h2>
+          <span class="dixit-subtitle">LENDING SOLUTION</span>
+          <div class="dixit-accent-line"></div>
+          <span class="dixit-workspace-badge">Admin Console</span>
+        </div>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Main</div>
+        <a href="/admin/dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span> <span>Dashboard</span></a>
+        <a href="/admin/employees.html" class="nav-item"><span class="nav-icon"><i class="fas fa-users" aria-hidden="true"></i></span> <span>Employees</span></a>
+        <a href="/admin/customers.html" class="nav-item"><span class="nav-icon"><i class="fas fa-address-book" aria-hidden="true"></i></span> <span>Customers</span></a>
+        <a href="/admin/loans.html" class="nav-item"><span class="nav-icon"><i class="fas fa-briefcase" aria-hidden="true"></i></span> <span>Loan Applications</span></a>
+        <a href="/admin/emi-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator" aria-hidden="true"></i></span> <span>EMI Calculator</span></a>
+        <a href="/admin/data-excel.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel" aria-hidden="true"></i></span> <span>Data Excel Document</span></a>
+        <a href="/admin/banking-partner-portal.html" class="nav-item"><span class="nav-icon"><i class="fas fa-landmark" aria-hidden="true"></i></span> <span>Banking Partner Portal</span></a>
+        <a href="/admin/private-communication.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-comments" aria-hidden="true"></i></span> <span>Private Communication</span></a>
+        <a href="/admin/login-activity.html" class="nav-item"><span class="nav-icon"><i class="fas fa-location-dot" aria-hidden="true"></i></span> <span>Login Activity</span></a>
+        <a href="/admin/apr.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span> <span>APR</span></a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="user-details"><p id="sidebar-user-name">Admin</p><span id="sidebar-user-role">admin</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Logout</span></button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation menu">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+        <span>Menu</span>
+      </button>
+      <div class="topbar-title">
+        <h2><i class="fas fa-comments"></i> Private Communication</h2>
+        <p>Enterprise Real-Time Collaboration & Notification Center</p>
+      </div>
+      <div class="topbar-actions">
+        <!-- Current Date Badge -->
+        <div class="topbar-date-badge">
+          <i class="fas fa-calendar-alt"></i>
+          <span id="current-date-display">Today</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="comm-container">
+
+        <!-- Retention Policy Info Banner -->
+        <div class="comm-policy-banner">
+          <div class="comm-policy-left">
+            <div class="comm-policy-icon"><i class="fas fa-shield-halved"></i></div>
+            <div class="comm-policy-text">
+              <h4>Strict 24-Hour Automated Cleanup Policy</h4>
+              <p>All conversation messages and attachments automatically expire and are purged from database and storage after 24 hours.</p>
+            </div>
+          </div>
+          <div class="comm-policy-pills">
+            <span class="comm-policy-pill green"><i class="fas fa-clock"></i> Messages: 24h</span>
+            <span class="comm-policy-pill amber"><i class="fas fa-key"></i> OTPs: 15m</span>
+            <span class="comm-policy-pill"><i class="fas fa-lock"></i> Private Storage</span>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="comm-tab-nav" role="tablist">
+          <button class="comm-tab-btn active" data-tab="tab-conversations" onclick="switchCommTab('tab-conversations')">
+            <i class="fas fa-comments"></i> Communication Hub
+            <span id="unread-total-badge" class="badge-count" style="display: none;">0</span>
+          </button>
+          <button class="comm-tab-btn" data-tab="tab-announcements" onclick="switchCommTab('tab-announcements')">
+            <i class="fas fa-bullhorn"></i> Admin Announcements
+          </button>
+          <button class="comm-tab-btn" data-tab="tab-employee-access" onclick="switchCommTab('tab-employee-access')">
+            <i class="fas fa-users-gear"></i> Employee Access
+          </button>
+          <button class="comm-tab-btn" data-tab="tab-audit-logs" onclick="switchCommTab('tab-audit-logs')">
+            <i class="fas fa-clock-rotate-left"></i> Access Audit History
+          </button>
+        </div>
+
+        <!-- TAB 1: COMMUNICATION HUB (GROUP + DIRECT CHATS) -->
+        <div id="tab-conversations" class="comm-tab-panel active">
+          <div class="comm-chat-layout">
+            <!-- Left Pane: Channels & Conversations List -->
+            <div class="comm-sidebar-pane" id="comm-sidebar-pane">
+              <div class="comm-sidebar-header">
+                <div class="comm-search-wrap">
+                  <i class="fas fa-magnifying-glass"></i>
+                  <input type="text" id="conv-search" placeholder="Search channels or employees..." oninput="filterChannelsAndConversations()" />
+                </div>
+                <div class="comm-filter-pills">
+                  <span class="comm-filter-pill active" data-filter="all" onclick="setChannelFilter('all')">All</span>
+                  <span class="comm-filter-pill" data-filter="groups" onclick="setChannelFilter('groups')">Groups</span>
+                  <span class="comm-filter-pill" data-filter="direct" onclick="setChannelFilter('direct')">Direct Chats</span>
+                </div>
+              </div>
+
+              <div class="comm-conv-list" id="conv-list-container">
+                <!-- Group Card (Pinned Top) -->
+                <div class="comm-conv-item group-card" id="group-channel-item" onclick="selectChannel('group')">
+                  <div class="comm-avatar group-avatar">
+                    <i class="fas fa-users"></i>
+                  </div>
+                  <div class="comm-conv-info">
+                    <div class="comm-conv-top">
+                      <h4 class="comm-conv-name">Company Group <i class="fas fa-circle-check" style="color: #10b981; font-size: 11px;"></i></h4>
+                      <span class="comm-conv-time" id="group-last-time">--</span>
+                    </div>
+                    <div class="comm-conv-bottom">
+                      <p class="comm-conv-preview" id="group-last-preview">Official company collaboration channel</p>
+                      <span class="comm-unread-pill" id="group-unread-pill" style="display: none;">0</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Direct Conversation List Items dynamically injected -->
+                <div id="direct-convs-container"></div>
+              </div>
+            </div>
+
+            <!-- Right Pane: Active Chat Room -->
+            <div class="comm-chat-pane" id="comm-chat-pane">
+              <!-- Empty state before selection -->
+              <div id="no-chat-selected" class="comm-empty-state" style="margin: auto; display: none;">
+                <i class="fas fa-message"></i>
+                <h4>Select a Conversation</h4>
+                <p>Choose the Company Group or an authorized employee to communicate in real time.</p>
+              </div>
+
+              <!-- Active Chat Container -->
+              <div id="active-chat-container" style="display: flex;">
+                <!-- Chat Header -->
+                <div class="comm-chat-header">
+                  <div class="comm-chat-header-user" onclick="toggleInfoDrawer()">
+                    <div class="comm-avatar" id="active-chat-avatar">
+                      <i class="fas fa-users"></i>
+                    </div>
+                    <div class="comm-chat-user-details">
+                      <h3 id="active-chat-name">Company Group</h3>
+                      <p id="active-chat-status">All active team members</p>
+                    </div>
+                  </div>
+                  <div class="comm-chat-actions">
+                    <button class="comm-tool-btn" onclick="openSearchModal()" title="Search in conversation">
+                      <i class="fas fa-magnifying-glass"></i>
+                    </button>
+                    <button class="comm-tool-btn" id="header-group-info-btn" onclick="toggleInfoDrawer()" title="Group Info">
+                      <i class="fas fa-circle-info"></i> Info
+                    </button>
+                    <button class="comm-tool-btn" onclick="refreshCurrentChannel()" title="Refresh messages">
+                      <i class="fas fa-rotate"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Pinned Message Bar -->
+                <div class="comm-pinned-bar" id="pinned-message-bar" style="display: none;">
+                  <i class="fas fa-thumbtack"></i>
+                  <span class="comm-pinned-content" id="pinned-message-text">Pinned message</span>
+                  <span class="comm-pinned-jump" onclick="jumpToPinnedMessage()">View</span>
+                </div>
+
+                <!-- Messages Stream -->
+                <div class="comm-messages-scroll" id="messages-stream">
+                  <div class="comm-empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h4>Loading messages...</h4>
+                  </div>
+                </div>
+
+                <!-- Typing indicator -->
+                <div class="comm-typing-indicator" id="typing-indicator">
+                  <i class="fas fa-ellipsis fa-fade"></i> <span id="typing-text">Someone is typing...</span>
+                </div>
+
+                <!-- Composer -->
+                <div class="comm-chat-composer">
+                  <!-- Replying Banner -->
+                  <div class="comm-reply-banner" id="reply-banner">
+                    <div>
+                      <i class="fas fa-reply" style="color: var(--accent);"></i>
+                      <span>Replying to <b id="reply-to-name">User</b>: <span id="reply-to-snippet" style="opacity: 0.85;">...</span></span>
+                    </div>
+                    <button type="button" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);" onclick="cancelReply()">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+
+                  <!-- Selected Files Chips -->
+                  <div class="comm-composer-files" id="composer-attachment-pills"></div>
+
+                  <div class="comm-composer-row">
+                    <input type="file" id="file-input-element" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" style="display: none;" onchange="handleFileSelection(event)" />
+                    <button type="button" class="comm-tool-btn" onclick="document.getElementById('file-input-element').click()" title="Attach PDF or Images">
+                      <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button type="button" class="comm-tool-btn" id="composer-otp-btn" onclick="openShareOtpModal()" style="display: none;" title="Share Secure OTP">
+                      <i class="fas fa-key" style="color: #f59e0b;"></i> OTP
+                    </button>
+                    <textarea id="chat-text-input" class="comm-composer-textarea" rows="1" placeholder="Type a message (Enter to send, Shift+Enter for new line, @ to mention)..." onkeydown="handleChatInputKey(event)" oninput="handleTypingAndGrowth(this)"></textarea>
+                    <button type="button" class="comm-send-btn" id="chat-send-btn" onclick="sendMessage()">
+                      <span>Send</span> <i class="fas fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Right Sliding Drawer: Group / User Info -->
+                <div class="comm-info-drawer" id="comm-info-drawer">
+                  <div class="comm-drawer-header">
+                    <h3 id="drawer-title">Group Details</h3>
+                    <button class="comm-drawer-close" onclick="toggleInfoDrawer()"><i class="fas fa-times"></i></button>
+                  </div>
+                  <div class="comm-drawer-body">
+                    <div style="text-align: center; padding: 10px 0;">
+                      <div class="comm-avatar group-avatar" style="width: 56px; height: 56px; margin: 0 auto 10px; font-size: 24px;">
+                        <i class="fas fa-building"></i>
+                      </div>
+                      <h4 id="drawer-group-name" style="margin: 0; font-size: 15px; color: var(--text-primary);">Company Group</h4>
+                      <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary);">Dixit Lending Solution Official Workspace</p>
+                    </div>
+
+                    <div class="comm-warn-box" style="margin: 0;">
+                      <i class="fas fa-shield-halved"></i>
+                      <span>All messages, shared media, and replies strictly expire and are permanently purged after 24 hours.</span>
+                    </div>
+
+                    <div>
+                      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <h5 style="margin: 0; font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                          Members (<span id="drawer-member-count">0</span>)
+                        </h5>
+                        <span style="font-size: 11px; color: #10b981; font-weight: 600;" id="drawer-online-count">0 Online</span>
+                      </div>
+                      <div class="comm-search-wrap" style="margin-bottom: 10px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="drawer-member-search" placeholder="Search members..." oninput="filterDrawerMembers()" style="height: 32px; font-size: 12px;" />
+                      </div>
+                      <div id="drawer-members-list">
+                        <!-- Members dynamically loaded -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: ANNOUNCEMENTS -->
+        <div id="tab-announcements" class="comm-tab-panel">
+          <div class="comm-announcements-container">
+            <div class="comm-anno-toolbar">
+              <div>
+                <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-primary);"><i class="fas fa-bullhorn" style="color: var(--accent); margin-right: 8px;"></i> Broadcast Announcements</h3>
+                <p style="margin: 3px 0 0; font-size: 12px; color: var(--text-secondary);">Official company communications sent to all or selected employees with delivery tracking.</p>
+              </div>
+              <button class="comm-send-btn" onclick="openNewAnnouncementModal()">
+                <i class="fas fa-plus"></i> New Announcement
+              </button>
+            </div>
+
+            <div id="announcements-feed">
+              <div class="comm-empty-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <h4>Loading announcements...</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: EMPLOYEE ACCESS (PRESERVED) -->
+        <div id="tab-employee-access" class="comm-tab-panel">
+          <div class="comm-access-toolbar">
+            <div class="comm-access-filters">
+              <div class="comm-search-wrap" style="min-width: 260px;">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="access-search" placeholder="Search employee name or email..." oninput="loadEmployeeAccessList()" />
+              </div>
+            </div>
+            <div>
+              <button class="comm-tool-btn" onclick="loadEmployeeAccessList()">
+                <i class="fas fa-rotate"></i> Refresh Access
+              </button>
+            </div>
+          </div>
+
+          <div class="comm-table-card" style="margin-top: 14px;">
+            <table class="comm-data-table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Status</th>
+                  <th>Communication Permission</th>
+                  <th>Unread</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="access-table-body">
+                <tr><td colspan="5" style="text-align: center; padding: 30px;">Loading access records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 4: AUDIT LOGS (PRESERVED) -->
+        <div id="tab-audit-logs" class="comm-tab-panel">
+          <div class="comm-table-card">
+            <table class="comm-data-table">
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Admin</th>
+                  <th>Action</th>
+                  <th>Target Employee</th>
+                  <th>IP Address</th>
+                </tr>
+              </thead>
+              <tbody id="audit-table-body">
+                <tr><td colspan="5" style="text-align: center; padding: 30px;">Loading audit logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: New Announcement Composer -->
+<div class="comm-modal-backdrop" id="modal-new-announcement" role="dialog" aria-modal="true" aria-labelledby="anno-composer-title">
+  <div class="comm-modal comm-modal-composer">
+    <div class="anno-composer-header">
+      <div class="anno-composer-head-left">
+        <div class="anno-composer-head-icon">
+          <i class="fas fa-bullhorn" aria-hidden="true"></i>
+        </div>
+        <div class="anno-composer-head-text">
+          <h3 id="anno-composer-title"><i class="fas fa-paper-plane" style="color:var(--accent);font-size:15px;"></i> Compose Broadcast Announcement</h3>
+          <p>Create and dispatch official announcements with live preview, priority tagging, and delivery tracking.</p>
+        </div>
+      </div>
+      <button type="button" class="comm-modal-close" onclick="cancelAnnouncementComposer()" aria-label="Close Announcement Composer">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="anno-composer-grid">
+      <!-- Left Column: Form Controls -->
+      <div class="anno-form-col">
+        <!-- A. Announcement Title -->
+        <div class="comm-form-group">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label for="anno-title-input" style="font-weight:700;font-size:13px;color:var(--text-primary);margin:0;">Announcement Title <span style="color:#ef4444;">*</span></label>
+            <span class="anno-counter" id="anno-title-counter">0 / 120</span>
+          </div>
+          <input
+            type="text"
+            id="anno-title-input"
+            maxlength="120"
+            placeholder="e.g. Q4 Performance Incentives & System Maintenance Schedule"
+            oninput="handleAnnoTitleInput(this)"
+            style="margin-top:6px;width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 14px;background:var(--bg-body);color:var(--text-primary);font-size:13.5px;"
+          />
+          <div id="anno-title-error" class="anno-form-error">Announcement title is required.</div>
+        </div>
+
+        <!-- B. Priority Level -->
+        <div class="comm-form-group" style="margin-top:16px;">
+          <label style="font-weight:700;font-size:13px;color:var(--text-primary);margin:0;">Priority Level <span style="color:#ef4444;">*</span></label>
+          <input type="hidden" id="anno-priority-input" value="Normal" />
+          <div class="anno-priority-cards" role="radiogroup" aria-label="Announcement Priority">
+            <!-- Normal -->
+            <div class="anno-priority-card priority-normal selected" id="card-prio-normal" onclick="setAnnouncementPriority('Normal')" role="radio" aria-checked="true" tabindex="0">
+              <div class="anno-priority-head">
+                <span style="color:#2563eb;"><i class="fas fa-circle-info"></i> Normal</span>
+                <span class="anno-priority-radio-check"><i class="fas fa-check"></i></span>
+              </div>
+              <div class="anno-priority-desc">Standard broadcast to team feeds.</div>
+            </div>
+            <!-- Important -->
+            <div class="anno-priority-card priority-important" id="card-prio-important" onclick="setAnnouncementPriority('Important')" role="radio" aria-checked="false" tabindex="0">
+              <div class="anno-priority-head">
+                <span style="color:#d97706;"><i class="fas fa-star"></i> Important</span>
+                <span class="anno-priority-radio-check"><i class="fas fa-check" style="display:none;"></i></span>
+              </div>
+              <div class="anno-priority-desc">Highlighted broadcast with badge.</div>
+            </div>
+            <!-- Urgent -->
+            <div class="anno-priority-card priority-urgent" id="card-prio-urgent" onclick="setAnnouncementPriority('Urgent')" role="radio" aria-checked="false" tabindex="0">
+              <div class="anno-priority-head">
+                <span style="color:#dc2626;"><i class="fas fa-triangle-exclamation"></i> Urgent</span>
+                <span class="anno-priority-radio-check"><i class="fas fa-check" style="display:none;"></i></span>
+              </div>
+              <div class="anno-priority-desc">Immediate topbar notification alert.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- C. Target Audience -->
+        <div class="comm-form-group" style="margin-top:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label style="font-weight:700;font-size:13px;color:var(--text-primary);margin:0;">Target Audience <span style="color:#ef4444;">*</span></label>
+            <span id="anno-selected-count-badge" style="font-size:11.5px;color:var(--accent);font-weight:700;display:none;">0 selected</span>
+          </div>
+          <input type="hidden" id="anno-audience-type-input" value="all" />
+          <div class="anno-audience-segmented" role="tablist">
+            <button type="button" class="anno-audience-tab active" id="aud-tab-all" onclick="setAnnouncementAudience('all')">
+              <i class="fas fa-users"></i> All Active Employees
+            </button>
+            <button type="button" class="anno-audience-tab" id="aud-tab-selected" onclick="setAnnouncementAudience('selected')">
+              <i class="fas fa-user-check"></i> Selected Employees
+            </button>
+          </div>
+
+          <!-- Selected Employees Checklist Drawer -->
+          <div class="anno-employees-box" id="anno-selected-employees-wrap">
+            <div class="anno-employees-search-wrap">
+              <i class="fas fa-magnifying-glass" style="color:var(--text-secondary);"></i>
+              <input type="text" id="anno-emp-search-input" placeholder="Search employees by name or email..." oninput="filterAnnouncementEmployees()" />
+            </div>
+            <div class="anno-employees-actions-row">
+              <span>Select recipients:</span>
+              <div style="display:flex;gap:8px;">
+                <button type="button" style="background:none;border:none;color:var(--accent);font-size:11.5px;font-weight:700;cursor:pointer;padding:0;" onclick="toggleAllAnnouncementEmployees(true)">Select All</button>
+                <span style="color:var(--border);">•</span>
+                <button type="button" style="background:none;border:none;color:var(--text-secondary);font-size:11.5px;font-weight:600;cursor:pointer;padding:0;" onclick="toggleAllAnnouncementEmployees(false)">Deselect All</button>
+              </div>
+            </div>
+            <div class="anno-employees-list" id="anno-employees-list">
+              <div style="padding:16px;text-align:center;font-size:12px;color:var(--text-secondary);">
+                <i class="fas fa-spinner fa-spin"></i> Loading workforce...
+              </div>
+            </div>
+          </div>
+          <div id="anno-audience-error" class="anno-form-error">Please select at least one employee recipient.</div>
+        </div>
+
+        <!-- D. Announcement Message -->
+        <div class="comm-form-group" style="margin-top:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label for="anno-content-input" style="font-weight:700;font-size:13px;color:var(--text-primary);margin:0;">Announcement Message <span style="color:#ef4444;">*</span></label>
+            <span class="anno-counter" id="anno-content-counter">0 / 2,000</span>
+          </div>
+          <textarea
+            id="anno-content-input"
+            rows="6"
+            maxlength="2000"
+            placeholder="Write clear, comprehensive broadcast details, instructions, action items, or policy updates for the team..."
+            oninput="handleAnnoContentInput(this)"
+            style="margin-top:6px;width:100%;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--bg-body);color:var(--text-primary);font-size:13.5px;line-height:1.55;resize:vertical;min-height:130px;"
+          ></textarea>
+          <div id="anno-content-error" class="anno-form-error">Announcement message is required.</div>
+        </div>
+      </div>
+
+      <!-- Right Column: Live Dynamic Preview Area -->
+      <div class="anno-preview-col">
+        <div class="anno-preview-panel">
+          <div class="anno-preview-header">
+            <span class="anno-preview-tag"><i class="fas fa-eye"></i> LIVE PREVIEW</span>
+            <span style="font-size:11px;color:var(--text-secondary);">Real-time mirror</span>
+          </div>
+
+          <!-- Simulated Employee Card -->
+          <div class="anno-sim-card normal" id="sim-anno-card">
+            <div class="anno-sim-title-wrap">
+              <span class="comm-anno-priority-badge normal" id="sim-anno-priority-badge">NORMAL</span>
+              <span style="font-size:11px;color:var(--text-secondary);"><i class="fas fa-clock"></i> 24h left</span>
+            </div>
+            <h4 class="anno-sim-title" id="sim-anno-title">Announcement Title Preview</h4>
+            <div class="anno-sim-meta-row">
+              <span id="sim-anno-audience" class="comm-anno-aud-badge"><i class="fas fa-users"></i> All Active Employees</span>
+            </div>
+            <div class="anno-sim-body" id="sim-anno-body">Your announcement message will appear here in real-time as you write...</div>
+            <div class="anno-sim-footer">
+              <span>Posted by <b>Admin (You)</b> • Just now</span>
+              <button type="button" class="comm-tool-btn" style="height:24px;font-size:10.5px;pointer-events:none;opacity:0.8;"><i class="fas fa-check"></i> Mark as Read</button>
+            </div>
+          </div>
+
+          <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:8px;">
+            <i class="fas fa-info-circle" style="color:var(--accent);margin-top:2px;"></i>
+            <span>This live preview displays how your broadcast will appear in the employee communication stream. Recipients can acknowledge by marking as read.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- E. Form Actions Footer -->
+    <div class="comm-modal-footer anno-composer-footer" style="padding:14px 24px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);background:var(--bg-card);">
+      <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-secondary);">
+        <i class="fas fa-shield-halved" style="color:var(--accent);"></i>
+        <span>24h automated purge policy active</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button type="button" class="comm-tool-btn" onclick="cancelAnnouncementComposer()">Cancel</button>
+        <button type="button" class="comm-send-btn" id="anno-publish-btn" onclick="submitAnnouncement()">
+          <i class="fas fa-paper-plane"></i>
+          <span>Publish Announcement</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Share OTP -->
+<div class="comm-modal-backdrop" id="modal-share-otp">
+  <div class="comm-modal">
+    <div class="comm-modal-header">
+      <h3><i class="fas fa-key" style="color: #f59e0b;"></i> Share Verification OTP</h3>
+      <button class="comm-modal-close" onclick="closeModal('modal-share-otp')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="comm-modal-body">
+      <div class="comm-warn-box">
+        <i class="fas fa-shield-halved"></i>
+        <span>Security notice: OTP messages automatically expire and are purged after 15 minutes.</span>
+      </div>
+      <div class="comm-form-group">
+        <label>OTP Value *</label>
+        <input type="text" id="otp-value-input" placeholder="e.g. 648192" maxlength="10" style="letter-spacing: 3px; font-weight: 700; font-size: 16px;" />
+      </div>
+      <div class="comm-form-group">
+        <label>Loan Case Reference</label>
+        <input type="text" id="otp-case-input" placeholder="e.g. DLS-LN-2026-891" />
+      </div>
+      <div class="comm-form-group">
+        <label>Purpose / Note</label>
+        <input type="text" id="otp-purpose-input" placeholder="e.g. Aadhaar Verification / Document Signature" />
+      </div>
+    </div>
+    <div class="comm-modal-footer">
+      <button class="comm-tool-btn" onclick="closeModal('modal-share-otp')">Cancel</button>
+      <button class="comm-send-btn" onclick="submitOtpMessage()">Send Secure OTP</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Search Messages -->
+<div class="comm-modal-backdrop" id="modal-search-messages">
+  <div class="comm-modal" style="max-width: 600px;">
+    <div class="comm-modal-header">
+      <h3><i class="fas fa-magnifying-glass" style="color: var(--accent);"></i> Search Messages</h3>
+      <button class="comm-modal-close" onclick="closeModal('modal-search-messages')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="comm-modal-body">
+      <div class="comm-search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="message-search-input" placeholder="Search keywords or file names in this channel..." oninput="executeMessageSearch()" />
+      </div>
+      <div id="search-results-container" style="max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+        <p style="text-align: center; color: var(--text-secondary); margin: 20px 0;">Enter keywords to search unexpired messages.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Attachment Viewer / Preview -->
+<div class="comm-modal-backdrop" id="modal-attachment-preview">
+  <div class="comm-modal" style="max-width: 820px; height: 85vh;">
+    <div class="comm-modal-header">
+      <h3 id="preview-modal-filename"><i class="fas fa-file-pdf"></i> Document Preview</h3>
+      <div style="display: flex; gap: 8px;">
+        <button class="comm-tool-btn" id="preview-download-btn" onclick="downloadPreviewAttachment()"><i class="fas fa-download"></i> Download</button>
+        <button class="comm-modal-close" onclick="closeModal('modal-attachment-preview')"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="comm-modal-body" style="padding: 0; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000;">
+      <iframe id="preview-iframe" style="width: 100%; height: 100%; border: none; display: none;"></iframe>
+      <img id="preview-img" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;" />
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// FRONTEND LOGIC & REAL-TIME WEBSOCKETS (ADMIN CONSOLE)
+// ══════════════════════════════════════════════════════════════════════════════
+const COMM_API_BASE = '/api/private-communication';
+let currentUser = null;
+let currentChannelType = 'group'; // 'group' or 'direct'
+let currentConversationId = null;
+let currentTargetEmployeeId = null;
+let activeConversationsList = [];
+let allGroupMembers = [];
+let onlineUsersSet = new Set();
+let selectedFiles = [];
+let currentReplyTo = null; // { id, name, snippet }
+let currentPreviewAttId = null;
+let socket = null;
+let typingTimeout = null;
+
+var getToken = function() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const qToken = urlParams.get('token') || urlParams.get('cln_token');
+    if (qToken) {
+      localStorage.setItem('token', qToken);
+      localStorage.setItem('cln_token', qToken);
+      return qToken;
+    }
+  } catch (_) {}
+  return sessionStorage.getItem('cln_token') || localStorage.getItem('cln_token') || localStorage.getItem('token') || '';
+};
+window.getToken = getToken;
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function formatRelativeTime(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diffSec = Math.floor((now - d) / 1000);
+  if (diffSec < 60) return 'Just now';
+  if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+}
+
+function formatExpiryTime(remainingSec) {
+  if (!remainingSec || remainingSec <= 0) return 'Expired';
+  const hours = Math.floor(remainingSec / 3600);
+  const mins = Math.floor((remainingSec % 3600) / 60);
+  if (hours > 0) return `${hours}h ${mins}m left`;
+  return `${mins}m left`;
+}
+
+// ── Tab Switching ─────────────────────────────────────────────────────────────
+function switchCommTab(tabId) {
+  document.querySelectorAll('.comm-tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+  });
+  document.querySelectorAll('.comm-tab-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === tabId);
+  });
+
+  if (tabId === 'tab-conversations') {
+    refreshCurrentChannel();
+  } else if (tabId === 'tab-announcements') {
+    loadAnnouncements();
+  } else if (tabId === 'tab-employee-access') {
+    loadEmployeeAccessList();
+  } else if (tabId === 'tab-audit-logs') {
+    loadAuditLogs();
+  }
+}
+
+// ── Socket.IO Real-time Connection ────────────────────────────────────────────
+function initRealtimeSocket() {
+  const token = getToken();
+  if (!token || typeof io === 'undefined') return;
+
+  try {
+    socket = io({
+      auth: { token },
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: 10,
+    });
+
+    socket.on('connect', () => {
+      console.log('✅ Real-time Socket connected to CLN Communication Hub');
+    });
+
+    socket.on('presence:initial', (data) => {
+      if (data && Array.isArray(data.onlineUserIds)) {
+        onlineUsersSet = new Set(data.onlineUserIds.map(Number));
+        updateOnlineIndicators();
+      }
+    });
+
+    socket.on('user:presence', (data) => {
+      if (!data) return;
+      const uid = Number(data.userId);
+      if (data.status === 'online') {
+        onlineUsersSet.add(uid);
+      } else {
+        onlineUsersSet.delete(uid);
+      }
+      updateOnlineIndicators();
+    });
+
+    // New Group Message arrived
+    socket.on('group:message:new', (msg) => {
+      if (currentChannelType === 'group') {
+        appendMessageToStream(msg);
+      } else {
+        const groupPill = document.getElementById('group-unread-pill');
+        if (groupPill) {
+          const cur = parseInt(groupPill.textContent || '0', 10);
+          groupPill.textContent = cur + 1;
+          groupPill.style.display = 'inline-block';
+        }
+      }
+      document.getElementById('group-last-preview').textContent = msg.content || 'Shared an attachment';
+      document.getElementById('group-last-time').textContent = 'Just now';
+    });
+
+    // New 1-on-1 Message arrived
+    socket.on('conversation:message:new', (data) => {
+      if (currentChannelType === 'direct' && currentConversationId === data.conversationId) {
+        appendMessageToStream(data.message);
+      } else {
+        loadConversationsList();
+      }
+    });
+
+    // Messages Read update (Double blue ticks)
+    socket.on('conversation:messages:read', (data) => {
+      if (currentChannelType === 'direct' && currentConversationId === data.conversationId) {
+        document.querySelectorAll('.comm-msg-row.outgoing .fa-check, .comm-msg-row.outgoing .fa-check-double').forEach(el => {
+          el.className = 'fas fa-check-double';
+          el.style.color = '#38bdf8'; // Blue read ticks
+        });
+      }
+    });
+
+    // Message Reaction update
+    socket.on('message:reaction:update', (data) => {
+      renderUpdatedReactions(data.messageId, data.reactions);
+    });
+
+    // Group Pin update
+    socket.on('group:pin:update', (data) => {
+      if (currentChannelType === 'group') {
+        refreshCurrentChannel();
+      }
+    });
+
+    // Announcement Broadcast
+    socket.on('announcement:new', (anno) => {
+      showCommToast(`📢 New Announcement: ${anno.title}`, 'info');
+      if (document.getElementById('tab-announcements').classList.contains('active')) {
+        loadAnnouncements();
+      }
+    });
+
+    // Typing Status update
+    socket.on('typing:status', (data) => {
+      if (data.channel === 'group' && currentChannelType === 'group' && data.userId !== currentUser?.id) {
+        setTypingIndicator(data.isTyping ? `${data.userName} is typing...` : null);
+      } else if (data.channel === 'conversation' && currentChannelType === 'direct' && data.conversationId === currentConversationId) {
+        setTypingIndicator(data.isTyping ? `${data.userName} is typing...` : null);
+      }
+    });
+
+  } catch (err) {
+    console.warn('[Socket init warning]:', err.message);
+  }
+}
+
+function updateOnlineIndicators() {
+  document.querySelectorAll('[data-user-id]').forEach(el => {
+    const uid = Number(el.getAttribute('data-user-id'));
+    const isOnline = onlineUsersSet.has(uid);
+    const dot = el.querySelector('.comm-online-dot');
+    if (dot) dot.classList.toggle('visible', isOnline);
+
+    const statusText = el.querySelector('.comm-member-status');
+    if (statusText) {
+      statusText.className = `comm-member-status ${isOnline ? 'online' : 'offline'}`;
+      statusText.innerHTML = isOnline ? '<i class="fas fa-circle"></i> Online' : '<i class="fas fa-circle" style="opacity:0.4;"></i> Offline';
+    }
+  });
+
+  // Active chat header status
+  if (currentChannelType === 'group') {
+    document.getElementById('active-chat-status').textContent = `${allGroupMembers.length} active members • ${Array.from(onlineUsersSet).length} online`;
+    document.getElementById('drawer-online-count').textContent = `${Array.from(onlineUsersSet).length} Online`;
+  } else if (currentTargetEmployeeId) {
+    const isOnline = onlineUsersSet.has(Number(currentTargetEmployeeId));
+    document.getElementById('active-chat-status').textContent = isOnline ? '🟢 Online' : '⚪ Offline';
+  }
+}
+
+// ── Channel Selection ─────────────────────────────────────────────────────────
+function selectChannel(type, id = null, name = '', email = '') {
+  currentChannelType = type;
+  document.getElementById('group-channel-item').classList.toggle('active', type === 'group');
+  document.querySelectorAll('.comm-conv-item:not(.group-card)').forEach(el => el.classList.remove('active'));
+
+  const composerOtpBtn = document.getElementById('composer-otp-btn');
+  const groupInfoBtn = document.getElementById('header-group-info-btn');
+
+  if (type === 'group') {
+    currentConversationId = null;
+    currentTargetEmployeeId = null;
+    document.getElementById('active-chat-avatar').innerHTML = '<i class="fas fa-users"></i>';
+    document.getElementById('active-chat-name').innerHTML = 'Company Group <i class="fas fa-circle-check" style="color:#10b981;font-size:12px;"></i>';
+    document.getElementById('active-chat-status').textContent = 'Loading team status...';
+    composerOtpBtn.style.display = 'none';
+    groupInfoBtn.style.display = 'inline-flex';
+    document.getElementById('group-unread-pill').style.display = 'none';
+    loadGroupMessages();
+    loadGroupInfo();
+  } else {
+    currentConversationId = id;
+    currentTargetEmployeeId = email; // or employee id
+    const convCard = document.getElementById(`conv-item-${id}`);
+    if (convCard) convCard.classList.add('active');
+
+    document.getElementById('active-chat-avatar').textContent = (name || 'E').slice(0, 1).toUpperCase();
+    document.getElementById('active-chat-name').textContent = name;
+    document.getElementById('active-chat-status').textContent = 'Active private conversation';
+    composerOtpBtn.style.display = 'inline-flex';
+    groupInfoBtn.style.display = 'none';
+    closeInfoDrawer();
+    load1on1Messages(id);
+
+    if (socket) {
+      socket.emit('conversation:join', { conversationId: id });
+    }
+  }
+}
+
+function refreshCurrentChannel() {
+  if (currentChannelType === 'group') {
+    loadGroupMessages();
+  } else if (currentConversationId) {
+    load1on1Messages(currentConversationId);
+  }
+}
+
+// ── Load Company Group Messages ───────────────────────────────────────────────
+async function loadGroupMessages() {
+  try {
+    const stream = document.getElementById('messages-stream');
+    const res = await fetch(`${COMM_API_BASE}/group/messages`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    const data = await res.json();
+    if (!data.success) {
+      stream.innerHTML = `<div class="comm-empty-state"><i class="fas fa-circle-exclamation" style="color:#ef4444;"></i><h4>Unable to load messages</h4><p>${escHtml(data.message)}</p></div>`;
+      return;
+    }
+
+    renderMessages(data.messages, true);
+  } catch (err) {
+    console.error('loadGroupMessages error:', err);
+  }
+}
+
+// ── Load 1-on-1 Messages ──────────────────────────────────────────────────────
+async function load1on1Messages(convId) {
+  try {
+    const stream = document.getElementById('messages-stream');
+    const res = await fetch(`${COMM_API_BASE}/admin/conversations/${convId}/messages`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    const data = await res.json();
+    if (!data.success) {
+      stream.innerHTML = `<div class="comm-empty-state"><i class="fas fa-circle-exclamation" style="color:#ef4444;"></i><h4>Unable to load messages</h4><p>${escHtml(data.message)}</p></div>`;
+      return;
+    }
+
+    currentTargetEmployeeId = data.conversation.employee_id;
+    updateOnlineIndicators();
+    renderMessages(data.messages, false);
+  } catch (err) {
+    console.error('load1on1Messages error:', err);
+  }
+}
+
+// ── Render Messages into Stream ───────────────────────────────────────────────
+function renderMessages(messages, isGroup) {
+  const stream = document.getElementById('messages-stream');
+  const pinnedBar = document.getElementById('pinned-message-bar');
+  pinnedBar.style.display = 'none';
+
+  if (!messages || messages.length === 0) {
+    stream.innerHTML = `
+      <div class="comm-empty-state" style="margin: auto;">
+        <i class="fas fa-comments"></i>
+        <h4>No messages yet</h4>
+        <p>Send a message below. All messages automatically expire after 24 hours.</p>
+      </div>`;
+    return;
+  }
+
+  // Check for pinned message
+  const pinned = messages.find(m => m.is_pinned);
+  if (pinned) {
+    pinnedBar.style.display = 'flex';
+    document.getElementById('pinned-message-text').textContent = `📌 ${pinned.sender_name}: ${pinned.content || 'Shared attachment'}`;
+    pinnedBar.setAttribute('data-pinned-id', pinned.id);
+  }
+
+  let html = '';
+  let lastDateStr = '';
+
+  messages.forEach(m => {
+    const d = new Date(m.created_at);
+    const dateStr = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    if (dateStr !== lastDateStr) {
+      html += `<div class="comm-date-separator"><span>${dateStr}</span></div>`;
+      lastDateStr = dateStr;
+    }
+
+    const isOutgoing = m.sender_role === 'admin';
+    const rowClass = isOutgoing ? 'outgoing' : 'incoming';
+    const timeStr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+    html += `<div class="comm-msg-row ${rowClass}" id="msg-${m.id}" data-msg-id="${m.id}">`;
+
+    if (isGroup && !isOutgoing) {
+      html += `<div class="comm-sender-tag">${escHtml(m.sender_name)} <span style="font-size:9.5px; opacity:0.7;">• Employee</span></div>`;
+    }
+
+    html += `<div class="comm-bubble">`;
+
+    // Bubble action hover menu
+    html += `
+      <div class="comm-bubble-actions">
+        <button class="comm-bubble-btn" onclick="startReply(${m.id}, '${escHtml(m.sender_name)}', '${escHtml((m.content || '').slice(0, 40))}')" title="Reply"><i class="fas fa-reply"></i></button>
+        <button class="comm-bubble-btn" onclick="toggleReaction(${m.id}, '👍')" title="React 👍">👍</button>
+        <button class="comm-bubble-btn" onclick="toggleReaction(${m.id}, '❤️')" title="React ❤️">❤️</button>
+        ${isGroup ? `<button class="comm-bubble-btn" onclick="togglePin(${m.id})" title="Pin / Unpin"><i class="fas fa-thumbtack"></i></button>` : ''}
+      </div>`;
+
+    // Reply preview inside bubble
+    if (m.reply_preview) {
+      html += `
+        <div class="comm-bubble-reply" onclick="jumpToMessage(${m.reply_to_id})">
+          <div class="comm-bubble-reply-author">${escHtml(m.reply_preview.sender_name || 'User')}</div>
+          <div>${escHtml(m.reply_preview.content || 'Attachment')}</div>
+        </div>`;
+    }
+
+    // Message Text
+    if (m.content) {
+      html += `<div>${formatMessageContent(m.content)}</div>`;
+    }
+
+    // OTP Card
+    if (m.message_type === 'otp') {
+      html += `
+        <div class="comm-otp-card">
+          <div class="comm-otp-badge"><i class="fas fa-key"></i> ${escHtml(m.otp_purpose || 'Verification OTP')}</div>
+          <div class="comm-otp-code-row">
+            <span class="comm-otp-code">${escHtml(m.otp_value)}</span>
+            <button class="comm-otp-copy-btn" onclick="copyOtp('${escHtml(m.otp_value)}')">Copy</button>
+          </div>
+          ${m.otp_case_reference ? `<div style="font-size:11px; margin-top:4px; opacity:0.8;">Case: ${escHtml(m.otp_case_reference)}</div>` : ''}
+        </div>`;
+    }
+
+    // Attachments
+    if (m.attachments && m.attachments.length > 0) {
+      m.attachments.forEach(att => {
+        const isPdf = att.mime_type && att.mime_type.includes('pdf');
+        html += `
+          <div class="comm-attachment-card">
+            <div class="comm-attachment-icon"><i class="${isPdf ? 'fas fa-file-pdf' : 'fas fa-file-image'}"></i></div>
+            <div class="comm-attachment-info">
+              <div class="comm-attachment-name">${escHtml(att.name)}</div>
+              <div class="comm-attachment-size">${formatFileSize(att.size)}</div>
+            </div>
+            <div class="comm-attachment-actions">
+              <button class="comm-att-btn" onclick="openAttachmentPreview(${att.id}, '${escHtml(att.name)}', '${att.mime_type}')"><i class="fas fa-eye"></i> View</button>
+              <button class="comm-att-btn" onclick="downloadAttachment(${att.id})"><i class="fas fa-download"></i></button>
+            </div>
+          </div>`;
+      });
+    }
+
+    // Metadata row
+    html += `
+      <div class="comm-bubble-meta">
+        <span class="comm-expiry-pill"><i class="fas fa-clock"></i> ${formatExpiryTime(m.remaining_seconds)}</span>
+        <span>${timeStr}</span>`;
+
+    if (isOutgoing && !isGroup) {
+      const tickIcon = m.status === 'read' ? '<i class="fas fa-check-double" style="color:#38bdf8;"></i>' : (m.status === 'delivered' ? '<i class="fas fa-check-double"></i>' : '<i class="fas fa-check"></i>');
+      html += `<span>${tickIcon}</span>`;
+    } else if (isGroup) {
+      html += `<span title="Read by ${m.read_count || 1} members"><i class="fas fa-check-double" style="color:${(m.read_count || 0) > 1 ? '#38bdf8' : 'inherit'};"></i></span>`;
+    }
+
+    html += `</div></div>`; // End bubble
+
+    // Reactions row
+    html += `<div class="comm-reactions-row" id="reactions-${m.id}">`;
+    if (m.reactions && m.reactions.length > 0) {
+      m.reactions.forEach(r => {
+        html += `<span class="comm-reaction-pill ${r.hasReacted ? 'reacted' : ''}" onclick="toggleReaction(${m.id}, '${r.emoji}')" title="${r.users.map(u => u.name).join(', ')}">${r.emoji} ${r.count}</span>`;
+      });
+    }
+    html += `</div></div>`; // End row
+  });
+
+  stream.innerHTML = html;
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function appendMessageToStream(m) {
+  const stream = document.getElementById('messages-stream');
+  // If empty state present, clear it
+  if (stream.querySelector('.comm-empty-state')) {
+    stream.innerHTML = '';
+  }
+
+  const isOutgoing = m.sender_role === 'admin';
+  const rowClass = isOutgoing ? 'outgoing' : 'incoming';
+  const d = new Date(m.created_at || new Date());
+  const timeStr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+  const div = document.createElement('div');
+  div.className = `comm-msg-row ${rowClass}`;
+  div.id = `msg-${m.id}`;
+  div.setAttribute('data-msg-id', m.id);
+
+  let inner = '';
+  if (currentChannelType === 'group' && !isOutgoing) {
+    inner += `<div class="comm-sender-tag">${escHtml(m.sender_name)} <span style="font-size:9.5px; opacity:0.7;">• Employee</span></div>`;
+  }
+  inner += `<div class="comm-bubble">`;
+  inner += `
+    <div class="comm-bubble-actions">
+      <button class="comm-bubble-btn" onclick="startReply(${m.id}, '${escHtml(m.sender_name)}', '${escHtml((m.content || '').slice(0, 40))}')" title="Reply"><i class="fas fa-reply"></i></button>
+      <button class="comm-bubble-btn" onclick="toggleReaction(${m.id}, '👍')" title="React 👍">👍</button>
+      <button class="comm-bubble-btn" onclick="toggleReaction(${m.id}, '❤️')" title="React ❤️">❤️</button>
+      ${currentChannelType === 'group' ? `<button class="comm-bubble-btn" onclick="togglePin(${m.id})" title="Pin / Unpin"><i class="fas fa-thumbtack"></i></button>` : ''}
+    </div>`;
+
+  if (m.reply_preview) {
+    inner += `
+      <div class="comm-bubble-reply" onclick="jumpToMessage(${m.reply_to_id})">
+        <div class="comm-bubble-reply-author">${escHtml(m.reply_preview.sender_name || 'User')}</div>
+        <div>${escHtml(m.reply_preview.content || 'Attachment')}</div>
+      </div>`;
+  }
+
+  if (m.content) {
+    inner += `<div>${formatMessageContent(m.content)}</div>`;
+  }
+
+  if (m.attachments && m.attachments.length > 0) {
+    m.attachments.forEach(att => {
+      const isPdf = att.mime_type && att.mime_type.includes('pdf');
+      inner += `
+        <div class="comm-attachment-card">
+          <div class="comm-attachment-icon"><i class="${isPdf ? 'fas fa-file-pdf' : 'fas fa-file-image'}"></i></div>
+          <div class="comm-attachment-info">
+            <div class="comm-attachment-name">${escHtml(att.name)}</div>
+            <div class="comm-attachment-size">${formatFileSize(att.size)}</div>
+          </div>
+          <div class="comm-attachment-actions">
+            <button class="comm-att-btn" onclick="openAttachmentPreview(${att.id}, '${escHtml(att.name)}', '${att.mime_type}')"><i class="fas fa-eye"></i> View</button>
+            <button class="comm-att-btn" onclick="downloadAttachment(${att.id})"><i class="fas fa-download"></i></button>
+          </div>
+        </div>`;
+    });
+  }
+
+  inner += `
+    <div class="comm-bubble-meta">
+      <span class="comm-expiry-pill"><i class="fas fa-clock"></i> 24h left</span>
+      <span>${timeStr}</span>
+      ${isOutgoing ? '<span><i class="fas fa-check"></i></span>' : ''}
+    </div></div>`;
+
+  inner += `<div class="comm-reactions-row" id="reactions-${m.id}"></div>`;
+  div.innerHTML = inner;
+  stream.appendChild(div);
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function formatMessageContent(text) {
+  let safe = escHtml(text);
+  // Highlight @mentions in green pill
+  safe = safe.replace(/@([a-zA-Z0-9._]+)/g, '<span class="comm-mention-pill">@$1</span>');
+  return safe.replace(/\n/g, '<br/>');
+}
+
+function formatFileSize(bytes) {
+  if (!bytes) return '0 B';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+// ── Sending Messages ──────────────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('chat-text-input');
+  const content = input.value.trim();
+
+  if (!content && selectedFiles.length === 0) return;
+
+  const sendBtn = document.getElementById('chat-send-btn');
+  sendBtn.disabled = true;
+
+  try {
+    let attachmentIds = [];
+    if (selectedFiles.length > 0) {
+      const formData = new FormData();
+      selectedFiles.forEach(f => formData.append('files', f));
+
+      const upRes = await fetch(`${COMM_API_BASE}/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${getToken()}` },
+        body: formData,
+      });
+      const upData = await upRes.json();
+      if (!upData.success) {
+        showCommToast(upData.message || 'File upload failed', 'error');
+        sendBtn.disabled = false;
+        return;
+      }
+      attachmentIds = upData.attachments.map(a => a.id);
+    }
+
+    const payload = {
+      content,
+      attachment_ids: attachmentIds,
+      reply_to_id: currentReplyTo ? currentReplyTo.id : null,
+    };
+
+    let url = currentChannelType === 'group'
+      ? `${COMM_API_BASE}/group/messages`
+      : `${COMM_API_BASE}/admin/conversations/${currentConversationId}/messages`;
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      input.value = '';
+      input.style.height = '38px';
+      selectedFiles = [];
+      renderSelectedFileChips();
+      cancelReply();
+
+      // If in 1-on-1, append message directly
+      if (currentChannelType === 'direct' && data.data) {
+        appendMessageToStream(data.data);
+      }
+    } else {
+      showCommToast(data.message || 'Failed to send message', 'error');
+    }
+  } catch (err) {
+    console.error('sendMessage error:', err);
+    showCommToast('Network error while sending message', 'error');
+  } finally {
+    sendBtn.disabled = false;
+  }
+}
+
+function handleChatInputKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function handleTypingAndGrowth(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+
+  if (!socket) return;
+  socket.emit('typing:start', {
+    channel: currentChannelType,
+    conversationId: currentConversationId,
+  });
+
+  if (typingTimeout) clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    socket.emit('typing:stop', {
+      channel: currentChannelType,
+      conversationId: currentConversationId,
+    });
+  }, 2000);
+}
+
+function setTypingIndicator(text) {
+  const el = document.getElementById('typing-indicator');
+  const txtEl = document.getElementById('typing-text');
+  if (text) {
+    txtEl.textContent = text;
+    el.classList.add('active');
+  } else {
+    el.classList.remove('active');
+  }
+}
+
+// ── Reply Functionality ───────────────────────────────────────────────────────
+function startReply(msgId, senderName, snippet) {
+  currentReplyTo = { id: msgId, name: senderName, snippet };
+  document.getElementById('reply-to-name').textContent = senderName;
+  document.getElementById('reply-to-snippet').textContent = snippet || '...';
+  document.getElementById('reply-banner').classList.add('active');
+  document.getElementById('chat-text-input').focus();
+}
+
+function cancelReply() {
+  currentReplyTo = null;
+  document.getElementById('reply-banner').classList.remove('active');
+}
+
+function jumpToMessage(msgId) {
+  const el = document.getElementById(`msg-${msgId}`);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.4)';
+    setTimeout(() => { el.style.boxShadow = ''; }, 2000);
+  }
+}
+
+function jumpToPinnedMessage() {
+  const pinnedId = document.getElementById('pinned-message-bar').getAttribute('data-pinned-id');
+  if (pinnedId) jumpToMessage(pinnedId);
+}
+
+// ── Emoji Reactions ───────────────────────────────────────────────────────────
+async function toggleReaction(msgId, emoji) {
+  try {
+    const res = await fetch(`${COMM_API_BASE}/messages/${msgId}/react`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({ emoji }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      renderUpdatedReactions(msgId, data.reactions);
+    }
+  } catch (err) {
+    console.error('toggleReaction error:', err);
+  }
+}
+
+function renderUpdatedReactions(msgId, reactions) {
+  const container = document.getElementById(`reactions-${msgId}`);
+  if (!container) return;
+  if (!reactions || reactions.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  let html = '';
+  reactions.forEach(r => {
+    html += `<span class="comm-reaction-pill ${r.hasReacted ? 'reacted' : ''}" onclick="toggleReaction(${msgId}, '${r.emoji}')" title="${r.users ? r.users.map(u => u.name).join(', ') : ''}">${r.emoji} ${r.count}</span>`;
+  });
+  container.innerHTML = html;
+}
+
+// ── Pinning Messages ──────────────────────────────────────────────────────────
+async function togglePin(msgId) {
+  try {
+    const res = await fetch(`${COMM_API_BASE}/group/messages/${msgId}/pin`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    const data = await res.json();
+    if (data.success) {
+      showCommToast(data.message, 'success');
+      refreshCurrentChannel();
+    }
+  } catch (err) {
+    console.error('togglePin error:', err);
+  }
+}
+
+// ── File Selection ────────────────────────────────────────────────────────────
+function handleFileSelection(e) {
+  const files = Array.from(e.target.files);
+  if (selectedFiles.length + files.length > 5) {
+    showCommToast('Maximum 5 files can be attached at a time.', 'error');
+    return;
+  }
+  for (const f of files) {
+    if (f.size > 10 * 1024 * 1024) {
+      showCommToast(`File "${f.name}" exceeds 10MB limit.`, 'error');
+      continue;
+    }
+    selectedFiles.push(f);
+  }
+  renderSelectedFileChips();
+  e.target.value = '';
+}
+
+function removeSelectedFile(index) {
+  selectedFiles.splice(index, 1);
+  renderSelectedFileChips();
+}
+
+function renderSelectedFileChips() {
+  const container = document.getElementById('composer-attachment-pills');
+  if (selectedFiles.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = selectedFiles.map((f, i) => `
+    <span class="comm-composer-file-chip">
+      <i class="fas fa-file"></i> ${escHtml(f.name)} (${formatFileSize(f.size)})
+      <i class="fas fa-times remove-file" onclick="removeSelectedFile(${i})"></i>
+    </span>
+  `).join('');
+}
+
+// ── Group Info Drawer ─────────────────────────────────────────────────────────
+function toggleInfoDrawer() {
+  const drawer = document.getElementById('comm-info-drawer');
+  drawer.classList.toggle('open');
+  if (drawer.classList.contains('open')) {
+    loadGroupInfo();
+  }
+}
+
+function closeInfoDrawer() {
+  document.getElementById('comm-info-drawer').classList.remove('open');
+}
+
+async function loadGroupInfo() {
+  try {
+    const res = await fetch(`${COMM_API_BASE}/group/info`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      allGroupMembers = data.members;
+      document.getElementById('drawer-member-count').textContent = data.group.total_members;
+      document.getElementById('drawer-online-count').textContent = `${data.group.online_members} Online`;
+      renderDrawerMembers(data.members);
+      updateOnlineIndicators();
+    }
+  } catch (err) {
+    console.error('loadGroupInfo error:', err);
+  }
+}
+
+function renderDrawerMembers(members) {
+  const container = document.getElementById('drawer-members-list');
+  container.innerHTML = members.map(m => {
+    const isOnline = onlineUsersSet.has(Number(m.id)) || m.is_online;
+    return `
+      <div class="comm-member-item" data-user-id="${m.id}">
+        <div class="comm-avatar" style="width: 34px; height: 34px; font-size: 13px;">
+          ${escHtml(m.name.slice(0, 1).toUpperCase())}
+          <span class="comm-online-dot ${isOnline ? 'visible' : ''}"></span>
+        </div>
+        <div class="comm-member-info">
+          <p class="comm-member-name">${escHtml(m.name)}</p>
+          <p class="comm-member-role">${m.role === 'admin' ? 'Administrator' : 'Employee'}</p>
+        </div>
+        <div class="comm-member-status ${isOnline ? 'online' : 'offline'}">
+          <i class="fas fa-circle" style="font-size: 8px;"></i> ${isOnline ? 'Online' : 'Offline'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterDrawerMembers() {
+  const q = document.getElementById('drawer-member-search').value.toLowerCase();
+  const filtered = allGroupMembers.filter(m => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q));
+  renderDrawerMembers(filtered);
+}
+
+// ── Search in Channel ─────────────────────────────────────────────────────────
+function openSearchModal() {
+  document.getElementById('modal-search-messages').classList.add('open');
+  document.getElementById('message-search-input').focus();
+}
+
+async function executeMessageSearch() {
+  const q = document.getElementById('message-search-input').value.trim();
+  const container = document.getElementById('search-results-container');
+  if (!q) {
+    container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin: 20px 0;">Enter keywords to search unexpired messages.</p>';
+    return;
+  }
+
+  try {
+    const url = `${COMM_API_BASE}/search?q=${encodeURIComponent(q)}&channel=${currentChannelType}&conversation_id=${currentConversationId || ''}`;
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${getToken()}` } });
+    const data = await res.json();
+
+    if (!data.results || data.results.length === 0) {
+      container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin: 20px 0;">No matching messages found.</p>';
+      return;
+    }
+
+    container.innerHTML = data.results.map(r => `
+      <div style="background:var(--bg-body);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;" onclick="closeModal('modal-search-messages');jumpToMessage(${r.id})">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary);margin-bottom:3px;">
+          <b>${escHtml(r.sender_name)}</b>
+          <span>${new Date(r.created_at).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</span>
+        </div>
+        <div style="font-size:13px;color:var(--text-primary);">${escHtml(r.content || 'Attachment')}</div>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error('search error:', err);
+  }
+}
+
+// ── Direct Conversations Loading ──────────────────────────────────────────────
+async function loadConversationsList() {
+  try {
+    const res = await fetch(`${COMM_API_BASE}/admin/conversations`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    const data = await res.json();
+    if (!data.success) return;
+
+    activeConversationsList = data.conversations;
+    renderConversationsList(data.conversations);
+  } catch (err) {
+    console.error('loadConversationsList error:', err);
+  }
+}
+
+function renderConversationsList(convs) {
+  const container = document.getElementById('direct-convs-container');
+  if (!convs || convs.length === 0) {
+    container.innerHTML = '<p style="padding: 16px; font-size: 12px; color: var(--text-secondary); text-align: center;">No authorized employees yet.</p>';
+    return;
+  }
+
+  container.innerHTML = convs.map(c => {
+    const isOnline = onlineUsersSet.has(Number(c.employee_id)) || c.is_online;
+    return `
+      <div class="comm-conv-item" id="conv-item-${c.id}" data-user-id="${c.employee_id}" onclick="selectChannel('direct', ${c.id}, '${escHtml(c.employee_name)}', '${escHtml(c.employee_email)}')">
+        <div class="comm-avatar">
+          ${escHtml(c.employee_name.slice(0, 1).toUpperCase())}
+          <span class="comm-online-dot ${isOnline ? 'visible' : ''}"></span>
+        </div>
+        <div class="comm-conv-info">
+          <div class="comm-conv-top">
+            <h4 class="comm-conv-name">${escHtml(c.employee_name)}</h4>
+            <span class="comm-conv-time">${formatRelativeTime(c.last_message_at)}</span>
+          </div>
+          <div class="comm-conv-bottom">
+            <p class="comm-conv-preview">${escHtml(c.last_message_preview)}</p>
+            ${c.unread_count > 0 ? `<span class="comm-unread-pill">${c.unread_count}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function setChannelFilter(filter) {
+  document.querySelectorAll('.comm-filter-pill').forEach(p => p.classList.toggle('active', p.getAttribute('data-filter') === filter));
+  const groupCard = document.getElementById('group-channel-item');
+  const directContainer = document.getElementById('direct-convs-container');
+
+  if (filter === 'groups') {
+    groupCard.style.display = 'flex';
+    directContainer.style.display = 'none';
+  } else if (filter === 'direct') {
+    groupCard.style.display = 'none';
+    directContainer.style.display = 'block';
+  } else {
+    groupCard.style.display = 'flex';
+    directContainer.style.display = 'block';
+  }
+}
+
+function filterChannelsAndConversations() {
+  const q = document.getElementById('conv-search').value.toLowerCase();
+  const groupCard = document.getElementById('group-channel-item');
+  groupCard.style.display = 'company group'.includes(q) ? 'flex' : 'none';
+
+  const filtered = activeConversationsList.filter(c =>
+    c.employee_name.toLowerCase().includes(q) || c.employee_email.toLowerCase().includes(q)
+  );
+  renderConversationsList(filtered);
+}
+
+// ── Admin Announcements ───────────────────────────────────────────────────────
+async function loadAnnouncements() {
+  try {
+    const feed = document.getElementById('announcements-feed');
+    const res = await fetch(`${COMM_API_BASE}/announcements`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    const data = await res.json();
+    if (!data.success || data.announcements.length === 0) {
+      feed.innerHTML = `
+        <div class="comm-empty-state">
+          <i class="fas fa-bullhorn"></i>
+          <h4>No active announcements</h4>
+          <p>Post a company announcement using the button above. Announcements automatically expire after 24 hours.</p>
+        </div>`;
+      return;
+    }
+
+    feed.innerHTML = data.announcements.map(a => {
+      const p = (a.priority || 'Normal').toLowerCase();
+      let prioIcon = 'fa-circle-info';
+      if (p === 'important') prioIcon = 'fa-star';
+      if (p === 'urgent') prioIcon = 'fa-triangle-exclamation';
+
+      const audLabel = a.target_type === 'selected' ? 'Selected Employees' : 'All Active Employees';
+      const audIcon = a.target_type === 'selected' ? 'fa-user-check' : 'fa-users';
+
+      return `
+        <div class="comm-anno-card ${p}">
+          <div class="comm-anno-header">
+            <h4 class="comm-anno-title">
+              <span class="comm-anno-priority-badge ${p}"><i class="fas ${prioIcon}"></i> ${escHtml(a.priority)}</span>
+              <span class="comm-anno-aud-badge"><i class="fas ${audIcon}"></i> ${audLabel}</span>
+              ${escHtml(a.title)}
+            </h4>
+            <span style="font-size: 11.5px; color: var(--text-secondary);"><i class="fas fa-clock"></i> ${formatExpiryTime(a.remaining_seconds)}</span>
+          </div>
+          <div class="comm-anno-body">${escHtml(a.content).replace(/\n/g, '<br/>')}</div>
+          <div class="comm-anno-footer">
+            <span>Posted by <b>${escHtml(a.sender_name)}</b> • ${new Date(a.created_at).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })}</span>
+            <span><i class="fas fa-check-double" style="color: #10b981;"></i> Read by <b>${a.read_count}</b> of <b>${a.total_recipients}</b></span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    console.error('loadAnnouncements error:', err);
+  }
+}
+
+// ── SaaS Enterprise Announcement Composer Logic ─────────────────────────────
+let _allEmployeesCache = [];
+let _selectedEmployeeIds = new Set();
+
+function openNewAnnouncementModal() {
+  resetAnnouncementForm();
+  document.getElementById('modal-new-announcement').classList.add('open');
+  loadAnnouncementEmployees();
+  updateAnnouncementPreview();
+  setTimeout(() => {
+    document.getElementById('anno-title-input')?.focus();
+  }, 100);
+}
+
+function cancelAnnouncementComposer() {
+  if (hasAnnouncementComposerChanges()) {
+    if (!confirm('You have unsaved changes in your announcement. Are you sure you want to discard them?')) {
+      return;
+    }
+  }
+  closeAnnouncementComposer();
+}
+
+function closeAnnouncementComposer() {
+  document.getElementById('modal-new-announcement').classList.remove('open');
+  resetAnnouncementForm();
+}
+
+function resetAnnouncementForm() {
+  const titleInput = document.getElementById('anno-title-input');
+  const contentInput = document.getElementById('anno-content-input');
+  if (titleInput) titleInput.value = '';
+  if (contentInput) contentInput.value = '';
+  setAnnouncementPriority('Normal');
+  setAnnouncementAudience('all');
+  _selectedEmployeeIds.clear();
+  updateSelectedCountBadge();
+  hideAnnoErrors();
+  updateAnnouncementPreview();
+}
+
+function setAnnouncementPriority(priority) {
+  document.getElementById('anno-priority-input').value = priority;
+
+  ['normal', 'important', 'urgent'].forEach(p => {
+    const card = document.getElementById(`card-prio-${p}`);
+    if (!card) return;
+    const isThis = p === priority.toLowerCase();
+    card.classList.toggle('selected', isThis);
+    card.setAttribute('aria-checked', isThis ? 'true' : 'false');
+    const checkIcon = card.querySelector('.anno-priority-radio-check i');
+    if (checkIcon) checkIcon.style.display = isThis ? 'inline-block' : 'none';
+  });
+
+  updateAnnouncementPreview();
+}
+
+function setAnnouncementAudience(type) {
+  document.getElementById('anno-audience-type-input').value = type;
+
+  const tabAll = document.getElementById('aud-tab-all');
+  const tabSel = document.getElementById('aud-tab-selected');
+  const wrap = document.getElementById('anno-selected-employees-wrap');
+  const countBadge = document.getElementById('anno-selected-count-badge');
+
+  if (type === 'all') {
+    tabAll?.classList.add('active');
+    tabSel?.classList.remove('active');
+    if (wrap) wrap.style.display = 'none';
+    if (countBadge) countBadge.style.display = 'none';
+  } else {
+    tabAll?.classList.remove('active');
+    tabSel?.classList.add('active');
+    if (wrap) wrap.style.display = 'block';
+    if (countBadge) countBadge.style.display = 'inline-block';
+    loadAnnouncementEmployees();
+  }
+
+  hideAnnoErrors();
+  updateAnnouncementPreview();
+}
+
+async function loadAnnouncementEmployees() {
+  const listEl = document.getElementById('anno-employees-list');
+  if (_allEmployeesCache.length > 0) {
+    renderAnnouncementEmployeesList();
+    return;
+  }
+  try {
+    const res = await fetch(`${COMM_API_BASE}/admin/employees`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    const data = await res.json();
+    if (data.success && Array.isArray(data.employees)) {
+      _allEmployeesCache = data.employees.filter(e => e.is_active);
+      renderAnnouncementEmployeesList();
+    } else {
+      if (listEl) listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-secondary);font-size:12px;">No active employees found.</div>';
+    }
+  } catch (err) {
+    console.error('loadAnnouncementEmployees error:', err);
+    if (listEl) listEl.innerHTML = '<div style="padding:12px;text-align:center;color:#ef4444;font-size:12px;">Failed to load employees.</div>';
+  }
+}
+
+function renderAnnouncementEmployeesList(filterQuery = '') {
+  const listEl = document.getElementById('anno-employees-list');
+  if (!listEl) return;
+
+  const q = filterQuery.toLowerCase().trim();
+  const filtered = _allEmployeesCache.filter(e => 
+    !q || e.name.toLowerCase().includes(q) || (e.email && e.email.toLowerCase().includes(q))
+  );
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-secondary);font-size:12px;">No matching employees.</div>';
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(emp => {
+    const isChecked = _selectedEmployeeIds.has(Number(emp.id));
+    return `
+      <div class="anno-emp-item ${isChecked ? 'checked' : ''}" onclick="toggleEmployeeSelection(${emp.id})">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); toggleEmployeeSelection(${emp.id})" style="accent-color:var(--accent);cursor:pointer;" />
+          <span style="font-weight:600;color:var(--text-primary);">${escHtml(emp.name)}</span>
+        </div>
+        <span style="font-size:11px;color:var(--text-secondary);">${escHtml(emp.email || '')}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterAnnouncementEmployees() {
+  const q = document.getElementById('anno-emp-search-input')?.value || '';
+  renderAnnouncementEmployeesList(q);
+}
+
+function toggleEmployeeSelection(empId) {
+  const id = Number(empId);
+  if (_selectedEmployeeIds.has(id)) {
+    _selectedEmployeeIds.delete(id);
+  } else {
+    _selectedEmployeeIds.add(id);
+  }
+  updateSelectedCountBadge();
+  renderAnnouncementEmployeesList(document.getElementById('anno-emp-search-input')?.value || '');
+  updateAnnouncementPreview();
+}
+
+function toggleAllAnnouncementEmployees(check) {
+  if (check) {
+    _allEmployeesCache.forEach(e => _selectedEmployeeIds.add(Number(e.id)));
+  } else {
+    _selectedEmployeeIds.clear();
+  }
+  updateSelectedCountBadge();
+  renderAnnouncementEmployeesList(document.getElementById('anno-emp-search-input')?.value || '');
+  updateAnnouncementPreview();
+}
+
+function updateSelectedCountBadge() {
+  const count = _selectedEmployeeIds.size;
+  const badge = document.getElementById('anno-selected-count-badge');
+  if (badge) {
+    badge.textContent = `${count} selected`;
+  }
+}
+
+function handleAnnoTitleInput(el) {
+  document.getElementById('anno-title-counter').textContent = `${el.value.length} / 120`;
+  document.getElementById('anno-title-error').style.display = 'none';
+  updateAnnouncementPreview();
+}
+
+function handleAnnoContentInput(el) {
+  document.getElementById('anno-content-counter').textContent = `${el.value.length} / 2,000`;
+  document.getElementById('anno-content-error').style.display = 'none';
+  updateAnnouncementPreview();
+}
+
+function updateAnnouncementPreview() {
+  const title = document.getElementById('anno-title-input')?.value.trim() || '';
+  const priority = document.getElementById('anno-priority-input')?.value || 'Normal';
+  const content = document.getElementById('anno-content-input')?.value || '';
+  const audience = document.getElementById('anno-audience-type-input')?.value || 'all';
+
+  // Title
+  const simTitle = document.getElementById('sim-anno-title');
+  if (simTitle) simTitle.textContent = title || 'Announcement Title Preview';
+
+  // Card Class & Priority Badge
+  const simCard = document.getElementById('sim-anno-card');
+  if (simCard) simCard.className = `anno-sim-card ${priority.toLowerCase()}`;
+
+  const prioBadge = document.getElementById('sim-anno-priority-badge');
+  if (prioBadge) {
+    let prioIcon = 'fa-circle-info';
+    if (priority === 'Important') prioIcon = 'fa-star';
+    if (priority === 'Urgent') prioIcon = 'fa-triangle-exclamation';
+    prioBadge.className = `comm-anno-priority-badge ${priority.toLowerCase()}`;
+    prioBadge.innerHTML = `<i class="fas ${prioIcon}"></i> ${priority.toUpperCase()}`;
+  }
+
+  // Audience
+  const audTag = document.getElementById('sim-anno-audience');
+  if (audTag) {
+    if (audience === 'all') {
+      audTag.innerHTML = '<i class="fas fa-users"></i> All Active Employees';
+    } else {
+      const cnt = _selectedEmployeeIds.size;
+      audTag.innerHTML = `<i class="fas fa-user-check"></i> ${cnt} Selected Employee${cnt === 1 ? '' : 's'}`;
+    }
+  }
+
+  // Body
+  const simBody = document.getElementById('sim-anno-body');
+  if (simBody) {
+    if (content.trim()) {
+      simBody.textContent = content;
+    } else {
+      simBody.innerHTML = '<span style="color:var(--text-secondary);font-style:italic;">Your announcement message will appear here in real-time as you write...</span>';
+    }
+  }
+}
+
+function hasAnnouncementComposerChanges() {
+  const title = document.getElementById('anno-title-input')?.value.trim() || '';
+  const content = document.getElementById('anno-content-input')?.value.trim() || '';
+  return title.length > 0 || content.length > 0;
+}
+
+function showAnnoError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+}
+
+function hideAnnoErrors() {
+  ['anno-title-error', 'anno-audience-error', 'anno-content-error'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
+
+async function submitAnnouncement() {
+  const titleInput = document.getElementById('anno-title-input');
+  const contentInput = document.getElementById('anno-content-input');
+  const title = titleInput?.value.trim() || '';
+  const priority = document.getElementById('anno-priority-input')?.value || 'Normal';
+  const content = contentInput?.value.trim() || '';
+  const targetType = document.getElementById('anno-audience-type-input')?.value || 'all';
+  const selectedEmpIds = Array.from(_selectedEmployeeIds);
+
+  hideAnnoErrors();
+
+  let hasError = false;
+  if (!title) {
+    showAnnoError('anno-title-error', 'Announcement title is required.');
+    titleInput?.focus();
+    hasError = true;
+  } else if (title.length > 120) {
+    showAnnoError('anno-title-error', 'Title cannot exceed 120 characters.');
+    hasError = true;
+  }
+
+  if (targetType === 'selected' && selectedEmpIds.length === 0) {
+    showAnnoError('anno-audience-error', 'Please select at least one employee recipient.');
+    hasError = true;
+  }
+
+  if (!content) {
+    showAnnoError('anno-content-error', 'Announcement message is required.');
+    if (!hasError) contentInput?.focus();
+    hasError = true;
+  } else if (content.length > 2000) {
+    showAnnoError('anno-content-error', 'Message cannot exceed 2,000 characters.');
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  const btn = document.getElementById('anno-publish-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Publishing...</span>';
+
+  try {
+    const res = await fetch(`${COMM_API_BASE}/admin/announcements`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({
+        title,
+        content,
+        priority,
+        target_type: targetType,
+        selected_employee_ids: targetType === 'selected' ? selectedEmpIds : undefined,
+      }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeAnnouncementComposer();
+      showCommToast(`Broadcast announcement (${priority}) published successfully.`, 'success');
+      loadAnnouncements();
+    } else {
+      showCommToast(data.message || 'Failed to publish announcement', 'error');
+    }
+  } catch (err) {
+    console.error('submitAnnouncement error:', err);
+    showCommToast('Network error while publishing announcement.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> <span>Publish Announcement</span>';
+  }
+}
+
+// ── Share OTP Modal ───────────────────────────────────────────────────────────
+function openShareOtpModal() {
+  document.getElementById('otp-value-input').value = Math.floor(100000 + Math.random() * 900000);
+  document.getElementById('otp-case-input').value = '';
+  document.getElementById('otp-purpose-input').value = '';
+  document.getElementById('modal-share-otp').classList.add('open');
+}
+
+async function submitOtpMessage() {
+  const otp_value = document.getElementById('otp-value-input').value.trim();
+  const otp_case_reference = document.getElementById('otp-case-input').value.trim();
+  const otp_purpose = document.getElementById('otp-purpose-input').value.trim();
+
+  if (!otp_value) {
+    showCommToast('OTP value is required.', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${COMM_API_BASE}/admin/conversations/${currentConversationId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({
+        message_type: 'otp',
+        otp_value,
+        otp_case_reference,
+        otp_purpose,
+      }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeModal('modal-share-otp');
+      showCommToast('Verification OTP sent successfully.', 'success');
+      if (data.data) appendMessageToStream(data.data);
+    } else {
+      showCommToast(data.message || 'Failed to send OTP', 'error');
+    }
+  } catch (err) {
+    console.error('submitOtpMessage error:', err);
+  }
+}
+
+function copyOtp(code) {
+  navigator.clipboard.writeText(code).then(() => {
+    showCommToast('OTP copied to clipboard!', 'success');
+  });
+}
+
+// ── Attachment Preview & Download ─────────────────────────────────────────────
+async function openAttachmentPreview(id, name, mime) {
+  currentPreviewAttId = id;
+  document.getElementById('preview-modal-filename').innerHTML = `<i class="fas fa-file"></i> ${escHtml(name)}`;
+  const iframe = document.getElementById('preview-iframe');
+  const img = document.getElementById('preview-img');
+  iframe.style.display = 'none';
+  img.style.display = 'none';
+
+  document.getElementById('modal-attachment-preview').classList.add('open');
+
+  try {
+    const res = await fetch(`${COMM_API_BASE}/attachments/${id}/view`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+
+    if (mime && mime.includes('pdf')) {
+      iframe.src = url;
+      iframe.style.display = 'block';
+    } else {
+      img.src = url;
+      img.style.display = 'block';
+    }
+  } catch (err) {
+    console.error('preview error:', err);
+    showCommToast('Failed to load preview', 'error');
+  }
+}
+
+function downloadPreviewAttachment() {
+  if (currentPreviewAttId) downloadAttachment(currentPreviewAttId);
+}
+
+function downloadAttachment(id) {
+  window.open(`${COMM_API_BASE}/attachments/${id}/download?token=${getToken()}`, '_blank');
+}
+
+// ── Employee Access List (Preserved) ──────────────────────────────────────────
+async function loadEmployeeAccessList() {
+  try {
+    const res = await fetch(`${COMM_API_BASE}/admin/employees`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    const data = await res.json();
+    if (!data.success) return;
+
+    const tbody = document.getElementById('access-table-body');
+    tbody.innerHTML = data.employees.map(e => `
+      <tr>
+        <td>
+          <b>${escHtml(e.name)}</b><br/>
+          <span style="font-size:11.5px;color:var(--text-secondary);">${escHtml(e.email)}</span>
+        </td>
+        <td>
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${e.is_active ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)'};color:${e.is_active ? '#10b981' : '#ef4444'};">
+            ${e.is_active ? 'Active' : 'Deactivated'}
+          </span>
+        </td>
+        <td>
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${e.has_access ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)'};color:${e.has_access ? '#10b981' : '#ef4444'};">
+            ${e.has_access ? 'Granted' : 'Revoked'}
+          </span>
+        </td>
+        <td>${e.unread_count || 0}</td>
+        <td>
+          <button class="comm-tool-btn" style="height:30px;font-size:11.5px;" onclick="toggleEmployeeAccess(${e.id}, ${!e.has_access})">
+            ${e.has_access ? 'Revoke Access' : 'Grant Access'}
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    console.error('loadEmployeeAccessList error:', err);
+  }
+}
+
+async function toggleEmployeeAccess(empId, grant) {
+  try {
+    const res = await fetch(`${COMM_API_BASE}/admin/employees/${empId}/access`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({ has_access: grant }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      showCommToast(data.message, 'success');
+      loadEmployeeAccessList();
+      loadConversationsList();
+    }
+  } catch (err) {
+    console.error('toggleEmployeeAccess error:', err);
+  }
+}
+
+// ── Access Audit Logs ─────────────────────────────────────────────────────────
+async function loadAuditLogs() {
+  try {
+    const res = await fetch(`${COMM_API_BASE}/admin/audit-logs`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    const data = await res.json();
+    if (!data.success) return;
+
+    const tbody = document.getElementById('audit-table-body');
+    tbody.innerHTML = data.logs.map(l => `
+      <tr>
+        <td>${new Date(l.created_at).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })}</td>
+        <td><b>${escHtml(l.admin_name)}</b></td>
+        <td><span style="font-weight:700;color:var(--accent);">${escHtml(l.action_type)}</span></td>
+        <td>${escHtml(l.target_employee_name || 'All / Bulk')}</td>
+        <td><code>${escHtml(l.ip_address || '127.0.0.1')}</code></td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    console.error('loadAuditLogs error:', err);
+  }
+}
+
+// ── Utilities & Modals ────────────────────────────────────────────────────────
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function showCommToast(message, type = 'info') {
+  let toast = document.getElementById('comm-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'comm-toast';
+    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.25);z-index:9999;display:none;align-items:center;gap:10px;transition:all 0.2s ease;max-width:420px;';
+    document.body.appendChild(toast);
+  }
+  let icon = '<i class="fas fa-info-circle" style="color:var(--accent);"></i>';
+  if (type === 'error') icon = '<i class="fas fa-exclamation-circle" style="color:#ef4444;"></i>';
+  if (type === 'success') icon = '<i class="fas fa-check-circle" style="color:#10b981;"></i>';
+  toast.innerHTML = `${icon} <span>${escHtml(message)}</span>`;
+  toast.style.display = 'flex';
+  if (window._commToastTimer) clearTimeout(window._commToastTimer);
+  window._commToastTimer = setTimeout(() => { toast.style.display = 'none'; }, 3500);
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = '/admin/login.html';
+}
+
+function toggleMobileSidebar() {
+  document.querySelector('.sidebar').classList.toggle('active');
+}
+
+// ── Initialization ────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('current-date-display').textContent = new Date().toLocaleDateString('en-IN', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  });
+
+  initRealtimeSocket();
+  selectChannel('group');
+  loadConversationsList();
+});
+</script>
+
+</body>
+</html>

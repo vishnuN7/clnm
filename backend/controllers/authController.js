@@ -49,9 +49,52 @@ function normalizeEmail(email) {
 }
 
 function getFrontendBaseUrl(req) {
-  const configuredBase = process.env.FRONTEND_BASE_URL || process.env.ALLOWED_ORIGIN || '';
-  const fallbackBase = `${req.protocol}://${req.get('host')}`;
-  return String(configuredBase || fallbackBase).replace(/\/$/, '');
+  // 1. Explicit environment variable FRONTEND_BASE_URL or FRONTEND_URL
+  const envFrontend = process.env.FRONTEND_BASE_URL || process.env.FRONTEND_URL;
+  if (envFrontend && envFrontend.trim()) {
+    const firstUrl = envFrontend.split(',')[0].trim().replace(/\/$/, '');
+    if (firstUrl) return firstUrl;
+  }
+
+  // 2. Request Origin header sent by browser fetch/XHR
+  const origin = req.get('origin');
+  if (origin && typeof origin === 'string') {
+    const cleanOrigin = origin.trim().replace(/\/$/, '');
+    try {
+      const parsed = new URL(cleanOrigin);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        return cleanOrigin;
+      }
+    } catch {}
+  }
+
+  // 3. Request Referer header
+  const referer = req.get('referer');
+  if (referer && typeof referer === 'string') {
+    try {
+      const parsed = new URL(referer);
+      return `${parsed.protocol}//${parsed.host}`;
+    } catch {}
+  }
+
+  // 4. ALLOWED_ORIGIN env var
+  const envAllowed = process.env.ALLOWED_ORIGIN;
+  if (envAllowed && envAllowed.trim()) {
+    const origins = envAllowed.split(',').map(s => s.trim().replace(/\/$/, '')).filter(Boolean);
+    const prodOrigin = origins.find(o => o.startsWith('https://'));
+    if (prodOrigin) return prodOrigin;
+    if (origins.length > 0) return origins[0];
+  }
+
+  // 5. In production, default to production domain
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://dixitlendingsolution.in';
+  }
+
+  // 6. Host fallback (respecting proxy headers)
+  const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:5000';
+  const proto = req.get('x-forwarded-proto') || req.protocol || 'http';
+  return `${proto}://${host}`.replace(/\/$/, '');
 }
 
 function hashResetToken(token) {
@@ -171,6 +214,7 @@ const authController = {
 
       const ip = geolocationService.extractClientIp(req) || '::1';
       const device = req.headers['user-agent'] || null;
+      const uaInfo = parseUA(device);
 
       // Resolve IP geolocation
       let geo = null;
@@ -190,16 +234,40 @@ const authController = {
         };
       }
 
-      // Attendance logs tracking for employees
+      // Generate unique session identifier for tracking
+      const sessionId = crypto.randomUUID();
+      let activityId = null;
+
+      // Attendance logs & Login Activities tracking for employees
       if (user.role === 'employee') {
         const [activeSessions] = await db.query(
           'SELECT id, login_time FROM attendance_logs WHERE employee_id = ? AND session_status = "Active Session" AND logout_time IS NULL',
           [user.id]
         );
+        const loginNow = new Date();
+        const todayYmd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(loginNow);
+
         for (const s of activeSessions) {
-          const closeTime = user.last_active_at ? new Date(user.last_active_at) : new Date();
-          const loginTime = new Date(s.login_time);
-          const durationSec = Math.max(0, Math.floor((closeTime.getTime() - loginTime.getTime()) / 1000));
+          const sessionLoginTime = new Date(s.login_time);
+          const sessionYmd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(sessionLoginTime);
+
+          let closeTime;
+          if (todayYmd === sessionYmd) {
+            // Re-authenticating on the same day (e.g. after clearing cookies/browsing data, browser restart):
+            // Credit full active duration up to right now, preventing zero-duration data wipe!
+            closeTime = loginNow;
+          } else {
+            // Past day unclosed session: credit up to last_active_at if valid, else standard 8h shift capped at midnight
+            if (user.last_active_at && new Date(user.last_active_at) > sessionLoginTime) {
+              closeTime = new Date(user.last_active_at);
+            } else {
+              closeTime = new Date(Math.min(sessionLoginTime.getTime() + 8 * 3600 * 1000, loginNow.getTime()));
+            }
+          }
+
+          const rawSec = Math.max(0, Math.floor((closeTime.getTime() - sessionLoginTime.getTime()) / 1000));
+          const durationSec = Math.min(rawSec, 12 * 3600);
+          closeTime = new Date(sessionLoginTime.getTime() + durationSec * 1000);
           const durationHours = Number((durationSec / 3600).toFixed(2));
           await db.query(
             'UPDATE attendance_logs SET logout_time = ?, total_working_hours = ?, session_status = "Logged Out" WHERE id = ?',
@@ -207,8 +275,26 @@ const authController = {
           );
         }
 
-        const uaInfo = parseUA(device);
-        // Create new active session record with location
+        // Close previous active login_activities sessions for session isolation
+        await db.query(
+          'UPDATE login_activities SET logout_at = NOW(), session_status = "Logged Out" WHERE employee_id = ? AND session_status = "Active"',
+          [user.id]
+        ).catch(() => {});
+
+        // Create new active session record in login_activities
+        try {
+          const [actResult] = await db.query(
+            `INSERT INTO login_activities 
+              (employee_id, session_id, ip_address, device_type, operating_system, browser, user_agent, permission_status, capture_status, login_at, session_status) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, 'prompt', 'pending', NOW(), 'Active')`,
+            [user.id, sessionId, ip, uaInfo.device, uaInfo.os, uaInfo.browser, device]
+          );
+          activityId = actResult.insertId;
+        } catch (actErr) {
+          console.warn('[Auth] Error creating login_activities row:', actErr.message);
+        }
+
+        // Create new active session record in attendance_logs with location
         await db.query(
           `INSERT INTO attendance_logs 
             (employee_id, employee_name, login_time, session_status, ip_address, device, browser, os,
@@ -232,10 +318,17 @@ const authController = {
           ]
         );
 
+        // Check if employee has an active break in progress to preserve their break status across re-authentication
+        const [activeBreaks] = await db.query(
+          'SELECT id FROM break_records WHERE employee_id = ? AND end_time IS NULL LIMIT 1',
+          [user.id]
+        );
+        const resolvedCurrentStatus = (activeBreaks && activeBreaks.length > 0) ? 'On Break' : 'Available';
+
         // Update user status in DB
         await db.query(
-          "UPDATE users SET current_status = 'Available', last_active_at = NOW() WHERE id = ?",
-          [user.id]
+          "UPDATE users SET current_status = ?, last_active_at = NOW() WHERE id = ?",
+          [resolvedCurrentStatus, user.id]
         );
       }
 
@@ -274,6 +367,8 @@ const authController = {
         success: true,
         message: 'Login successful',
         token,
+        session_id: sessionId,
+        activity_id: activityId,
         must_change_password: Boolean(user.must_change_password),
         user: {
           id: user.id,
@@ -308,43 +403,88 @@ const authController = {
 
   /**
    * POST /api/auth/forgot-password
-   * Sends an email with a reset link for the admin account.
+   * Sends an email with a reset link for Admin or Employee account.
    */
   async forgotPassword(req, res) {
     try {
       const email = normalizeEmail(req.body.email);
 
       if (!email) {
-        return res.status(400).json({ success: false, message: 'Email is required.' });
+        return res.status(400).json({ success: false, message: 'Email address is required.' });
       }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ success: false, message: 'Please provide a valid email address.' });
+      }
+
+      const genericMessage = 'If your email is registered with an account, a password reset link has been sent. Please check your inbox and spam folder.';
 
       const user = await UserModel.findByEmail(email);
 
-      // Keep the response generic to avoid user enumeration.
-      if (!user || user.role !== 'admin') {
+      // Keep response generic to prevent user enumeration if user not found or deactivated
+      if (!user || user.is_active === 0) {
         return res.json({
           success: true,
-          message: 'If the email is registered as an admin account, a reset link will be sent.'
+          message: genericMessage
         });
       }
 
       const rawToken = crypto.randomBytes(32).toString('hex');
       const tokenHash = hashResetToken(rawToken);
       const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS);
-      const resetUrl = `${getFrontendBaseUrl(req)}/reset-password.html?token=${rawToken}`;
+      const baseUrl = getFrontendBaseUrl(req);
+      const resetUrl = `${baseUrl}/reset-password.html?token=${rawToken}`;
 
       await PasswordResetModel.deleteForUser(user.id);
       await PasswordResetModel.create({ userId: user.id, tokenHash, expiresAt });
-      await sendPasswordResetEmail({ to: user.email, name: user.name, resetUrl });
+
+      await sendPasswordResetEmail({
+        to: user.email,
+        name: user.name,
+        role: user.role,
+        resetUrl
+      });
 
       return res.json({
         success: true,
-        message: 'If the email is registered as an admin account, a reset link will be sent.'
+        message: genericMessage
       });
     } catch (err) {
-      console.error('[Auth] Forgot password error:', err);
-      const message = err && err.message ? err.message : 'Unable to send reset email right now.';
-      return res.status(500).json({ success: false, message });
+      console.error('[Auth] Forgot password error:', err && err.message ? err.message : err);
+      return res.status(500).json({
+        success: false,
+        message: 'Unable to send password reset email at this time. Please try again later.'
+      });
+    }
+  },
+
+  /**
+   * GET /api/auth/verify-reset-token
+   * Validates if a token is valid, unexpired, and unused before rendering or submitting.
+   */
+  async verifyResetToken(req, res) {
+    try {
+      const token = req.query.token;
+      if (!token) {
+        return res.status(400).json({ success: false, valid: false, message: 'Reset token is required.' });
+      }
+
+      const tokenHash = hashResetToken(token);
+      const resetEntry = await PasswordResetModel.findValidByTokenHash(tokenHash);
+
+      if (!resetEntry) {
+        return res.status(400).json({
+          success: false,
+          valid: false,
+          message: 'This password reset link is invalid, has expired, or has already been used.'
+        });
+      }
+
+      return res.json({ success: true, valid: true });
+    } catch (err) {
+      console.error('[Auth] Verify reset token error:', err);
+      return res.status(500).json({ success: false, valid: false, message: 'Server error verifying reset link.' });
     }
   },
 
@@ -357,7 +497,7 @@ const authController = {
       const { token, password, confirmPassword } = req.body;
 
       if (!token || !password || !confirmPassword) {
-        return res.status(400).json({ success: false, message: 'Token, password, and confirm password are required.' });
+        return res.status(400).json({ success: false, message: 'Token, new password, and confirm password are required.' });
       }
 
       if (password !== confirmPassword) {
@@ -372,19 +512,46 @@ const authController = {
       const resetEntry = await PasswordResetModel.findValidByTokenHash(tokenHash);
 
       if (!resetEntry) {
-        return res.status(400).json({ success: false, message: 'Reset link is invalid or has expired.' });
+        return res.status(400).json({
+          success: false,
+          message: 'This reset link is invalid, has expired, or has already been used. Please request a new one.'
+        });
+      }
+
+      const user = await UserModel.findById(resetEntry.user_id);
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User account not found.' });
+      }
+
+      if (user.is_active === 0) {
+        return res.status(403).json({ success: false, message: 'This account has been deactivated. Please contact administrator.' });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      await UserModel.updatePassword(resetEntry.user_id, hashedPassword);
-      await db.query('UPDATE users SET token_version = token_version + 1 WHERE id = ?', [resetEntry.user_id]);
-      await PasswordResetModel.markUsed(resetEntry.id);
-      await PasswordResetModel.deleteForUser(resetEntry.user_id);
+      await UserModel.updatePassword(user.id, hashedPassword);
 
-      return res.json({ success: true, message: 'Password has been reset successfully.' });
+      // Increment token_version to invalidate all existing sessions, clear must_change_password
+      await db.query(
+        'UPDATE users SET token_version = token_version + 1, must_change_password = 0 WHERE id = ?',
+        [user.id]
+      );
+
+      await PasswordResetModel.markUsed(resetEntry.id);
+      await PasswordResetModel.deleteForUser(user.id);
+
+      // Audit log the password reset
+      await db.query(
+        'INSERT INTO user_activity_logs (user_id, activity, status, ip_address) VALUES (?, ?, ?, ?)',
+        [user.id, 'Password reset via email link', 'Success', req.ip || null]
+      ).catch(() => {});
+
+      return res.json({
+        success: true,
+        message: 'Password has been reset successfully. You can now sign in with your new password.'
+      });
     } catch (err) {
       console.error('[Auth] Reset password error:', err);
-      return res.status(500).json({ success: false, message: 'Unable to reset password right now.' });
+      return res.status(500).json({ success: false, message: 'Unable to reset password right now. Please try again.' });
     }
   },
 
@@ -406,24 +573,36 @@ const authController = {
       ).catch(() => {});
 
       if (role === 'employee') {
-        // Find active open session
+        // Find all active open sessions for this employee
         const [activeSessions] = await db.query(
-          'SELECT id, login_time FROM attendance_logs WHERE employee_id = ? AND session_status = "Active Session" AND logout_time IS NULL ORDER BY login_time DESC LIMIT 1',
+          'SELECT id, login_time FROM attendance_logs WHERE employee_id = ? AND session_status = "Active Session" AND logout_time IS NULL',
           [userId]
         );
 
-        if (activeSessions.length > 0) {
-          const sessionId = activeSessions[0].id;
-          const loginTime = new Date(activeSessions[0].login_time).getTime();
+        for (const s of activeSessions) {
+          const loginTime = new Date(s.login_time).getTime();
           const logoutTime = new Date();
-          const durationSec = Math.max(0, Math.floor((logoutTime.getTime() - loginTime) / 1000));
+          const rawSec = Math.max(0, Math.floor((logoutTime.getTime() - loginTime) / 1000));
+          const durationSec = Math.min(rawSec, 12 * 3600);
           const durationHours = Number((durationSec / 3600).toFixed(2));
 
           await db.query(
             'UPDATE attendance_logs SET logout_time = NOW(), total_working_hours = ?, session_status = "Logged Out" WHERE id = ?',
-            [durationHours, sessionId]
+            [durationHours, s.id]
           );
         }
+
+        // Close any active open break for this employee
+        await db.query(
+          'UPDATE break_records SET end_time = NOW(), duration = GREATEST(60, TIMESTAMPDIFF(SECOND, start_time, NOW())), status = "Completed" WHERE employee_id = ? AND end_time IS NULL',
+          [userId]
+        ).catch(() => {});
+
+        // Mark active login_activities sessions as Logged Out
+        await db.query(
+          'UPDATE login_activities SET logout_at = NOW(), session_status = "Logged Out" WHERE employee_id = ? AND session_status = "Active"',
+          [userId]
+        ).catch(() => {});
 
         // Set status to Offline
         await db.query(

@@ -461,6 +461,18 @@
         }
 
         setSession(res.data.token, res.data.user, keepMeSignedIn);
+        if (res.data.session_id) {
+          try {
+            sessionStorage.setItem('cln_session_id', res.data.session_id);
+            localStorage.setItem('cln_session_id', res.data.session_id);
+          } catch(e) {}
+        }
+        if (res.data.activity_id) {
+          try {
+            sessionStorage.setItem('cln_activity_id', res.data.activity_id);
+            localStorage.setItem('cln_activity_id', res.data.activity_id);
+          } catch(e) {}
+        }
         if (res.data.must_change_password || res.data.user?.must_change_password) {
           window.location.href = '/employee/profile.html?force_password_change=1';
         } else {

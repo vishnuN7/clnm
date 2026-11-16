@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const breakTimeController = require('../controllers/breakTimeController');
-const { requireAdmin, requireEmployee } = require('../middleware/auth');
+const { requireAdmin, requireEmployee, verifyToken } = require('../middleware/auth');
 
 // Heartbeat (updates status, accessible to logged-in users)
-router.post('/heartbeat', breakTimeController.heartbeat);
+router.post('/heartbeat', verifyToken, breakTimeController.heartbeat);
 
 // Employee-specific endpoints
 router.get('/status', requireEmployee, breakTimeController.getStatus);
