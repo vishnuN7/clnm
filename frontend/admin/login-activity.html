@@ -1231,7 +1231,7 @@
     async function loadStats() {
       try {
         const token = getToken();
-        const res = await fetch('/api/login-activity/stats', {
+        const res = await fetch(`${API_BASE}/login-activity/stats`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -1269,15 +1269,16 @@
     async function loadEmployeesDropdown() {
       try {
         const token = getToken();
-        const res = await fetch('/api/employees', {
+        const res = await fetch(`${API_BASE}/admin/employees`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
         const select = document.getElementById('employee-filter');
-        if (data.success && Array.isArray(data.employees)) {
+        const empList = Array.isArray(data.employees) ? data.employees : data.data;
+        if (data.success && Array.isArray(empList)) {
           const curVal = select.value;
           select.innerHTML = '<option value="all">All Employees</option>';
-          data.employees.forEach(emp => {
+          empList.forEach(emp => {
             const opt = document.createElement('option');
             opt.value = emp.id;
             opt.textContent = `${emp.name} (${emp.email})`;
@@ -1328,7 +1329,7 @@
         }
 
         const token = getToken();
-        const res = await fetch(`/api/login-activity/records?${params.toString()}`, {
+        const res = await fetch(`${API_BASE}/login-activity/records?${params.toString()}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -1653,7 +1654,7 @@
         }
 
         const token = getToken();
-        const res = await fetch(`/api/login-activity/export?${params.toString()}`, {
+        const res = await fetch(`${API_BASE}/login-activity/export?${params.toString()}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -1867,7 +1868,7 @@
 
       try {
         const token = getToken();
-        const res = await fetch(`/api/login-activity/records/${recordId}`, {
+        const res = await fetch(`${API_BASE}/login-activity/records/${recordId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -1974,7 +1975,7 @@
 
       try {
         const token = getToken();
-        const res = await fetch(`/api/login-activity/employee/${employeeId}?limit=50`, {
+        const res = await fetch(`${API_BASE}/login-activity/employee/${employeeId}?limit=50`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -2083,7 +2084,7 @@
 
       try {
         const token = getToken();
-        const res = await fetch(`/api/login-activity/alerts/${recordId}/review`, {
+        const res = await fetch(`${API_BASE}/login-activity/alerts/${recordId}/review`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2140,7 +2141,7 @@
 
       try {
         const token = getToken();
-        const res = await fetch(`/api/login-activity/records/${recordId}/terminate`, {
+        const res = await fetch(`${API_BASE}/login-activity/records/${recordId}/terminate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2171,7 +2172,7 @@
 
       try {
         const token = getToken();
-        const res = await fetch('/api/login-activity/alerts', {
+        const res = await fetch(`${API_BASE}/login-activity/alerts`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
