@@ -1,0 +1,30 @@
+[
+  {
+    "break_type": "Health Break",
+    "allowed_duration": 30
+  },
+  {
+    "break_type": "Lunch Break",
+    "allowed_duration": 30
+  },
+  {
+    "break_type": "Meeting Break",
+    "allowed_duration": 30
+  },
+  {
+    "break_type": "Other",
+    "allowed_duration": 30
+  },
+  {
+    "break_type": "Personal Break",
+    "allowed_duration": 15
+  },
+  {
+    "break_type": "Prayer Break",
+    "allowed_duration": 15
+  },
+  {
+    "break_type": "Tea Break",
+    "allowed_duration": 30
+  }
+]

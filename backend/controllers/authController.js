@@ -7,6 +7,7 @@ const { sendPasswordResetEmail } = require('../utils/mailer');
 const db = require('../config/db');
 const { recordFailedLogin, recordSuccessfulLogin } = require('../middleware/rateLimit');
 const geolocationService = require('../services/geolocationService');
+const { checkOfficeNetwork, OFFICE_ONLY_MESSAGE } = require('../middleware/officeNetwork');
 
 const RESET_TOKEN_TTL_MS = 30 * 60 * 1000;
 
@@ -194,6 +195,15 @@ const authController = {
       if (!isPasswordValid) {
         recordFailedLogin(req.ip, normalized);
         return res.status(401).json({ success: false, message: 'Authentication failed. Please check your credentials.' });
+      }
+
+      // Employees may only sign in from the office network (admins are exempt)
+      if (user.role === 'employee') {
+        const net = checkOfficeNetwork(req);
+        if (!net.allowed) {
+          console.warn(`[OfficeNetwork] Blocked employee login ${normalized} from ${net.ip}`);
+          return res.status(403).json({ success: false, code: 'OFFICE_NETWORK_REQUIRED', message: OFFICE_ONLY_MESSAGE });
+        }
       }
 
       // Credentials valid — reset any failed attempt counters immediately

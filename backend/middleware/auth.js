@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const { checkOfficeNetwork, OFFICE_ONLY_MESSAGE } = require('./officeNetwork');
 
 function formatTimeToAMPM(timeStr) {
   const [hourStr, minStr] = timeStr.split(':');
@@ -56,6 +57,12 @@ const verifyToken = async (req, res, next) => {
 
     // Role is employee
     if (decoded.role === 'employee') {
+      // Office network restriction: existing sessions also stop working outside the office
+      const net = checkOfficeNetwork(req);
+      if (!net.allowed) {
+        return res.status(403).json({ success: false, code: 'OFFICE_NETWORK_REQUIRED', message: OFFICE_ONLY_MESSAGE });
+      }
+
       // Security enforcement: temporary onboarding password must be changed before accessing operational routes
       if (user.must_change_password === 1) {
         const fullUrl = (req.originalUrl || (req.baseUrl + req.path) || '').toLowerCase();
