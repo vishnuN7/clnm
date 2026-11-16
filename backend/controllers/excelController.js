@@ -1441,25 +1441,29 @@ exports.updateRecord = async (req, res) => {
       [newFileStatus, record.file_id]
     );
 
-    // Callback reminder
-    if (req.user.role !== 'admin' && targetAsgnId) {
-      await notifCtrl.upsertCallbackReminder({
-        employeeId:   userId,
-        assignmentId: targetAsgnId,
-        recordId:     parseInt(recordId, 10),
-        phoneNumber:  record.phone_number,
-        disposition:  newDisp,
-        subDisposition: newSubDisp
-      });
-    } else if (req.user.role === 'admin') {
-      const targetEmp = record.assigned_to;
-      if (targetEmp && targetAsgnId) {
-        await notifCtrl.createRecordUpdatedNotification({
-          employeeId: targetEmp,
+    // Callback reminder (non-critical — wrapped so any error never breaks the save)
+    try {
+      if (req.user.role !== 'admin' && targetAsgnId) {
+        await notifCtrl.upsertCallbackReminder({
+          employeeId:   userId,
           assignmentId: targetAsgnId,
-          phoneNumber: record.phone_number
+          recordId:     parseInt(recordId, 10),
+          phoneNumber:  record.phone_number,
+          disposition:  newDisp,
+          subDisposition: newSubDisp
         });
+      } else if (req.user.role === 'admin') {
+        const targetEmp = record.assigned_to;
+        if (targetEmp && targetAsgnId) {
+          await notifCtrl.createRecordUpdatedNotification({
+            employeeId: targetEmp,
+            assignmentId: targetAsgnId,
+            phoneNumber: record.phone_number
+          });
+        }
       }
+    } catch (notifErr) {
+      console.warn('[Excel] updateRecord notification error (non-critical):', notifErr.message);
     }
 
     const [[updated]] = await db.query('SELECT * FROM excel_records WHERE id = ?', [recordId]);

@@ -298,3 +298,50 @@ exports.createWorkAssignedNotification = async function({ employeeId, assignment
 exports.createAssignmentUpdatedNotification = async function() { return null; };
 exports.createAssignmentExpiringNotification = async function() { return null; };
 exports.checkExpiringAssignments = async function() { return null; };
+
+// ── Callback Reminder: upsert a notification for call-back/follow-up dispositions ──
+exports.upsertCallbackReminder = async function({ employeeId, assignmentId, recordId, phoneNumber, disposition, subDisposition }) {
+  try {
+    const callbackDispositions = ['Call Back Requested', 'Call Later', 'Follow Up Required'];
+    if (!disposition || !callbackDispositions.includes(disposition)) return null;
+
+    return notifService.createNotification({
+      type: 'callback_reminder',
+      title: 'Callback Reminder',
+      message: `Callback scheduled for ${phoneNumber || 'a contact'} · ${disposition}${subDisposition ? ' — ' + subDisposition : ''} (Assignment #${assignmentId})`,
+      recipientRole: 'employee',
+      audienceType: 'individual',
+      recipients: [employeeId],
+      priority: 'normal',
+      actionUrl: `/employee/data-excel.html?assignmentId=${encodeURIComponent(assignmentId)}&recordId=${encodeURIComponent(recordId)}`,
+      entityType: 'record',
+      entityId: recordId,
+      metadata: { assignmentId, recordId, phoneNumber, disposition, subDisposition }
+    });
+  } catch (e) {
+    console.warn('[upsertCallbackReminder] non-critical error:', e.message);
+    return null;
+  }
+};
+
+// ── Record Updated Notification (admin → employee) ─────────────────────────
+exports.createRecordUpdatedNotification = async function({ employeeId, assignmentId, phoneNumber }) {
+  try {
+    return notifService.createNotification({
+      type: 'record_updated',
+      title: 'Record Updated',
+      message: `A record for ${phoneNumber || 'a contact'} in Assignment #${assignmentId} was updated by Admin.`,
+      recipientRole: 'employee',
+      audienceType: 'individual',
+      recipients: [employeeId],
+      priority: 'low',
+      actionUrl: `/employee/data-excel.html?assignmentId=${encodeURIComponent(assignmentId)}`,
+      entityType: 'assignment',
+      entityId: assignmentId,
+      metadata: { assignmentId, phoneNumber }
+    });
+  } catch (e) {
+    console.warn('[createRecordUpdatedNotification] non-critical error:', e.message);
+    return null;
+  }
+};
