@@ -64,10 +64,19 @@ function checkOfficeNetwork(req) {
   const rules = getRules();
   const ip = geolocationService.extractClientIp(req);
   if ((process.env.OFFICE_RESTRICTION || '').toLowerCase() === 'off' || rules.length === 0) {
+    if (!global.__officeWarned) {
+      global.__officeWarned = true;
+      console.warn('[OfficeNetwork] RESTRICTION INACTIVE: OFFICE_ALLOWED_IPS is empty or OFFICE_RESTRICTION=off. All employee IPs are allowed.');
+    }
     return { allowed: true, ip };
   }
-  if (!ip) return { allowed: false, ip };
-  return { allowed: rules.some(r => matches(ip, r)), ip };
+  const allowed = !!ip && rules.some(r => matches(ip, r));
+  if (!global.__officeLogged) {
+    global.__officeLogged = true;
+    console.log(`[OfficeNetwork] Restriction ACTIVE with ${rules.length} rule(s): ${rules.join(', ')}`);
+  }
+  console.log(`[OfficeNetwork] employee request from ${ip} -> ${allowed ? 'allowed' : 'BLOCKED'}`);
+  return { allowed, ip };
 }
 
 const OFFICE_ONLY_MESSAGE =
