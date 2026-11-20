@@ -208,6 +208,44 @@ async function ensurePasswordResetTable() {
   }
 }
 
+async function ensureCustomersTable() {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS customers (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        phone VARCHAR(15) NOT NULL,
+        email VARCHAR(150) NULL,
+        address TEXT NOT NULL,
+        area VARCHAR(100) NOT NULL,
+        net_salary DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+        total_obligation DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+        added_by INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+    const [cols] = await db.query("SHOW COLUMNS FROM customers");
+    const colNames = cols.map(c => c.Field);
+
+    if (!colNames.includes('email')) {
+      await db.query('ALTER TABLE customers ADD COLUMN email VARCHAR(150) NULL AFTER phone');
+      console.log("Added column 'email' to customers.");
+    }
+    if (!colNames.includes('net_salary')) {
+      await db.query('ALTER TABLE customers ADD COLUMN net_salary DECIMAL(12, 2) NOT NULL DEFAULT 0.00 AFTER area');
+      console.log("Added column 'net_salary' to customers.");
+    }
+    if (!colNames.includes('total_obligation')) {
+      await db.query('ALTER TABLE customers ADD COLUMN total_obligation DECIMAL(12, 2) NOT NULL DEFAULT 0.00 AFTER net_salary');
+      console.log("Added column 'total_obligation' to customers.");
+    }
+  } catch (err) {
+    console.error('Failed to ensure customers table schema:', err.message);
+  }
+}
+
 async function ensureDocumentsTable() {
   try {
     await db.query('ALTER TABLE documents MODIFY doc_type VARCHAR(255) NOT NULL');
@@ -982,6 +1020,7 @@ async function ensureExcelModule() {
 async function runMigrations() {
   try {
     await ensureDefaultAdminAccount();
+    await ensureCustomersTable();
     await ensurePasswordResetTable();
     await ensureDocumentsTable();
     await ensureLoansTable();

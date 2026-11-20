@@ -345,3 +345,25 @@ exports.createRecordUpdatedNotification = async function({ employeeId, assignmen
     return null;
   }
 };
+
+// ── Customer Registered Notification (employee) ─────────────────────────
+exports.createCustomerNotification = async function(data) {
+  try {
+    return notifService.createNotification({
+      type: 'customer',
+      title: data.title || 'New Customer Added',
+      message: data.message || `Customer "${data.customerName || ''}" (${data.phone || ''}) has been registered.`,
+      recipientRole: 'employee',
+      audienceType: 'individual',
+      recipients: [data.employeeId],
+      priority: data.priority || 'normal',
+      actionUrl: `/employee/my-customers.html`,
+      entityType: 'customer',
+      entityId: data.customerId || null,
+      metadata: data
+    });
+  } catch (e) {
+    console.error('[Legacy createCustomerNotification error]', e.message);
+    return null;
+  }
+};

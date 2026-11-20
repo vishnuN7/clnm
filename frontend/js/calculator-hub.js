@@ -184,6 +184,23 @@
       hexBorder: '#D7E6F5',
       fileSlug: 'Tata_Capital'
     },
+    lt_finance: {
+      id: 'lt_finance',
+      key: 'lt_finance',
+      name: 'L&T FINANCE LIMITED',
+      shortName: 'L&T Finance',
+      primaryColor: [0, 79, 138],        // #004F8A Official L&T Corporate Navy Blue
+      secondaryColor: [249, 198, 35],    // #F9C623 Official L&T Yellow / Gold Accent
+      accentColor: [0, 79, 138],
+      lightBg: [244, 248, 252],          // #F4F8FC Soft L&T Background
+      borderStroke: [213, 228, 243],     // #D5E4F3 Soft L&T Blue Tint
+      hexPrimary: '#004F8A',
+      hexSecondary: '#F9C623',
+      hexAccent: '#004F8A',
+      hexLightBg: '#F4F8FC',
+      hexBorder: '#D5E4F3',
+      fileSlug: 'LT_Finance'
+    },
     indusind_bank: {
       id: 'indusind_bank',
       key: 'indusind_bank',
@@ -215,6 +232,8 @@
     'TATA CAP': { name: 'TATA CAPITAL', shortName: 'Tata Capital', slug: 'Tata_Capital' },
     'ABFL': { name: 'ADITYA BIRLA FINANCE', shortName: 'Aditya Birla Finance', slug: 'Aditya_Birla_Finance' },
     'LTF': { name: 'L&T FINANCE', shortName: 'L&T Finance', slug: 'LT_Finance' },
+    'lt_finance': { name: 'L&T FINANCE LIMITED', shortName: 'L&T Finance', slug: 'LT_Finance' },
+    'LT_Finance': { name: 'L&T FINANCE LIMITED', shortName: 'L&T Finance', slug: 'LT_Finance' },
     'POONAWALLA': { name: 'POONAWALLA FINCORP', shortName: 'Poonawalla Fincorp', slug: 'Poonawalla_Fincorp' },
     'HDBFS': { name: 'HDB FINANCIAL', shortName: 'HDB Financial', slug: 'HDB_Financial' },
     'SUNDARM': { name: 'SUNDARAM FINANCE', shortName: 'Sundaram Finance', slug: 'Sundaram_Finance' },

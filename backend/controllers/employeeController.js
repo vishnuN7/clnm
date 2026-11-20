@@ -217,15 +217,22 @@ const employeeController = {
       }
 
       // Employee Notification Center trigger
-      notifCtrl.createCustomerNotification({
-        employeeId: req.user.id,
-        customerId: id,
-        customerName: name,
-        type: 'customer',
-        title: 'New Customer Added',
-        message: `Customer "${name}" (${phone}) has been registered.`,
-        priority: 'normal'
-      }).catch(e => console.error('[Employee] Customer notification error:', e.message));
+      try {
+        if (typeof notifCtrl.createCustomerNotification === 'function') {
+          notifCtrl.createCustomerNotification({
+            employeeId: req.user.id,
+            customerId: id,
+            customerName: name,
+            phone,
+            type: 'customer',
+            title: 'New Customer Added',
+            message: `Customer "${name}" (${phone}) has been registered.`,
+            priority: 'normal'
+          }).catch(e => console.error('[Employee] Customer notification error:', e.message));
+        }
+      } catch (custEmpNotifErr) {
+        console.warn('[Employee] Customer notification trigger failed:', custEmpNotifErr.message);
+      }
 
       return res.status(201).json({ success: true, message: 'Customer added successfully.', id, customer });
     } catch (err) {
