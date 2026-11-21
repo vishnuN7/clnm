@@ -233,7 +233,7 @@ exports.getEligibleEmployees = async (req, res) => {
 // ==========================================
 exports.createNotification = async function(data) {
   try {
-    return notifService.createNotification({
+    return await notifService.createNotification({
       type: data.type || 'general',
       title: data.title,
       message: data.message || data.body || '',
@@ -254,7 +254,7 @@ exports.createNotification = async function(data) {
 
 exports.createLoanNotification = async function(data) {
   try {
-    return notifService.createNotification({
+    return await notifService.createNotification({
       type: 'loan',
       title: data.title || 'Loan Application Update',
       message: data.message || '',
@@ -276,7 +276,7 @@ exports.createLoanNotification = async function(data) {
 exports.createWorkAssignedNotification = async function({ employeeId, assignmentId, fileName, totalRecords }) {
   try {
     const cleanName = fileName ? String(fileName).replace(/\\/g, '/') : 'Workbook';
-    return notifService.createNotification({
+    return await notifService.createNotification({
       type: 'assignment',
       title: 'New Assignment',
       message: `"${cleanName}" has been assigned to you. Assignment #${assignmentId || ''} · ${totalRecords || 0} records`,
@@ -305,7 +305,7 @@ exports.upsertCallbackReminder = async function({ employeeId, assignmentId, reco
     const callbackDispositions = ['Call Back Requested', 'Call Later', 'Follow Up Required'];
     if (!disposition || !callbackDispositions.includes(disposition)) return null;
 
-    return notifService.createNotification({
+    return await notifService.createNotification({
       type: 'callback_reminder',
       title: 'Callback Reminder',
       message: `Callback scheduled for ${phoneNumber || 'a contact'} · ${disposition}${subDisposition ? ' — ' + subDisposition : ''} (Assignment #${assignmentId})`,
@@ -327,7 +327,7 @@ exports.upsertCallbackReminder = async function({ employeeId, assignmentId, reco
 // ── Record Updated Notification (admin → employee) ─────────────────────────
 exports.createRecordUpdatedNotification = async function({ employeeId, assignmentId, phoneNumber }) {
   try {
-    return notifService.createNotification({
+    return await notifService.createNotification({
       type: 'record_updated',
       title: 'Record Updated',
       message: `A record for ${phoneNumber || 'a contact'} in Assignment #${assignmentId} was updated by Admin.`,
@@ -349,7 +349,7 @@ exports.createRecordUpdatedNotification = async function({ employeeId, assignmen
 // ── Customer Registered Notification (employee) ─────────────────────────
 exports.createCustomerNotification = async function(data) {
   try {
-    return notifService.createNotification({
+    return await notifService.createNotification({
       type: 'customer',
       title: data.title || 'New Customer Added',
       message: data.message || `Customer "${data.customerName || ''}" (${data.phone || ''}) has been registered.`,
