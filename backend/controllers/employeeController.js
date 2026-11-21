@@ -173,7 +173,7 @@ const employeeController = {
       }
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
+      if (!emailRegex.test(String(email).trim())) {
         return res.status(400).json({ success: false, message: 'Enter a valid email address.' });
       }
 
@@ -187,30 +187,47 @@ const employeeController = {
         return res.status(400).json({ success: false, message: 'Total Obligation must be a non-negative number.' });
       }
 
+      const employeeId = req.user && req.user.id;
+      if (!employeeId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized employee session.' });
+      }
+
+      const cleanName = String(name || '').trim();
+      const cleanPhone = String(phone || '').replace(/\D/g, '').slice(-15) || String(phone || '').trim();
+      const cleanEmail = String(email || '').trim().toLowerCase();
+      const cleanAddress = String(address || '').trim();
+      const cleanArea = String(area || '').trim();
+
       const id = await CustomerModel.create({
-        name,
-        phone,
-        email,
-        address,
-        area,
+        name: cleanName,
+        phone: cleanPhone,
+        email: cleanEmail,
+        address: cleanAddress,
+        area: cleanArea,
         net_salary: parsedNetSalary,
         total_obligation: parsedTotalObligation,
-        added_by: req.user.id
+        added_by: employeeId
       });
       const customer = await CustomerModel.findById(id);
       
       // WhatsApp workflow trigger: Lead Created (Welcome Message)
-      whatsappService.sendWorkflowMessage('Welcome Message', id, { employee_id: req.user.id });
+      try {
+        if (whatsappService && typeof whatsappService.sendWorkflowMessage === 'function') {
+          whatsappService.sendWorkflowMessage('Welcome Message', id, { employee_id: employeeId });
+        }
+      } catch (waErr) {
+        console.warn('[Customer] WhatsApp trigger error:', waErr.message);
+      }
 
       // Dispatch Admin Notification for new customer
       try {
         const notifService = require('../services/notificationService');
         await notifService.notifyAdminCustomerCreated({
-          employeeId: req.user.id,
+          employeeId: employeeId,
           employeeName: req.user.name || 'Employee',
           customerId: id,
-          customerName: name,
-          phone
+          customerName: cleanName,
+          phone: cleanPhone
         });
       } catch (custNotifErr) {
         console.warn('[Customer] notifyAdmin error:', custNotifErr.message);
@@ -220,13 +237,13 @@ const employeeController = {
       try {
         if (typeof notifCtrl.createCustomerNotification === 'function') {
           notifCtrl.createCustomerNotification({
-            employeeId: req.user.id,
+            employeeId: employeeId,
             customerId: id,
-            customerName: name,
-            phone,
+            customerName: cleanName,
+            phone: cleanPhone,
             type: 'customer',
             title: 'New Customer Added',
-            message: `Customer "${name}" (${phone}) has been registered.`,
+            message: `Customer "${cleanName}" (${cleanPhone}) has been registered.`,
             priority: 'normal'
           }).catch(e => console.error('[Employee] Customer notification error:', e.message));
         }
@@ -237,7 +254,10 @@ const employeeController = {
       return res.status(201).json({ success: true, message: 'Customer added successfully.', id, customer });
     } catch (err) {
       console.error('[Employee] Add customer error:', err);
-      return res.status(500).json({ success: false, message: 'Failed to add customer.' });
+      if (err.code === 'ER_DUP_ENTRY' || err.errno === 1062) {
+        return res.status(409).json({ success: false, message: 'A customer with this phone number or email already exists.' });
+      }
+      return res.status(500).json({ success: false, message: err.sqlMessage || err.message || 'Failed to add customer.' });
     }
   },
 
@@ -300,7 +320,10 @@ const employeeController = {
       return res.json({ success: true, message: 'Customer details updated successfully.', customer: updatedCustomer });
     } catch (err) {
       console.error('[Employee] Update customer error:', err);
-      return res.status(500).json({ success: false, message: 'Failed to update customer details.' });
+      if (err.code === 'ER_DUP_ENTRY' || err.errno === 1062) {
+        return res.status(409).json({ success: false, message: 'A customer with this phone number or email already exists.' });
+      }
+      return res.status(500).json({ success: false, message: err.sqlMessage || err.message || 'Failed to update customer details.' });
     }
   },
   async getCustomerDetail(req, res) {

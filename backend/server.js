@@ -214,7 +214,7 @@ async function ensureCustomersTable() {
       CREATE TABLE IF NOT EXISTS customers (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
-        phone VARCHAR(15) NOT NULL,
+        phone VARCHAR(20) NOT NULL,
         email VARCHAR(150) NULL,
         address TEXT NOT NULL,
         area VARCHAR(100) NOT NULL,
@@ -227,20 +227,35 @@ async function ensureCustomersTable() {
     `);
 
     const [cols] = await db.query("SHOW COLUMNS FROM customers");
-    const colNames = cols.map(c => c.Field);
+    const colNames = new Set(
+      cols.map(c => (c.Field || c.field || c.COLUMN_NAME || c.column_name || '').toLowerCase())
+    );
 
-    if (!colNames.includes('email')) {
-      await db.query('ALTER TABLE customers ADD COLUMN email VARCHAR(150) NULL AFTER phone');
-      console.log("Added column 'email' to customers.");
+    const columnsToAdd = [
+      { name: 'email',            def: 'VARCHAR(150) NULL' },
+      { name: 'net_salary',       def: 'DECIMAL(12, 2) NOT NULL DEFAULT 0.00' },
+      { name: 'total_obligation', def: 'DECIMAL(12, 2) NOT NULL DEFAULT 0.00' },
+      { name: 'address',          def: 'TEXT NULL' },
+      { name: 'area',             def: 'VARCHAR(100) NULL' },
+      { name: 'added_by',         def: 'INT NULL' }
+    ];
+
+    for (const { name, def } of columnsToAdd) {
+      if (!colNames.has(name.toLowerCase())) {
+        try {
+          await db.query(`ALTER TABLE customers ADD COLUMN ${name} ${def}`);
+          console.log(`Added column '${name}' to customers.`);
+        } catch (colErr) {
+          if (colErr.code !== 'ER_DUP_FIELDNAME' && colErr.errno !== 1060) {
+            console.warn(`Warning adding column '${name}' to customers:`, colErr.message);
+          }
+        }
+      }
     }
-    if (!colNames.includes('net_salary')) {
-      await db.query('ALTER TABLE customers ADD COLUMN net_salary DECIMAL(12, 2) NOT NULL DEFAULT 0.00 AFTER area');
-      console.log("Added column 'net_salary' to customers.");
-    }
-    if (!colNames.includes('total_obligation')) {
-      await db.query('ALTER TABLE customers ADD COLUMN total_obligation DECIMAL(12, 2) NOT NULL DEFAULT 0.00 AFTER net_salary');
-      console.log("Added column 'total_obligation' to customers.");
-    }
+
+    try {
+      await db.query('ALTER TABLE customers MODIFY COLUMN phone VARCHAR(20) NOT NULL');
+    } catch (phoneErr) {}
   } catch (err) {
     console.error('Failed to ensure customers table schema:', err.message);
   }
